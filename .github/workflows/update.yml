@@ -38,17 +38,37 @@ jobs:
       - name: Install pipeline dependencies
         run: pip install -r requirements.txt
 
-      - name: Run pipeline
+      - name: Download results and fixtures
         run: python -m pipeline.run
 
+      - name: Build model and publish rounds
+        run: python -m pipeline.run_model
+
       - name: Commit changed data
+        id: commit
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add web/public/data
+          git add web/public/data picks pipeline/model/decisions.json
           if git diff --cached --quiet; then
             echo "No data changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit -m "data: update"
             git push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      # Vercel's git integration cannot be relied on for commits authored by
+      # github-actions[bot], so fire the deploy hook explicitly when data changed.
+      - name: Trigger Vercel deploy hook
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "No VERCEL_DEPLOY_HOOK secret set; skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error --request POST "$DEPLOY_HOOK"
+          echo "Deploy hook triggered."

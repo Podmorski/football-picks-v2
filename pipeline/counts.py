@@ -171,16 +171,22 @@ def team_counts(
             home_results = _results(current["home"], outcome)
             away_results = _results(current["away"], outcome)
 
+            # Rolling across season boundaries: last 6/10 and the streak follow the team's
+            # most recent matches regardless of which season they fell in.
+            overall_rolling = _results(venues["overall"], outcome)
+            home_rolling = _results(venues["home"], outcome)
+            away_rolling = _results(venues["away"], outcome)
+
             stats["current"]["overall"][outcome.id] = _stat(overall)
             stats["current"]["home"][outcome.id] = _stat(home_results)
             stats["current"]["away"][outcome.id] = _stat(away_results)
-            stats["current"]["last6"][outcome.id] = _stat(overall[:6])
-            stats["current"]["last10"][outcome.id] = _stat(overall[:10])
-            stats["current"]["home_last6"][outcome.id] = _stat(home_results[:6])
-            stats["current"]["home_last10"][outcome.id] = _stat(home_results[:10])
-            stats["current"]["away_last6"][outcome.id] = _stat(away_results[:6])
-            stats["current"]["away_last10"][outcome.id] = _stat(away_results[:10])
-            stats["streak"][outcome.id] = current_streak(overall)
+            stats["current"]["last6"][outcome.id] = _stat(overall_rolling[:6])
+            stats["current"]["last10"][outcome.id] = _stat(overall_rolling[:10])
+            stats["current"]["home_last6"][outcome.id] = _stat(home_rolling[:6])
+            stats["current"]["home_last10"][outcome.id] = _stat(home_rolling[:10])
+            stats["current"]["away_last6"][outcome.id] = _stat(away_rolling[:6])
+            stats["current"]["away_last10"][outcome.id] = _stat(away_rolling[:10])
+            stats["streak"][outcome.id] = current_streak(overall_rolling)
 
         teams[team] = stats
 

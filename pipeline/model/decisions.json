@@ -1,0 +1,840 @@
+{
+ "backtest_seasons": [
+  "2019-20",
+  "2020-21",
+  "2021-22",
+  "2022-23",
+  "2023-24",
+  "2024-25",
+  "2025-26"
+ ],
+ "fixtures": 30431,
+ "full_worse_than_base": [
+  "tg_2_3",
+  "odd",
+  "even",
+  "mg_1h",
+  "mg_eq",
+  "mg_2h",
+  "c9"
+ ],
+ "full_worse_than_base_count": 7,
+ "groups": {
+  "BTTS": {
+   "brier": {
+    "base": 0.216489,
+    "counts": 0.218076,
+    "full": 0.215194,
+    "goals": 0.217256,
+    "odds": 0.214853
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": false,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.62081,
+    "counts": 0.625564,
+    "full": 0.618247,
+    "goals": 0.622517,
+    "odds": 0.617219
+   },
+   "n": 91289
+  },
+  "Combos": {
+   "brier": {
+    "base": 0.210478,
+    "counts": 0.21145,
+    "full": 0.207251,
+    "goals": 0.210526,
+    "odds": 0.206782
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": false,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.610935,
+    "counts": 0.613703,
+    "full": 0.603173,
+    "goals": 0.611168,
+    "odds": 0.601985
+   },
+   "n": 304294
+  },
+  "Double chance": {
+   "brier": {
+    "base": 0.217647,
+    "counts": 0.215942,
+    "full": 0.206893,
+    "goals": 0.214089,
+    "odds": 0.206366
+   },
+   "keep_calibration": false,
+   "keep_counts": true,
+   "keep_goals": true,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.626335,
+    "counts": 0.622902,
+    "full": 0.601987,
+    "goals": 0.618305,
+    "odds": 0.600668
+   },
+   "n": 91293
+  },
+  "FT result": {
+   "brier": {
+    "base": 0.217647,
+    "counts": 0.215942,
+    "full": 0.206893,
+    "goals": 0.214089,
+    "odds": 0.206366
+   },
+   "keep_calibration": false,
+   "keep_counts": true,
+   "keep_goals": true,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.626335,
+    "counts": 0.622902,
+    "full": 0.601987,
+    "goals": 0.618305,
+    "odds": 0.600668
+   },
+   "n": 91293
+  },
+  "HT result": {
+   "brier": {
+    "base": 0.217234,
+    "counts": 0.217634,
+    "full": 0.212787,
+    "goals": 0.215942,
+    "odds": 0.212502
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": true,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.625221,
+    "counts": 0.626494,
+    "full": 0.61459,
+    "goals": 0.622199,
+    "odds": 0.613862
+   },
+   "n": 91281
+  },
+  "HT/FT": {
+   "brier": {
+    "base": 0.093279,
+    "counts": 0.093576,
+    "full": 0.091222,
+    "goals": 0.09262,
+    "odds": 0.091191
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": true,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.31985,
+    "counts": 0.335245,
+    "full": 0.312964,
+    "goals": 0.317851,
+    "odds": 0.312963
+   },
+   "n": 273843
+  },
+  "Half goals": {
+   "brier": {
+    "base": 0.213005,
+    "counts": 0.214572,
+    "full": 0.211682,
+    "goals": 0.213489,
+    "odds": 0.211307
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": false,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.616171,
+    "counts": 0.62039,
+    "full": 0.613163,
+    "goals": 0.617296,
+    "odds": 0.612261
+   },
+   "n": 121708
+  },
+  "More goals": {
+   "brier": {
+    "base": 0.216982,
+    "counts": 0.219266,
+    "full": 0.217498,
+    "goals": 0.217012,
+    "odds": 0.216853
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": false,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.624918,
+    "counts": 0.630341,
+    "full": 0.626063,
+    "goals": 0.624977,
+    "odds": 0.62461
+   },
+   "n": 91281
+  },
+  "Odd/Even": {
+   "brier": {
+    "base": 0.250151,
+    "counts": 0.252871,
+    "full": 0.250558,
+    "goals": 0.249975,
+    "odds": 0.249965
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": true,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.69345,
+    "counts": 0.699001,
+    "full": 0.694292,
+    "goals": 0.693097,
+    "odds": 0.693077
+   },
+   "n": 60862
+  },
+  "Over/Under": {
+   "brier": {
+    "base": 0.21238,
+    "counts": 0.213477,
+    "full": 0.209282,
+    "goals": 0.21311,
+    "odds": 0.209025
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": false,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.614682,
+    "counts": 0.618008,
+    "full": 0.60745,
+    "goals": 0.616478,
+    "odds": 0.606782
+   },
+   "n": 182586
+  },
+  "Team goals": {
+   "brier": {
+    "base": 0.2126,
+    "counts": 0.212122,
+    "full": 0.205395,
+    "goals": 0.210954,
+    "odds": 0.205058
+   },
+   "keep_calibration": false,
+   "keep_counts": true,
+   "keep_goals": true,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.614738,
+    "counts": 0.614524,
+    "full": 0.5978,
+    "goals": 0.6111,
+    "odds": 0.596941
+   },
+   "n": 243432
+  },
+  "Total goals": {
+   "brier": {
+    "base": 0.180807,
+    "counts": 0.18209,
+    "full": 0.178928,
+    "goals": 0.181306,
+    "odds": 0.178692
+   },
+   "keep_calibration": false,
+   "keep_counts": false,
+   "keep_goals": false,
+   "keep_odds": true,
+   "live_component": "odds",
+   "logloss": {
+    "base": 0.539632,
+    "counts": 0.546452,
+    "full": 0.534574,
+    "goals": 0.540998,
+    "odds": 0.533799
+   },
+   "n": 243448
+  }
+ },
+ "hyperparameters": {
+  "best": {
+   "half_life_days": 365.0,
+   "k": 20.0,
+   "logloss": 0.66008
+  },
+  "grid": [
+   {
+    "half_life_days": 365.0,
+    "k": 5.0,
+    "logloss": 0.668799
+   },
+   {
+    "half_life_days": 365.0,
+    "k": 10.0,
+    "logloss": 0.664015
+   },
+   {
+    "half_life_days": 365.0,
+    "k": 20.0,
+    "logloss": 0.66008
+   },
+   {
+    "half_life_days": 730.0,
+    "k": 5.0,
+    "logloss": 0.669996
+   },
+   {
+    "half_life_days": 730.0,
+    "k": 10.0,
+    "logloss": 0.665559
+   },
+   {
+    "half_life_days": 730.0,
+    "k": 20.0,
+    "logloss": 0.661328
+   },
+   {
+    "half_life_days": 1095.0,
+    "k": 5.0,
+    "logloss": 0.670674
+   },
+   {
+    "half_life_days": 1095.0,
+    "k": 10.0,
+    "logloss": 0.666425
+   },
+   {
+    "half_life_days": 1095.0,
+    "k": 20.0,
+    "logloss": 0.662107
+   }
+  ]
+ },
+ "outcomes": {
+  "away_1h_1plus": {
+   "base": 0.239611,
+   "counts": 0.240295,
+   "full": 0.234764,
+   "goals": 0.238865,
+   "n": 30427,
+   "odds": 0.23453
+  },
+  "away_1plus": {
+   "base": 0.217569,
+   "counts": 0.216901,
+   "full": 0.210758,
+   "goals": 0.215944,
+   "n": 30431,
+   "odds": 0.210396
+  },
+  "away_2plus": {
+   "base": 0.218526,
+   "counts": 0.21712,
+   "full": 0.209193,
+   "goals": 0.216082,
+   "n": 30431,
+   "odds": 0.208882
+  },
+  "away_both_halves": {
+   "base": 0.156782,
+   "counts": 0.157002,
+   "full": 0.152444,
+   "goals": 0.155928,
+   "n": 30427,
+   "odds": 0.152215
+  },
+  "btts_1h": {
+   "base": 0.150183,
+   "counts": 0.151582,
+   "full": 0.150139,
+   "goals": 0.15047,
+   "n": 30427,
+   "odds": 0.149517
+  },
+  "btts_no": {
+   "base": 0.249638,
+   "counts": 0.251319,
+   "full": 0.24772,
+   "goals": 0.250645,
+   "n": 30431,
+   "odds": 0.247517
+  },
+  "btts_yes": {
+   "base": 0.249638,
+   "counts": 0.251319,
+   "full": 0.247713,
+   "goals": 0.250645,
+   "n": 30431,
+   "odds": 0.247517
+  },
+  "c1": {
+   "base": 0.214488,
+   "counts": 0.213539,
+   "full": 0.205462,
+   "goals": 0.2128,
+   "n": 30431,
+   "odds": 0.20492
+  },
+  "c10": {
+   "base": 0.216134,
+   "counts": 0.216742,
+   "full": 0.21166,
+   "goals": 0.215563,
+   "n": 30427,
+   "odds": 0.211117
+  },
+  "c2": {
+   "base": 0.210199,
+   "counts": 0.211689,
+   "full": 0.208256,
+   "goals": 0.211028,
+   "n": 30427,
+   "odds": 0.207839
+  },
+  "c3": {
+   "base": 0.201714,
+   "counts": 0.202785,
+   "full": 0.198963,
+   "goals": 0.202388,
+   "n": 30431,
+   "odds": 0.198542
+  },
+  "c4": {
+   "base": 0.237427,
+   "counts": 0.239122,
+   "full": 0.235425,
+   "goals": 0.2383,
+   "n": 30431,
+   "odds": 0.234676
+  },
+  "c5": {
+   "base": 0.235018,
+   "counts": 0.236413,
+   "full": 0.232827,
+   "goals": 0.235325,
+   "n": 30431,
+   "odds": 0.232655
+  },
+  "c6": {
+   "base": 0.180223,
+   "counts": 0.179861,
+   "full": 0.17412,
+   "goals": 0.17832,
+   "n": 30431,
+   "odds": 0.173614
+  },
+  "c7": {
+   "base": 0.247538,
+   "counts": 0.24942,
+   "full": 0.24603,
+   "goals": 0.249415,
+   "n": 30427,
+   "odds": 0.245623
+  },
+  "c8": {
+   "base": 0.183351,
+   "counts": 0.184486,
+   "full": 0.180677,
+   "goals": 0.183241,
+   "n": 30431,
+   "odds": 0.180184
+  },
+  "c9": {
+   "base": 0.178689,
+   "counts": 0.180449,
+   "full": 0.179093,
+   "goals": 0.178884,
+   "n": 30427,
+   "odds": 0.178653
+  },
+  "dc_12": {
+   "base": 0.19705,
+   "counts": 0.198635,
+   "full": 0.196174,
+   "goals": 0.196719,
+   "n": 30431,
+   "odds": 0.195861
+  },
+  "dc_1x": {
+   "base": 0.210892,
+   "counts": 0.208196,
+   "full": 0.197071,
+   "goals": 0.206151,
+   "n": 30431,
+   "odds": 0.196831
+  },
+  "dc_x2": {
+   "base": 0.244999,
+   "counts": 0.240997,
+   "full": 0.227436,
+   "goals": 0.239397,
+   "n": 30431,
+   "odds": 0.226406
+  },
+  "even": {
+   "base": 0.250151,
+   "counts": 0.252871,
+   "full": 0.250558,
+   "goals": 0.249975,
+   "n": 30431,
+   "odds": 0.249965
+  },
+  "ft_1": {
+   "base": 0.244999,
+   "counts": 0.240997,
+   "full": 0.227436,
+   "goals": 0.239397,
+   "n": 30431,
+   "odds": 0.226406
+  },
+  "ft_2": {
+   "base": 0.210892,
+   "counts": 0.208196,
+   "full": 0.197071,
+   "goals": 0.206151,
+   "n": 30431,
+   "odds": 0.196831
+  },
+  "ft_x": {
+   "base": 0.19705,
+   "counts": 0.198635,
+   "full": 0.196174,
+   "goals": 0.196719,
+   "n": 30431,
+   "odds": 0.195861
+  },
+  "h1_1plus": {
+   "base": 0.213695,
+   "counts": 0.215401,
+   "full": 0.21248,
+   "goals": 0.214068,
+   "n": 30427,
+   "odds": 0.212294
+  },
+  "h1_2plus": {
+   "base": 0.217832,
+   "counts": 0.218965,
+   "full": 0.215986,
+   "goals": 0.217617,
+   "n": 30427,
+   "odds": 0.215606
+  },
+  "h2_1plus": {
+   "base": 0.17661,
+   "counts": 0.178261,
+   "full": 0.176093,
+   "goals": 0.177665,
+   "n": 30427,
+   "odds": 0.175764
+  },
+  "h2_2plus": {
+   "base": 0.243883,
+   "counts": 0.245661,
+   "full": 0.24217,
+   "goals": 0.244607,
+   "n": 30427,
+   "odds": 0.241562
+  },
+  "home_1h_1plus": {
+   "base": 0.249325,
+   "counts": 0.249265,
+   "full": 0.242976,
+   "goals": 0.247271,
+   "n": 30427,
+   "odds": 0.242644
+  },
+  "home_1plus": {
+   "base": 0.184012,
+   "counts": 0.183951,
+   "full": 0.177687,
+   "goals": 0.182707,
+   "n": 30431,
+   "odds": 0.177325
+  },
+  "home_2plus": {
+   "base": 0.242188,
+   "counts": 0.240129,
+   "full": 0.229591,
+   "goals": 0.239698,
+   "n": 30431,
+   "odds": 0.229085
+  },
+  "home_both_halves": {
+   "base": 0.192788,
+   "counts": 0.192313,
+   "full": 0.185748,
+   "goals": 0.191133,
+   "n": 30427,
+   "odds": 0.185387
+  },
+  "ht_1": {
+   "base": 0.22109,
+   "counts": 0.220257,
+   "full": 0.213834,
+   "goals": 0.218759,
+   "n": 30427,
+   "odds": 0.213503
+  },
+  "ht_2": {
+   "base": 0.187396,
+   "counts": 0.187384,
+   "full": 0.182086,
+   "goals": 0.185546,
+   "n": 30427,
+   "odds": 0.181782
+  },
+  "ht_x": {
+   "base": 0.243218,
+   "counts": 0.245262,
+   "full": 0.242441,
+   "goals": 0.24352,
+   "n": 30427,
+   "odds": 0.242223
+  },
+  "htft_11": {
+   "base": 0.188903,
+   "counts": 0.187144,
+   "full": 0.180009,
+   "goals": 0.185734,
+   "n": 30427,
+   "odds": 0.17972
+  },
+  "htft_12": {
+   "base": 0.021266,
+   "counts": 0.021513,
+   "full": 0.021237,
+   "goals": 0.021248,
+   "n": 30427,
+   "odds": 0.02123
+  },
+  "htft_1x": {
+   "base": 0.052298,
+   "counts": 0.053012,
+   "full": 0.052274,
+   "goals": 0.052355,
+   "n": 30427,
+   "odds": 0.052358
+  },
+  "htft_21": {
+   "base": 0.025156,
+   "counts": 0.025436,
+   "full": 0.02513,
+   "goals": 0.025168,
+   "n": 30427,
+   "odds": 0.025127
+  },
+  "htft_22": {
+   "base": 0.142227,
+   "counts": 0.141913,
+   "full": 0.136161,
+   "goals": 0.140088,
+   "n": 30427,
+   "odds": 0.13615
+  },
+  "htft_2x": {
+   "base": 0.049939,
+   "counts": 0.050626,
+   "full": 0.049882,
+   "goals": 0.049958,
+   "n": 30427,
+   "odds": 0.049933
+  },
+  "htft_x1": {
+   "base": 0.127189,
+   "counts": 0.128074,
+   "full": 0.125736,
+   "goals": 0.126723,
+   "n": 30427,
+   "odds": 0.125714
+  },
+  "htft_x2": {
+   "base": 0.096892,
+   "counts": 0.097532,
+   "full": 0.095679,
+   "goals": 0.096564,
+   "n": 30427,
+   "odds": 0.09564
+  },
+  "htft_xx": {
+   "base": 0.135637,
+   "counts": 0.136934,
+   "full": 0.134893,
+   "goals": 0.135744,
+   "n": 30427,
+   "odds": 0.134844
+  },
+  "mg_1h": {
+   "base": 0.207285,
+   "counts": 0.2096,
+   "full": 0.207606,
+   "goals": 0.207264,
+   "n": 30427,
+   "odds": 0.207278
+  },
+  "mg_2h": {
+   "base": 0.246003,
+   "counts": 0.248571,
+   "full": 0.247086,
+   "goals": 0.246083,
+   "n": 30427,
+   "odds": 0.245854
+  },
+  "mg_eq": {
+   "base": 0.197658,
+   "counts": 0.199627,
+   "full": 0.197803,
+   "goals": 0.197689,
+   "n": 30427,
+   "odds": 0.197428
+  },
+  "odd": {
+   "base": 0.250151,
+   "counts": 0.252871,
+   "full": 0.250558,
+   "goals": 0.249975,
+   "n": 30431,
+   "odds": 0.249965
+  },
+  "ou_o15": {
+   "base": 0.195696,
+   "counts": 0.196798,
+   "full": 0.193446,
+   "goals": 0.196449,
+   "n": 30431,
+   "odds": 0.193254
+  },
+  "ou_o25": {
+   "base": 0.248332,
+   "counts": 0.249429,
+   "full": 0.244131,
+   "goals": 0.249038,
+   "n": 30431,
+   "odds": 0.243916
+  },
+  "ou_o35": {
+   "base": 0.193113,
+   "counts": 0.194204,
+   "full": 0.190269,
+   "goals": 0.193842,
+   "n": 30431,
+   "odds": 0.189905
+  },
+  "ou_u15": {
+   "base": 0.195696,
+   "counts": 0.196798,
+   "full": 0.193446,
+   "goals": 0.196449,
+   "n": 30431,
+   "odds": 0.193254
+  },
+  "ou_u25": {
+   "base": 0.248332,
+   "counts": 0.249429,
+   "full": 0.244131,
+   "goals": 0.249038,
+   "n": 30431,
+   "odds": 0.243916
+  },
+  "ou_u35": {
+   "base": 0.193113,
+   "counts": 0.194204,
+   "full": 0.190269,
+   "goals": 0.193842,
+   "n": 30431,
+   "odds": 0.189905
+  },
+  "tg_0_1": {
+   "base": 0.195696,
+   "counts": 0.196798,
+   "full": 0.193243,
+   "goals": 0.196449,
+   "n": 30431,
+   "odds": 0.193254
+  },
+  "tg_1plus": {
+   "base": 0.072637,
+   "counts": 0.073458,
+   "full": 0.072462,
+   "goals": 0.072797,
+   "n": 30431,
+   "odds": 0.072198
+  },
+  "tg_2_3": {
+   "base": 0.24917,
+   "counts": 0.251907,
+   "full": 0.249413,
+   "goals": 0.249214,
+   "n": 30431,
+   "odds": 0.249018
+  },
+  "tg_2plus": {
+   "base": 0.195696,
+   "counts": 0.196798,
+   "full": 0.193753,
+   "goals": 0.196449,
+   "n": 30431,
+   "odds": 0.193254
+  },
+  "tg_3plus": {
+   "base": 0.248332,
+   "counts": 0.249429,
+   "full": 0.24423,
+   "goals": 0.249038,
+   "n": 30431,
+   "odds": 0.243916
+  },
+  "tg_4_6": {
+   "base": 0.184948,
+   "counts": 0.186275,
+   "full": 0.182749,
+   "goals": 0.18548,
+   "n": 30431,
+   "odds": 0.18258
+  },
+  "tg_4plus": {
+   "base": 0.193113,
+   "counts": 0.194204,
+   "full": 0.190072,
+   "goals": 0.193842,
+   "n": 30431,
+   "odds": 0.189905
+  },
+  "tg_5plus": {
+   "base": 0.106868,
+   "counts": 0.107856,
+   "full": 0.105504,
+   "goals": 0.107179,
+   "n": 30431,
+   "odds": 0.105407
+  }
+ }
+}

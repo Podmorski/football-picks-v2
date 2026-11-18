@@ -1,73 +1,70 @@
 import Link from 'next/link';
 
-import { readIndex } from '@/lib/data';
-import { nOf, rate } from '@/lib/format';
+import RoundList from '@/components/RoundList';
+import { Badge } from '@/components/ui/badge';
+import { readRound, readRoundIndex } from '@/lib/data';
+import type { RoundDocument } from '@/lib/types';
 
-const HEADLINE = [
-  { id: 'tg_3plus', label: '3+ goals' },
-  { id: 'btts_yes', label: 'BTTS' },
-  { id: 'ht_x', label: 'HT draw' },
-  { id: 'c1', label: 'C1 1X & 3+' },
-  { id: 'c2', label: 'C2 1H 1+ & 2H 2+' },
-  { id: 'c3', label: 'C3 Home 2+ & BTTS' },
-];
+function latest(kind: string): RoundDocument | null {
+  const index = readRoundIndex();
+  const candidates = index.rounds
+    .filter((row) => row.kind === kind && row.picks > 0)
+    .sort((a, b) => (a.date < b.date ? 1 : -1));
+  for (const row of candidates) {
+    const round = readRound(row.date);
+    if (round && round.picks.length > 0) return round;
+  }
+  return null;
+}
 
 export default function HomePage() {
-  const index = readIndex();
-  const lastSeason = index.seasons[index.seasons.length - 1];
+  const round = latest('round');
+  const example = latest('example');
 
   return (
-    <main className="wrap">
-      <h1>League outcome rates</h1>
-      <p className="lede">
-        Every figure here is a historical hit rate: how often an outcome has actually happened in
-        the division since {index.seasons[0]}, counted across {index.divisions.length} leagues.
-        Nothing on this site is a prediction or a tip.
-      </p>
-      <p className="meta">
-        {index.seasons[0]} – {lastSeason} · current season {index.current_season} · all-season
-        pooled rates
-      </p>
+    <div className="space-y-8">
+      <section className="space-y-2">
+        <h1 className="text-2xl font-bold tracking-tight">
+          {round ? `${round.label} — best plays` : 'This round — best plays'}
+        </h1>
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          One play per match, chosen where the counted history and the goal model agree. Probability is a
+          calibrated hit rate, not a guarantee.
+        </p>
+      </section>
 
-      <div className="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>League</th>
-              {HEADLINE.map((item) => (
-                <th key={item.id}>{item.label}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {index.divisions.map((division) => (
-              <tr key={division.code}>
-                <td>
-                  <Link href={`/league/${division.code}`}>{division.name}</Link>
-                  <div className="sub">
-                    {division.country} · tier {division.tier} ·{' '}
-                    {division.matches.toLocaleString('en-GB')} matches
-                  </div>
-                </td>
-                {HEADLINE.map((item) => {
-                  const stat = division.headline[item.id];
-                  return (
-                    <td key={item.id}>
-                      <div className="rate">{rate(stat)}</div>
-                      <div className="sub">n={nOf(stat)}</div>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {round ? (
+        <RoundList round={round} />
+      ) : (
+        <section className="rounded-xl border border-dashed px-4 py-8 text-center">
+          <p className="font-medium">This round is not published yet.</p>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-muted-foreground">
+            Saturday picks appear Friday around 18:00 UK; Tuesday picks Tuesday around 14:00 UK.
+          </p>
+          {example ? (
+            <p className="mt-4 text-sm">
+              <Link className="underline underline-offset-2" href="#example">
+                See the example round for last Saturday ({example.label}) →
+              </Link>
+            </p>
+          ) : null}
+        </section>
+      )}
 
-      <p className="note">
-        Rates pool every season in the archive. Open a league for season-by-season rates, Tuesday
-        and Saturday splits, and team Top 10s.
-      </p>
-    </main>
+      {example ? (
+        <section id="example" className="scroll-mt-16 space-y-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <h2 className="text-lg font-semibold">Example — last Saturday</h2>
+            <Badge variant="secondary">
+              {example.settled_count}/{example.picks.length} settled · {example.hits} landed
+            </Badge>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            {example.label}, using only data available before that day, settled against the real results.
+          </p>
+          <RoundList round={example} />
+        </section>
+      ) : null}
+    </div>
   );
 }

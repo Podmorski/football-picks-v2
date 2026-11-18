@@ -1,0 +1,24 @@
+{
+ "rounds": [
+  {
+   "date": "2026-11-14",
+   "hits": 11,
+   "kind": "example",
+   "label": "Saturday 14 Nov",
+   "picks": 15,
+   "settled": true,
+   "settled_count": 15,
+   "weekday": "Saturday"
+  },
+  {
+   "date": "2026-11-21",
+   "hits": 0,
+   "kind": "round",
+   "label": "Saturday 21 Nov",
+   "picks": 0,
+   "settled": false,
+   "settled_count": 0,
+   "weekday": "Saturday"
+  }
+ ]
+}

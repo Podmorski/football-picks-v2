@@ -241,7 +241,17 @@ def main(argv: list[str] | None = None) -> int:
         previous = season_label(focus_start - 1) if focus_start - 1 >= FIRST_SEASON_START else None
 
         document = build_division(league, matches, present, current_label, focus, previous)
+        teams_document = {
+            "schema": SCHEMA,
+            "code": league.code,
+            "name": league.name,
+            "focus_season": focus,
+            "teams": document.pop("teams"),
+            "top10": document.pop("top10"),
+            "upcoming": [],
+        }
         size = write_json(out_dir / f"{league.code}.json", document)
+        teams_size = write_json(out_dir / "teams" / f"{league.code}.json", teams_document)
 
         division_quality[league.code] = {
             "name": league.name,
@@ -259,12 +269,15 @@ def main(argv: list[str] | None = None) -> int:
                 "country": league.country,
                 "tier": league.tier,
                 "matches": len(matches),
-                "teams": len(document["teams"]),
+                "teams": document["team_count"],
                 "focus_season": focus,
                 "headline": {oid: pooled[oid] for oid in HEADLINE_OUTCOMES},
             }
         )
-        print(f"{league.code}: {len(matches)} matches, {len(document['teams'])} teams, {size / 1024:.0f} KB")
+        print(
+            f"{league.code}: {len(matches)} matches, {document['team_count']} teams, "
+            f"{size / 1024:.0f} KB rates + {teams_size / 1024:.0f} KB teams"
+        )
 
     if not args.offline:
         try:
