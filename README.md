@@ -1,3 +1,5 @@
 # football-picks-v2
 
 A public web app that ranks the most statistically probable football plays per league and fixture by counting how often each outcome has actually occurred — league-wide, per team, per venue and over recent form — and presenting the results as Top 10s, with Tuesday and Saturday fixtures as the focus. Every number on the site is a historical hit rate with a sample size and a 95% confidence interval, not a model prediction. All raw data comes from the free historical results and odds files published by [football-data.co.uk](https://football-data.co.uk/), which is credited in the site footer; only aggregated counts and rates are published, never the raw CSVs.
+
+Live: https://football-picks-v2.vercel.app
