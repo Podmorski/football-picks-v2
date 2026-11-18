@@ -1,0 +1,9 @@
+# Never upload raw downloads, caches or local secrets.
+data/raw/
+**/__pycache__/
+.pytest_cache/
+web/node_modules/
+web/.next/
+web/out/
+.env.local
+**/.env.local
