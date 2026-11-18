@@ -12,7 +12,7 @@
  "cutoff": "2026-11-14",
  "date": "2026-11-14",
  "fixtures": 45,
- "hits": 20,
+ "hits": 23,
  "kind": "example",
  "label": "Saturday 14 Nov",
  "picks": [
@@ -42,9 +42,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 5463,
-     "landed": 0.6358,
-     "n": 8593,
+     "hits": 13213,
+     "landed": 0.634,
+     "n": 20841,
      "shown": 0.625
     },
     "engines": {
@@ -92,9 +92,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 2399,
-     "landed": 0.6409,
-     "n": 3743,
+     "hits": 8266,
+     "landed": 0.6324,
+     "n": 13070,
      "shown": 0.625
     },
     "engines": {
@@ -142,9 +142,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 1320,
-     "landed": 0.6355,
-     "n": 2077,
+     "hits": 4733,
+     "landed": 0.6445,
+     "n": 7344,
      "shown": 0.625
     },
     "engines": {
@@ -192,9 +192,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 5463,
-     "landed": 0.6358,
-     "n": 8593,
+     "hits": 13213,
+     "landed": 0.634,
+     "n": 20841,
      "shown": 0.625
     },
     "engines": {
@@ -242,9 +242,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 5463,
-     "landed": 0.6358,
-     "n": 8593,
+     "hits": 13213,
+     "landed": 0.634,
+     "n": 20841,
      "shown": 0.625
     },
     "engines": {
@@ -292,9 +292,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 1352,
-     "landed": 0.6052,
-     "n": 2234,
+     "hits": 5922,
+     "landed": 0.6007,
+     "n": 9859,
      "shown": 0.625
     },
     "engines": {
@@ -342,9 +342,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 6456,
-     "landed": 0.6275,
-     "n": 10288,
+     "hits": 18240,
+     "landed": 0.6344,
+     "n": 28753,
      "shown": 0.625
     },
     "engines": {
@@ -392,9 +392,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 1352,
-     "landed": 0.6052,
-     "n": 2234,
+     "hits": 5922,
+     "landed": 0.6007,
+     "n": 9859,
      "shown": 0.625
     },
     "engines": {
@@ -442,9 +442,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 1352,
-     "landed": 0.6052,
-     "n": 2234,
+     "hits": 5922,
+     "landed": 0.6007,
+     "n": 9859,
      "shown": 0.625
     },
     "engines": {
@@ -492,9 +492,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 1320,
-     "landed": 0.6355,
-     "n": 2077,
+     "hits": 4733,
+     "landed": 0.6445,
+     "n": 7344,
      "shown": 0.625
     },
     "engines": {
@@ -542,9 +542,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 1320,
-     "landed": 0.6355,
-     "n": 2077,
+     "hits": 4733,
+     "landed": 0.6445,
+     "n": 7344,
      "shown": 0.625
     },
     "engines": {
@@ -592,9 +592,9 @@
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 3875,
-     "landed": 0.6365,
-     "n": 6088,
+     "hits": 6508,
+     "landed": 0.6354,
+     "n": 10243,
      "shown": 0.625
     },
     "engines": {
@@ -642,9 +642,9 @@
     ],
     "bin": {
      "bin": "55-60",
-     "hits": 1351,
-     "landed": 0.5912,
-     "n": 2285,
+     "hits": 2922,
+     "landed": 0.5783,
+     "n": 5053,
      "shown": 0.575
     },
     "engines": {
@@ -692,9 +692,9 @@
     ],
     "bin": {
      "bin": "55-60",
-     "hits": 6562,
-     "landed": 0.5811,
-     "n": 11292,
+     "hits": 18921,
+     "landed": 0.5754,
+     "n": 32883,
      "shown": 0.575
     },
     "engines": {
@@ -742,9 +742,9 @@
     ],
     "bin": {
      "bin": "55-60",
-     "hits": 5714,
-     "landed": 0.5836,
-     "n": 9791,
+     "hits": 15940,
+     "landed": 0.5931,
+     "n": 26875,
      "shown": 0.575
     },
     "engines": {
@@ -769,8 +769,265 @@
  ],
  "published": true,
  "settled": true,
- "settled_count": 30,
+ "settled_count": 35,
  "views": {
+  "best_combos": {
+   "hits": 3,
+   "label": "Best combos",
+   "picks": [
+    {
+     "away": "Morton",
+     "confidence": "Low",
+     "div": "SC1",
+     "fair_odds": 1.57,
+     "group": "Combos",
+     "home": "Livingston",
+     "kickoff": "15:00",
+     "label": "C7: 1H 1+ & 2H 1+",
+     "landed": false,
+     "league": "Scottish Championship",
+     "league_base": 0.5056,
+     "lift": 0.1321,
+     "no_odds": false,
+     "outcome": "c7",
+     "play": "A goal in each half",
+     "probability": 0.6377,
+     "result": "2-0 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       101,
+       195
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 4733,
+       "landed": 0.6445,
+       "n": 7344,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.5505,
+       "gap": 0.0872,
+       "goals": 0.6377
+      },
+      "home_at_home": [
+       27,
+       61
+      ],
+      "league_rate": [
+       0.5056,
+       1961
+      ],
+      "samples": {
+       "away": 24.8,
+       "home": 11.3
+      }
+     }
+    },
+    {
+     "away": "Boreham Wood",
+     "confidence": "High",
+     "div": "EC",
+     "fair_odds": 1.57,
+     "group": "Combos",
+     "home": "Yeovil",
+     "kickoff": "15:00",
+     "label": "C7: 1H 1+ & 2H 1+",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.5865,
+     "lift": 0.0486,
+     "no_odds": false,
+     "outcome": "c7",
+     "play": "A goal in each half",
+     "probability": 0.635,
+     "result": "2-2 (2-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       123,
+       232
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 4733,
+       "landed": 0.6445,
+       "n": 7344,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6673,
+       "gap": 0.0323,
+       "goals": 0.635
+      },
+      "home_at_home": [
+       75,
+       139
+      ],
+      "league_rate": [
+       0.5865,
+       6039
+      ],
+      "samples": {
+       "away": 25.8,
+       "home": 28.6
+      }
+     }
+    },
+    {
+     "away": "Fylde",
+     "confidence": "Medium",
+     "div": "EC",
+     "fair_odds": 1.75,
+     "group": "Combos",
+     "home": "Eastleigh",
+     "kickoff": "15:00",
+     "label": "C4: BTTS & 3+",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.4576,
+     "lift": 0.114,
+     "no_odds": false,
+     "outcome": "c4",
+     "play": "Both teams score and 3+ goals",
+     "probability": 0.5716,
+     "result": "1-2 (0-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       60,
+       118
+      ],
+      "bin": {
+       "bin": "55-60",
+       "hits": 9660,
+       "landed": 0.5916,
+       "n": 16328,
+       "shown": 0.575
+      },
+      "engines": {
+       "counts": 0.5502,
+       "gap": 0.0215,
+       "goals": 0.5716
+      },
+      "home_at_home": [
+       101,
+       252
+      ],
+      "league_rate": [
+       0.4576,
+       6039
+      ],
+      "samples": {
+       "away": 16.8,
+       "home": 32.0
+      }
+     }
+    },
+    {
+     "away": "Boston Utd",
+     "confidence": "Medium",
+     "div": "EC",
+     "fair_odds": 1.82,
+     "group": "Combos",
+     "home": "Carlisle",
+     "kickoff": "15:00",
+     "label": "C10: Home 1+ in 1H & 3+",
+     "landed": false,
+     "league": "National League",
+     "league_base": 0.3762,
+     "lift": 0.1728,
+     "no_odds": false,
+     "outcome": "c10",
+     "play": "Home team scores in the first half and 3+ goals",
+     "probability": 0.549,
+     "result": "2-0 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       19,
+       53
+      ],
+      "bin": {
+       "bin": "50-55",
+       "hits": 14344,
+       "landed": 0.5289,
+       "n": 27123,
+       "shown": 0.525
+      },
+      "engines": {
+       "counts": 0.5228,
+       "gap": 0.0262,
+       "goals": 0.549
+      },
+      "home_at_home": [
+       19,
+       31
+      ],
+      "league_rate": [
+       0.3762,
+       6039
+      ],
+      "samples": {
+       "away": 25.0,
+       "home": 19.4
+      }
+     }
+    },
+    {
+     "away": "Aldershot",
+     "confidence": "High",
+     "div": "EC",
+     "fair_odds": 1.89,
+     "group": "Combos",
+     "home": "Southend",
+     "kickoff": "15:00",
+     "label": "C4: BTTS & 3+",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.4576,
+     "lift": 0.072,
+     "no_odds": false,
+     "outcome": "c4",
+     "play": "Both teams score and 3+ goals",
+     "probability": 0.5296,
+     "result": "2-1 (0-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       115,
+       256
+      ],
+      "bin": {
+       "bin": "50-55",
+       "hits": 14344,
+       "landed": 0.5289,
+       "n": 27123,
+       "shown": 0.525
+      },
+      "engines": {
+       "counts": 0.4823,
+       "gap": 0.0474,
+       "goals": 0.5296
+      },
+      "home_at_home": [
+       44,
+       121
+      ],
+      "league_rate": [
+       0.4576,
+       6039
+      ],
+      "samples": {
+       "away": 31.9,
+       "home": 30.6
+      }
+     }
+    }
+   ],
+   "settled_count": 5
+  },
   "most_likely": {
    "hits": 10,
    "label": "Most likely",
@@ -801,9 +1058,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 5463,
-       "landed": 0.6358,
-       "n": 8593,
+       "hits": 13213,
+       "landed": 0.634,
+       "n": 20841,
        "shown": 0.625
       },
       "engines": {
@@ -851,9 +1108,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 2399,
-       "landed": 0.6409,
-       "n": 3743,
+       "hits": 8266,
+       "landed": 0.6324,
+       "n": 13070,
        "shown": 0.625
       },
       "engines": {
@@ -901,9 +1158,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 1320,
-       "landed": 0.6355,
-       "n": 2077,
+       "hits": 4733,
+       "landed": 0.6445,
+       "n": 7344,
        "shown": 0.625
       },
       "engines": {
@@ -951,9 +1208,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 5463,
-       "landed": 0.6358,
-       "n": 8593,
+       "hits": 13213,
+       "landed": 0.634,
+       "n": 20841,
        "shown": 0.625
       },
       "engines": {
@@ -1001,9 +1258,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 5463,
-       "landed": 0.6358,
-       "n": 8593,
+       "hits": 13213,
+       "landed": 0.634,
+       "n": 20841,
        "shown": 0.625
       },
       "engines": {
@@ -1051,9 +1308,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 1352,
-       "landed": 0.6052,
-       "n": 2234,
+       "hits": 5922,
+       "landed": 0.6007,
+       "n": 9859,
        "shown": 0.625
       },
       "engines": {
@@ -1101,9 +1358,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 6456,
-       "landed": 0.6275,
-       "n": 10288,
+       "hits": 18240,
+       "landed": 0.6344,
+       "n": 28753,
        "shown": 0.625
       },
       "engines": {
@@ -1151,9 +1408,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 1352,
-       "landed": 0.6052,
-       "n": 2234,
+       "hits": 5922,
+       "landed": 0.6007,
+       "n": 9859,
        "shown": 0.625
       },
       "engines": {
@@ -1201,9 +1458,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 1352,
-       "landed": 0.6052,
-       "n": 2234,
+       "hits": 5922,
+       "landed": 0.6007,
+       "n": 9859,
        "shown": 0.625
       },
       "engines": {
@@ -1251,9 +1508,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 1320,
-       "landed": 0.6355,
-       "n": 2077,
+       "hits": 4733,
+       "landed": 0.6445,
+       "n": 7344,
        "shown": 0.625
       },
       "engines": {
@@ -1301,9 +1558,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 1320,
-       "landed": 0.6355,
-       "n": 2077,
+       "hits": 4733,
+       "landed": 0.6445,
+       "n": 7344,
        "shown": 0.625
       },
       "engines": {
@@ -1351,9 +1608,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 3875,
-       "landed": 0.6365,
-       "n": 6088,
+       "hits": 6508,
+       "landed": 0.6354,
+       "n": 10243,
        "shown": 0.625
       },
       "engines": {
@@ -1401,9 +1658,9 @@
       ],
       "bin": {
        "bin": "55-60",
-       "hits": 1351,
-       "landed": 0.5912,
-       "n": 2285,
+       "hits": 2922,
+       "landed": 0.5783,
+       "n": 5053,
        "shown": 0.575
       },
       "engines": {
@@ -1451,9 +1708,9 @@
       ],
       "bin": {
        "bin": "55-60",
-       "hits": 6562,
-       "landed": 0.5811,
-       "n": 11292,
+       "hits": 18921,
+       "landed": 0.5754,
+       "n": 32883,
        "shown": 0.575
       },
       "engines": {
@@ -1501,9 +1758,9 @@
       ],
       "bin": {
        "bin": "55-60",
-       "hits": 5714,
-       "landed": 0.5836,
-       "n": 9791,
+       "hits": 15940,
+       "landed": 0.5931,
+       "n": 26875,
        "shown": 0.575
       },
       "engines": {
@@ -1558,9 +1815,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 6456,
-       "landed": 0.6275,
-       "n": 10288,
+       "hits": 18240,
+       "landed": 0.6344,
+       "n": 28753,
        "shown": 0.625
       },
       "engines": {
@@ -1608,9 +1865,9 @@
       ],
       "bin": {
        "bin": "45-50",
-       "hits": 299,
-       "landed": 0.4694,
-       "n": 637,
+       "hits": 1025,
+       "landed": 0.4683,
+       "n": 2189,
        "shown": 0.475
       },
       "engines": {
@@ -1658,9 +1915,9 @@
       ],
       "bin": {
        "bin": "50-55",
-       "hits": 6990,
-       "landed": 0.5274,
-       "n": 13253,
+       "hits": 16395,
+       "landed": 0.5277,
+       "n": 31069,
        "shown": 0.525
       },
       "engines": {
@@ -1708,9 +1965,9 @@
       ],
       "bin": {
        "bin": "60-65",
-       "hits": 6456,
-       "landed": 0.6275,
-       "n": 10288,
+       "hits": 18240,
+       "landed": 0.6344,
+       "n": 28753,
        "shown": 0.625
       },
       "engines": {
@@ -1758,9 +2015,9 @@
       ],
       "bin": {
        "bin": "45-50",
-       "hits": 7717,
-       "landed": 0.4884,
-       "n": 15799,
+       "hits": 20330,
+       "landed": 0.4798,
+       "n": 42373,
        "shown": 0.475
       },
       "engines": {
@@ -1808,9 +2065,9 @@
       ],
       "bin": {
        "bin": "45-50",
-       "hits": 9032,
-       "landed": 0.4796,
-       "n": 18832,
+       "hits": 18767,
+       "landed": 0.479,
+       "n": 39178,
        "shown": 0.475
       },
       "engines": {
@@ -1858,9 +2115,9 @@
       ],
       "bin": {
        "bin": "50-55",
-       "hits": 6990,
-       "landed": 0.5274,
-       "n": 13253,
+       "hits": 16395,
+       "landed": 0.5277,
+       "n": 31069,
        "shown": 0.525
       },
       "engines": {
@@ -1908,9 +2165,9 @@
       ],
       "bin": {
        "bin": "45-50",
-       "hits": 9032,
-       "landed": 0.4796,
-       "n": 18832,
+       "hits": 18767,
+       "landed": 0.479,
+       "n": 39178,
        "shown": 0.475
       },
       "engines": {
@@ -1958,9 +2215,9 @@
       ],
       "bin": {
        "bin": "55-60",
-       "hits": 5714,
-       "landed": 0.5836,
-       "n": 9791,
+       "hits": 15940,
+       "landed": 0.5931,
+       "n": 26875,
        "shown": 0.575
       },
       "engines": {
@@ -2008,9 +2265,9 @@
       ],
       "bin": {
        "bin": "50-55",
-       "hits": 1537,
-       "landed": 0.5132,
-       "n": 2995,
+       "hits": 4170,
+       "landed": 0.5256,
+       "n": 7934,
        "shown": 0.525
       },
       "engines": {
@@ -2058,9 +2315,9 @@
       ],
       "bin": {
        "bin": "55-60",
-       "hits": 5714,
-       "landed": 0.5836,
-       "n": 9791,
+       "hits": 15940,
+       "landed": 0.5931,
+       "n": 26875,
        "shown": 0.575
       },
       "engines": {
@@ -2108,9 +2365,9 @@
       ],
       "bin": {
        "bin": "45-50",
-       "hits": 7717,
-       "landed": 0.4884,
-       "n": 15799,
+       "hits": 20330,
+       "landed": 0.4798,
+       "n": 42373,
        "shown": 0.475
       },
       "engines": {
@@ -2158,9 +2415,9 @@
       ],
       "bin": {
        "bin": "50-55",
-       "hits": 6990,
-       "landed": 0.5274,
-       "n": 13253,
+       "hits": 16395,
+       "landed": 0.5277,
+       "n": 31069,
        "shown": 0.525
       },
       "engines": {
@@ -2208,9 +2465,9 @@
       ],
       "bin": {
        "bin": "55-60",
-       "hits": 5714,
-       "landed": 0.5836,
-       "n": 9791,
+       "hits": 15940,
+       "landed": 0.5931,
+       "n": 26875,
        "shown": 0.575
       },
       "engines": {
@@ -2258,9 +2515,9 @@
       ],
       "bin": {
        "bin": "50-55",
-       "hits": 1537,
-       "landed": 0.5132,
-       "n": 2995,
+       "hits": 4170,
+       "landed": 0.5256,
+       "n": 7934,
        "shown": 0.525
       },
       "engines": {

@@ -18,6 +18,9 @@ export type DivisionSummary = {
   matches: number;
   teams: number;
   focus_season: string;
+  ft_only?: boolean;
+  has_odds?: boolean;
+  seasons?: number;
   headline: Record<string, Stat>;
 };
 
@@ -119,6 +122,8 @@ export type ModelFile = {
   calibration: { overall: CalibrationBlock; groups: Record<string, CalibrationBlock> };
   decisions: Record<string, { keep_counts: boolean; keep_goals: boolean; keep_odds: boolean; keep_calibration: boolean; live_component: string }>;
   full_worse_than_base_count: number;
+  missing_odds?: { fixtures: number; fixtures_without_odds: number; brier_without_odds: number | null; brier_with_odds: number | null };
+  picker_backtest?: PickerBacktest;
 };
 
 export type PickerRow = {
@@ -148,7 +153,62 @@ export type PickerBacktest = {
   weekdays: string[];
   degraded_groups: string[];
   views: Record<string, PickerViewSummary>;
+  play_bands?: BandStat[];
 };
+
+export type BandStat = {
+  outcome: string;
+  label: string;
+  band: string;
+  picks: number;
+  mean_probability: number;
+  hits: number;
+  hit_rate: number;
+  ci: [number, number];
+};
+
+export type ByPlayRow = {
+  div: string;
+  league: string;
+  kickoff: string | null;
+  home: string;
+  away: string;
+  outcome: string;
+  label: string;
+  group: string;
+  play: string;
+  probability: number;
+  league_base: number;
+  lift: number;
+  fair_odds: number;
+  band: string;
+  confidence: 'High' | 'Medium' | 'Low';
+  no_odds: boolean;
+  counts: number;
+  goals: number;
+  eligible: boolean;
+};
+
+export type ByPlayFile = {
+  date: string;
+  label: string;
+  weekday: string;
+  fixtures: number;
+  bands: { key: string; label: string }[];
+  rows: ByPlayRow[];
+};
+
+export type PlayLeagueRow = {
+  code: string;
+  name: string;
+  country: string;
+  ft_only: boolean;
+  n: number;
+  rate: number;
+  ci: [number | null, number | null];
+};
+
+export type PlayLeaguesFile = { outcomes: Record<string, PlayLeagueRow[]> };
 
 export type RecordFile = {
   calibration: { overall: CalibrationBlock; groups: Record<string, CalibrationBlock> };

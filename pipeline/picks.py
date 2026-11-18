@@ -34,7 +34,34 @@ DEFAULT_CONFIG = {
 }
 
 EXCLUDED = {"ft_1", "ft_2"}
-VIEW_LABELS = {"most_likely": "Most likely", "stand_out": "Stand-out"}
+VIEW_LABELS = {
+    "most_likely": "Most likely",
+    "stand_out": "Stand-out",
+    "best_combos": "Best combos",
+}
+COMBO_GROUP = "Combos"
+
+# Fair-odds bands (fair odds = 1 / probability).
+ODDS_BANDS = (
+    {"key": "any", "label": "Any", "low": 1.0, "high": float("inf")},
+    {"key": "1.50-2.00", "label": "1.50–2.00", "low": 1.50, "high": 2.00},
+    {"key": "2.00-3.00", "label": "2.00–3.00", "low": 2.00, "high": 3.00},
+    {"key": "3.00-5.00", "label": "3.00–5.00", "low": 3.00, "high": 5.00},
+    {"key": "5.00+", "label": "5.00+", "low": 5.00, "high": float("inf")},
+)
+
+
+def odds_band(probability: float) -> str:
+    if probability <= 0:
+        return "5.00+"
+    odds = 1.0 / probability
+    if odds < 2.00:
+        return "1.50-2.00" if odds >= 1.50 else "1.50-2.00"
+    if odds < 3.00:
+        return "2.00-3.00"
+    if odds < 5.00:
+        return "3.00-5.00"
+    return "5.00+"
 
 PLAY_WORDS = {
     "ft_x": "Draw",
@@ -204,6 +231,7 @@ def select_views(
 
     most_likely: list[dict] = []
     stand_out: list[dict] = []
+    best_combos: list[dict] = []
 
     for index, row in enumerate(rows):
         if float(n_home[index]) < settings["min_samples"] or float(n_away[index]) < settings["min_samples"]:
@@ -211,6 +239,7 @@ def select_views(
 
         best_probability: dict | None = None
         best_lift: dict | None = None
+        best_combo: dict | None = None
 
         for column, outcome in enumerate(OUTCOMES):
             if outcome.id in EXCLUDED:
@@ -247,26 +276,36 @@ def select_views(
                 and (best_lift is None or lift > best_lift["lift"])
             ):
                 best_lift = candidate
+            if (
+                outcome.group == COMBO_GROUP
+                and lift >= 0
+                and (best_combo is None or probability > best_combo["probability"])
+            ):
+                best_combo = candidate
 
         if best_probability is not None:
             most_likely.append(_make_pick(row, best_probability, counts, calibration, settings))
         if best_lift is not None:
             stand_out.append(_make_pick(row, best_lift, counts, calibration, settings))
+        if best_combo is not None:
+            best_combos.append(_make_pick(row, best_combo, counts, calibration, settings))
 
-    return {"most_likely": most_likely, "stand_out": stand_out}
+    return {"most_likely": most_likely, "stand_out": stand_out, "best_combos": best_combos}
 
 
-def finalise(picks: list[dict], sort_key: str, settings: dict) -> list[dict]:
+def finalise(picks: list[dict], sort_key: str, settings: dict, top_n: int | None = None, max_same: int | None = None) -> list[dict]:
     """Sort, enforce the per-play cap and cut to top_n."""
+    limit = settings["top_n"] if top_n is None else top_n
+    cap = settings["max_same_play"] if max_same is None else max_same
     ordered = sorted(picks, key=lambda pick: (-pick[sort_key], pick["home"], pick["away"]))
     per_play: dict[str, int] = defaultdict(int)
     kept: list[dict] = []
     for pick in ordered:
-        if per_play[pick["outcome"]] >= settings["max_same_play"]:
+        if per_play[pick["outcome"]] >= cap:
             continue
         per_play[pick["outcome"]] += 1
         kept.append(pick)
-        if len(kept) >= settings["top_n"]:
+        if len(kept) >= limit:
             break
     return kept
 
@@ -303,7 +342,7 @@ def build_round(
         if fixture.div in predictors:
             grouped[fixture.div].append(fixture)
 
-    views: dict[str, list[dict]] = {"most_likely": [], "stand_out": []}
+    views: dict[str, list[dict]] = {"most_likely": [], "stand_out": [], "best_combos": []}
 
     for div, group in grouped.items():
         predictor = predictors[div]
@@ -328,9 +367,11 @@ def build_round(
         selected = select_views(rows, probabilities, predictor.counts, calibration, settings)
         views["most_likely"].extend(selected["most_likely"])
         views["stand_out"].extend(selected["stand_out"])
+        views["best_combos"].extend(selected["best_combos"])
 
     most = finalise(views["most_likely"], "probability", settings)
     stand = finalise(views["stand_out"], "lift", settings)
+    combos = finalise(views["best_combos"], "probability", settings, top_n=5, max_same=2)
 
     return {
         "date": round_date.isoformat(),
@@ -343,12 +384,103 @@ def build_round(
         "views": {
             "most_likely": {"label": VIEW_LABELS["most_likely"], "picks": most, "hits": 0, "settled_count": 0},
             "stand_out": {"label": VIEW_LABELS["stand_out"], "picks": stand, "hits": 0, "settled_count": 0},
+            "best_combos": {"label": VIEW_LABELS["best_combos"], "picks": combos, "hits": 0, "settled_count": 0},
         },
         "picks": most,
         "published": bool(most or stand),
         "settled": False,
         "hits": 0,
         "settled_count": 0,
+    }
+
+
+def build_by_play(
+    predictors: dict,
+    fixtures: list[Fixture],
+    league_names: dict[str, str],
+    round_date,
+    calibration: dict | None = None,
+    config: dict | None = None,
+    ft_only_divisions: set[str] | None = None,
+) -> dict:
+    """Every outcome for every round fixture, as a lazy-loaded payload."""
+    settings = {**DEFAULT_CONFIG, **(config or {})}
+    ft_only = ft_only_divisions or set()
+
+    grouped: dict[str, list[Fixture]] = defaultdict(list)
+    for fixture in fixtures:
+        if fixture.div in predictors:
+            grouped[fixture.div].append(fixture)
+
+    rows: list[dict] = []
+    for div, group in grouped.items():
+        predictor = predictors[div]
+        probabilities = predictor.probabilities(
+            [fixture.home for fixture in group],
+            [fixture.away for fixture in group],
+            [fixture.odds for fixture in group],
+        )
+        counts = predictor.counts
+        league_base = counts.league_rates()
+
+        for index, fixture in enumerate(group):
+            n_home = float(probabilities["n_home"][index])
+            n_away = float(probabilities["n_away"][index])
+            no_odds = extract_targets(fixture.odds) is None
+
+            for column, outcome in enumerate(OUTCOMES):
+                if outcome.id in EXCLUDED:
+                    continue
+                if outcome.needs_ht and div in ft_only:
+                    continue
+                probability = float(probabilities["full"][index][column])
+                if probability <= 0 or probability > settings["max_probability"]:
+                    continue
+                gap = abs(float(probabilities["counts"][index][column]) - float(probabilities["odds"][index][column]))
+                lift = probability - float(league_base[column])
+                bin_row = calibration_bin(calibration or {}, outcome.group, probability)
+                badge = confidence_badge(
+                    min(n_home, n_away), gap, bin_row, settings["min_bin_sample"]
+                )
+                if no_odds and badge == "High":
+                    badge = "Medium"
+
+                rows.append(
+                    {
+                        "div": div,
+                        "league": league_names.get(div, div),
+                        "kickoff": fixture.time,
+                        "home": fixture.home,
+                        "away": fixture.away,
+                        "outcome": outcome.id,
+                        "label": outcome.label,
+                        "group": outcome.group,
+                        "play": PLAY_WORDS.get(outcome.id, outcome.label),
+                        "probability": round(probability, 4),
+                        "league_base": round(float(league_base[column]), 4),
+                        "lift": round(lift, 4),
+                        "fair_odds": round(1.0 / probability, 2),
+                        "band": odds_band(probability),
+                        "confidence": badge,
+                        "no_odds": no_odds,
+                        "counts": round(float(probabilities["counts"][index][column]), 4),
+                        "goals": round(float(probabilities["odds"][index][column]), 4),
+                        "eligible": bool(
+                            n_home >= settings["min_samples"]
+                            and n_away >= settings["min_samples"]
+                            and gap <= settings["agreement"]
+                            and lift >= 0
+                        ),
+                    }
+                )
+
+    return {
+        "date": round_date.isoformat(),
+        "label": round_label(round_date),
+        "weekday": WEEKDAY_NAMES[round_date.weekday()],
+        "fixtures": len(fixtures),
+        "bands": [{"key": band["key"], "label": band["label"]} for band in ODDS_BANDS],
+        "rows": rows,
     }
 
 
@@ -452,7 +584,8 @@ def rebuild_index(picks_dir: Path, web_dir: Path) -> dict:
         views = document_views(document)
         most = views.get("most_likely", {}).get("picks", [])
         stand = views.get("stand_out", {}).get("picks", [])
-        if not most and not stand:
+        combos = views.get("best_combos", {}).get("picks", [])
+        if not most and not stand and not combos:
             continue
         rounds.append(
             {
@@ -462,6 +595,7 @@ def rebuild_index(picks_dir: Path, web_dir: Path) -> dict:
                 "kind": document.get("kind", "round"),
                 "picks": len(most),
                 "stand_out": len(stand),
+                "combos": len(combos),
                 "hits": document.get("hits", 0),
                 "settled_count": document.get("settled_count", 0),
                 "settled": document.get("settled", False),

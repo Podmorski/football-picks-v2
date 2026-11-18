@@ -10,11 +10,12 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_leagues, season_code, season_label
+from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
+from .extras import parse_extra_csv
 from .fixtures import Fixture, current_or_next_round_date, fixtures_for_date, last_saturday, parse_fixtures
 from .model import backtest, live, picker_backtest
 from .parse import parse_season_csv
-from .picks import build_round, publish, read_results, rebuild_index, round_action, settle_document
+from .picks import build_by_play, build_round, publish, read_results, rebuild_index, round_action, settle_document
 from .run import cached_seasons
 
 PICKS_DIR = Path(__file__).resolve().parents[1] / "picks"
@@ -23,6 +24,7 @@ DECISIONS_FILE = MODEL_DIR / "decisions.json"
 MODEL_JSON = WEB_DATA_DIR / "model.json"
 RECORD_JSON = WEB_DATA_DIR / "record.json"
 ROUNDS_DIR = WEB_DATA_DIR / "rounds"
+BY_PLAY_DIR = WEB_DATA_DIR / "by-play"
 TEAMS_DIR = WEB_DATA_DIR / "teams"
 
 PICK_CONFIG = {
@@ -41,15 +43,21 @@ def season_start(match) -> int:
     return int(str(match.season).split("-")[0])
 
 
-def load_by_division(raw_dir: Path, leagues, current_start: int) -> dict[str, list]:
+def load_by_division(raw_dir: Path, divisions, extras, current_start: int) -> dict[str, list]:
     by_division: dict[str, list] = defaultdict(list)
-    for league in leagues:
+    for league in divisions:
         for start in range(FIRST_SEASON_START, current_start + 1):
             path = raw_dir / season_code(start) / f"{league.code}.csv"
             if not path.exists():
                 continue
             parsed = parse_season_csv(path, season_label(start))
             by_division[league.code].extend(parsed.matches)
+    for league in extras:
+        path = raw_dir / "new" / f"{league.code}.csv"
+        if not path.exists():
+            continue
+        parsed_extra = parse_extra_csv(path)
+        by_division[league.code].extend(parsed_extra.matches)
     return by_division
 
 
@@ -135,11 +143,13 @@ def main(argv=None) -> int:
         print("STOP: no cached season files; run python -m pipeline.run first")
         return 2
 
-    leagues = load_leagues()
-    league_names = {league.code: league.name for league in leagues}
-    by_division = load_by_division(RAW_DIR, leagues, current_start)
+    divisions = load_divisions()
+    extras = load_extras()
+    ft_only = {league.code for league in extras}
+    league_names = {league.code: league.name for league in divisions + extras}
+    by_division = load_by_division(RAW_DIR, divisions, extras, current_start)
     all_matches = [match for matches in by_division.values() for match in matches]
-    print(f"loaded {len(all_matches)} matches across {len(by_division)} divisions")
+    print(f"loaded {len(all_matches)} matches across {len(by_division)} leagues (incl. {len(extras)} FT-only)")
 
     if args.skip_backtest and DECISIONS_FILE.exists() and MODEL_JSON.exists():
         decisions = json.loads(DECISIONS_FILE.read_text(encoding="utf-8"))
@@ -185,7 +195,7 @@ def main(argv=None) -> int:
     k = float(hyper["k"])
 
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
-    divisions_set = set(league_names)
+    divisions_set = {league.code for league in divisions}
     results = read_results(all_matches)
 
     round_date = current_or_next_round_date(today)
@@ -210,6 +220,12 @@ def main(argv=None) -> int:
         settle_document(document, results)
         if not args.no_publish:
             publish(document, PICKS_DIR, ROUNDS_DIR)
+            write_json(
+                BY_PLAY_DIR / f"{round_date.isoformat()}.json",
+                build_by_play(
+                    predictors, round_fixtures, league_names, round_date, calibration, PICK_CONFIG, ft_only
+                ),
+            )
         counts = {name: len(view["picks"]) for name, view in document["views"].items()}
         replaced = " (replaced an empty round file)" if existing is not None else ""
         print(f"round {round_date}: published {counts} from {len(round_fixtures)} fixtures{replaced}")
@@ -229,6 +245,12 @@ def main(argv=None) -> int:
     print(f"example round {example_date}: {example_counts}")
     if not args.no_publish and example["views"]["most_likely"]["picks"]:
         publish(example, PICKS_DIR, ROUNDS_DIR)
+        write_json(
+            BY_PLAY_DIR / f"{example_date.isoformat()}.json",
+            build_by_play(
+                example_predictors, example_fixtures, league_names, example_date, calibration, PICK_CONFIG, ft_only
+            ),
+        )
 
     for path in sorted(PICKS_DIR.glob("*.json")):
         stored = json.loads(path.read_text(encoding="utf-8"))
@@ -249,7 +271,14 @@ def main(argv=None) -> int:
         if picker:
             print("reused existing picker backtest")
     else:
-        picker = picker_backtest.run(by_division, decisions, half_life, k, PICK_CONFIG, calibration)
+        picker = picker_backtest.run(
+            {code: by_division[code] for code in by_division if code in {league.code for league in divisions}},
+            decisions,
+            half_life,
+            k,
+            PICK_CONFIG,
+            calibration,
+        )
         model_payload["picker_backtest"] = picker
         write_json(MODEL_JSON, model_payload)
         for name, summary in picker["views"].items():

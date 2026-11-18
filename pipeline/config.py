@@ -30,6 +30,11 @@ class League:
     name: str
     country: str
     tier: int
+    ft_only: bool = False
+
+    @property
+    def has_odds(self) -> bool:
+        return not self.ft_only
 
 
 def season_label(start_year: int) -> str:
@@ -55,10 +60,19 @@ def fixtures_url() -> str:
     return f"{BASE_URL}/fixtures.csv"
 
 
-def load_leagues(path: Path | None = None) -> list[League]:
+def extra_url(code: str) -> str:
+    return f"{BASE_URL}/new/{code}.csv"
+
+
+def _read_yaml(path: Path | None = None) -> dict:
     source = path or LEAGUES_FILE
     with source.open("r", encoding="utf-8") as handle:
-        document = yaml.safe_load(handle) or {}
+        return yaml.safe_load(handle) or {}
+
+
+def load_divisions(path: Path | None = None) -> list[League]:
+    source = path or LEAGUES_FILE
+    document = _read_yaml(source)
 
     entries = document.get("divisions")
     if not entries:
@@ -83,3 +97,41 @@ def load_leagues(path: Path | None = None) -> list[League]:
             )
         )
     return leagues
+
+
+def load_extras(path: Path | None = None) -> list[League]:
+    """Extra leagues: one file each, full-time scores only, no pre-match odds."""
+    source = path or LEAGUES_FILE
+    document = _read_yaml(source)
+    entries = document.get("extras") or []
+
+    leagues: list[League] = []
+    seen: set[str] = set()
+    for entry in entries:
+        missing = [key for key in ("code", "name", "country") if key not in entry]
+        if missing:
+            raise ValueError(f"extra entry {entry!r} is missing {missing}")
+        code = str(entry["code"]).strip()
+        if code in seen:
+            raise ValueError(f"duplicate extra code {code!r} in {source}")
+        seen.add(code)
+        leagues.append(
+            League(
+                code=code,
+                name=str(entry["name"]).strip(),
+                country=str(entry["country"]).strip(),
+                tier=1,
+                ft_only=True,
+            )
+        )
+    return leagues
+
+
+def load_leagues(path: Path | None = None) -> list[League]:
+    """Every league, main archive first, extras second."""
+    divisions = load_divisions(path)
+    extras = load_extras(path)
+    codes = {league.code for league in divisions} & {league.code for league in extras}
+    if codes:
+        raise ValueError(f"codes defined as both division and extra: {sorted(codes)}")
+    return divisions + extras

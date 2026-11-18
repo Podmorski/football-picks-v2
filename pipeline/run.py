@@ -1,4 +1,7 @@
-"""Run the pipeline: download -> parse -> count -> write derived JSON.
+"""Run the data pipeline: download -> parse -> count -> write derived JSON.
+
+Covers the main archive (mmz4281/{YYZZ}/{DIV}.csv, half-time scores and pre-match odds)
+and the "extra" leagues (new/{CODE}.csv, full-time only, closing odds never read).
 
 Usage: python -m pipeline.run [--divisions E1,E2] [--offline]
 """
@@ -14,23 +17,28 @@ from .config import (
     FIRST_SEASON_START,
     RAW_DIR,
     WEB_DATA_DIR,
-    load_leagues,
+    extra_url,
+    load_divisions,
+    load_extras,
     season_code,
     season_label,
     season_start_year,
 )
-from .counts import TEAM_SCOPES, league_counts, team_counts, top_ten
+from .counts import league_counts, team_counts, top_ten
 from .download import DownloadError, Fetcher, SeasonFetcher, probe_season_exists
+from .extras import parse_extra_csv
 from .outcomes import OUTCOMES
 from .parse import MissingColumns, parse_season_csv
-from .quality import missing_season, season_quality, totals
+from .quality import duplicate_fixtures, missing_season, season_quality, totals
+from .counts import TEAM_SCOPES
 
 SCHEMA = {
-    "version": 1,
+    "version": 2,
     "stat": "[n, hits, rate, lo, hi] — Wilson 95% CI, rate and bounds rounded to 4dp; null when n=0",
     "weekday_buckets": {"tue": "Tuesday", "sat": "Saturday", "other": "all other days"},
     "team_scopes": list(TEAM_SCOPES),
     "top10": "ranked by Wilson lower bound, minimum n=5, top 10 per scope",
+    "ft_only": "league has full-time scores only: no half-time outcomes, no odds",
 }
 
 HEADLINE_OUTCOMES = ("tg_3plus", "btts_yes", "ht_x", "c1", "c2", "c3")
@@ -38,7 +46,7 @@ HEADLINE_OUTCOMES = ("tg_3plus", "btts_yes", "ht_x", "c1", "c2", "c3")
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(prog="pipeline", description="Build football-picks-v2 data")
-    parser.add_argument("--divisions", help="comma-separated division codes (default: all in leagues.yaml)")
+    parser.add_argument("--divisions", help="comma-separated codes (default: all configured)")
     parser.add_argument("--raw-dir", type=Path, default=RAW_DIR, help="download cache directory")
     parser.add_argument("--out-dir", type=Path, default=WEB_DATA_DIR, help="JSON output directory")
     parser.add_argument("--offline", action="store_true", help="use only already-cached files")
@@ -61,7 +69,6 @@ def table_cell(stat: list) -> str:
 
 
 def determine_current_start(fetcher: Fetcher, today: dt.date) -> int | None:
-    """Newest season the archive actually holds (probed on E1)."""
     guess = today.year if today.month >= 7 else today.year - 1
     for candidate in range(guess, FIRST_SEASON_START - 1, -1):
         if probe_season_exists(fetcher, candidate):
@@ -96,43 +103,13 @@ def print_pooled(index_rows: list[dict], outcome_ids: tuple[str, ...]) -> None:
     labels = {outcome.id: f"{outcome.id} {outcome.label}" for outcome in OUTCOMES}
     for group in (outcome_ids[:3], outcome_ids[3:]):
         print("")
-        header = f"{'div':<5}{'league':<24}" + "".join(f"{labels[oid]:<30}" for oid in group)
-        print(header)
+        print(f"{'div':<5}{'league':<24}" + "".join(f"{labels[oid]:<30}" for oid in group))
         for row in index_rows:
             cells = "".join(f"{table_cell(row['headline'][oid]):<30}" for oid in group)
             print(f"{row['code']:<5}{row['name'][:23]:<24}{cells}")
 
 
-def compact_teams(teams: dict) -> dict:
-    """Drop n=0 stats and zero streaks: absence means "no sample".
-
-    Keeps the JSON small without losing information — a stat with n=0 has no
-    rate or interval, and a streak of 0 is the same statement as no key.
-    """
-    compact: dict[str, dict] = {}
-    for team, data in teams.items():
-        entry: dict[str, dict] = {"current": {}, "previous": {}, "streak": {}}
-        for scope, stats in data["current"].items():
-            kept = {oid: stat for oid, stat in stats.items() if stat[0] > 0}
-            if kept:
-                entry["current"][scope] = kept
-        for scope, stats in data["previous"].items():
-            kept = {oid: stat for oid, stat in stats.items() if stat[0] > 0}
-            if kept:
-                entry["previous"][scope] = kept
-        entry["streak"] = {oid: value for oid, value in data["streak"].items() if value}
-        compact[team] = entry
-    return compact
-
-
-def build_division(
-    league,
-    matches: list,
-    seasons: list[str],
-    current_label: str | None,
-    focus: str | None,
-    previous: str | None,
-) -> dict:
+def build_division(league, matches: list, seasons: list[str], current_label: str | None, focus: str | None, previous: str | None) -> dict:
     league_stats = league_counts(matches, OUTCOMES)
     teams = team_counts(matches, OUTCOMES, focus, previous)
     top10s = top_ten(teams, OUTCOMES)
@@ -143,6 +120,8 @@ def build_division(
         "name": league.name,
         "country": league.country,
         "tier": league.tier,
+        "ft_only": league.ft_only,
+        "has_odds": league.has_odds,
         "seasons": seasons,
         "current_season": current_label,
         "focus_season": focus,
@@ -154,24 +133,51 @@ def build_division(
             for outcome in OUTCOMES
         ],
         "league": league_stats,
-        "teams": compact_teams(teams),
+        "teams": teams,
         "top10": top10s,
     }
+
+
+def compact_teams(teams: dict) -> dict:
+    """Drop n=0 stats and zero streaks: absence means "no sample"."""
+    compact: dict[str, dict] = {}
+    for team, data in teams.items():
+        entry: dict[str, dict] = {"current": {}, "streak": {}}
+        for scope, stats in data.get("current", {}).items():
+            kept = {oid: stat for oid, stat in stats.items() if stat[0] > 0}
+            if kept:
+                entry["current"][scope] = kept
+        entry["streak"] = {oid: value for oid, value in data.get("streak", {}).items() if value}
+        compact[team] = entry
+    return compact
+
+
+def fetch_extra(fetcher: Fetcher, raw_dir: Path, code: str) -> tuple[int, Path | None]:
+    url = extra_url(code)
+    status, body = fetcher.get(url)
+    if status == 200 and body.strip():
+        dest = raw_dir / "new" / f"{code}.csv"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(body)
+        return status, dest
+    return status, None
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
 
-    leagues = load_leagues()
+    divisions = load_divisions()
+    extras = load_extras()
     if args.divisions:
         wanted = [code.strip() for code in args.divisions.split(",") if code.strip()]
-        known = {league.code for league in leagues}
+        known = {league.code for league in divisions + extras}
         unknown = [code for code in wanted if code not in known]
         if unknown:
             print(f"unknown division codes: {unknown}", file=sys.stderr)
             return 2
-        leagues = [league for league in leagues if league.code in wanted]
+        divisions = [league for league in divisions if league.code in wanted]
+        extras = [league for league in extras if league.code in wanted]
 
     fetcher = Fetcher()
     season_fetcher = SeasonFetcher(fetcher, args.raw_dir)
@@ -198,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
     division_quality: dict[str, dict] = {}
     missing_files: list[str] = []
 
-    for league in leagues:
+    for league in divisions:
         matches: list = []
         quality: dict[str, dict] = {}
 
@@ -246,7 +252,7 @@ def main(argv: list[str] | None = None) -> int:
             "code": league.code,
             "name": league.name,
             "focus_season": focus,
-            "teams": document.pop("teams"),
+            "teams": compact_teams(document.pop("teams")),
             "top10": document.pop("top10"),
             "upcoming": [],
         }
@@ -257,6 +263,7 @@ def main(argv: list[str] | None = None) -> int:
             "name": league.name,
             "country": league.country,
             "tier": league.tier,
+            "ft_only": league.ft_only,
             "seasons": quality,
             "totals": totals(quality),
         }
@@ -268,14 +275,101 @@ def main(argv: list[str] | None = None) -> int:
                 "name": league.name,
                 "country": league.country,
                 "tier": league.tier,
+                "ft_only": league.ft_only,
+                "has_odds": league.has_odds,
                 "matches": len(matches),
                 "teams": document["team_count"],
                 "focus_season": focus,
+                "seasons": len(present),
                 "headline": {oid: pooled[oid] for oid in HEADLINE_OUTCOMES},
             }
         )
         print(
             f"{league.code}: {len(matches)} matches, {document['team_count']} teams, "
+            f"{size / 1024:.0f} KB rates + {teams_size / 1024:.0f} KB teams"
+        )
+
+    for league in extras:
+        try:
+            status, path = fetch_extra(fetcher, args.raw_dir, league.code)
+        except DownloadError as exc:
+            print(f"STOP: football-data.co.uk refused a download: {exc}", file=sys.stderr)
+            return 4
+        if path is None:
+            print(f"{league.code}: extra file unavailable ({status})")
+            missing_files.append(f"new/{league.code}")
+            continue
+
+        parsed_extra = parse_extra_csv(path)
+        matches = parsed_extra.matches
+        if not matches:
+            print(f"{league.code}: no matches after 2015, skipping")
+            continue
+
+        league_name = league.name or parsed_extra.league_name
+        present = sorted({match.season for match in matches}, key=season_start_year)
+        focus = present[-1]
+        focus_start = season_start_year(focus)
+        previous = season_label(focus_start - 1) if focus_start - 1 >= FIRST_SEASON_START else None
+
+        document = build_division(league, matches, present, None, focus, previous)
+        teams_document = {
+            "schema": SCHEMA,
+            "code": league.code,
+            "name": league_name,
+            "focus_season": focus,
+            "teams": compact_teams(document.pop("teams")),
+            "top10": document.pop("top10"),
+            "upcoming": [],
+        }
+        size = write_json(out_dir / f"{league.code}.json", document)
+        teams_size = write_json(out_dir / "teams" / f"{league.code}.json", teams_document)
+
+        dates = [match.date for match in matches]
+        division_quality[league.code] = {
+            "name": league_name,
+            "country": league.country,
+            "tier": 1,
+            "ft_only": True,
+            "seasons": {
+                focus: {
+                    "season": focus,
+                    "status": 200,
+                    "rows": len(matches),
+                    "rows_in_file": parsed_extra.rows_total,
+                    "rows_invalid": parsed_extra.rows_invalid,
+                    "ht_missing": 0,
+                    "duplicates": duplicate_fixtures(matches),
+                    "date_min": min(dates).isoformat(),
+                    "date_max": max(dates).isoformat(),
+                    "teams": len({match.home for match in matches} | {match.away for match in matches}),
+                }
+            },
+            "totals": {
+                "rows": len(matches),
+                "ht_missing": 0,
+                "duplicates": duplicate_fixtures(matches),
+            },
+        }
+
+        pooled = document["league"]["pooled"]
+        index_rows.append(
+            {
+                "code": league.code,
+                "name": league_name,
+                "country": league.country,
+                "tier": 1,
+                "ft_only": True,
+                "has_odds": False,
+                "matches": len(matches),
+                "teams": document["team_count"],
+                "focus_season": focus,
+                "seasons": len(present),
+                "headline": {oid: pooled[oid] for oid in HEADLINE_OUTCOMES},
+            }
+        )
+        print(
+            f"{league.code}: {len(matches)} matches ({parsed_extra.league_name}), {document['team_count']} teams, "
             f"{size / 1024:.0f} KB rates + {teams_size / 1024:.0f} KB teams"
         )
 
@@ -294,8 +388,38 @@ def main(argv: list[str] | None = None) -> int:
         "schema": SCHEMA,
         "seasons": seasons,
         "current_season": current_label,
-        "divisions": sorted(index_rows, key=lambda row: row["code"]),
+        "divisions": sorted(index_rows, key=lambda row: (row["country"], row["tier"], row["code"])),
     }
+
+    # Compact per-play league index: which leagues land each outcome most often.
+    play_leagues: dict[str, list] = {outcome.id: [] for outcome in OUTCOMES}
+    for document_path in out_dir.glob("*.json"):
+        if document_path.stem in ("leagues", "data_quality", "model", "record"):
+            continue
+        try:
+            payload = json.loads(document_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        pooled = payload.get("league", {}).get("pooled", {})
+        for outcome in OUTCOMES:
+            stat = pooled.get(outcome.id)
+            if not stat or not stat[0] or stat[0] < 30:
+                continue
+            play_leagues[outcome.id].append(
+                {
+                    "code": payload["code"],
+                    "name": payload["name"],
+                    "country": payload["country"],
+                    "ft_only": payload.get("ft_only", False),
+                    "n": stat[0],
+                    "rate": stat[2],
+                    "ci": [stat[3], stat[4]],
+                }
+            )
+    for outcome_id, rows in play_leagues.items():
+        rows.sort(key=lambda row: (-row["rate"], -row["n"]))
+        play_leagues[outcome_id] = rows[:20]
+    write_json(out_dir / "play-leagues.json", {"outcomes": play_leagues})
     quality_payload = {
         "schema": SCHEMA,
         "seasons": seasons,

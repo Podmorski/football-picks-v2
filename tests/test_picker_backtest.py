@@ -192,6 +192,6 @@ def test_backtest_replay_matches_the_live_picker_engine(component: str) -> None:
     matches = synthetic_matches()
     round_date = a_mid_season_round(matches)
     picks = picks_for_round(matches, round_date, HALF_LIFE, K, settings=LOOSE, live={group: component for group in GROUP_NAMES})
-    assert set(picks) == {"most_likely", "stand_out"}
+    assert set(picks) == {"most_likely", "stand_out", "best_combos"}
     for pick in picks["most_likely"]:
         assert pick["div"] == ""  # no division passed in this call

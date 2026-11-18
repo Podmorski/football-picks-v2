@@ -1,56 +1,48 @@
-# Division registry — the single place leagues are defined.
-# Add a league by appending an entry; nothing else needs to change.
+# League registry — the single place leagues are defined.
 #
-# code:    football-data.co.uk division code (the {DIV} in mmz4281/{YYZZ}/{DIV}.csv)
-# name:    display name
-# country: display country
-# tier:    league level within that country (1 = top flight)
+# divisions:  main archive, mmz4281/{YYZZ}/{code}.csv (has half-time scores and pre-match odds)
+# extras:     one file per league, new/{code}.csv (full-time scores only, closing odds only —
+#             closing columns are never read, so these leagues are FT-only and odds-free)
+extras_source: https://football-data.co.uk/new/
+
 divisions:
-  - code: E1
-    name: Championship
-    country: England
-    tier: 2
-  - code: E2
-    name: League One
-    country: England
-    tier: 3
-  - code: E3
-    name: League Two
-    country: England
-    tier: 4
-  - code: EC
-    name: National League
-    country: England
-    tier: 5
-  - code: SC0
-    name: Scottish Premiership
-    country: Scotland
-    tier: 1
-  - code: SC1
-    name: Scottish Championship
-    country: Scotland
-    tier: 2
-  - code: SC2
-    name: Scottish League One
-    country: Scotland
-    tier: 3
-  - code: SC3
-    name: Scottish League Two
-    country: Scotland
-    tier: 4
-  - code: D2
-    name: 2. Bundesliga
-    country: Germany
-    tier: 2
-  - code: I2
-    name: Serie B
-    country: Italy
-    tier: 2
-  - code: SP2
-    name: Segunda Division
-    country: Spain
-    tier: 2
-  - code: F2
-    name: Ligue 2
-    country: France
-    tier: 2
+  - { code: E0,  name: Premier League,         country: England,    tier: 1 }
+  - { code: E1,  name: Championship,           country: England,    tier: 2 }
+  - { code: E2,  name: League One,             country: England,    tier: 3 }
+  - { code: E3,  name: League Two,             country: England,    tier: 4 }
+  - { code: EC,  name: National League,        country: England,    tier: 5 }
+  - { code: SC0, name: Scottish Premiership,   country: Scotland,   tier: 1 }
+  - { code: SC1, name: Scottish Championship,  country: Scotland,   tier: 2 }
+  - { code: SC2, name: Scottish League One,    country: Scotland,   tier: 3 }
+  - { code: SC3, name: Scottish League Two,    country: Scotland,   tier: 4 }
+  - { code: D1,  name: Bundesliga,             country: Germany,    tier: 1 }
+  - { code: D2,  name: 2. Bundesliga,          country: Germany,    tier: 2 }
+  - { code: I1,  name: Serie A,                country: Italy,      tier: 1 }
+  - { code: I2,  name: Serie B,                country: Italy,      tier: 2 }
+  - { code: SP1, name: La Liga,                country: Spain,      tier: 1 }
+  - { code: SP2, name: Segunda Division,       country: Spain,      tier: 2 }
+  - { code: F1,  name: Ligue 1,                country: France,     tier: 1 }
+  - { code: F2,  name: Ligue 2,                country: France,     tier: 2 }
+  - { code: N1,  name: Eredivisie,             country: Netherlands, tier: 1 }
+  - { code: B1,  name: Jupiler Pro League,     country: Belgium,    tier: 1 }
+  - { code: P1,  name: Primeira Liga,          country: Portugal,   tier: 1 }
+  - { code: T1,  name: Super Lig,              country: Turkey,     tier: 1 }
+  - { code: G1,  name: Super League,           country: Greece,     tier: 1 }
+
+extras:
+  - { code: ARG, name: Liga Profesional,  country: Argentina }
+  - { code: AUT, name: Bundesliga,        country: Austria }
+  - { code: BRA, name: Serie A,           country: Brazil }
+  - { code: CHN, name: Super League,      country: China }
+  - { code: DNK, name: Superliga,         country: Denmark }
+  - { code: FIN, name: Veikkausliiga,     country: Finland }
+  - { code: IRL, name: Premier Division,  country: Ireland }
+  - { code: JPN, name: J1 League,         country: Japan }
+  - { code: MEX, name: Liga MX,           country: Mexico }
+  - { code: NOR, name: Eliteserien,       country: Norway }
+  - { code: POL, name: Ekstraklasa,       country: Poland }
+  - { code: ROU, name: Superliga,         country: Romania }
+  - { code: RUS, name: Premier League,    country: Russia }
+  - { code: SWE, name: Allsvenskan,       country: Sweden }
+  - { code: SWZ, name: Super League,      country: Switzerland }
+  - { code: USA, name: MLS,               country: USA }

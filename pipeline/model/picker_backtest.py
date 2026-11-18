@@ -12,7 +12,7 @@ import numpy as np
 
 from ..counts import wilson_interval
 from ..outcomes import OUTCOMES_BY_ID
-from ..picks import DEFAULT_CONFIG, finalise, select_views
+from ..picks import DEFAULT_CONFIG, finalise, odds_band, select_views
 from . import blend as blend_module
 from .counts_engine import fit as fit_counts
 from .data import EPOCH, MatchArrays, build_arrays, day_number, subset
@@ -21,7 +21,12 @@ from .goals_engine import fit as fit_goals
 SEASONS = tuple(range(2019, 2026))
 ROUND_WEEKDAYS = (1, 5)
 MIN_TRAINING_MATCHES = 200
-VIEW_NAMES = ("most_likely", "stand_out")
+VIEW_NAMES = ("most_likely", "stand_out", "best_combos")
+FINALISE = {
+    "most_likely": ("probability", None, None),
+    "stand_out": ("lift", None, None),
+    "best_combos": ("probability", 5, 2),
+}
 
 
 def season_start(match) -> int:
@@ -108,8 +113,8 @@ def picks_for_round(
     by_match = {(row["home"], row["away"]): row for row in rows}
     output: dict[str, list[dict]] = {}
     for view_name in VIEW_NAMES:
-        sort_key = "probability" if view_name == "most_likely" else "lift"
-        picks = finalise(selected[view_name], sort_key, settings)
+        sort_key, top_n, max_same = FINALISE[view_name]
+        picks = finalise(selected[view_name], sort_key, settings, top_n=top_n, max_same=max_same)
         kept = []
         for pick in picks:
             match = by_match[(pick["home"], pick["away"])]["match"]
@@ -179,6 +184,32 @@ def _summarise(picks: list[dict], rounds: int) -> dict:
     }
 
 
+def _band_rows(picks: list[dict]) -> list[dict]:
+    """Per play x fair-odds band: n, mean predicted, hit rate, 95% CI."""
+    buckets: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    for pick in picks:
+        buckets[(pick["outcome"], odds_band(pick["probability"]))].append(pick)
+
+    rows = []
+    for (outcome, band), group in buckets.items():
+        hits = sum(1 for pick in group if pick.get("landed"))
+        low, high = wilson_interval(hits, len(group))
+        rows.append(
+            {
+                "outcome": outcome,
+                "label": group[0]["play"],
+                "band": band,
+                "picks": len(group),
+                "mean_probability": round(float(np.mean([pick["probability"] for pick in group])), 4),
+                "hits": hits,
+                "hit_rate": round(hits / len(group), 4),
+                "ci": [round(low, 4), round(high, 4)],
+            }
+        )
+    rows.sort(key=lambda row: (row["outcome"], row["band"]))
+    return rows
+
+
 def run(
     matches_by_division: dict[str, list],
     decisions: dict,
@@ -232,4 +263,5 @@ def run(
         "weekdays": ["Tuesday", "Saturday"],
         "degraded_groups": degraded,
         "views": {name: _summarise(collected[name], len(round_dates[name])) for name in VIEW_NAMES},
+        "play_bands": _band_rows([pick for picks in collected.values() for pick in picks]),
     }

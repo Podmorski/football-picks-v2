@@ -112,10 +112,6 @@ TEAM_SCOPES = (
     "away",
     "last6",
     "last10",
-    "home_last6",
-    "home_last10",
-    "away_last6",
-    "away_last10",
 )
 
 
@@ -143,7 +139,8 @@ def team_counts(
     focus_season: str | None,
     previous_season: str | None,
 ) -> dict[str, dict]:
-    """Per-team stats: focus season (all scopes + streak) and previous season (core scopes)."""
+    """Per-team stats for the focus season plus rolling last 6/10 and the current streak."""
+    del previous_season  # kept for call-site compatibility; rolling scopes cross seasons
     index = teams_index(matches)
     teams: dict[str, dict] = {}
 
@@ -152,21 +149,13 @@ def team_counts(
             key: [match for match in venue_matches if match.season == focus_season]
             for key, venue_matches in venues.items()
         }
-        previous = {
-            key: [match for match in venue_matches if match.season == previous_season]
-            for key, venue_matches in venues.items()
-        }
 
         stats: dict[str, dict] = {
             "current": {scope: {} for scope in TEAM_SCOPES},
-            "previous": {scope: {} for scope in ("overall", "home", "away")},
             "streak": {},
         }
 
         for outcome in outcomes:
-            for scope in ("overall", "home", "away"):
-                stats["previous"][scope][outcome.id] = _stat(_results(previous[scope], outcome))
-
             overall = _results(current["overall"], outcome)
             home_results = _results(current["home"], outcome)
             away_results = _results(current["away"], outcome)
@@ -174,18 +163,12 @@ def team_counts(
             # Rolling across season boundaries: last 6/10 and the streak follow the team's
             # most recent matches regardless of which season they fell in.
             overall_rolling = _results(venues["overall"], outcome)
-            home_rolling = _results(venues["home"], outcome)
-            away_rolling = _results(venues["away"], outcome)
 
             stats["current"]["overall"][outcome.id] = _stat(overall)
             stats["current"]["home"][outcome.id] = _stat(home_results)
             stats["current"]["away"][outcome.id] = _stat(away_results)
             stats["current"]["last6"][outcome.id] = _stat(overall_rolling[:6])
             stats["current"]["last10"][outcome.id] = _stat(overall_rolling[:10])
-            stats["current"]["home_last6"][outcome.id] = _stat(home_rolling[:6])
-            stats["current"]["home_last10"][outcome.id] = _stat(home_rolling[:10])
-            stats["current"]["away_last6"][outcome.id] = _stat(away_rolling[:6])
-            stats["current"]["away_last10"][outcome.id] = _stat(away_rolling[:10])
             stats["streak"][outcome.id] = current_streak(overall_rolling)
 
         teams[team] = stats

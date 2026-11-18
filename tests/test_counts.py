@@ -156,11 +156,15 @@ def test_top_ten_respects_limit() -> None:
     assert len(rows) == 10
 
 
-def test_previous_season_is_separate() -> None:
+def test_current_season_scopes_and_rolling_across_seasons() -> None:
     old = make_match(3, "A", "B", 5, 0, season="2023-24")
     new = make_match(3, "A", "C", 0, 0, season="2024-25")
     teams = team_counts([old, new], OUTCOMES, "2024-25", "2023-24")
 
+    # Season scopes stay inside the focus season.
     assert teams["A"]["current"]["overall"]["tg_4plus"][0] == 1
     assert teams["A"]["current"]["overall"]["tg_4plus"][1] == 0
-    assert teams["A"]["previous"]["overall"]["tg_4plus"][1] == 1
+
+    # last 10 rolls across the season boundary.
+    assert teams["A"]["current"]["last10"]["tg_4plus"][0] == 2
+    assert teams["A"]["current"]["last10"]["tg_4plus"][1] == 1

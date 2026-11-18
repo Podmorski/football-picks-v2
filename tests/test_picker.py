@@ -8,7 +8,7 @@ import pytest
 
 from pipeline.fixtures import Fixture
 from pipeline.outcomes import OUTCOMES
-from pipeline.picks import EXCLUDED, build_round, confidence_badge, select_views
+from pipeline.picks import EXCLUDED, build_round, confidence_badge, odds_band, select_views
 
 INDEX = {outcome.id: position for position, outcome in enumerate(OUTCOMES)}
 SIZE = len(OUTCOMES)
@@ -199,7 +199,23 @@ def test_most_likely_falls_back_to_nothing_when_every_play_is_below_base() -> No
 
 def test_both_views_are_stored() -> None:
     document = build(StubPredictor(np.vstack([vector(tg_3plus=0.60, btts_yes=0.50)])))
-    assert set(document["views"]) == {"most_likely", "stand_out"}
+    assert set(document["views"]) == {"most_likely", "stand_out", "best_combos"}
     assert document["views"]["most_likely"]["label"] == "Most likely"
     assert document["views"]["stand_out"]["label"] == "Stand-out"
+    assert document["views"]["best_combos"]["label"] == "Best combos"
     assert document["picks"] == document["views"]["most_likely"]["picks"]
+
+
+def test_best_combos_only_uses_combo_outcomes() -> None:
+    full = np.vstack([vector(tg_3plus=0.64, c3=0.60, c1=0.50, btts_yes=0.62)])
+    document = build(StubPredictor(full))
+    combos = picks(document, "best_combos")
+    assert [pick["outcome"] for pick in combos] == ["c3"]  # highest-probability combo, lift >= 0
+    assert picks(document, "most_likely")[0]["outcome"] == "tg_3plus"
+
+
+def test_odds_bands() -> None:
+    assert odds_band(0.60) == "1.50-2.00"  # 1.67
+    assert odds_band(0.40) == "2.00-3.00"  # 2.50
+    assert odds_band(0.25) == "3.00-5.00"  # 4.00
+    assert odds_band(0.10) == "5.00+"  # 10.00
