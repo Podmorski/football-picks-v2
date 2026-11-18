@@ -1,0 +1,56 @@
+# Division registry — the single place leagues are defined.
+# Add a league by appending an entry; nothing else needs to change.
+#
+# code:    football-data.co.uk division code (the {DIV} in mmz4281/{YYZZ}/{DIV}.csv)
+# name:    display name
+# country: display country
+# tier:    league level within that country (1 = top flight)
+divisions:
+  - code: E1
+    name: Championship
+    country: England
+    tier: 2
+  - code: E2
+    name: League One
+    country: England
+    tier: 3
+  - code: E3
+    name: League Two
+    country: England
+    tier: 4
+  - code: EC
+    name: National League
+    country: England
+    tier: 5
+  - code: SC0
+    name: Scottish Premiership
+    country: Scotland
+    tier: 1
+  - code: SC1
+    name: Scottish Championship
+    country: Scotland
+    tier: 2
+  - code: SC2
+    name: Scottish League One
+    country: Scotland
+    tier: 3
+  - code: SC3
+    name: Scottish League Two
+    country: Scotland
+    tier: 4
+  - code: D2
+    name: 2. Bundesliga
+    country: Germany
+    tier: 2
+  - code: I2
+    name: Serie B
+    country: Italy
+    tier: 2
+  - code: SP2
+    name: Segunda Division
+    country: Spain
+    tier: 2
+  - code: F2
+    name: Ligue 2
+    country: France
+    tier: 2

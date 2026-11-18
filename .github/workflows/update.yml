@@ -1,0 +1,54 @@
+name: Update data
+
+on:
+  schedule:
+    # Tuesday and Friday (UTC): the two matchday groups this project focuses on.
+    - cron: '0 14 * * 2'
+    - cron: '0 18 * * 5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      # Past-season files are downloaded once and reused; only the current season is refetched.
+      - name: Restore raw CSV cache
+        uses: actions/cache@v4
+        with:
+          path: data/raw
+          key: picks-raw-v1-${{ github.run_id }}
+          restore-keys: |
+            picks-raw-v1-
+
+      - name: Install pipeline dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pipeline
+        run: python -m pipeline.run
+
+      - name: Commit changed data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/public/data
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "data: update"
+            git push
+          fi
