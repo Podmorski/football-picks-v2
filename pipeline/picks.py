@@ -238,7 +238,9 @@ def select_views(
             }
 
             if best_probability is None or probability > best_probability["probability"]:
-                best_probability = candidate
+                # Most likely also requires the play to be no worse than the league's usual rate.
+                if lift >= 0:
+                    best_probability = candidate
             if (
                 probability >= settings["lift_min_probability"]
                 and lift >= settings["min_lift"]
@@ -417,6 +419,30 @@ def document_views(document: dict) -> dict:
         return views
     legacy = document.get("picks", [])
     return {"most_likely": {"label": VIEW_LABELS["most_likely"], "picks": legacy, "hits": document.get("hits", 0), "settled_count": document.get("settled_count", 0)}}
+
+
+def has_picks(document: dict | None) -> bool:
+    """True only when a round file actually contains at least one pick."""
+    if not document:
+        return False
+    views = document.get("views")
+    if views:
+        return any(view.get("picks") for view in views.values())
+    return bool(document.get("picks"))
+
+
+def round_action(existing: dict | None, fixtures: list) -> str:
+    """What to do with an existing round file.
+
+    * settle — it already has picks; never regenerate it.
+    * publish — it is new, or it is empty and fixtures have now appeared.
+    * skip — nothing published yet and no fixtures to publish.
+    """
+    if has_picks(existing):
+        return "settle"
+    if fixtures:
+        return "publish"
+    return "skip"
 
 
 def rebuild_index(picks_dir: Path, web_dir: Path) -> dict:

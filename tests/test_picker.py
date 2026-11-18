@@ -185,6 +185,18 @@ def test_confidence_badge_thresholds() -> None:
     assert confidence_badge(15, 0.06, None, 100) == "Medium"
 
 
+def test_most_likely_requires_lift_zero_or_better() -> None:
+    # League base is 0.35: 0.30 is below the usual rate and must not be published as "most likely".
+    full = np.vstack([vector(tg_3plus=0.30, btts_yes=0.36)])
+    document = build(StubPredictor(full))
+    assert [pick["outcome"] for pick in picks(document)] == ["btts_yes"]
+
+
+def test_most_likely_falls_back_to_nothing_when_every_play_is_below_base() -> None:
+    full = np.vstack([vector(tg_3plus=0.30, btts_yes=0.31)])
+    assert picks(build(StubPredictor(full))) == []
+
+
 def test_both_views_are_stored() -> None:
     document = build(StubPredictor(np.vstack([vector(tg_3plus=0.60, btts_yes=0.50)])))
     assert set(document["views"]) == {"most_likely", "stand_out"}

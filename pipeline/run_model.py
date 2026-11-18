@@ -14,7 +14,7 @@ from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_leagues, sea
 from .fixtures import Fixture, current_or_next_round_date, fixtures_for_date, last_saturday, parse_fixtures
 from .model import backtest, live, picker_backtest
 from .parse import parse_season_csv
-from .picks import build_round, document_views, publish, read_results, rebuild_index, settle_document
+from .picks import build_round, publish, read_results, rebuild_index, round_action, settle_document
 from .run import cached_seasons
 
 PICKS_DIR = Path(__file__).resolve().parents[1] / "picks"
@@ -195,18 +195,24 @@ def main(argv=None) -> int:
     predictors = build_predictors(by_division, round_date, half_life, k, decisions)
 
     if round_path.exists():
-        document = json.loads(round_path.read_text(encoding="utf-8"))
-        settle_document(document, results)
+        existing = json.loads(round_path.read_text(encoding="utf-8"))
+    else:
+        existing = None
+
+    action = round_action(existing, round_fixtures)
+    if action == "settle":
+        settle_document(existing, results)
         if not args.no_publish:
-            publish(document, PICKS_DIR, ROUNDS_DIR)
-        print(f"round {round_date}: already published, settled only")
-    elif round_fixtures:
+            publish(existing, PICKS_DIR, ROUNDS_DIR)
+        print(f"round {round_date}: already published ({sum(len(v['picks']) for v in existing.get('views', {}).values())} picks), settled only")
+    elif action == "publish":
         document = build_round(predictors, round_fixtures, league_names, round_date, calibration, PICK_CONFIG, kind="round")
         settle_document(document, results)
         if not args.no_publish:
             publish(document, PICKS_DIR, ROUNDS_DIR)
         counts = {name: len(view["picks"]) for name, view in document["views"].items()}
-        print(f"round {round_date}: published {counts} from {len(round_fixtures)} fixtures")
+        replaced = " (replaced an empty round file)" if existing is not None else ""
+        print(f"round {round_date}: published {counts} from {len(round_fixtures)} fixtures{replaced}")
     else:
         print(f"round {round_date}: no fixtures published by the source, nothing to publish")
 

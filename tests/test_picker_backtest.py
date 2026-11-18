@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 from dataclasses import replace
 from pathlib import Path
 
@@ -15,7 +16,7 @@ from pipeline.model.data import build_arrays, day_number
 from pipeline.model.goals_engine import fit as fit_goals
 from pipeline.model.picker_backtest import picks_for_round
 from pipeline.parse import Match
-from pipeline.picks import build_round, publish
+from pipeline.picks import build_round, has_picks, publish, round_action, settle_document
 
 HALF_LIFE = 365.0
 K = 10.0
@@ -90,6 +91,60 @@ def test_picks_ignore_everything_on_or_after_the_round_date() -> None:
         for match in matches
     ]
     assert picks_for_round(altered, round_date, HALF_LIFE, K, settings=LOOSE) == base
+
+
+def test_round_action_distinguishes_empty_from_published() -> None:
+    empty = {"views": {"most_likely": {"picks": []}, "stand_out": {"picks": []}}}
+    published = {"views": {"most_likely": {"picks": [{"home": "A"}]}, "stand_out": {"picks": []}}}
+    legacy_empty = {"picks": []}
+    legacy_published = {"picks": [{"home": "A"}]}
+
+    assert round_action(None, ["fixture"]) == "publish"
+    assert round_action(empty, ["fixture"]) == "publish"  # empty file is replaced when fixtures appear
+    assert round_action(legacy_empty, ["fixture"]) == "publish"
+    assert round_action(empty, []) == "skip"
+    assert round_action(legacy_empty, []) == "skip"
+    assert round_action(published, ["fixture"]) == "settle"  # never replaced
+    assert round_action(legacy_published, ["fixture"]) == "settle"
+
+    assert has_picks(empty) is False
+    assert has_picks(published) is True
+
+
+def test_empty_round_file_is_replaced_once_fixtures_exist(tmp_path: Path) -> None:
+    picks_dir = tmp_path / "picks"
+    web_dir = tmp_path / "web"
+    day = dt.date(2026, 11, 21)
+
+    empty = {
+        "date": day.isoformat(),
+        "label": "Saturday 21 Nov",
+        "weekday": "Saturday",
+        "kind": "round",
+        "views": {"most_likely": {"picks": []}, "stand_out": {"picks": []}},
+        "picks": [],
+    }
+    publish(empty, picks_dir, web_dir)
+    assert round_action(empty, ["fixture"]) == "publish"
+
+    filled = {
+        "date": day.isoformat(),
+        "label": "Saturday 21 Nov",
+        "weekday": "Saturday",
+        "kind": "round",
+        "views": {
+            "most_likely": {"picks": [{"home": "A", "away": "B", "outcome": "tg_3plus"}]},
+            "stand_out": {"picks": []},
+        },
+        "picks": [],
+    }
+    settle_document(filled, {})
+    publish(filled, picks_dir, web_dir)
+
+    stored = json.loads((picks_dir / f"{day.isoformat()}.json").read_text())
+    assert len(stored["views"]["most_likely"]["picks"]) == 1
+    # Now that it has picks it must never be replaced again.
+    assert round_action(stored, ["fixture"]) == "settle"
 
 
 def test_publishing_from_a_past_fixture_list_stays_in_the_temp_directory(tmp_path: Path) -> None:
