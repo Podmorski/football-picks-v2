@@ -11,7 +11,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_leagues, season_code, season_label
-from .fixtures import Fixture, fixtures_for_date, last_saturday, next_round_date, parse_fixtures
+from .fixtures import Fixture, current_or_next_round_date, fixtures_for_date, last_saturday, parse_fixtures
 from .model import backtest, live, picker_backtest
 from .parse import parse_season_csv
 from .picks import build_round, document_views, publish, read_results, rebuild_index, settle_document
@@ -188,7 +188,7 @@ def main(argv=None) -> int:
     divisions_set = set(league_names)
     results = read_results(all_matches)
 
-    round_date = next_round_date(today)
+    round_date = current_or_next_round_date(today)
     round_fixtures = fixtures_for_date(fixtures, round_date, divisions_set)
     round_path = PICKS_DIR / f"{round_date.isoformat()}.json"
 

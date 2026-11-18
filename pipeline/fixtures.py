@@ -79,6 +79,13 @@ def next_round_date(today: dt.date) -> dt.date:
     raise ValueError("no Tuesday or Saturday found within a week")
 
 
+def current_or_next_round_date(today: dt.date) -> dt.date:
+    """Today when today is a round day (so retries can publish it), else the next one."""
+    if today.weekday() in ROUND_WEEKDAYS:
+        return today
+    return next_round_date(today)
+
+
 def last_saturday(today: dt.date) -> dt.date:
     """Most recent Saturday strictly before today."""
     candidate = today - dt.timedelta(days=(today.weekday() - SATURDAY) % 7)

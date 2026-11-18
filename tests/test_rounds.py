@@ -5,7 +5,7 @@ import datetime as dt
 
 import pytest
 
-from pipeline.fixtures import Fixture, fixtures_for_date, last_saturday, next_round_date
+from pipeline.fixtures import Fixture, current_or_next_round_date, fixtures_for_date, last_saturday, next_round_date
 
 
 def make(day: int, month: int = 11, year: int = 2026, div: str = "E2") -> Fixture:
@@ -32,6 +32,14 @@ def test_next_round_is_always_tuesday_or_saturday_and_in_the_future() -> None:
         assert candidate.weekday() in (1, 5)
         assert candidate > today
         assert (candidate - today).days <= 7
+
+
+def test_retry_days_target_today() -> None:
+    # A Saturday morning retry must target that same Saturday, not the next Tuesday.
+    assert current_or_next_round_date(dt.date(2026, 11, 21)) == dt.date(2026, 11, 21)
+    assert current_or_next_round_date(dt.date(2026, 11, 24)) == dt.date(2026, 11, 24)
+    assert current_or_next_round_date(dt.date(2026, 11, 18)) == dt.date(2026, 11, 21)
+    assert current_or_next_round_date(dt.date(2026, 11, 20)) == dt.date(2026, 11, 21)
 
 
 def test_last_saturday_is_a_past_saturday() -> None:
