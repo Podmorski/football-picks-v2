@@ -1,4 +1,4 @@
-"""Build the model, publish rounds, settle them and refresh the site data.
+"""Build the model, publish rounds in both views, settle them, refresh site data.
 
 Usage: python -m pipeline.run_model [--today DATE] [--skip-backtest] [--no-publish]
 """
@@ -11,11 +11,10 @@ from collections import defaultdict
 from pathlib import Path
 
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_leagues, season_code, season_label
-from .fixtures import fixtures_for_date, last_saturday, next_round_date, parse_fixtures
-from .model import backtest, live
-from .model.blend import GROUP_NAMES
+from .fixtures import Fixture, fixtures_for_date, last_saturday, next_round_date, parse_fixtures
+from .model import backtest, live, picker_backtest
 from .parse import parse_season_csv
-from .picks import build_round, publish, read_results, rebuild_index, settle_document
+from .picks import build_round, document_views, publish, read_results, rebuild_index, settle_document
 from .run import cached_seasons
 
 PICKS_DIR = Path(__file__).resolve().parents[1] / "picks"
@@ -26,7 +25,15 @@ RECORD_JSON = WEB_DATA_DIR / "record.json"
 ROUNDS_DIR = WEB_DATA_DIR / "rounds"
 TEAMS_DIR = WEB_DATA_DIR / "teams"
 
-PICK_CONFIG = {"max_probability": 0.65, "top_n": 15, "min_samples": 8, "agreement": 0.10}
+PICK_CONFIG = {
+    "max_probability": 0.65,
+    "min_lift": 0.08,
+    "lift_min_probability": 0.45,
+    "top_n": 15,
+    "min_samples": 8,
+    "agreement": 0.10,
+    "max_same_play": 3,
+}
 UPCOMING_DAYS = 21
 
 
@@ -90,11 +97,32 @@ def calibration_overall(selected: dict) -> dict:
     return overall_bins(selected)
 
 
+def historical_fixtures(by_division: dict[str, list], date: dt.date) -> list[Fixture]:
+    fixtures: list[Fixture] = []
+    for code, matches in by_division.items():
+        for match in matches:
+            if match.date == date:
+                fixtures.append(
+                    Fixture(div=code, date=date, time=match.time, home=match.home, away=match.away, odds=match.odds)
+                )
+    return fixtures
+
+
+def build_predictors(by_division: dict[str, list], cutoff: dt.date, half_life: float, k: float, decisions: dict) -> dict:
+    predictors = {}
+    for code, matches in by_division.items():
+        if not matches:
+            continue
+        predictors[code] = live.build_predictor(matches, cutoff, half_life, k, decisions)
+    return predictors
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(prog="pipeline.run_model", description="Build model and publish rounds")
     parser.add_argument("--today", help="override today's date (YYYY-MM-DD)")
     parser.add_argument("--skip-backtest", action="store_true", help="reuse decisions.json / model.json")
     parser.add_argument("--no-publish", action="store_true", help="compute but do not write round files")
+    parser.add_argument("--skip-picker-backtest", action="store_true")
     return parser.parse_args(argv)
 
 
@@ -133,13 +161,24 @@ def main(argv=None) -> int:
             "hyperparameters": tuning,
             "ablation": {"overall": overall_ablation(groups), "groups": groups},
             "calibration": calibration,
-            "decisions": {group: {key: entry[key] for key in ("keep_counts", "keep_goals", "keep_odds", "keep_calibration", "live_component")} for group, entry in groups.items()},
+            "decisions": {
+                group: {
+                    key: entry[key]
+                    for key in ("keep_counts", "keep_goals", "keep_odds", "keep_calibration", "live_component")
+                }
+                for group, entry in groups.items()
+            },
             "full_worse_than_base_count": decisions["full_worse_than_base_count"],
+            "missing_odds": decisions["missing_odds"],
         }
         write_json(DECISIONS_FILE, decisions)
         write_json(MODEL_JSON, model_payload)
         print(f"backtest fixtures: {decisions['fixtures']:,}")
-        print(f"outcomes where full model is worse than base on Brier: {decisions['full_worse_than_base_count']} / {len(decisions['outcomes'])}")
+        print(
+            "outcomes where full model is worse than base on Brier: "
+            f"{decisions['full_worse_than_base_count']} / {len(decisions['outcomes'])}"
+        )
+        print(f"fixtures without odds: {decisions['missing_odds']['fixtures_without_odds']:,}")
 
     hyper = decisions["hyperparameters"]["best"]
     half_life = float(hyper["half_life_days"])
@@ -151,31 +190,43 @@ def main(argv=None) -> int:
 
     round_date = next_round_date(today)
     round_fixtures = fixtures_for_date(fixtures, round_date, divisions_set)
-    predictor = live.build_predictor(all_matches, round_date, half_life, k, decisions)
-
     round_path = PICKS_DIR / f"{round_date.isoformat()}.json"
+
+    predictors = build_predictors(by_division, round_date, half_life, k, decisions)
+
     if round_path.exists():
         document = json.loads(round_path.read_text(encoding="utf-8"))
-        print(f"round {round_date} already published ({len(document['picks'])} picks) — not regenerated")
+        settle_document(document, results)
+        if not args.no_publish:
+            publish(document, PICKS_DIR, ROUNDS_DIR)
+        print(f"round {round_date}: already published, settled only")
+    elif round_fixtures:
+        document = build_round(predictors, round_fixtures, league_names, round_date, calibration, PICK_CONFIG, kind="round")
+        settle_document(document, results)
+        if not args.no_publish:
+            publish(document, PICKS_DIR, ROUNDS_DIR)
+        counts = {name: len(view["picks"]) for name, view in document["views"].items()}
+        print(f"round {round_date}: published {counts} from {len(round_fixtures)} fixtures")
     else:
-        document = build_round(predictor, round_fixtures, league_names, round_date, calibration, PICK_CONFIG, kind="round")
-        print(f"round {round_date}: {len(document['picks'])} picks from {len(round_fixtures)} fixtures")
-    settle_document(document, results)
-    if not args.no_publish:
-        publish(document, PICKS_DIR, ROUNDS_DIR)
+        print(f"round {round_date}: no fixtures published by the source, nothing to publish")
 
     example_date = last_saturday(today)
-    example_fixtures = fixtures_for_date(fixtures, example_date, divisions_set)
-    example_predictor = live.build_predictor(all_matches, example_date, half_life, k, decisions)
-    example = build_round(example_predictor, example_fixtures, league_names, example_date, calibration, PICK_CONFIG, kind="example")
+    example_fixtures = fixtures_for_date(fixtures, example_date, divisions_set) or historical_fixtures(
+        by_division, example_date
+    )
+    example_predictors = build_predictors(by_division, example_date, half_life, k, decisions)
+    example = build_round(
+        example_predictors, example_fixtures, league_names, example_date, calibration, PICK_CONFIG, kind="example"
+    )
     settle_document(example, results)
-    print(f"example round {example_date}: {len(example['picks'])} picks ({example['settled_count']} settled, {example['hits']} hits)")
-    if not args.no_publish:
+    example_counts = {name: len(view["picks"]) for name, view in example["views"].items()}
+    print(f"example round {example_date}: {example_counts}")
+    if not args.no_publish and example["views"]["most_likely"]["picks"]:
         publish(example, PICKS_DIR, ROUNDS_DIR)
 
     for path in sorted(PICKS_DIR.glob("*.json")):
         stored = json.loads(path.read_text(encoding="utf-8"))
-        if stored.get("kind") == "example" or stored["date"] == round_date.isoformat():
+        if stored.get("kind") == "example" or stored["date"] in (round_date.isoformat(), example_date.isoformat()):
             continue
         if settle_document(stored, results) and not args.no_publish:
             publish(stored, PICKS_DIR, ROUNDS_DIR)
@@ -185,7 +236,27 @@ def main(argv=None) -> int:
 
     index = rebuild_index(PICKS_DIR, ROUNDS_DIR)
 
-    upcoming = [fixture for fixture in fixtures if fixture.div in divisions_set and today <= fixture.date <= today + dt.timedelta(days=UPCOMING_DAYS)]
+    picker = None
+    if args.skip_backtest and args.skip_picker_backtest and MODEL_JSON.exists():
+        existing = json.loads(MODEL_JSON.read_text(encoding="utf-8"))
+        picker = existing.get("picker_backtest")
+        if picker:
+            print("reused existing picker backtest")
+    else:
+        picker = picker_backtest.run(by_division, decisions, half_life, k, PICK_CONFIG, calibration)
+        model_payload["picker_backtest"] = picker
+        write_json(MODEL_JSON, model_payload)
+        for name, summary in picker["views"].items():
+            print(
+                f"picker backtest {name}: {summary['rounds']} rounds, {summary['picks']} picks, "
+                f"hit rate {summary['hit_rate']}"
+            )
+
+    upcoming = [
+        fixture
+        for fixture in fixtures
+        if fixture.div in divisions_set and today <= fixture.date <= today + dt.timedelta(days=UPCOMING_DAYS)
+    ]
     by_div: dict[str, list] = defaultdict(list)
     for fixture in upcoming:
         by_div[fixture.div].append(fixture)
@@ -195,8 +266,10 @@ def main(argv=None) -> int:
         if not teams_path.exists():
             continue
         teams_document = json.loads(teams_path.read_text(encoding="utf-8"))
-        built = build_round(predictor, items, league_names, round_date, calibration, {**PICK_CONFIG, "top_n": 999}, kind="upcoming")
-        by_match = {(pick["home"], pick["away"]): pick for pick in built["picks"]}
+        built = build_round(
+            predictors, items, league_names, round_date, calibration, {**PICK_CONFIG, "top_n": 999}, kind="upcoming"
+        )
+        by_match = {(pick["home"], pick["away"]): pick for pick in built["views"]["most_likely"]["picks"]}
         teams_document["upcoming"] = [
             {
                 "date": fixture.date.isoformat(),
@@ -209,9 +282,17 @@ def main(argv=None) -> int:
         ]
         write_json(teams_path, teams_document)
 
-    totals = {"rounds": len(index["rounds"]), "picks": sum(row["picks"] for row in index["rounds"]), "hits": sum(row["hits"] for row in index["rounds"]), "settled": sum(row["settled_count"] for row in index["rounds"])}
+    totals = {
+        "rounds": len(index["rounds"]),
+        "picks": sum(row["picks"] for row in index["rounds"]),
+        "hits": sum(row["hits"] for row in index["rounds"]),
+        "settled": sum(row["settled_count"] for row in index["rounds"]),
+    }
     totals["hit_rate"] = round(totals["hits"] / totals["settled"], 4) if totals["settled"] else None
-    write_json(RECORD_JSON, {"calibration": calibration, "rounds": index["rounds"], "totals": totals})
+    payload = {"calibration": calibration, "rounds": index["rounds"], "totals": totals}
+    if picker is not None:
+        payload["picker_backtest"] = picker
+    write_json(RECORD_JSON, payload)
 
     print(f"rounds published: {totals['rounds']}, picks: {totals['picks']}, settled: {totals['settled']}, hits: {totals['hits']}")
     return 0

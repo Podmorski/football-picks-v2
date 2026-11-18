@@ -339,6 +339,14 @@
    }
   ]
  },
+ "missing_odds": {
+  "brier_with_odds": 0.189511,
+  "brier_without_odds": 0.186337,
+  "fixtures": 30431,
+  "fixtures_without_odds": 29,
+  "fixtures_without_odds_share": 0.001,
+  "rows_without_odds": 1770
+ },
  "outcomes": {
   "away_1h_1plus": {
    "base": 0.239611,

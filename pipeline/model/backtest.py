@@ -14,7 +14,7 @@ from ..outcomes import OUTCOMES
 from . import blend as blend_module
 from .counts_engine import fit as fit_counts, logit, sigmoid
 from .data import MatchArrays, build_arrays, day_number, subset
-from .goals_engine import fit as fit_goals
+from .goals_engine import extract_targets, fit as fit_goals
 
 BACKTEST_YEARS = tuple(range(2019, 2026))
 COMPONENTS = ("base", "counts", "goals", "odds", "full")
@@ -49,6 +49,11 @@ class Board:
     brier: dict[str, np.ndarray] = field(default_factory=lambda: {c: np.zeros(len(OUTCOMES)) for c in COMPONENTS})
     logloss: dict[str, np.ndarray] = field(default_factory=lambda: {c: np.zeros(len(OUTCOMES)) for c in COMPONENTS})
     n: np.ndarray = field(default_factory=lambda: np.zeros(len(OUTCOMES)))
+    brier_no_odds: np.ndarray = field(default_factory=lambda: np.zeros(len(OUTCOMES)))
+    n_no_odds: np.ndarray = field(default_factory=lambda: np.zeros(len(OUTCOMES)))
+    brier_with_odds: np.ndarray = field(default_factory=lambda: np.zeros(len(OUTCOMES)))
+    n_with_odds: np.ndarray = field(default_factory=lambda: np.zeros(len(OUTCOMES)))
+    fixtures_no_odds: int = 0
     bins: dict[str, dict[str, dict[str, list]]] = field(
         default_factory=lambda: {
             source: {group: {"n": [0] * BIN_COUNT, "hits": [0] * BIN_COUNT} for group in blend_module.GROUP_NAMES}
@@ -187,6 +192,17 @@ def run_division(division: DivisionData, half_life: float, k: float, board: Boar
         board.accumulate_bins("odds", parts["odds"], labels, applicable)
         board.fixtures += len(test_idx)
 
+        # Missing odds: the live fallback is the unanchored goals engine, so score that subset.
+        has_odds = np.array([extract_targets(odds) is not None for odds in test.odds], dtype=bool)
+        error = (np.clip(full, 1e-6, 1.0 - 1e-6) - labels) ** 2
+        no_odds_mask = (~has_odds)[:, None].astype(np.float64) * applicable
+        with_odds_mask = has_odds[:, None].astype(np.float64) * applicable
+        board.brier_no_odds += (error * no_odds_mask).sum(axis=0)
+        board.n_no_odds += no_odds_mask.sum(axis=0)
+        board.brier_with_odds += (error * with_odds_mask).sum(axis=0)
+        board.n_with_odds += with_odds_mask.sum(axis=0)
+        board.fixtures_no_odds += int((~has_odds).sum())
+
 
 def run(divisions: list[DivisionData], half_life: float, k: float, progress=None) -> Board:
     board = Board()
@@ -256,6 +272,19 @@ def selected_bin_table(board: Board, groups: dict[str, dict]) -> dict[str, dict]
     return selected
 
 
+def missing_odds_summary(board: Board) -> dict:
+    rows_without = float(board.n_no_odds.sum())
+    rows_with = float(board.n_with_odds.sum())
+    return {
+        "fixtures": int(board.fixtures),
+        "fixtures_without_odds": int(board.fixtures_no_odds),
+        "fixtures_without_odds_share": round(board.fixtures_no_odds / board.fixtures, 4) if board.fixtures else None,
+        "rows_without_odds": int(rows_without),
+        "brier_without_odds": round(float(board.brier_no_odds.sum() / rows_without), 6) if rows_without else None,
+        "brier_with_odds": round(float(board.brier_with_odds.sum() / rows_with) , 6) if rows_with else None,
+    }
+
+
 def build_decisions(board: Board, hyperparameters: dict) -> dict:
     summary = group_summary(board)
     per_outcome = outcome_summary(board)
@@ -311,4 +340,5 @@ def build_decisions(board: Board, hyperparameters: dict) -> dict:
         "outcomes": per_outcome,
         "full_worse_than_base": worse,
         "full_worse_than_base_count": len(worse),
+        "missing_odds": missing_odds_summary(board),
     }

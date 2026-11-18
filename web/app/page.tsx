@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import RoundList from '@/components/RoundList';
+import RoundTabs from '@/components/RoundTabs';
 import { Badge } from '@/components/ui/badge';
 import { readRound, readRoundIndex } from '@/lib/data';
 import type { RoundDocument } from '@/lib/types';
@@ -34,7 +34,7 @@ export default function HomePage() {
       </section>
 
       {round ? (
-        <RoundList round={round} />
+        <RoundTabs round={round} />
       ) : (
         <section className="rounded-xl border border-dashed px-4 py-8 text-center">
           <p className="font-medium">This round is not published yet.</p>
@@ -62,7 +62,7 @@ export default function HomePage() {
           <p className="text-sm text-muted-foreground">
             {example.label}, using only data available before that day, settled against the real results.
           </p>
-          <RoundList round={example} />
+          <RoundTabs round={example} />
         </section>
       ) : null}
     </div>

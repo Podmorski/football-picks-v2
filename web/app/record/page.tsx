@@ -103,6 +103,66 @@ export default function RecordPage() {
       ) : null}
 
       <section className="space-y-3">
+        <h2 className="text-lg font-semibold">How past picks landed</h2>
+        <p className="text-sm text-muted-foreground">
+          Every Tuesday and Saturday round from {record.picker_backtest?.seasons[0] ?? '2019-20'} to{' '}
+          {record.picker_backtest?.seasons.at(-1) ?? '2025-26'}, replayed with the same filters and only the data
+          available before each round date.
+        </p>
+        {(Object.entries(record.picker_backtest?.views ?? {}) as [string, import('@/lib/types').PickerViewSummary][]).map(
+          ([key, view]) => (
+            <div key={key} className="space-y-3 rounded-xl border p-4">
+              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+                <h3 className="text-base font-semibold">{key === 'stand_out' ? 'Stand-out' : 'Most likely'}</h3>
+                <span className="text-sm text-muted-foreground">
+                  {view.rounds} rounds · {view.picks} picks · mean {pct(view.mean_probability)} · landed{' '}
+                  <span className="font-medium text-foreground">{pct(view.hit_rate)}</span>{' '}
+                  <span className="tabular text-xs">
+                    (95% CI {pct(view.ci[0])}–{pct(view.ci[1])}, {view.hits}/{view.picks})
+                  </span>
+                </span>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2">
+                {([
+                  ['By play', view.by_play],
+                  ['By league', view.by_league],
+                ] as [string, import('@/lib/types').PickerRow[]][]).map(([title, rows]) => (
+                  <div key={title} className="space-y-1">
+                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h4>
+                    <div className="overflow-x-auto rounded-lg border">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-muted/60 text-xs text-muted-foreground">
+                            <th className="px-2 py-1.5 text-left font-semibold">Play</th>
+                            <th className="px-2 py-1.5 text-right font-semibold">n</th>
+                            <th className="px-2 py-1.5 text-right font-semibold">Predicted</th>
+                            <th className="px-2 py-1.5 text-right font-semibold">Landed</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {rows.slice(0, 10).map((row) => (
+                            <tr key={row.name} className="border-t">
+                              <td className="px-2 py-1.5">{row.label}</td>
+                              <td className="tabular px-2 py-1.5 text-right">{row.picks}</td>
+                              <td className="tabular px-2 py-1.5 text-right text-muted-foreground">
+                                {pct(row.mean_probability)}
+                              </td>
+                              <td className="tabular px-2 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ),
+        )}
+      </section>
+
+      <section className="space-y-3">
         <h2 className="text-lg font-semibold">Published picks</h2>
         {settledRounds.length === 0 ? (
           <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">

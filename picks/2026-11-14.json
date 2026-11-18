@@ -1,14 +1,18 @@
 {
  "config": {
   "agreement": 0.1,
+  "lift_min_probability": 0.45,
   "max_probability": 0.65,
+  "max_same_play": 3,
   "min_bin_sample": 100,
+  "min_lift": 0.08,
   "min_samples": 8,
   "top_n": 15
  },
  "cutoff": "2026-11-14",
  "date": "2026-11-14",
- "hits": 11,
+ "fixtures": 45,
+ "hits": 20,
  "kind": "example",
  "label": "Saturday 14 Nov",
  "picks": [
@@ -23,6 +27,9 @@
    "label": "Away 1+",
    "landed": true,
    "league": "National League",
+   "league_base": 0.7378,
+   "lift": -0.0894,
+   "no_odds": false,
    "outcome": "away_1plus",
    "play": "Away team scores",
    "probability": 0.6484,
@@ -41,115 +48,71 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.7128,
-     "gap": 0.0644,
+     "counts": 0.703,
+     "gap": 0.0547,
      "goals": 0.6484
     },
     "home_at_home": [
-     174,
-     253
+     76,
+     121
     ],
     "league_rate": [
-     0.6972,
-     50082
+     0.7378,
+     6039
     ],
     "samples": {
      "away": 31.9,
-     "home": 31.3
+     "home": 30.6
     }
    }
   },
   {
-   "away": "Raith Rvs",
+   "away": "Blackpool",
    "confidence": "Medium",
-   "div": "SC1",
+   "div": "E2",
    "fair_odds": 1.55,
-   "group": "Half goals",
-   "home": "Ayr",
+   "group": "Double chance",
+   "home": "AFC Wimbledon",
    "kickoff": "15:00",
-   "label": "1H 1+",
-   "landed": true,
-   "league": "Scottish Championship",
-   "outcome": "h1_1plus",
-   "play": "1+ goals in the first half",
-   "probability": 0.6445,
-   "result": "3-1 (2-0 HT)",
+   "label": "X2",
+   "landed": false,
+   "league": "League One",
+   "league_base": 0.5626,
+   "lift": 0.081,
+   "no_odds": false,
+   "outcome": "dc_x2",
+   "play": "Draw or away win",
+   "probability": 0.6435,
+   "result": "1-0 (1-0 HT)",
    "settled": true,
    "why": {
     "away_away": [
-     137,
-     197
+     102,
+     185
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 3875,
-     "landed": 0.6365,
-     "n": 6088,
+     "hits": 5463,
+     "landed": 0.6358,
+     "n": 8593,
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.7116,
-     "gap": 0.0671,
-     "goals": 0.6445
+     "counts": 0.5717,
+     "gap": 0.0718,
+     "goals": 0.6435
     },
     "home_at_home": [
-     144,
-     196
+     116,
+     162
     ],
     "league_rate": [
-     0.7057,
-     50055
+     0.5626,
+     6078
     ],
     "samples": {
-     "away": 25.8,
-     "home": 25.9
-    }
-   }
-  },
-  {
-   "away": "Barrow",
-   "confidence": "High",
-   "div": "EC",
-   "fair_odds": 1.55,
-   "group": "Over/Under",
-   "home": "Gateshead",
-   "kickoff": "15:00",
-   "label": "Under 3.5",
-   "landed": true,
-   "league": "National League",
-   "outcome": "ou_u35",
-   "play": "Under 3.5 goals",
-   "probability": 0.6444,
-   "result": "0-3 (0-1 HT)",
-   "settled": true,
-   "why": {
-    "away_away": [
-     180,
-     256
-    ],
-    "bin": {
-     "bin": "60-65",
-     "hits": 5775,
-     "landed": 0.6324,
-     "n": 9132,
-     "shown": 0.625
-    },
-    "engines": {
-     "counts": 0.6617,
-     "gap": 0.0173,
-     "goals": 0.6444
-    },
-    "home_at_home": [
-     136,
-     190
-    ],
-    "league_rate": [
-     0.7162,
-     50082
-    ],
-    "samples": {
-     "away": 32.2,
-     "home": 28.9
+     "away": 28.2,
+     "home": 19.7
     }
    }
   },
@@ -164,6 +127,9 @@
    "label": "3+",
    "landed": true,
    "league": "National League",
+   "league_base": 0.5646,
+   "lift": 0.0779,
+   "no_odds": false,
    "outcome": "tg_3plus",
    "play": "3+ goals in the match",
    "probability": 0.6425,
@@ -182,27 +148,27 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.6497,
-     "gap": 0.0072,
+     "counts": 0.6428,
+     "gap": 0.0003,
      "goals": 0.6425
     },
     "home_at_home": [
-     103,
-     231
+     67,
+     139
     ],
     "league_rate": [
-     0.5118,
-     50082
+     0.5646,
+     6039
     ],
     "samples": {
      "away": 25.8,
-     "home": 28.8
+     "home": 28.6
     }
    }
   },
   {
    "away": "Oldham",
-   "confidence": "High",
+   "confidence": "Medium",
    "div": "E3",
    "fair_odds": 1.56,
    "group": "Double chance",
@@ -211,6 +177,9 @@
    "label": "1X",
    "landed": true,
    "league": "League Two",
+   "league_base": 0.7073,
+   "lift": -0.0663,
+   "no_odds": false,
    "outcome": "dc_1x",
    "play": "Home win or draw",
    "probability": 0.641,
@@ -218,8 +187,8 @@
    "settled": true,
    "why": {
     "away_away": [
-     191,
-     256
+     87,
+     118
     ],
     "bin": {
      "bin": "60-65",
@@ -229,226 +198,41 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.6137,
-     "gap": 0.0272,
+     "counts": 0.6762,
+     "gap": 0.0353,
      "goals": 0.641
     },
     "home_at_home": [
-     152,
-     254
+     19,
+     30
     ],
     "league_rate": [
-     0.6985,
-     50082
+     0.7073,
+     6124
     ],
     "samples": {
-     "away": 31.5,
-     "home": 31.4
-    }
-   }
-  },
-  {
-   "away": "Peterhead",
-   "confidence": "Medium",
-   "div": "SC2",
-   "fair_odds": 1.57,
-   "group": "Double chance",
-   "home": "East Fife",
-   "kickoff": "15:00",
-   "label": "1X",
-   "landed": true,
-   "league": "Scottish League One",
-   "outcome": "dc_1x",
-   "play": "Home win or draw",
-   "probability": 0.6368,
-   "result": "1-0 (1-0 HT)",
-   "settled": true,
-   "why": {
-    "away_away": [
-     129,
-     193
-    ],
-    "bin": {
-     "bin": "60-65",
-     "hits": 5463,
-     "landed": 0.6358,
-     "n": 8593,
-     "shown": 0.625
-    },
-    "engines": {
-     "counts": 0.7022,
-     "gap": 0.0654,
-     "goals": 0.6368
-    },
-    "home_at_home": [
-     126,
-     194
-    ],
-    "league_rate": [
-     0.6985,
-     50082
-    ],
-    "samples": {
-     "away": 25.8,
-     "home": 25.8
-    }
-   }
-  },
-  {
-   "away": "Cheltenham",
-   "confidence": "High",
-   "div": "E3",
-   "fair_odds": 1.58,
-   "group": "Team goals",
-   "home": "Exeter",
-   "kickoff": "12:30",
-   "label": "Away 1+",
-   "landed": false,
-   "league": "League Two",
-   "outcome": "away_1plus",
-   "play": "Away team scores",
-   "probability": 0.6346,
-   "result": "1-0 (0-0 HT)",
-   "settled": true,
-   "why": {
-    "away_away": [
-     172,
-     255
-    ],
-    "bin": {
-     "bin": "60-65",
-     "hits": 6456,
-     "landed": 0.6275,
-     "n": 10288,
-     "shown": 0.625
-    },
-    "engines": {
-     "counts": 0.6201,
-     "gap": 0.0145,
-     "goals": 0.6346
-    },
-    "home_at_home": [
-     162,
-     255
-    ],
-    "league_rate": [
-     0.6972,
-     50082
-    ],
-    "samples": {
-     "away": 31.5,
-     "home": 31.6
-    }
-   }
-  },
-  {
-   "away": "Stranraer",
-   "confidence": "High",
-   "div": "SC3",
-   "fair_odds": 1.58,
-   "group": "Over/Under",
-   "home": "Kelty Hearts",
-   "kickoff": "15:00",
-   "label": "Under 3.5",
-   "landed": true,
-   "league": "Scottish League Two",
-   "outcome": "ou_u35",
-   "play": "Under 3.5 goals",
-   "probability": 0.6346,
-   "result": "0-1 (0-1 HT)",
-   "settled": true,
-   "why": {
-    "away_away": [
-     130,
-     194
-    ],
-    "bin": {
-     "bin": "60-65",
-     "hits": 5775,
-     "landed": 0.6324,
-     "n": 9132,
-     "shown": 0.625
-    },
-    "engines": {
-     "counts": 0.6743,
-     "gap": 0.0397,
-     "goals": 0.6346
-    },
-    "home_at_home": [
-     72,
-     96
-    ],
-    "league_rate": [
-     0.7162,
-     50082
-    ],
-    "samples": {
-     "away": 24.9,
-     "home": 24.5
-    }
-   }
-  },
-  {
-   "away": "Annan Athletic",
-   "confidence": "Low",
-   "div": "SC3",
-   "fair_odds": 1.58,
-   "group": "Over/Under",
-   "home": "Dumbarton",
-   "kickoff": "15:00",
-   "label": "Under 3.5",
-   "landed": false,
-   "league": "Scottish League Two",
-   "outcome": "ou_u35",
-   "play": "Under 3.5 goals",
-   "probability": 0.6337,
-   "result": "0-5 (0-3 HT)",
-   "settled": true,
-   "why": {
-    "away_away": [
-     131,
-     192
-    ],
-    "bin": {
-     "bin": "60-65",
-     "hits": 5775,
-     "landed": 0.6324,
-     "n": 9132,
-     "shown": 0.625
-    },
-    "engines": {
-     "counts": 0.7243,
-     "gap": 0.0907,
-     "goals": 0.6337
-    },
-    "home_at_home": [
-     139,
-     193
-    ],
-    "league_rate": [
-     0.7162,
-     50082
-    ],
-    "samples": {
-     "away": 24.8,
-     "home": 24.9
+     "away": 20.5,
+     "home": 18.9
     }
    }
   },
   {
    "away": "Morton",
-   "confidence": "High",
+   "confidence": "Low",
    "div": "SC1",
-   "fair_odds": 1.58,
+   "fair_odds": 1.57,
    "group": "Combos",
    "home": "Livingston",
    "kickoff": "15:00",
    "label": "C7: 1H 1+ & 2H 1+",
    "landed": false,
    "league": "Scottish Championship",
+   "league_base": 0.5056,
+   "lift": 0.1321,
+   "no_odds": false,
    "outcome": "c7",
    "play": "A goal in each half",
-   "probability": 0.6333,
+   "probability": 0.6377,
    "result": "2-0 (2-0 HT)",
    "settled": true,
    "why": {
@@ -464,68 +248,71 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.6062,
-     "gap": 0.0271,
-     "goals": 0.6333
+     "counts": 0.5505,
+     "gap": 0.0872,
+     "goals": 0.6377
     },
     "home_at_home": [
-     102,
-     206
+     27,
+     61
     ],
     "league_rate": [
-     0.5609,
-     50055
+     0.5056,
+     1961
     ],
     "samples": {
      "away": 24.8,
-     "home": 26.4
+     "home": 11.3
     }
    }
   },
   {
-   "away": "Alloa",
+   "away": "Peterhead",
    "confidence": "Medium",
    "div": "SC2",
-   "fair_odds": 1.58,
-   "group": "Total goals",
-   "home": "East Kilbride",
+   "fair_odds": 1.57,
+   "group": "Double chance",
+   "home": "East Fife",
    "kickoff": "15:00",
-   "label": "3+",
+   "label": "1X",
    "landed": true,
    "league": "Scottish League One",
-   "outcome": "tg_3plus",
-   "play": "3+ goals in the match",
-   "probability": 0.6319,
-   "result": "4-1 (2-0 HT)",
+   "league_base": 0.6697,
+   "lift": -0.033,
+   "no_odds": false,
+   "outcome": "dc_1x",
+   "play": "Home win or draw",
+   "probability": 0.6368,
+   "result": "1-0 (1-0 HT)",
    "settled": true,
    "why": {
     "away_away": [
-     110,
-     196
+     93,
+     121
     ],
     "bin": {
      "bin": "60-65",
-     "hits": 2399,
-     "landed": 0.6409,
-     "n": 3743,
+     "hits": 5463,
+     "landed": 0.6358,
+     "n": 8593,
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.5931,
-     "gap": 0.0388,
-     "goals": 0.6319
+     "counts": 0.6875,
+     "gap": 0.0507,
+     "goals": 0.6368
     },
     "home_at_home": [
-     18,
-     25
+     75,
+     122
     ],
     "league_rate": [
-     0.5118,
-     50082
+     0.6697,
+     1938
     ],
     "samples": {
-     "away": 25.8,
-     "home": 16.2
+     "away": 18.3,
+     "home": 17.2
     }
    }
   },
@@ -540,6 +327,9 @@
    "label": "1X",
    "landed": true,
    "league": "National League",
+   "league_base": 0.6707,
+   "lift": -0.0409,
+   "no_odds": false,
    "outcome": "dc_1x",
    "play": "Home win or draw",
    "probability": 0.6297,
@@ -558,8 +348,8 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.6274,
-     "gap": 0.0023,
+     "counts": 0.6257,
+     "gap": 0.0041,
      "goals": 0.6297
     },
     "home_at_home": [
@@ -567,8 +357,8 @@
      54
     ],
     "league_rate": [
-     0.6985,
-     50082
+     0.6707,
+     6039
     ],
     "samples": {
      "away": 30.8,
@@ -587,15 +377,18 @@
    "label": "Under 3.5",
    "landed": false,
    "league": "League One",
+   "league_base": 0.7279,
+   "lift": -0.0994,
+   "no_odds": false,
    "outcome": "ou_u35",
    "play": "Under 3.5 goals",
-   "probability": 0.6284,
+   "probability": 0.6285,
    "result": "3-1 (2-1 HT)",
    "settled": true,
    "why": {
     "away_away": [
-     181,
-     260
+     50,
+     76
     ],
     "bin": {
      "bin": "60-65",
@@ -605,44 +398,47 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.7083,
-     "gap": 0.0798,
-     "goals": 0.6284
+     "counts": 0.7049,
+     "gap": 0.0764,
+     "goals": 0.6285
     },
     "home_at_home": [
-     118,
-     162
+     39,
+     53
     ],
     "league_rate": [
-     0.7162,
-     50082
+     0.7279,
+     6078
     ],
     "samples": {
-     "away": 31.8,
-     "home": 31.3
+     "away": 28.6,
+     "home": 25.3
     }
    }
   },
   {
-   "away": "Accrington",
+   "away": "Raith Rvs",
    "confidence": "High",
-   "div": "E3",
-   "fair_odds": 1.6,
+   "div": "SC1",
+   "fair_odds": 1.59,
    "group": "Team goals",
-   "home": "Port Vale",
+   "home": "Ayr",
    "kickoff": "15:00",
-   "label": "Away 1+",
+   "label": "Home 1+",
    "landed": true,
-   "league": "League Two",
-   "outcome": "away_1plus",
-   "play": "Away team scores",
-   "probability": 0.6267,
-   "result": "4-2 (2-0 HT)",
+   "league": "Scottish Championship",
+   "league_base": 0.703,
+   "lift": -0.0748,
+   "no_odds": false,
+   "outcome": "home_1plus",
+   "play": "Home team scores",
+   "probability": 0.6282,
+   "result": "3-1 (2-0 HT)",
    "settled": true,
    "why": {
     "away_away": [
-     168,
-     255
+     105,
+     147
     ],
     "bin": {
      "bin": "60-65",
@@ -652,44 +448,97 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.5825,
-     "gap": 0.0443,
-     "goals": 0.6267
+     "counts": 0.6624,
+     "gap": 0.0341,
+     "goals": 0.6282
     },
     "home_at_home": [
-     168,
-     254
+     110,
+     160
     ],
     "league_rate": [
-     0.6972,
-     50082
+     0.703,
+     1961
     ],
     "samples": {
-     "away": 31.6,
-     "home": 30.9
+     "away": 25.6,
+     "home": 25.9
     }
    }
   },
   {
-   "away": "York",
+   "away": "Accrington",
    "confidence": "Medium",
    "div": "E3",
    "fair_odds": 1.6,
-   "group": "Over/Under",
-   "home": "Rochdale",
+   "group": "Team goals",
+   "home": "Port Vale",
    "kickoff": "15:00",
-   "label": "Under 3.5",
+   "label": "Away 1+",
    "landed": true,
    "league": "League Two",
-   "outcome": "ou_u35",
-   "play": "Under 3.5 goals",
-   "probability": 0.6252,
-   "result": "0-1 (0-0 HT)",
+   "league_base": 0.6838,
+   "lift": -0.0571,
+   "no_odds": false,
+   "outcome": "away_1plus",
+   "play": "Away team scores",
+   "probability": 0.6267,
+   "result": "4-2 (2-0 HT)",
    "settled": true,
    "why": {
     "away_away": [
-     107,
+     100,
      145
+    ],
+    "bin": {
+     "bin": "60-65",
+     "hits": 6456,
+     "landed": 0.6275,
+     "n": 10288,
+     "shown": 0.625
+    },
+    "engines": {
+     "counts": 0.5741,
+     "gap": 0.0526,
+     "goals": 0.6267
+    },
+    "home_at_home": [
+     88,
+     139
+    ],
+    "league_rate": [
+     0.6838,
+     6124
+    ],
+    "samples": {
+     "away": 28.6,
+     "home": 13.4
+    }
+   }
+  },
+  {
+   "away": "Queen of Sth",
+   "confidence": "Low",
+   "div": "SC2",
+   "fair_odds": 1.6,
+   "group": "Over/Under",
+   "home": "Airdrie Utd",
+   "kickoff": "15:00",
+   "label": "Under 3.5",
+   "landed": true,
+   "league": "Scottish League One",
+   "league_base": 0.6996,
+   "lift": -0.0735,
+   "no_odds": false,
+   "outcome": "ou_u35",
+   "play": "Under 3.5 goals",
+   "probability": 0.6262,
+   "result": "2-0 (1-0 HT)",
+   "settled": true,
+   "why": {
+    "away_away": [
+     56,
+     79
     ],
     "bin": {
      "bin": "60-65",
@@ -699,28 +548,1743 @@
      "shown": 0.625
     },
     "engines": {
-     "counts": 0.6761,
-     "gap": 0.0509,
-     "goals": 0.6252
+     "counts": 0.7215,
+     "gap": 0.0953,
+     "goals": 0.6262
     },
     "home_at_home": [
-     179,
-     253
+     95,
+     141
     ],
     "league_rate": [
-     0.7162,
-     50082
+     0.6996,
+     1938
     ],
     "samples": {
-     "away": 29.8,
-     "home": 31.5
+     "away": 24.8,
+     "home": 8.6
+    }
+   }
+  },
+  {
+   "away": "Grimsby",
+   "confidence": "High",
+   "div": "E3",
+   "fair_odds": 1.61,
+   "group": "Over/Under",
+   "home": "Swindon",
+   "kickoff": "15:00",
+   "label": "Under 3.5",
+   "landed": false,
+   "league": "League Two",
+   "league_base": 0.7273,
+   "lift": -0.1065,
+   "no_odds": false,
+   "outcome": "ou_u35",
+   "play": "Under 3.5 goals",
+   "probability": 0.6208,
+   "result": "1-4 (0-2 HT)",
+   "settled": true,
+   "why": {
+    "away_away": [
+     150,
+     210
+    ],
+    "bin": {
+     "bin": "60-65",
+     "hits": 5775,
+     "landed": 0.6324,
+     "n": 9132,
+     "shown": 0.625
+    },
+    "engines": {
+     "counts": 0.6522,
+     "gap": 0.0314,
+     "goals": 0.6208
+    },
+    "home_at_home": [
+     130,
+     187
+    ],
+    "league_rate": [
+     0.7273,
+     6124
+    ],
+    "samples": {
+     "away": 30.8,
+     "home": 31.1
+    }
+   }
+  },
+  {
+   "away": "Boston Utd",
+   "confidence": "Medium",
+   "div": "EC",
+   "fair_odds": 1.61,
+   "group": "BTTS",
+   "home": "Carlisle",
+   "kickoff": "15:00",
+   "label": "Yes",
+   "landed": false,
+   "league": "National League",
+   "league_base": 0.5765,
+   "lift": 0.0431,
+   "no_odds": false,
+   "outcome": "btts_yes",
+   "play": "Both teams score",
+   "probability": 0.6196,
+   "result": "2-0 (1-0 HT)",
+   "settled": true,
+   "why": {
+    "away_away": [
+     30,
+     53
+    ],
+    "bin": {
+     "bin": "60-65",
+     "hits": 1352,
+     "landed": 0.6052,
+     "n": 2234,
+     "shown": 0.625
+    },
+    "engines": {
+     "counts": 0.6006,
+     "gap": 0.0189,
+     "goals": 0.6196
+    },
+    "home_at_home": [
+     17,
+     31
+    ],
+    "league_rate": [
+     0.5765,
+     6039
+    ],
+    "samples": {
+     "away": 25.0,
+     "home": 19.4
+    }
+   }
+  },
+  {
+   "away": "Andorra",
+   "confidence": "High",
+   "div": "SP2",
+   "fair_odds": 1.62,
+   "group": "Team goals",
+   "home": "Almeria",
+   "kickoff": "17:30",
+   "label": "Home 2+",
+   "landed": true,
+   "league": "Segunda Division",
+   "league_base": 0.4206,
+   "lift": 0.1979,
+   "no_odds": false,
+   "outcome": "home_2plus",
+   "play": "Home team scores 2+",
+   "probability": 0.6185,
+   "result": "2-1 (2-0 HT)",
+   "settled": true,
+   "why": {
+    "away_away": [
+     29,
+     69
+    ],
+    "bin": {
+     "bin": "60-65",
+     "hits": 6456,
+     "landed": 0.6275,
+     "n": 10288,
+     "shown": 0.625
+    },
+    "engines": {
+     "counts": 0.6353,
+     "gap": 0.0169,
+     "goals": 0.6185
+    },
+    "home_at_home": [
+     106,
+     195
+    ],
+    "league_rate": [
+     0.4206,
+     5223
+    ],
+    "samples": {
+     "away": 21.5,
+     "home": 24.8
+    }
+   }
+  },
+  {
+   "away": "Elgin",
+   "confidence": "High",
+   "div": "SC3",
+   "fair_odds": 1.62,
+   "group": "BTTS",
+   "home": "Stirling",
+   "kickoff": "15:00",
+   "label": "Yes",
+   "landed": true,
+   "league": "Scottish League Two",
+   "league_base": 0.5532,
+   "lift": 0.0648,
+   "no_odds": false,
+   "outcome": "btts_yes",
+   "play": "Both teams score",
+   "probability": 0.618,
+   "result": "2-1 (0-0 HT)",
+   "settled": true,
+   "why": {
+    "away_away": [
+     103,
+     193
+    ],
+    "bin": {
+     "bin": "60-65",
+     "hits": 1352,
+     "landed": 0.6052,
+     "n": 2234,
+     "shown": 0.625
+    },
+    "engines": {
+     "counts": 0.5964,
+     "gap": 0.0215,
+     "goals": 0.618
+    },
+    "home_at_home": [
+     86,
+     174
+    ],
+    "league_rate": [
+     0.5532,
+     1932
+    ],
+    "samples": {
+     "away": 24.9,
+     "home": 22.4
     }
    }
   }
  ],
  "published": true,
  "settled": true,
- "settled_count": 15,
- "trained_matches": 50082,
+ "settled_count": 30,
+ "views": {
+  "most_likely": {
+   "hits": 10,
+   "label": "Most likely",
+   "picks": [
+    {
+     "away": "Aldershot",
+     "confidence": "Medium",
+     "div": "EC",
+     "fair_odds": 1.54,
+     "group": "Team goals",
+     "home": "Southend",
+     "kickoff": "15:00",
+     "label": "Away 1+",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.7378,
+     "lift": -0.0894,
+     "no_odds": false,
+     "outcome": "away_1plus",
+     "play": "Away team scores",
+     "probability": 0.6484,
+     "result": "2-1 (0-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       180,
+       256
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 6456,
+       "landed": 0.6275,
+       "n": 10288,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.703,
+       "gap": 0.0547,
+       "goals": 0.6484
+      },
+      "home_at_home": [
+       76,
+       121
+      ],
+      "league_rate": [
+       0.7378,
+       6039
+      ],
+      "samples": {
+       "away": 31.9,
+       "home": 30.6
+      }
+     }
+    },
+    {
+     "away": "Blackpool",
+     "confidence": "Medium",
+     "div": "E2",
+     "fair_odds": 1.55,
+     "group": "Double chance",
+     "home": "AFC Wimbledon",
+     "kickoff": "15:00",
+     "label": "X2",
+     "landed": false,
+     "league": "League One",
+     "league_base": 0.5626,
+     "lift": 0.081,
+     "no_odds": false,
+     "outcome": "dc_x2",
+     "play": "Draw or away win",
+     "probability": 0.6435,
+     "result": "1-0 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       102,
+       185
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 5463,
+       "landed": 0.6358,
+       "n": 8593,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.5717,
+       "gap": 0.0718,
+       "goals": 0.6435
+      },
+      "home_at_home": [
+       116,
+       162
+      ],
+      "league_rate": [
+       0.5626,
+       6078
+      ],
+      "samples": {
+       "away": 28.2,
+       "home": 19.7
+      }
+     }
+    },
+    {
+     "away": "Boreham Wood",
+     "confidence": "High",
+     "div": "EC",
+     "fair_odds": 1.56,
+     "group": "Total goals",
+     "home": "Yeovil",
+     "kickoff": "15:00",
+     "label": "3+",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.5646,
+     "lift": 0.0779,
+     "no_odds": false,
+     "outcome": "tg_3plus",
+     "play": "3+ goals in the match",
+     "probability": 0.6425,
+     "result": "2-2 (2-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       111,
+       232
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 2399,
+       "landed": 0.6409,
+       "n": 3743,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6428,
+       "gap": 0.0003,
+       "goals": 0.6425
+      },
+      "home_at_home": [
+       67,
+       139
+      ],
+      "league_rate": [
+       0.5646,
+       6039
+      ],
+      "samples": {
+       "away": 25.8,
+       "home": 28.6
+      }
+     }
+    },
+    {
+     "away": "Oldham",
+     "confidence": "Medium",
+     "div": "E3",
+     "fair_odds": 1.56,
+     "group": "Double chance",
+     "home": "Shrewsbury",
+     "kickoff": "15:00",
+     "label": "1X",
+     "landed": true,
+     "league": "League Two",
+     "league_base": 0.7073,
+     "lift": -0.0663,
+     "no_odds": false,
+     "outcome": "dc_1x",
+     "play": "Home win or draw",
+     "probability": 0.641,
+     "result": "2-1 (0-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       87,
+       118
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 5463,
+       "landed": 0.6358,
+       "n": 8593,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6762,
+       "gap": 0.0353,
+       "goals": 0.641
+      },
+      "home_at_home": [
+       19,
+       30
+      ],
+      "league_rate": [
+       0.7073,
+       6124
+      ],
+      "samples": {
+       "away": 20.5,
+       "home": 18.9
+      }
+     }
+    },
+    {
+     "away": "Morton",
+     "confidence": "Low",
+     "div": "SC1",
+     "fair_odds": 1.57,
+     "group": "Combos",
+     "home": "Livingston",
+     "kickoff": "15:00",
+     "label": "C7: 1H 1+ & 2H 1+",
+     "landed": false,
+     "league": "Scottish Championship",
+     "league_base": 0.5056,
+     "lift": 0.1321,
+     "no_odds": false,
+     "outcome": "c7",
+     "play": "A goal in each half",
+     "probability": 0.6377,
+     "result": "2-0 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       101,
+       195
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 1320,
+       "landed": 0.6355,
+       "n": 2077,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.5505,
+       "gap": 0.0872,
+       "goals": 0.6377
+      },
+      "home_at_home": [
+       27,
+       61
+      ],
+      "league_rate": [
+       0.5056,
+       1961
+      ],
+      "samples": {
+       "away": 24.8,
+       "home": 11.3
+      }
+     }
+    },
+    {
+     "away": "Peterhead",
+     "confidence": "Medium",
+     "div": "SC2",
+     "fair_odds": 1.57,
+     "group": "Double chance",
+     "home": "East Fife",
+     "kickoff": "15:00",
+     "label": "1X",
+     "landed": true,
+     "league": "Scottish League One",
+     "league_base": 0.6697,
+     "lift": -0.033,
+     "no_odds": false,
+     "outcome": "dc_1x",
+     "play": "Home win or draw",
+     "probability": 0.6368,
+     "result": "1-0 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       93,
+       121
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 5463,
+       "landed": 0.6358,
+       "n": 8593,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6875,
+       "gap": 0.0507,
+       "goals": 0.6368
+      },
+      "home_at_home": [
+       75,
+       122
+      ],
+      "league_rate": [
+       0.6697,
+       1938
+      ],
+      "samples": {
+       "away": 18.3,
+       "home": 17.2
+      }
+     }
+    },
+    {
+     "away": "Halifax",
+     "confidence": "Low",
+     "div": "EC",
+     "fair_odds": 1.59,
+     "group": "Double chance",
+     "home": "Kidderminster",
+     "kickoff": "15:00",
+     "label": "1X",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.6707,
+     "lift": -0.0409,
+     "no_odds": false,
+     "outcome": "dc_1x",
+     "play": "Home win or draw",
+     "probability": 0.6297,
+     "result": "1-1 (0-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       150,
+       228
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 5463,
+       "landed": 0.6358,
+       "n": 8593,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6257,
+       "gap": 0.0041,
+       "goals": 0.6297
+      },
+      "home_at_home": [
+       30,
+       54
+      ],
+      "league_rate": [
+       0.6707,
+       6039
+      ],
+      "samples": {
+       "away": 30.8,
+       "home": 10.2
+      }
+     }
+    },
+    {
+     "away": "Reading",
+     "confidence": "Medium",
+     "div": "E2",
+     "fair_odds": 1.59,
+     "group": "Over/Under",
+     "home": "Stockport",
+     "kickoff": "15:00",
+     "label": "Under 3.5",
+     "landed": false,
+     "league": "League One",
+     "league_base": 0.7279,
+     "lift": -0.0994,
+     "no_odds": false,
+     "outcome": "ou_u35",
+     "play": "Under 3.5 goals",
+     "probability": 0.6285,
+     "result": "3-1 (2-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       50,
+       76
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 5775,
+       "landed": 0.6324,
+       "n": 9132,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.7049,
+       "gap": 0.0764,
+       "goals": 0.6285
+      },
+      "home_at_home": [
+       39,
+       53
+      ],
+      "league_rate": [
+       0.7279,
+       6078
+      ],
+      "samples": {
+       "away": 28.6,
+       "home": 25.3
+      }
+     }
+    },
+    {
+     "away": "Raith Rvs",
+     "confidence": "High",
+     "div": "SC1",
+     "fair_odds": 1.59,
+     "group": "Team goals",
+     "home": "Ayr",
+     "kickoff": "15:00",
+     "label": "Home 1+",
+     "landed": true,
+     "league": "Scottish Championship",
+     "league_base": 0.703,
+     "lift": -0.0748,
+     "no_odds": false,
+     "outcome": "home_1plus",
+     "play": "Home team scores",
+     "probability": 0.6282,
+     "result": "3-1 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       105,
+       147
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 6456,
+       "landed": 0.6275,
+       "n": 10288,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6624,
+       "gap": 0.0341,
+       "goals": 0.6282
+      },
+      "home_at_home": [
+       110,
+       160
+      ],
+      "league_rate": [
+       0.703,
+       1961
+      ],
+      "samples": {
+       "away": 25.6,
+       "home": 25.9
+      }
+     }
+    },
+    {
+     "away": "Accrington",
+     "confidence": "Medium",
+     "div": "E3",
+     "fair_odds": 1.6,
+     "group": "Team goals",
+     "home": "Port Vale",
+     "kickoff": "15:00",
+     "label": "Away 1+",
+     "landed": true,
+     "league": "League Two",
+     "league_base": 0.6838,
+     "lift": -0.0571,
+     "no_odds": false,
+     "outcome": "away_1plus",
+     "play": "Away team scores",
+     "probability": 0.6267,
+     "result": "4-2 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       100,
+       145
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 6456,
+       "landed": 0.6275,
+       "n": 10288,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.5741,
+       "gap": 0.0526,
+       "goals": 0.6267
+      },
+      "home_at_home": [
+       88,
+       139
+      ],
+      "league_rate": [
+       0.6838,
+       6124
+      ],
+      "samples": {
+       "away": 28.6,
+       "home": 13.4
+      }
+     }
+    },
+    {
+     "away": "Queen of Sth",
+     "confidence": "Low",
+     "div": "SC2",
+     "fair_odds": 1.6,
+     "group": "Over/Under",
+     "home": "Airdrie Utd",
+     "kickoff": "15:00",
+     "label": "Under 3.5",
+     "landed": true,
+     "league": "Scottish League One",
+     "league_base": 0.6996,
+     "lift": -0.0735,
+     "no_odds": false,
+     "outcome": "ou_u35",
+     "play": "Under 3.5 goals",
+     "probability": 0.6262,
+     "result": "2-0 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       56,
+       79
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 5775,
+       "landed": 0.6324,
+       "n": 9132,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.7215,
+       "gap": 0.0953,
+       "goals": 0.6262
+      },
+      "home_at_home": [
+       95,
+       141
+      ],
+      "league_rate": [
+       0.6996,
+       1938
+      ],
+      "samples": {
+       "away": 24.8,
+       "home": 8.6
+      }
+     }
+    },
+    {
+     "away": "Grimsby",
+     "confidence": "High",
+     "div": "E3",
+     "fair_odds": 1.61,
+     "group": "Over/Under",
+     "home": "Swindon",
+     "kickoff": "15:00",
+     "label": "Under 3.5",
+     "landed": false,
+     "league": "League Two",
+     "league_base": 0.7273,
+     "lift": -0.1065,
+     "no_odds": false,
+     "outcome": "ou_u35",
+     "play": "Under 3.5 goals",
+     "probability": 0.6208,
+     "result": "1-4 (0-2 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       150,
+       210
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 5775,
+       "landed": 0.6324,
+       "n": 9132,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6522,
+       "gap": 0.0314,
+       "goals": 0.6208
+      },
+      "home_at_home": [
+       130,
+       187
+      ],
+      "league_rate": [
+       0.7273,
+       6124
+      ],
+      "samples": {
+       "away": 30.8,
+       "home": 31.1
+      }
+     }
+    },
+    {
+     "away": "Boston Utd",
+     "confidence": "Medium",
+     "div": "EC",
+     "fair_odds": 1.61,
+     "group": "BTTS",
+     "home": "Carlisle",
+     "kickoff": "15:00",
+     "label": "Yes",
+     "landed": false,
+     "league": "National League",
+     "league_base": 0.5765,
+     "lift": 0.0431,
+     "no_odds": false,
+     "outcome": "btts_yes",
+     "play": "Both teams score",
+     "probability": 0.6196,
+     "result": "2-0 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       30,
+       53
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 1352,
+       "landed": 0.6052,
+       "n": 2234,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6006,
+       "gap": 0.0189,
+       "goals": 0.6196
+      },
+      "home_at_home": [
+       17,
+       31
+      ],
+      "league_rate": [
+       0.5765,
+       6039
+      ],
+      "samples": {
+       "away": 25.0,
+       "home": 19.4
+      }
+     }
+    },
+    {
+     "away": "Andorra",
+     "confidence": "High",
+     "div": "SP2",
+     "fair_odds": 1.62,
+     "group": "Team goals",
+     "home": "Almeria",
+     "kickoff": "17:30",
+     "label": "Home 2+",
+     "landed": true,
+     "league": "Segunda Division",
+     "league_base": 0.4206,
+     "lift": 0.1979,
+     "no_odds": false,
+     "outcome": "home_2plus",
+     "play": "Home team scores 2+",
+     "probability": 0.6185,
+     "result": "2-1 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       29,
+       69
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 6456,
+       "landed": 0.6275,
+       "n": 10288,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6353,
+       "gap": 0.0169,
+       "goals": 0.6185
+      },
+      "home_at_home": [
+       106,
+       195
+      ],
+      "league_rate": [
+       0.4206,
+       5223
+      ],
+      "samples": {
+       "away": 21.5,
+       "home": 24.8
+      }
+     }
+    },
+    {
+     "away": "Elgin",
+     "confidence": "High",
+     "div": "SC3",
+     "fair_odds": 1.62,
+     "group": "BTTS",
+     "home": "Stirling",
+     "kickoff": "15:00",
+     "label": "Yes",
+     "landed": true,
+     "league": "Scottish League Two",
+     "league_base": 0.5532,
+     "lift": 0.0648,
+     "no_odds": false,
+     "outcome": "btts_yes",
+     "play": "Both teams score",
+     "probability": 0.618,
+     "result": "2-1 (0-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       103,
+       193
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 1352,
+       "landed": 0.6052,
+       "n": 2234,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.5964,
+       "gap": 0.0215,
+       "goals": 0.618
+      },
+      "home_at_home": [
+       86,
+       174
+      ],
+      "league_rate": [
+       0.5532,
+       1932
+      ],
+      "samples": {
+       "away": 24.9,
+       "home": 22.4
+      }
+     }
+    }
+   ],
+   "settled_count": 15
+  },
+  "stand_out": {
+   "hits": 10,
+   "label": "Stand-out",
+   "picks": [
+    {
+     "away": "Boreham Wood",
+     "confidence": "Low",
+     "div": "EC",
+     "fair_odds": 1.59,
+     "group": "Team goals",
+     "home": "Yeovil",
+     "kickoff": "15:00",
+     "label": "Away 2+",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.3798,
+     "lift": 0.25,
+     "no_odds": false,
+     "outcome": "away_2plus",
+     "play": "Away team scores 2+",
+     "probability": 0.6298,
+     "result": "2-2 (2-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       95,
+       232
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 6456,
+       "landed": 0.6275,
+       "n": 10288,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.5457,
+       "gap": 0.0841,
+       "goals": 0.6298
+      },
+      "home_at_home": [
+       49,
+       139
+      ],
+      "league_rate": [
+       0.3798,
+       6039
+      ],
+      "samples": {
+       "away": 25.8,
+       "home": 28.6
+      }
+     }
+    },
+    {
+     "away": "Aldershot",
+     "confidence": "Medium",
+     "div": "EC",
+     "fair_odds": 2.08,
+     "group": "HT/FT",
+     "home": "Southend",
+     "kickoff": "15:00",
+     "label": "1/1",
+     "landed": false,
+     "league": "National League",
+     "league_base": 0.2687,
+     "lift": 0.2111,
+     "no_odds": false,
+     "outcome": "htft_11",
+     "play": "Home ahead at half-time and full-time",
+     "probability": 0.4798,
+     "result": "2-1 (0-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       73,
+       256
+      ],
+      "bin": {
+       "bin": "45-50",
+       "hits": 299,
+       "landed": 0.4694,
+       "n": 637,
+       "shown": 0.475
+      },
+      "engines": {
+       "counts": 0.4032,
+       "gap": 0.0766,
+       "goals": 0.4798
+      },
+      "home_at_home": [
+       44,
+       121
+      ],
+      "league_rate": [
+       0.2687,
+       6039
+      ],
+      "samples": {
+       "away": 31.9,
+       "home": 30.6
+      }
+     }
+    },
+    {
+     "away": "Boston Utd",
+     "confidence": "Low",
+     "div": "EC",
+     "fair_odds": 1.99,
+     "group": "Team goals",
+     "home": "Carlisle",
+     "kickoff": "15:00",
+     "label": "Home scores both halves",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.291,
+     "lift": 0.2104,
+     "no_odds": false,
+     "outcome": "home_both_halves",
+     "play": "Home team scores in both halves",
+     "probability": 0.5014,
+     "result": "2-0 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       14,
+       53
+      ],
+      "bin": {
+       "bin": "50-55",
+       "hits": 6990,
+       "landed": 0.5274,
+       "n": 13253,
+       "shown": 0.525
+      },
+      "engines": {
+       "counts": 0.4109,
+       "gap": 0.0905,
+       "goals": 0.5014
+      },
+      "home_at_home": [
+       16,
+       31
+      ],
+      "league_rate": [
+       0.291,
+       6039
+      ],
+      "samples": {
+       "away": 25.0,
+       "home": 19.4
+      }
+     }
+    },
+    {
+     "away": "Andorra",
+     "confidence": "High",
+     "div": "SP2",
+     "fair_odds": 1.62,
+     "group": "Team goals",
+     "home": "Almeria",
+     "kickoff": "17:30",
+     "label": "Home 2+",
+     "landed": true,
+     "league": "Segunda Division",
+     "league_base": 0.4206,
+     "lift": 0.1979,
+     "no_odds": false,
+     "outcome": "home_2plus",
+     "play": "Home team scores 2+",
+     "probability": 0.6185,
+     "result": "2-1 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       29,
+       69
+      ],
+      "bin": {
+       "bin": "60-65",
+       "hits": 6456,
+       "landed": 0.6275,
+       "n": 10288,
+       "shown": 0.625
+      },
+      "engines": {
+       "counts": 0.6353,
+       "gap": 0.0169,
+       "goals": 0.6185
+      },
+      "home_at_home": [
+       106,
+       195
+      ],
+      "league_rate": [
+       0.4206,
+       5223
+      ],
+      "samples": {
+       "away": 21.5,
+       "home": 24.8
+      }
+     }
+    },
+    {
+     "away": "Fylde",
+     "confidence": "Medium",
+     "div": "EC",
+     "fair_odds": 2.18,
+     "group": "Combos",
+     "home": "Eastleigh",
+     "kickoff": "15:00",
+     "label": "C8: Away 2+ & BTTS",
+     "landed": true,
+     "league": "National League",
+     "league_base": 0.2896,
+     "lift": 0.1689,
+     "no_odds": false,
+     "outcome": "c8",
+     "play": "Away team 2+ and both teams score",
+     "probability": 0.4585,
+     "result": "1-2 (0-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       36,
+       118
+      ],
+      "bin": {
+       "bin": "45-50",
+       "hits": 7717,
+       "landed": 0.4884,
+       "n": 15799,
+       "shown": 0.475
+      },
+      "engines": {
+       "counts": 0.3958,
+       "gap": 0.0626,
+       "goals": 0.4585
+      },
+      "home_at_home": [
+       68,
+       252
+      ],
+      "league_rate": [
+       0.2896,
+       6039
+      ],
+      "samples": {
+       "away": 16.8,
+       "home": 32.0
+      }
+     }
+    },
+    {
+     "away": "Clyde",
+     "confidence": "High",
+     "div": "SC3",
+     "fair_odds": 2.0,
+     "group": "Team goals",
+     "home": "Edinburgh City",
+     "kickoff": "15:00",
+     "label": "Away 2+",
+     "landed": true,
+     "league": "Scottish League Two",
+     "league_base": 0.3541,
+     "lift": 0.1447,
+     "no_odds": false,
+     "outcome": "away_2plus",
+     "play": "Away team scores 2+",
+     "probability": 0.4988,
+     "result": "2-6 (2-2 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       46,
+       132
+      ],
+      "bin": {
+       "bin": "45-50",
+       "hits": 9032,
+       "landed": 0.4796,
+       "n": 18832,
+       "shown": 0.475
+      },
+      "engines": {
+       "counts": 0.4633,
+       "gap": 0.0355,
+       "goals": 0.4988
+      },
+      "home_at_home": [
+       55,
+       139
+      ],
+      "league_rate": [
+       0.3541,
+       1932
+      ],
+      "samples": {
+       "away": 22.9,
+       "home": 21.2
+      }
+     }
+    },
+    {
+     "away": "Grimsby",
+     "confidence": "High",
+     "div": "E3",
+     "fair_odds": 1.87,
+     "group": "Team goals",
+     "home": "Swindon",
+     "kickoff": "15:00",
+     "label": "Away 1+ in 1H",
+     "landed": true,
+     "league": "League Two",
+     "league_base": 0.3923,
+     "lift": 0.1429,
+     "no_odds": false,
+     "outcome": "away_1h_1plus",
+     "play": "Away team scores in the first half",
+     "probability": 0.5352,
+     "result": "1-4 (0-2 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       86,
+       210
+      ],
+      "bin": {
+       "bin": "50-55",
+       "hits": 6990,
+       "landed": 0.5274,
+       "n": 13253,
+       "shown": 0.525
+      },
+      "engines": {
+       "counts": 0.4984,
+       "gap": 0.0368,
+       "goals": 0.5352
+      },
+      "home_at_home": [
+       78,
+       187
+      ],
+      "league_rate": [
+       0.3923,
+       6124
+      ],
+      "samples": {
+       "away": 30.8,
+       "home": 31.1
+      }
+     }
+    },
+    {
+     "away": "Spartans",
+     "confidence": "Medium",
+     "div": "SC3",
+     "fair_odds": 2.01,
+     "group": "Team goals",
+     "home": "Forfar",
+     "kickoff": "15:00",
+     "label": "Away 2+",
+     "landed": false,
+     "league": "Scottish League Two",
+     "league_base": 0.3541,
+     "lift": 0.1428,
+     "no_odds": false,
+     "outcome": "away_2plus",
+     "play": "Away team scores 2+",
+     "probability": 0.4969,
+     "result": "2-1 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       33,
+       60
+      ],
+      "bin": {
+       "bin": "45-50",
+       "hits": 9032,
+       "landed": 0.4796,
+       "n": 18832,
+       "shown": 0.475
+      },
+      "engines": {
+       "counts": 0.4445,
+       "gap": 0.0524,
+       "goals": 0.4969
+      },
+      "home_at_home": [
+       36,
+       114
+      ],
+      "league_rate": [
+       0.3541,
+       1932
+      ],
+      "samples": {
+       "away": 22.7,
+       "home": 24.5
+      }
+     }
+    },
+    {
+     "away": "Elgin",
+     "confidence": "Medium",
+     "div": "SC3",
+     "fair_odds": 1.77,
+     "group": "Team goals",
+     "home": "Stirling",
+     "kickoff": "15:00",
+     "label": "Away 1+ in 1H",
+     "landed": false,
+     "league": "Scottish League Two",
+     "league_base": 0.4284,
+     "lift": 0.1365,
+     "no_odds": false,
+     "outcome": "away_1h_1plus",
+     "play": "Away team scores in the first half",
+     "probability": 0.5649,
+     "result": "2-1 (0-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       78,
+       193
+      ],
+      "bin": {
+       "bin": "55-60",
+       "hits": 5714,
+       "landed": 0.5836,
+       "n": 9791,
+       "shown": 0.575
+      },
+      "engines": {
+       "counts": 0.4961,
+       "gap": 0.0688,
+       "goals": 0.5649
+      },
+      "home_at_home": [
+       88,
+       174
+      ],
+      "league_rate": [
+       0.4284,
+       1932
+      ],
+      "samples": {
+       "away": 24.9,
+       "home": 22.4
+      }
+     }
+    },
+    {
+     "away": "Morton",
+     "confidence": "Low",
+     "div": "SC1",
+     "fair_odds": 1.96,
+     "group": "Half goals",
+     "home": "Livingston",
+     "kickoff": "15:00",
+     "label": "2H 2+",
+     "landed": false,
+     "league": "Scottish Championship",
+     "league_base": 0.3759,
+     "lift": 0.134,
+     "no_odds": false,
+     "outcome": "h2_2plus",
+     "play": "2+ goals in the second half",
+     "probability": 0.5099,
+     "result": "2-0 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       87,
+       195
+      ],
+      "bin": {
+       "bin": "50-55",
+       "hits": 1537,
+       "landed": 0.5132,
+       "n": 2995,
+       "shown": 0.525
+      },
+      "engines": {
+       "counts": 0.4444,
+       "gap": 0.0655,
+       "goals": 0.5099
+      },
+      "home_at_home": [
+       21,
+       61
+      ],
+      "league_rate": [
+       0.3759,
+       1961
+      ],
+      "samples": {
+       "away": 24.8,
+       "home": 11.3
+      }
+     }
+    },
+    {
+     "away": "Reading",
+     "confidence": "Low",
+     "div": "E2",
+     "fair_odds": 1.81,
+     "group": "Team goals",
+     "home": "Stockport",
+     "kickoff": "15:00",
+     "label": "Home 2+",
+     "landed": true,
+     "league": "League One",
+     "league_base": 0.4207,
+     "lift": 0.1326,
+     "no_odds": false,
+     "outcome": "home_2plus",
+     "play": "Home team scores 2+",
+     "probability": 0.5533,
+     "result": "3-1 (2-1 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       33,
+       76
+      ],
+      "bin": {
+       "bin": "55-60",
+       "hits": 5714,
+       "landed": 0.5836,
+       "n": 9791,
+       "shown": 0.575
+      },
+      "engines": {
+       "counts": 0.4574,
+       "gap": 0.0958,
+       "goals": 0.5533
+      },
+      "home_at_home": [
+       28,
+       53
+      ],
+      "league_rate": [
+       0.4207,
+       6078
+      ],
+      "samples": {
+       "away": 28.6,
+       "home": 25.3
+      }
+     }
+    },
+    {
+     "away": "Burton",
+     "confidence": "Low",
+     "div": "E2",
+     "fair_odds": 2.17,
+     "group": "Combos",
+     "home": "Milton Keynes Dons",
+     "kickoff": "15:00",
+     "label": "C1: 1X & 3+",
+     "landed": true,
+     "league": "League One",
+     "league_base": 0.3323,
+     "lift": 0.1288,
+     "no_odds": false,
+     "outcome": "c1",
+     "play": "Home win or draw, and 3+ goals",
+     "probability": 0.461,
+     "result": "6-2 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       74,
+       209
+      ],
+      "bin": {
+       "bin": "45-50",
+       "hits": 7717,
+       "landed": 0.4884,
+       "n": 15799,
+       "shown": 0.475
+      },
+      "engines": {
+       "counts": 0.3873,
+       "gap": 0.0737,
+       "goals": 0.461
+      },
+      "home_at_home": [
+       35,
+       140
+      ],
+      "league_rate": [
+       0.3323,
+       6078
+      ],
+      "samples": {
+       "away": 31.5,
+       "home": 9.4
+      }
+     }
+    },
+    {
+     "away": "Castellon",
+     "confidence": "High",
+     "div": "SP2",
+     "fair_odds": 1.98,
+     "group": "Team goals",
+     "home": "Valladolid",
+     "kickoff": "13:00",
+     "label": "Away 1+ in 1H",
+     "landed": false,
+     "league": "Segunda Division",
+     "league_base": 0.3808,
+     "lift": 0.1241,
+     "no_odds": false,
+     "outcome": "away_1h_1plus",
+     "play": "Away team scores in the first half",
+     "probability": 0.5049,
+     "result": "0-1 (0-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       28,
+       70
+      ],
+      "bin": {
+       "bin": "50-55",
+       "hits": 6990,
+       "landed": 0.5274,
+       "n": 13253,
+       "shown": 0.525
+      },
+      "engines": {
+       "counts": 0.4698,
+       "gap": 0.0351,
+       "goals": 0.5049
+      },
+      "home_at_home": [
+       40,
+       132
+      ],
+      "league_rate": [
+       0.3808,
+       5202
+      ],
+      "samples": {
+       "away": 24.4,
+       "home": 21.0
+      }
+     }
+    },
+    {
+     "away": "Inverness C",
+     "confidence": "Low",
+     "div": "SC1",
+     "fair_odds": 1.79,
+     "group": "Team goals",
+     "home": "Partick",
+     "kickoff": "15:00",
+     "label": "Home 1+ in 1H",
+     "landed": true,
+     "league": "Scottish Championship",
+     "league_base": 0.4492,
+     "lift": 0.1109,
+     "no_odds": false,
+     "outcome": "home_1h_1plus",
+     "play": "Home team scores in the first half",
+     "probability": 0.5601,
+     "result": "3-2 (2-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       50,
+       125
+      ],
+      "bin": {
+       "bin": "55-60",
+       "hits": 5714,
+       "landed": 0.5836,
+       "n": 9791,
+       "shown": 0.575
+      },
+      "engines": {
+       "counts": 0.5643,
+       "gap": 0.0042,
+       "goals": 0.5601
+      },
+      "home_at_home": [
+       66,
+       128
+      ],
+      "league_rate": [
+       0.4492,
+       1961
+      ],
+      "samples": {
+       "away": 11.1,
+       "home": 25.4
+      }
+     }
+    },
+    {
+     "away": "Plymouth",
+     "confidence": "Low",
+     "div": "E2",
+     "fair_odds": 1.85,
+     "group": "Half goals",
+     "home": "Sheffield Weds",
+     "kickoff": "15:00",
+     "label": "2H 2+",
+     "landed": true,
+     "league": "League One",
+     "league_base": 0.4319,
+     "lift": 0.11,
+     "no_odds": false,
+     "outcome": "h2_2plus",
+     "play": "2+ goals in the second half",
+     "probability": 0.5419,
+     "result": "3-0 (1-0 HT)",
+     "settled": true,
+     "why": {
+      "away_away": [
+       65,
+       145
+      ],
+      "bin": {
+       "bin": "50-55",
+       "hits": 1537,
+       "landed": 0.5132,
+       "n": 2995,
+       "shown": 0.525
+      },
+      "engines": {
+       "counts": 0.4656,
+       "gap": 0.0762,
+       "goals": 0.5419
+      },
+      "home_at_home": [
+       23,
+       53
+      ],
+      "league_rate": [
+       0.4319,
+       6078
+      ],
+      "samples": {
+       "away": 21.9,
+       "home": 8.7
+      }
+     }
+    }
+   ],
+   "settled_count": 15
+  }
+ },
  "weekday": "Saturday"
 }

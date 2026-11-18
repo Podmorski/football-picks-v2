@@ -58,6 +58,9 @@ export type RoundPick = {
   play: string;
   probability: number;
   fair_odds: number;
+  league_base?: number;
+  lift?: number;
+  no_odds?: boolean;
   confidence: 'High' | 'Medium' | 'Low';
   why: {
     home_at_home: [number, number];
@@ -72,13 +75,17 @@ export type RoundPick = {
   result: string | null;
 };
 
+export type RoundView = { label: string; picks: RoundPick[]; hits: number; settled_count: number };
+
 export type RoundDocument = {
   date: string;
   label: string;
   weekday: string;
   kind: 'round' | 'example' | 'upcoming';
-  cutoff: string;
-  trained_matches: number;
+  cutoff?: string;
+  trained_matches?: number;
+  fixtures?: number;
+  views?: Record<string, RoundView>;
   picks: RoundPick[];
   published: boolean;
   settled: boolean;
@@ -92,6 +99,7 @@ export type RoundIndexRow = {
   weekday: string;
   kind: string;
   picks: number;
+  stand_out?: number;
   hits: number;
   settled_count: number;
   settled: boolean;
@@ -113,10 +121,40 @@ export type ModelFile = {
   full_worse_than_base_count: number;
 };
 
+export type PickerRow = {
+  name: string;
+  label: string;
+  picks: number;
+  mean_probability: number | null;
+  hits: number;
+  hit_rate: number;
+  ci: [number | null, number | null];
+};
+
+export type PickerViewSummary = {
+  rounds: number;
+  picks: number;
+  mean_probability: number | null;
+  hits: number;
+  hit_rate: number | null;
+  ci: [number | null, number | null];
+  by_play: PickerRow[];
+  by_league: PickerRow[];
+  no_odds_picks: number;
+};
+
+export type PickerBacktest = {
+  seasons: string[];
+  weekdays: string[];
+  degraded_groups: string[];
+  views: Record<string, PickerViewSummary>;
+};
+
 export type RecordFile = {
   calibration: { overall: CalibrationBlock; groups: Record<string, CalibrationBlock> };
   rounds: RoundIndexRow[];
   totals: { rounds: number; picks: number; hits: number; settled: number; hit_rate: number | null };
+  picker_backtest?: PickerBacktest;
 };
 
 export type UpcomingFixture = {
