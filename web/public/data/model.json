@@ -4065,5 +4065,452 @@
    "Tuesday",
    "Saturday"
   ]
+ },
+ "ranking_backtest": {
+  "bands": [
+   "1.70-2.00",
+   "2.00-3.00",
+   "3.00-5.00",
+   "5.00-10.00",
+   "10.00+"
+  ],
+  "groups": [
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5381,
+     0.5955
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.567,
+    "hits": 647,
+    "mean_probability": 0.5834,
+    "picks": 1141
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4926,
+     0.5353
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.514,
+    "hits": 1085,
+    "mean_probability": 0.4975,
+    "picks": 2111
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.2609,
+     0.3599
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.3082,
+    "hits": 102,
+    "mean_probability": 0.3303,
+    "picks": 331
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1749,
+     0.208
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.1909,
+    "hits": 412,
+    "mean_probability": 0.1958,
+    "picks": 2158
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5526,
+     0.5864
+    ],
+    "group": "Combos",
+    "hit_rate": 0.5696,
+    "hits": 1878,
+    "mean_probability": 0.5834,
+    "picks": 3297
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0881,
+     0.1109
+    ],
+    "group": "Combos",
+    "hit_rate": 0.0989,
+    "hits": 260,
+    "mean_probability": 0.0976,
+    "picks": 2628
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4881,
+     0.5209
+    ],
+    "group": "Combos",
+    "hit_rate": 0.5045,
+    "hits": 1795,
+    "mean_probability": 0.4973,
+    "picks": 3558
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3395,
+     0.3554
+    ],
+    "group": "Combos",
+    "hit_rate": 0.3474,
+    "hits": 4769,
+    "mean_probability": 0.33,
+    "picks": 13728
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1828,
+     0.2006
+    ],
+    "group": "Combos",
+    "hit_rate": 0.1915,
+    "hits": 1438,
+    "mean_probability": 0.1948,
+    "picks": 7509
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.1032,
+     0.1155
+    ],
+    "group": "Correct score",
+    "hit_rate": 0.1092,
+    "hits": 1092,
+    "mean_probability": 0.0975,
+    "picks": 9999
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5873,
+     0.6157
+    ],
+    "group": "Goals",
+    "hit_rate": 0.6016,
+    "hits": 2748,
+    "mean_probability": 0.5826,
+    "picks": 4568
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0847,
+     0.111
+    ],
+    "group": "Goals",
+    "hit_rate": 0.0971,
+    "hits": 190,
+    "mean_probability": 0.0978,
+    "picks": 1957
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4945,
+     0.5076
+    ],
+    "group": "Goals",
+    "hit_rate": 0.501,
+    "hits": 11183,
+    "mean_probability": 0.4957,
+    "picks": 22320
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3042,
+     0.3324
+    ],
+    "group": "Goals",
+    "hit_rate": 0.3181,
+    "hits": 1331,
+    "mean_probability": 0.329,
+    "picks": 4184
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1906,
+     0.2119
+    ],
+    "group": "Goals",
+    "hit_rate": 0.201,
+    "hits": 1086,
+    "mean_probability": 0.1962,
+    "picks": 5402
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5487,
+     0.5899
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.5694,
+    "hits": 1259,
+    "mean_probability": 0.584,
+    "picks": 2211
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0887,
+     0.1003
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.0943,
+    "hits": 917,
+    "mean_probability": 0.0969,
+    "picks": 9724
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4828,
+     0.5219
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.5024,
+    "hits": 1262,
+    "mean_probability": 0.4978,
+    "picks": 2512
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3192,
+     0.3549
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.3368,
+    "hits": 905,
+    "mean_probability": 0.33,
+    "picks": 2687
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1922,
+     0.2128
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.2023,
+    "hits": 1190,
+    "mean_probability": 0.196,
+    "picks": 5882
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5886,
+     0.6035
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.5961,
+    "hits": 9970,
+    "mean_probability": 0.5816,
+    "picks": 16726
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.084,
+     0.104
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.0935,
+    "hits": 306,
+    "mean_probability": 0.0976,
+    "picks": 3272
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4468,
+     0.4984
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.4725,
+    "hits": 679,
+    "mean_probability": 0.4974,
+    "picks": 1437
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3138,
+     0.3338
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.3237,
+    "hits": 2741,
+    "mean_probability": 0.3298,
+    "picks": 8467
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1815,
+     0.2031
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.192,
+    "hits": 985,
+    "mean_probability": 0.1966,
+    "picks": 5129
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5659,
+     0.6195
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.593,
+    "hits": 762,
+    "mean_probability": 0.5836,
+    "picks": 1285
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0796,
+     0.0991
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.0889,
+    "hits": 289,
+    "mean_probability": 0.0976,
+    "picks": 3252
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.463,
+     0.546
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.5045,
+    "hits": 279,
+    "mean_probability": 0.4976,
+    "picks": 553
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.278,
+     0.3322
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.3044,
+    "hits": 337,
+    "mean_probability": 0.329,
+    "picks": 1107
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1753,
+     0.2013
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.1879,
+    "hits": 651,
+    "mean_probability": 0.1963,
+    "picks": 3464
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5722,
+     0.599
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.5856,
+    "hits": 3040,
+    "mean_probability": 0.5838,
+    "picks": 5191
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0903,
+     0.1111
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.1002,
+    "hits": 323,
+    "mean_probability": 0.0979,
+    "picks": 3223
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.483,
+     0.5138
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.4984,
+    "hits": 2013,
+    "mean_probability": 0.4976,
+    "picks": 4039
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3061,
+     0.3367
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.3212,
+    "hits": 1147,
+    "mean_probability": 0.3296,
+    "picks": 3571
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1935,
+     0.2167
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.2049,
+    "hits": 954,
+    "mean_probability": 0.1956,
+    "picks": 4657
+   }
+  ],
+  "rounds": {
+   "1.70-2.00": 679,
+   "10.00+": 677,
+   "2.00-3.00": 698,
+   "3.00-5.00": 683,
+   "5.00-10.00": 685
+  },
+  "seasons": [
+   "2019-20",
+   "2020-21",
+   "2021-22",
+   "2022-23",
+   "2023-24",
+   "2024-25",
+   "2025-26"
+  ]
  }
 }

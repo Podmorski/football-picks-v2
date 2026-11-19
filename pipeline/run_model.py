@@ -13,9 +13,10 @@ from pathlib import Path
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
 from .extras import parse_extra_csv
 from .fixtures import Fixture, current_or_next_round_date, fixtures_for_date, last_saturday, parse_fixtures
-from .model import backtest, live, picker_backtest
+from . import ranking
+from .model import backtest, live, picker_backtest, ranking_backtest
 from .parse import parse_season_csv
-from .picks import build_by_play, build_round, publish, read_results, rebuild_index, round_action, settle_document
+from .picks import build_round, publish, read_results, rebuild_index, round_action, settle_document
 from .run import cached_seasons
 
 PICKS_DIR = Path(__file__).resolve().parents[1] / "picks"
@@ -125,6 +126,18 @@ def build_predictors(by_division: dict[str, list], cutoff: dt.date, half_life: f
     return predictors
 
 
+def market_band_map(ranking_bt: dict) -> dict:
+    """Group|band -> the row confidence_badge expects (landed, shown, n)."""
+    return {
+        f"{row['group']}|{row['band']}": {
+            "landed": row["hit_rate"],
+            "shown": row["mean_probability"],
+            "n": row["picks"],
+        }
+        for row in ranking_bt.get("groups", [])
+    }
+
+
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(prog="pipeline.run_model", description="Build model and publish rounds")
     parser.add_argument("--today", help="override today's date (YYYY-MM-DD)")
@@ -193,6 +206,7 @@ def main(argv=None) -> int:
     hyper = decisions["hyperparameters"]["best"]
     half_life = float(hyper["half_life_days"])
     k = float(hyper["k"])
+    market_bands = market_band_map(model_payload.get("ranking_backtest", {}))
 
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
     divisions_set = {league.code for league in divisions}
@@ -212,23 +226,21 @@ def main(argv=None) -> int:
     action = round_action(existing, round_fixtures)
     if action == "settle":
         settle_document(existing, results)
+        ranking.settle_document(existing, results)
         if not args.no_publish:
             publish(existing, PICKS_DIR, ROUNDS_DIR)
-        print(f"round {round_date}: already published ({sum(len(v['picks']) for v in existing.get('views', {}).values())} picks), settled only")
+        print(f"round {round_date}: already published, settled only")
     elif action == "publish":
         document = build_round(predictors, round_fixtures, league_names, round_date, calibration, PICK_CONFIG, kind="round")
         settle_document(document, results)
+        document["rows"] = ranking.build_ranking(predictors, round_fixtures, league_names, round_date, market_bands)["rows"]
+        document["market_bands"] = market_bands
+        ranking.settle_document(document, results)
         if not args.no_publish:
             publish(document, PICKS_DIR, ROUNDS_DIR)
-            write_json(
-                BY_PLAY_DIR / f"{round_date.isoformat()}.json",
-                build_by_play(
-                    predictors, round_fixtures, league_names, round_date, calibration, PICK_CONFIG, ft_only
-                ),
-            )
         counts = {name: len(view["picks"]) for name, view in document["views"].items()}
         replaced = " (replaced an empty round file)" if existing is not None else ""
-        print(f"round {round_date}: published {counts} from {len(round_fixtures)} fixtures{replaced}")
+        print(f"round {round_date}: published {counts}, {len(document['rows'])} ranking rows{replaced}")
     else:
         print(f"round {round_date}: no fixtures published by the source, nothing to publish")
 
@@ -241,16 +253,13 @@ def main(argv=None) -> int:
         example_predictors, example_fixtures, league_names, example_date, calibration, PICK_CONFIG, kind="example"
     )
     settle_document(example, results)
+    example["rows"] = ranking.build_ranking(example_predictors, example_fixtures, league_names, example_date, market_bands)["rows"]
+    example["market_bands"] = market_bands
+    ranking.settle_document(example, results)
     example_counts = {name: len(view["picks"]) for name, view in example["views"].items()}
-    print(f"example round {example_date}: {example_counts}")
+    print(f"example round {example_date}: {example_counts}, {len(example['rows'])} ranking rows")
     if not args.no_publish and example["views"]["most_likely"]["picks"]:
         publish(example, PICKS_DIR, ROUNDS_DIR)
-        write_json(
-            BY_PLAY_DIR / f"{example_date.isoformat()}.json",
-            build_by_play(
-                example_predictors, example_fixtures, league_names, example_date, calibration, PICK_CONFIG, ft_only
-            ),
-        )
 
     for path in sorted(PICKS_DIR.glob("*.json")):
         stored = json.loads(path.read_text(encoding="utf-8"))
@@ -280,7 +289,18 @@ def main(argv=None) -> int:
             calibration,
         )
         model_payload["picker_backtest"] = picker
+        ranking_bt = ranking_backtest.run(
+            {code: by_division[code] for code in by_division if code in {league.code for league in divisions}},
+            half_life,
+            k,
+        )
+        model_payload["ranking_backtest"] = ranking_bt
         write_json(MODEL_JSON, model_payload)
+        for row in ranking_bt["groups"]:
+            print(
+                f"ranking backtest {row['group'][:26]:26s} {row['band']:10s} n={row['picks']:6d} "
+                f"pred={row['mean_probability'] * 100:5.1f}% hit={row['hit_rate'] * 100:5.1f}%"
+            )
         for name, summary in picker["views"].items():
             print(
                 f"picker backtest {name}: {summary['rounds']} rounds, {summary['picks']} picks, "

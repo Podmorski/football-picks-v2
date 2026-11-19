@@ -34,8 +34,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </a>
             </p>
             <p className="text-xs">
-              Derived counts and rates only — no raw match data is republished. Statistics, not certainty. 18+ —
-              gamble responsibly.
+              Derived counts and rates only — no raw match data is republished. Predictions are probabilities, not
+              certainties. 18+ BeGambleAware.org
             </p>
           </div>
         </footer>

@@ -10,6 +10,9 @@ from . import blend as blend_module
 from .counts_engine import fit as fit_counts
 from .data import build_arrays, subset
 from .goals_engine import fit as fit_goals
+from .grid import joint_vector
+
+from .. import markets as market_module
 
 
 def season_start_of(match) -> int:
@@ -43,6 +46,40 @@ class Predictor:
             "n_home": self.counts.n_home[home_index],
             "n_away": self.counts.n_away[away_index],
         }
+
+
+    def market_probabilities(self, home: list[str], away: list[str], odds: list[dict]):
+        """(fixtures, markets) grid probabilities plus the league baseline vector."""
+        home_index = np.array([self.team_index.get(name, self.unknown_index) for name in home], dtype=np.int32)
+        away_index = np.array([self.team_index.get(name, self.unknown_index) for name in away], dtype=np.int32)
+        home_lambda, away_lambda = self.goals.anchored_lambdas(home_index, away_index, odds, use_odds=True)
+
+        out = np.zeros((len(home), len(market_module.MARKETS)))
+        for row in range(len(home)):
+            lh = float(home_lambda[row])
+            la = float(away_lambda[row])
+            joint = joint_vector(
+                lh * self.goals.share_home,
+                la * self.goals.share_away,
+                lh * (1.0 - self.goals.share_home),
+                la * (1.0 - self.goals.share_away),
+                self.goals.rho,
+            )
+            out[row] = market_module.probabilities(joint)
+        return out, self.market_baseline()
+
+    def market_baseline(self):
+        """What an average match in this league looks like, market by market."""
+        lh = float(self.goals.league_home)
+        la = float(self.goals.league_away)
+        joint = joint_vector(
+            lh * self.goals.share_home,
+            la * self.goals.share_away,
+            lh * (1.0 - self.goals.share_home),
+            la * (1.0 - self.goals.share_away),
+            self.goals.rho,
+        )
+        return market_module.probabilities(joint)
 
 
 def _pad_counts(model) -> int:

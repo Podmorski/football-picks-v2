@@ -84,15 +84,17 @@ class GoalsModel:
         away = self.league_away * self.att[away_index] * self.dfn[home_index]
         return np.clip(home, MIN_LAMBDA, MAX_LAMBDA), np.clip(away, MIN_LAMBDA, MAX_LAMBDA)
 
-    def probabilities(
+    def anchored_lambdas(
         self,
         home_index: np.ndarray,
         away_index: np.ndarray,
         odds: list[dict],
         use_odds: bool = True,
-    ) -> np.ndarray:
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Expected goals per team, projected onto de-margined pre-match odds when present."""
         home_lambda, away_lambda = self.lambdas(home_index, away_index)
-        out = np.zeros((len(home_lambda), len(OUTCOMES)))
+        out_home = home_lambda.copy()
+        out_away = away_lambda.copy()
         for row in range(len(home_lambda)):
             lh = float(home_lambda[row])
             la = float(away_lambda[row])
@@ -102,6 +104,22 @@ class GoalsModel:
                 total = solve_total(p_over) if p_over is not None else lh + la
                 share = solve_split(total, p_home, self.rho)
                 lh, la = total * share, total * (1.0 - share)
+            out_home[row] = lh
+            out_away[row] = la
+        return out_home, out_away
+
+    def probabilities(
+        self,
+        home_index: np.ndarray,
+        away_index: np.ndarray,
+        odds: list[dict],
+        use_odds: bool = True,
+    ) -> np.ndarray:
+        home_lambda, away_lambda = self.anchored_lambdas(home_index, away_index, odds, use_odds)
+        out = np.zeros((len(home_lambda), len(OUTCOMES)))
+        for row in range(len(home_lambda)):
+            lh = float(home_lambda[row])
+            la = float(away_lambda[row])
             out[row] = outcome_probabilities(
                 lh * self.share_home,
                 la * self.share_away,
