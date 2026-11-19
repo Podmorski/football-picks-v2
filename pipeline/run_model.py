@@ -16,7 +16,7 @@ from .fixtures import Fixture, current_or_next_round_date, fixtures_for_date, la
 from . import ranking
 from .model import backtest, live, picker_backtest, ranking_backtest
 from .parse import parse_season_csv
-from .picks import build_round, publish, read_results, rebuild_index, round_action, settle_document
+from .picks import read_results
 from .run import cached_seasons
 
 PICKS_DIR = Path(__file__).resolve().parents[1] / "picks"
@@ -219,28 +219,30 @@ def main(argv=None) -> int:
     predictors = build_predictors(by_division, round_date, half_life, k, decisions)
 
     if round_path.exists():
-        existing = json.loads(round_path.read_text(encoding="utf-8"))
+        existing = ranking.load(round_path)
     else:
         existing = None
 
-    action = round_action(existing, round_fixtures)
+    def action_for(document, fixtures):
+        if document and document.get("rows"):
+            return "settle"
+        return "publish" if fixtures else "skip"
+
+    action = action_for(existing, round_fixtures)
     if action == "settle":
-        settle_document(existing, results)
         ranking.settle_document(existing, results)
         if not args.no_publish:
-            publish(existing, PICKS_DIR, ROUNDS_DIR)
+            ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
         print(f"round {round_date}: already published, settled only")
     elif action == "publish":
-        document = build_round(predictors, round_fixtures, league_names, round_date, calibration, PICK_CONFIG, kind="round")
-        settle_document(document, results)
-        document["rows"] = ranking.build_ranking(predictors, round_fixtures, league_names, round_date, market_bands)["rows"]
+        document = ranking.build_ranking(predictors, round_fixtures, round_date, market_bands)
+        document["kind"] = "round"
         document["market_bands"] = market_bands
         ranking.settle_document(document, results)
         if not args.no_publish:
-            publish(document, PICKS_DIR, ROUNDS_DIR)
-        counts = {name: len(view["picks"]) for name, view in document["views"].items()}
+            ranking.publish(document, PICKS_DIR, ROUNDS_DIR)
         replaced = " (replaced an empty round file)" if existing is not None else ""
-        print(f"round {round_date}: published {counts}, {len(document['rows'])} ranking rows{replaced}")
+        print(f"round {round_date}: published {len(document['rows'])} rows{replaced}")
     else:
         print(f"round {round_date}: no fixtures published by the source, nothing to publish")
 
@@ -249,46 +251,41 @@ def main(argv=None) -> int:
         by_division, example_date
     )
     example_predictors = build_predictors(by_division, example_date, half_life, k, decisions)
-    example = build_round(
-        example_predictors, example_fixtures, league_names, example_date, calibration, PICK_CONFIG, kind="example"
-    )
-    settle_document(example, results)
-    example["rows"] = ranking.build_ranking(example_predictors, example_fixtures, league_names, example_date, market_bands)["rows"]
+    example = ranking.build_ranking(example_predictors, example_fixtures, example_date, market_bands)
+    example["kind"] = "example"
     example["market_bands"] = market_bands
     ranking.settle_document(example, results)
-    example_counts = {name: len(view["picks"]) for name, view in example["views"].items()}
-    print(f"example round {example_date}: {example_counts}, {len(example['rows'])} ranking rows")
-    if not args.no_publish and example["views"]["most_likely"]["picks"]:
-        publish(example, PICKS_DIR, ROUNDS_DIR)
+    print(f"example round {example_date}: {len(example['rows'])} rows")
+    if not args.no_publish and example["rows"]:
+        ranking.publish(example, PICKS_DIR, ROUNDS_DIR)
 
     for path in sorted(PICKS_DIR.glob("*.json")):
-        stored = json.loads(path.read_text(encoding="utf-8"))
-        if stored.get("kind") == "example" or stored["date"] in (round_date.isoformat(), example_date.isoformat()):
+        stored = ranking.load(path)
+        if stored["date"] in (round_date.isoformat(), example_date.isoformat()):
             continue
-        if settle_document(stored, results) and not args.no_publish:
-            publish(stored, PICKS_DIR, ROUNDS_DIR)
+        if ranking.settle_document(stored, results) and not args.no_publish:
+            ranking.publish(stored, PICKS_DIR, ROUNDS_DIR)
 
     if args.no_publish:
         return 0
 
-    index = rebuild_index(PICKS_DIR, ROUNDS_DIR)
+    index = ranking.rebuild_index(PICKS_DIR, ROUNDS_DIR)
+    write_json(WEB_DATA_DIR / "markets.json", ranking.market_catalogue())
 
-    picker = None
+    ranking_bt = None
     if args.skip_backtest and args.skip_picker_backtest and MODEL_JSON.exists():
-        existing = json.loads(MODEL_JSON.read_text(encoding="utf-8"))
-        picker = existing.get("picker_backtest")
-        if picker:
-            print("reused existing picker backtest")
+        existing_model = json.loads(MODEL_JSON.read_text(encoding="utf-8"))
+        ranking_bt = existing_model.get("ranking_backtest")
+        if ranking_bt:
+            print("reused existing ranking backtest")
     else:
-        picker = picker_backtest.run(
+        ranking_bt = ranking_backtest.run(
             {code: by_division[code] for code in by_division if code in {league.code for league in divisions}},
-            decisions,
             half_life,
             k,
-            PICK_CONFIG,
-            calibration,
         )
-        model_payload["picker_backtest"] = picker
+        model_payload["ranking_backtest"] = ranking_bt
+        write_json(MODEL_JSON, model_payload)
         ranking_bt = ranking_backtest.run(
             {code: by_division[code] for code in by_division if code in {league.code for league in divisions}},
             half_life,
@@ -300,11 +297,6 @@ def main(argv=None) -> int:
             print(
                 f"ranking backtest {row['group'][:26]:26s} {row['band']:10s} n={row['picks']:6d} "
                 f"pred={row['mean_probability'] * 100:5.1f}% hit={row['hit_rate'] * 100:5.1f}%"
-            )
-        for name, summary in picker["views"].items():
-            print(
-                f"picker backtest {name}: {summary['rounds']} rounds, {summary['picks']} picks, "
-                f"hit rate {summary['hit_rate']}"
             )
 
     upcoming = [
@@ -321,17 +313,17 @@ def main(argv=None) -> int:
         if not teams_path.exists():
             continue
         teams_document = json.loads(teams_path.read_text(encoding="utf-8"))
-        built = build_round(
-            predictors, items, league_names, round_date, calibration, {**PICK_CONFIG, "top_n": 999}, kind="upcoming"
-        )
-        by_match = {(pick["home"], pick["away"]): pick for pick in built["views"]["most_likely"]["picks"]}
+        built = ranking.build_ranking(predictors, items, round_date, market_bands)
+        best: dict[tuple[str, str], dict] = {}
+        for row in ranking.rank_rows(built["rows"], band=ranking.DEFAULT_BAND):
+            best.setdefault((row["h"], row["a"]), row)
         teams_document["upcoming"] = [
             {
                 "date": fixture.date.isoformat(),
                 "time": fixture.time,
                 "home": fixture.home,
                 "away": fixture.away,
-                "best": by_match.get((fixture.home, fixture.away)),
+                "best": best.get((fixture.home, fixture.away)),
             }
             for fixture in sorted(items, key=lambda item: (item.date, item.home))
         ]
@@ -345,8 +337,8 @@ def main(argv=None) -> int:
     }
     totals["hit_rate"] = round(totals["hits"] / totals["settled"], 4) if totals["settled"] else None
     payload = {"calibration": calibration, "rounds": index["rounds"], "totals": totals}
-    if picker is not None:
-        payload["picker_backtest"] = picker
+    if ranking_bt is not None:
+        payload["ranking_backtest"] = ranking_bt
     write_json(RECORD_JSON, payload)
 
     print(f"rounds published: {totals['rounds']}, picks: {totals['picks']}, settled: {totals['settled']}, hits: {totals['hits']}")

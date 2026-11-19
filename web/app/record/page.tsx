@@ -105,102 +105,50 @@ export default function RecordPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">How past picks landed</h2>
         <p className="text-sm text-muted-foreground">
-          Every Tuesday and Saturday round from {record.picker_backtest?.seasons[0] ?? '2019-20'} to{' '}
-          {record.picker_backtest?.seasons.at(-1) ?? '2025-26'}, replayed with the same filters and only the data
-          available before each round date.
+          Every Tuesday and Saturday round from {model?.ranking_backtest?.seasons[0] ?? '2019-20'} to{' '}
+          {model?.ranking_backtest?.seasons.at(-1) ?? '2025-26'}, replayed with each ranking and only the data
+          available before each round date. Shown where at least 30 past picks exist.
         </p>
-        {(Object.entries(record.picker_backtest?.views ?? {}) as [string, import('@/lib/types').PickerViewSummary][]).map(
-          ([key, view]) => (
-            <div key={key} className="space-y-3 rounded-xl border p-4">
-              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <h3 className="text-base font-semibold">
-                  {key === 'stand_out' ? 'Stand-out' : key === 'best_combos' ? 'Best combos' : 'Most likely'}
-                </h3>
-                <span className="text-sm text-muted-foreground">
-                  {view.rounds} rounds · {view.picks} picks · mean {pct(view.mean_probability)} · landed{' '}
-                  <span className="font-medium text-foreground">{pct(view.hit_rate)}</span>{' '}
-                  <span className="tabular text-xs">
-                    (95% CI {pct(view.ci[0])}–{pct(view.ci[1])}, {view.hits}/{view.picks})
-                  </span>
-                </span>
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-2">
-                {([
-                  ['By play', view.by_play],
-                  ['By league', view.by_league],
-                ] as [string, import('@/lib/types').PickerRow[]][]).map(([title, rows]) => (
-                  <div key={title} className="space-y-1">
-                    <h4 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h4>
-                    <div className="overflow-x-auto rounded-lg border">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-muted/60 text-xs text-muted-foreground">
-                            <th className="px-2 py-1.5 text-left font-semibold">Play</th>
-                            <th className="px-2 py-1.5 text-right font-semibold">n</th>
-                            <th className="px-2 py-1.5 text-right font-semibold">Predicted</th>
-                            <th className="px-2 py-1.5 text-right font-semibold">Landed</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {rows.slice(0, 10).map((row) => (
-                            <tr key={row.name} className="border-t">
-                              <td className="px-2 py-1.5">{row.label}</td>
-                              <td className="tabular px-2 py-1.5 text-right">{row.picks}</td>
-                              <td className="tabular px-2 py-1.5 text-right text-muted-foreground">
-                                {pct(row.mean_probability)}
-                              </td>
-                              <td className="tabular px-2 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ))}
+        {(['lean', 'probability'] as const).map((strategy) => {
+          const rows = (model?.ranking_backtest?.groups ?? [])
+            .filter((row) => row.strategy === strategy && row.picks >= 30)
+            .sort((a, b) => b.picks - a.picks);
+          return (
+            <div key={strategy} className="space-y-2 rounded-xl border p-4">
+              <h3 className="text-base font-semibold">
+                {strategy === 'lean' ? 'Strongest lean' : 'Most likely'}
+              </h3>
+              <div className="overflow-x-auto rounded-lg border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                      <th className="px-3 py-2 text-left font-semibold">Group</th>
+                      <th className="px-3 py-2 text-right font-semibold">Band</th>
+                      <th className="px-3 py-2 text-right font-semibold">n</th>
+                      <th className="px-3 py-2 text-right font-semibold">Predicted</th>
+                      <th className="px-3 py-2 text-right font-semibold">Landed</th>
+                      <th className="px-3 py-2 text-right font-semibold">95% CI</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows.map((row) => (
+                      <tr key={`${row.group}-${row.band}`} className="border-t">
+                        <td className="px-3 py-1.5">{row.group}</td>
+                        <td className="tabular px-3 py-1.5 text-right text-muted-foreground">{row.band}</td>
+                        <td className="tabular px-3 py-1.5 text-right">{row.picks.toLocaleString('en-GB')}</td>
+                        <td className="tabular px-3 py-1.5 text-right">{pct(row.mean_probability)}</td>
+                        <td className="tabular px-3 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
+                        <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">
+                          {pct(row.ci[0])}–{pct(row.ci[1])}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
-          ),
-        )}
-      </section>
-
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Past picks like this landed</h2>
-        <p className="text-sm text-muted-foreground">
-          Every published play, by fair-odds band. Shown only where at least 30 past picks exist.
-        </p>
-        <div className="overflow-x-auto rounded-xl border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="px-3 py-2 text-left font-semibold">Play</th>
-                <th className="px-3 py-2 text-right font-semibold">Band</th>
-                <th className="px-3 py-2 text-right font-semibold">n</th>
-                <th className="px-3 py-2 text-right font-semibold">Predicted</th>
-                <th className="px-3 py-2 text-right font-semibold">Landed</th>
-                <th className="px-3 py-2 text-right font-semibold">95% CI</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(model?.picker_backtest?.play_bands ?? [])
-                .filter((row) => row.picks >= 30)
-                .sort((a, b) => b.picks - a.picks)
-                .slice(0, 60)
-                .map((row) => (
-                  <tr key={`${row.outcome}-${row.band}`} className="border-t">
-                    <td className="px-3 py-1.5">{row.label}</td>
-                    <td className="tabular px-3 py-1.5 text-right text-muted-foreground">{row.band}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{row.picks.toLocaleString('en-GB')}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{pct(row.mean_probability)}</td>
-                    <td className="tabular px-3 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
-                    <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">
-                      {pct(row.ci[0])}–{pct(row.ci[1])}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
+          );
+        })}
       </section>
 
       <section className="space-y-3">

@@ -1147,1102 +1147,912 @@
    ]
   }
  },
- "picker_backtest": {
-  "degraded_groups": [],
-  "play_bands": [
+ "ranking_backtest": {
+  "bands": [
+   "1.70-2.00",
+   "2.00-3.00",
+   "3.00-5.00",
+   "5.00-10.00",
+   "10.00+"
+  ],
+  "groups": [
    {
-    "band": "1.50-2.00",
+    "band": "1.70-2.00",
     "ci": [
-     0.507,
-     0.5587
+     0.4986,
+     0.5407
     ],
-    "hit_rate": 0.5329,
-    "hits": 761,
-    "label": "Away team scores in the first half",
-    "mean_probability": 0.5561,
-    "outcome": "away_1h_1plus",
-    "picks": 1428
+    "group": "BTTS",
+    "hit_rate": 0.5197,
+    "hits": 1122,
+    "mean_probability": 0.5518,
+    "picks": 2159,
+    "strategy": "lean"
    },
    {
     "band": "2.00-3.00",
     "ci": [
-     0.4417,
-     0.5405
+     0.2968,
+     0.3962
     ],
-    "hit_rate": 0.491,
-    "hits": 191,
-    "label": "Away team scores in the first half",
-    "mean_probability": 0.4803,
-    "outcome": "away_1h_1plus",
-    "picks": 389
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.573,
-     0.6683
-    ],
-    "hit_rate": 0.6218,
-    "hits": 245,
-    "label": "Away team scores",
-    "mean_probability": 0.6323,
-    "outcome": "away_1plus",
-    "picks": 394
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5469,
-     0.602
-    ],
-    "hit_rate": 0.5747,
-    "hits": 708,
-    "label": "Away team scores 2+",
-    "mean_probability": 0.5525,
-    "outcome": "away_2plus",
-    "picks": 1232
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.4385,
-     0.4957
-    ],
-    "hit_rate": 0.467,
-    "hits": 544,
-    "label": "Away team scores 2+",
-    "mean_probability": 0.4744,
-    "outcome": "away_2plus",
-    "picks": 1165
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.413,
-     0.8269
-    ],
-    "hit_rate": 0.6471,
-    "hits": 11,
-    "label": "Away team scores in both halves",
-    "mean_probability": 0.5407,
-    "outcome": "away_both_halves",
-    "picks": 17
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.2834,
-     0.6763
-    ],
-    "hit_rate": 0.4762,
-    "hits": 10,
-    "label": "Away team scores in both halves",
-    "mean_probability": 0.4713,
-    "outcome": "away_both_halves",
-    "picks": 21
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5461,
-     0.5791
-    ],
-    "hit_rate": 0.5627,
-    "hits": 1953,
-    "label": "At least one team fails to score",
-    "mean_probability": 0.5762,
-    "outcome": "btts_no",
-    "picks": 3471
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3846,
-     0.5768
-    ],
-    "hit_rate": 0.48,
-    "hits": 48,
-    "label": "At least one team fails to score",
-    "mean_probability": 0.4876,
-    "outcome": "btts_no",
-    "picks": 100
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5555,
-     0.581
-    ],
-    "hit_rate": 0.5683,
-    "hits": 3287,
-    "label": "Both teams score",
-    "mean_probability": 0.5699,
-    "outcome": "btts_yes",
-    "picks": 5784
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.2954,
-     0.6042
-    ],
-    "hit_rate": 0.4444,
-    "hits": 16,
-    "label": "Both teams score",
-    "mean_probability": 0.4879,
-    "outcome": "btts_yes",
-    "picks": 36
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5284,
-     0.5842
-    ],
-    "hit_rate": 0.5565,
-    "hits": 675,
-    "label": "Home win or draw, and 3+ goals",
-    "mean_probability": 0.5631,
-    "outcome": "c1",
-    "picks": 1213
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.4094,
-     0.452
-    ],
-    "hit_rate": 0.4306,
-    "hits": 890,
-    "label": "Home win or draw, and 3+ goals",
-    "mean_probability": 0.4173,
-    "outcome": "c1",
-    "picks": 2067
+    "group": "BTTS",
+    "hit_rate": 0.3448,
+    "hits": 120,
+    "mean_probability": 0.3782,
+    "picks": 348,
+    "strategy": "lean"
    },
    {
     "band": "3.00-5.00",
     "ci": [
-     0.2658,
-     0.3394
+     0.2064,
+     0.2469
     ],
-    "hit_rate": 0.3013,
-    "hits": 179,
-    "label": "Home win or draw, and 3+ goals",
-    "mean_probability": 0.304,
-    "outcome": "c1",
-    "picks": 594
+    "group": "BTTS",
+    "hit_rate": 0.226,
+    "hits": 370,
+    "mean_probability": 0.2494,
+    "picks": 1637,
+    "strategy": "lean"
    },
    {
-    "band": "1.50-2.00",
+    "band": "5.00-10.00",
     "ci": [
-     0.517,
-     0.6162
+     0.1444,
+     0.2918
     ],
-    "hit_rate": 0.5673,
-    "hits": 215,
-    "label": "Home team scores in the first half and 3+ goals",
-    "mean_probability": 0.5768,
-    "outcome": "c10",
-    "picks": 379
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3533,
-     0.4752
-    ],
-    "hit_rate": 0.413,
-    "hits": 102,
-    "label": "Home team scores in the first half and 3+ goals",
-    "mean_probability": 0.4274,
-    "outcome": "c10",
-    "picks": 247
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.1929,
-     0.3777
-    ],
-    "hit_rate": 0.2759,
+    "group": "BTTS",
+    "hit_rate": 0.2087,
     "hits": 24,
-    "label": "Home team scores in the first half and 3+ goals",
-    "mean_probability": 0.3065,
-    "outcome": "c10",
-    "picks": 87
+    "mean_probability": 0.1744,
+    "picks": 115,
+    "strategy": "lean"
    },
    {
-    "band": "1.50-2.00",
+    "band": "1.70-2.00",
     "ci": [
-     0.4776,
-     0.6382
+     0.5255,
+     0.5449
     ],
-    "hit_rate": 0.5594,
-    "hits": 80,
-    "label": "A goal in the first half and 2+ in the second half",
-    "mean_probability": 0.5509,
-    "outcome": "c2",
-    "picks": 143
+    "group": "Combos",
+    "hit_rate": 0.5352,
+    "hits": 5459,
+    "mean_probability": 0.5398,
+    "picks": 10200,
+    "strategy": "lean"
    },
    {
     "band": "2.00-3.00",
     "ci": [
-     0.387,
-     0.522
+     0.3774,
+     0.3944
     ],
-    "hit_rate": 0.4537,
-    "hits": 93,
-    "label": "A goal in the first half and 2+ in the second half",
-    "mean_probability": 0.4371,
-    "outcome": "c2",
-    "picks": 205
+    "group": "Combos",
+    "hit_rate": 0.3859,
+    "hits": 4818,
+    "mean_probability": 0.3872,
+    "picks": 12486,
+    "strategy": "lean"
    },
    {
     "band": "3.00-5.00",
     "ci": [
-     0.2382,
-     0.4852
+     0.2195,
+     0.2416
     ],
-    "hit_rate": 0.3519,
-    "hits": 19,
-    "label": "A goal in the first half and 2+ in the second half",
-    "mean_probability": 0.2968,
-    "outcome": "c2",
-    "picks": 54
+    "group": "Combos",
+    "hit_rate": 0.2304,
+    "hits": 1285,
+    "mean_probability": 0.2454,
+    "picks": 5577,
+    "strategy": "lean"
    },
    {
-    "band": "1.50-2.00",
+    "band": "5.00-10.00",
     "ci": [
-     0.1582,
-     0.7495
+     0.1516,
+     0.1826
     ],
-    "hit_rate": 0.4286,
-    "hits": 3,
-    "label": "Home team 2+ and both teams score",
-    "mean_probability": 0.5315,
-    "outcome": "c3",
-    "picks": 7
+    "group": "Combos",
+    "hit_rate": 0.1665,
+    "hits": 369,
+    "mean_probability": 0.1646,
+    "picks": 2216,
+    "strategy": "lean"
    },
    {
-    "band": "2.00-3.00",
+    "band": "10.00+",
     "ci": [
-     0.3827,
-     0.6173
+     0.0168,
+     0.0195
     ],
-    "hit_rate": 0.5,
-    "hits": 33,
-    "label": "Home team 2+ and both teams score",
-    "mean_probability": 0.4236,
-    "outcome": "c3",
-    "picks": 66
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.1506,
-     0.3073
-    ],
-    "hit_rate": 0.219,
-    "hits": 23,
-    "label": "Home team 2+ and both teams score",
-    "mean_probability": 0.2852,
-    "outcome": "c3",
-    "picks": 105
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5111,
-     0.5599
-    ],
-    "hit_rate": 0.5356,
-    "hits": 857,
-    "label": "Both teams score and 3+ goals",
-    "mean_probability": 0.5397,
-    "outcome": "c4",
-    "picks": 1600
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.4095,
-     0.4348
-    ],
-    "hit_rate": 0.4221,
-    "hits": 2474,
-    "label": "Both teams score and 3+ goals",
-    "mean_probability": 0.4305,
-    "outcome": "c4",
-    "picks": 5861
+    "group": "Correct score",
+    "hit_rate": 0.0181,
+    "hits": 699,
+    "mean_probability": 0.0185,
+    "picks": 38659,
+    "strategy": "lean"
    },
    {
     "band": "3.00-5.00",
     "ci": [
-     0.2532,
-     0.3968
+     0.0543,
+     0.1942
     ],
-    "hit_rate": 0.3208,
-    "hits": 51,
-    "label": "Both teams score and 3+ goals",
-    "mean_probability": 0.3112,
-    "outcome": "c4",
-    "picks": 159
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.4408,
-     0.6705
-    ],
-    "hit_rate": 0.5588,
-    "hits": 38,
-    "label": "Home win or draw and both teams score",
-    "mean_probability": 0.5206,
-    "outcome": "c5",
-    "picks": 68
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3977,
-     0.4283
-    ],
-    "hit_rate": 0.4129,
-    "hits": 1642,
-    "label": "Home win or draw and both teams score",
-    "mean_probability": 0.3974,
-    "outcome": "c5",
-    "picks": 3977
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.222,
-     0.3877
-    ],
-    "hit_rate": 0.2982,
-    "hits": 34,
-    "label": "Home win or draw and both teams score",
-    "mean_probability": 0.3237,
-    "outcome": "c5",
-    "picks": 114
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.4483,
-     0.5994
-    ],
-    "hit_rate": 0.5244,
-    "hits": 86,
-    "label": "Draw or away win, and 3+ goals",
-    "mean_probability": 0.5486,
-    "outcome": "c6",
-    "picks": 164
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3554,
-     0.4192
-    ],
-    "hit_rate": 0.3868,
-    "hits": 345,
-    "label": "Draw or away win, and 3+ goals",
-    "mean_probability": 0.3927,
-    "outcome": "c6",
-    "picks": 892
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.2648,
-     0.3034
-    ],
-    "hit_rate": 0.2837,
-    "hits": 593,
-    "label": "Draw or away win, and 3+ goals",
-    "mean_probability": 0.2751,
-    "outcome": "c6",
-    "picks": 2090
-   },
-   {
-    "band": "5.00+",
-    "ci": [
-     0.0722,
-     0.2039
-    ],
-    "hit_rate": 0.1237,
-    "hits": 12,
-    "label": "Draw or away win, and 3+ goals",
-    "mean_probability": 0.1795,
-    "outcome": "c6",
-    "picks": 97
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5874,
-     0.6108
-    ],
-    "hit_rate": 0.5992,
-    "hits": 4042,
-    "label": "A goal in each half",
-    "mean_probability": 0.5811,
-    "outcome": "c7",
-    "picks": 6746
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.5148,
-     0.6401
-    ],
-    "hit_rate": 0.5787,
-    "hits": 136,
-    "label": "A goal in each half",
-    "mean_probability": 0.4834,
-    "outcome": "c7",
-    "picks": 235
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.2366,
-     0.7634
-    ],
-    "hit_rate": 0.5,
-    "hits": 5,
-    "label": "Away team 2+ and both teams score",
-    "mean_probability": 0.5279,
-    "outcome": "c8",
-    "picks": 10
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.2873,
-     0.4184
-    ],
-    "hit_rate": 0.35,
-    "hits": 70,
-    "label": "Away team 2+ and both teams score",
-    "mean_probability": 0.393,
-    "outcome": "c8",
-    "picks": 200
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.2679,
-     0.3431
-    ],
-    "hit_rate": 0.3042,
-    "hits": 174,
-    "label": "Away team 2+ and both teams score",
-    "mean_probability": 0.285,
-    "outcome": "c8",
-    "picks": 572
-   },
-   {
-    "band": "5.00+",
-    "ci": [
-     0.1636,
-     0.5268
-    ],
-    "hit_rate": 0.3182,
-    "hits": 7,
-    "label": "Away team 2+ and both teams score",
-    "mean_probability": 0.1777,
-    "outcome": "c8",
-    "picks": 22
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.2252,
-     0.2673
-    ],
-    "hit_rate": 0.2456,
-    "hits": 393,
-    "label": "Level at half-time and 2+ goals",
-    "mean_probability": 0.2444,
-    "outcome": "c9",
-    "picks": 1600
-   },
-   {
-    "band": "5.00+",
-    "ci": [
-     0.0,
-     0.7935
-    ],
-    "hit_rate": 0.0,
-    "hits": 0,
-    "label": "Level at half-time and 2+ goals",
-    "mean_probability": 0.1856,
-    "outcome": "c9",
-    "picks": 1
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.4915,
-     0.7917
-    ],
-    "hit_rate": 0.6571,
-    "hits": 23,
-    "label": "Home win or draw",
-    "mean_probability": 0.6416,
-    "outcome": "dc_1x",
-    "picks": 35
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.6102,
-     0.6351
-    ],
-    "hit_rate": 0.6228,
-    "hits": 3612,
-    "label": "Draw or away win",
-    "mean_probability": 0.6137,
-    "outcome": "dc_x2",
-    "picks": 5800
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.4641,
-     0.5225
-    ],
-    "hit_rate": 0.4933,
-    "hits": 553,
-    "label": "Even number of goals",
-    "mean_probability": 0.5067,
-    "outcome": "even",
-    "picks": 1121
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.0,
-     0.7935
-    ],
-    "hit_rate": 0.0,
-    "hits": 0,
-    "label": "Draw",
-    "mean_probability": 0.3381,
-    "outcome": "ft_x",
-    "picks": 1
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.0301,
-     0.5635
-    ],
-    "hit_rate": 0.1667,
-    "hits": 1,
-    "label": "Draw",
-    "mean_probability": 0.3011,
-    "outcome": "ft_x",
-    "picks": 6
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.6196,
-     0.7177
-    ],
-    "hit_rate": 0.6705,
-    "hits": 234,
-    "label": "1+ goals in the first half",
-    "mean_probability": 0.6377,
-    "outcome": "h1_1plus",
-    "picks": 349
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.3543,
-     0.5884
-    ],
-    "hit_rate": 0.4697,
-    "hits": 31,
-    "label": "2+ goals in the first half",
-    "mean_probability": 0.5428,
-    "outcome": "h1_2plus",
-    "picks": 66
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.2987,
-     0.5295
-    ],
-    "hit_rate": 0.4091,
-    "hits": 27,
-    "label": "2+ goals in the first half",
-    "mean_probability": 0.4719,
-    "outcome": "h1_2plus",
-    "picks": 66
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5174,
-     0.5992
-    ],
-    "hit_rate": 0.5587,
-    "hits": 314,
-    "label": "2+ goals in the second half",
-    "mean_probability": 0.5857,
-    "outcome": "h2_2plus",
-    "picks": 562
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.2481,
-     0.6988
-    ],
-    "hit_rate": 0.4667,
-    "hits": 7,
-    "label": "2+ goals in the second half",
-    "mean_probability": 0.4827,
-    "outcome": "h2_2plus",
-    "picks": 15
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5448,
-     0.5816
-    ],
-    "hit_rate": 0.5633,
-    "hits": 1567,
-    "label": "Home team scores in the first half",
-    "mean_probability": 0.567,
-    "outcome": "home_1h_1plus",
-    "picks": 2782
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.125,
-     0.5087
-    ],
-    "hit_rate": 0.2778,
-    "hits": 5,
-    "label": "Home team scores in the first half",
-    "mean_probability": 0.4915,
-    "outcome": "home_1h_1plus",
-    "picks": 18
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5718,
-     0.6001
-    ],
-    "hit_rate": 0.586,
-    "hits": 2721,
-    "label": "Home team scores 2+",
-    "mean_probability": 0.5697,
-    "outcome": "home_2plus",
-    "picks": 4643
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.4511,
-     0.5331
-    ],
-    "hit_rate": 0.4921,
-    "hits": 279,
-    "label": "Home team scores 2+",
-    "mean_probability": 0.482,
-    "outcome": "home_2plus",
-    "picks": 567
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.4152,
-     0.6164
-    ],
-    "hit_rate": 0.5165,
-    "hits": 47,
-    "label": "Home team scores in both halves",
-    "mean_probability": 0.5618,
-    "outcome": "home_both_halves",
-    "picks": 91
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.427,
-     0.6543
-    ],
-    "hit_rate": 0.5429,
-    "hits": 38,
-    "label": "Home team scores in both halves",
-    "mean_probability": 0.4749,
-    "outcome": "home_both_halves",
-    "picks": 70
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5234,
-     0.6461
-    ],
-    "hit_rate": 0.5861,
-    "hits": 143,
-    "label": "Home team leading at half-time",
-    "mean_probability": 0.5706,
-    "outcome": "ht_1",
-    "picks": 244
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3928,
-     0.521
-    ],
-    "hit_rate": 0.4561,
-    "hits": 104,
-    "label": "Home team leading at half-time",
-    "mean_probability": 0.4713,
-    "outcome": "ht_1",
-    "picks": 228
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5182,
-     0.7471
-    ],
-    "hit_rate": 0.6406,
-    "hits": 41,
-    "label": "Away team leading at half-time",
-    "mean_probability": 0.5564,
-    "outcome": "ht_2",
-    "picks": 64
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.4266,
-     0.657
-    ],
-    "hit_rate": 0.5441,
-    "hits": 37,
-    "label": "Away team leading at half-time",
-    "mean_probability": 0.4709,
-    "outcome": "ht_2",
-    "picks": 68
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.422,
-     0.7286
-    ],
-    "hit_rate": 0.5833,
-    "hits": 21,
-    "label": "Level at half-time",
-    "mean_probability": 0.517,
-    "outcome": "ht_x",
-    "picks": 36
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.4556,
-     0.6876
-    ],
-    "hit_rate": 0.5758,
-    "hits": 38,
-    "label": "Level at half-time",
-    "mean_probability": 0.475,
-    "outcome": "ht_x",
-    "picks": 66
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.4446,
-     0.619
-    ],
-    "hit_rate": 0.5328,
-    "hits": 65,
-    "label": "Home ahead at half-time and full-time",
-    "mean_probability": 0.5536,
-    "outcome": "htft_11",
-    "picks": 122
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3992,
-     0.5452
-    ],
-    "hit_rate": 0.4716,
-    "hits": 83,
-    "label": "Home ahead at half-time and full-time",
-    "mean_probability": 0.4732,
-    "outcome": "htft_11",
-    "picks": 176
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.2505,
-     0.8418
-    ],
-    "hit_rate": 0.5714,
-    "hits": 4,
-    "label": "Away ahead at half-time and full-time",
-    "mean_probability": 0.5201,
-    "outcome": "htft_22",
-    "picks": 7
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.125,
-     0.5087
-    ],
-    "hit_rate": 0.2778,
-    "hits": 5,
-    "label": "Away ahead at half-time and full-time",
-    "mean_probability": 0.4668,
-    "outcome": "htft_22",
-    "picks": 18
-   },
-   {
-    "band": "3.00-5.00",
-    "ci": [
-     0.0945,
-     0.9055
-    ],
-    "hit_rate": 0.5,
-    "hits": 1,
-    "label": "More goals in the first half",
-    "mean_probability": 0.3182,
-    "outcome": "mg_1h",
-    "picks": 2
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.2456,
-     0.6628
-    ],
-    "hit_rate": 0.4444,
+    "group": "Correct score",
+    "hit_rate": 0.1053,
     "hits": 8,
-    "label": "More goals in the second half",
-    "mean_probability": 0.5139,
-    "outcome": "mg_2h",
-    "picks": 18
+    "mean_probability": 0.2311,
+    "picks": 76,
+    "strategy": "lean"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1046,
+     0.1189
+    ],
+    "group": "Correct score",
+    "hit_rate": 0.1116,
+    "hits": 841,
+    "mean_probability": 0.1192,
+    "picks": 7539,
+    "strategy": "lean"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5088,
+     0.5412
+    ],
+    "group": "Goals",
+    "hit_rate": 0.5251,
+    "hits": 1917,
+    "mean_probability": 0.5411,
+    "picks": 3651,
+    "strategy": "lean"
    },
    {
     "band": "2.00-3.00",
     "ci": [
-     0.1517,
-     0.6462
+     0.352,
+     0.3873
     ],
-    "hit_rate": 0.3636,
-    "hits": 4,
-    "label": "More goals in the second half",
-    "mean_probability": 0.4561,
-    "outcome": "mg_2h",
-    "picks": 11
+    "group": "Goals",
+    "hit_rate": 0.3695,
+    "hits": 1060,
+    "mean_probability": 0.3903,
+    "picks": 2869,
+    "strategy": "lean"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.2225,
+     0.2502
+    ],
+    "group": "Goals",
+    "hit_rate": 0.236,
+    "hits": 850,
+    "mean_probability": 0.2571,
+    "picks": 3601,
+    "strategy": "lean"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1428,
+     0.171
+    ],
+    "group": "Goals",
+    "hit_rate": 0.1564,
+    "hits": 399,
+    "mean_probability": 0.1587,
+    "picks": 2551,
+    "strategy": "lean"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.527,
+     0.5588
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.5429,
+    "hits": 2048,
+    "mean_probability": 0.5535,
+    "picks": 3772,
+    "strategy": "lean"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.061,
+     0.0946
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.0761,
+    "hits": 73,
+    "mean_probability": 0.0684,
+    "picks": 959,
+    "strategy": "lean"
    },
    {
     "band": "2.00-3.00",
     "ci": [
-     0.4309,
-     0.5019
+     0.3504,
+     0.3903
     ],
-    "hit_rate": 0.4662,
+    "group": "HT/FT",
+    "hit_rate": 0.3702,
+    "hits": 831,
+    "mean_probability": 0.3776,
+    "picks": 2245,
+    "strategy": "lean"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.23,
+     0.2561
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.2428,
+    "hits": 1002,
+    "mean_probability": 0.2381,
+    "picks": 4127,
+    "strategy": "lean"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1336,
+     0.146
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.1397,
+    "hits": 1687,
+    "mean_probability": 0.1416,
+    "picks": 12077,
+    "strategy": "lean"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.4898,
+     0.5654
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.5277,
     "hits": 352,
-    "label": "Odd number of goals",
-    "mean_probability": 0.4944,
-    "outcome": "odd",
-    "picks": 755
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5661,
-     0.5866
-    ],
-    "hit_rate": 0.5764,
-    "hits": 5143,
-    "label": "Under 2.5 goals",
-    "mean_probability": 0.5783,
-    "outcome": "ou_u25",
-    "picks": 8923
+    "mean_probability": 0.5371,
+    "picks": 667,
+    "strategy": "lean"
    },
    {
     "band": "2.00-3.00",
     "ci": [
-     0.3954,
-     0.5424
+     0.3526,
+     0.3853
     ],
-    "hit_rate": 0.4682,
-    "hits": 81,
-    "label": "Under 2.5 goals",
-    "mean_probability": 0.4888,
-    "outcome": "ou_u25",
-    "picks": 173
+    "group": "Half-time",
+    "hit_rate": 0.3688,
+    "hits": 1227,
+    "mean_probability": 0.3783,
+    "picks": 3327,
+    "strategy": "lean"
    },
    {
-    "band": "1.50-2.00",
+    "band": "3.00-5.00",
     "ci": [
-     0.613,
-     0.7082
+     0.2402,
+     0.2715
     ],
-    "hit_rate": 0.6622,
-    "hits": 249,
-    "label": "Under 3.5 goals",
-    "mean_probability": 0.6357,
-    "outcome": "ou_u35",
-    "picks": 376
+    "group": "Half-time",
+    "hit_rate": 0.2555,
+    "hits": 761,
+    "mean_probability": 0.2652,
+    "picks": 2978,
+    "strategy": "lean"
    },
    {
-    "band": "1.50-2.00",
+    "band": "5.00-10.00",
     "ci": [
-     0.2438,
-     0.5214
+     0.0865,
+     0.1469
     ],
-    "hit_rate": 0.3721,
-    "hits": 16,
-    "label": "0-1 goals in the match",
-    "mean_probability": 0.5325,
-    "outcome": "tg_0_1",
-    "picks": 43
+    "group": "Half-time",
+    "hit_rate": 0.1132,
+    "hits": 48,
+    "mean_probability": 0.1419,
+    "picks": 424,
+    "strategy": "lean"
    },
    {
-    "band": "2.00-3.00",
+    "band": "1.70-2.00",
     "ci": [
-     0.3338,
-     0.5231
+     0.4831,
+     0.5385
     ],
-    "hit_rate": 0.4257,
-    "hits": 43,
-    "label": "0-1 goals in the match",
-    "mean_probability": 0.4668,
-    "outcome": "tg_0_1",
-    "picks": 101
+    "group": "Result & double chance",
+    "hit_rate": 0.5108,
+    "hits": 637,
+    "mean_probability": 0.5382,
+    "picks": 1247,
+    "strategy": "lean"
    },
    {
-    "band": "2.00-3.00",
+    "band": "10.00+",
     "ci": [
-     0.2269,
-     0.56
+     0.0048,
+     0.1382
     ],
-    "hit_rate": 0.3793,
-    "hits": 11,
-    "label": "2-3 goals in the match",
-    "mean_probability": 0.4622,
-    "outcome": "tg_2_3",
-    "picks": 29
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.6277,
-     0.8422
-    ],
-    "hit_rate": 0.75,
-    "hits": 45,
-    "label": "2+ goals in the match",
-    "mean_probability": 0.639,
-    "outcome": "tg_2plus",
-    "picks": 60
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.5712,
-     0.6144
-    ],
-    "hit_rate": 0.5929,
-    "hits": 1177,
-    "label": "3+ goals in the match",
-    "mean_probability": 0.5961,
-    "outcome": "tg_3plus",
-    "picks": 1985
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3733,
-     0.6267
-    ],
-    "hit_rate": 0.5,
-    "hits": 28,
-    "label": "3+ goals in the match",
-    "mean_probability": 0.4797,
-    "outcome": "tg_3plus",
-    "picks": 56
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.3171,
-     0.7267
-    ],
-    "hit_rate": 0.5263,
-    "hits": 10,
-    "label": "4-6 goals in the match",
-    "mean_probability": 0.4705,
-    "outcome": "tg_4_6",
-    "picks": 19
-   },
-   {
-    "band": "1.50-2.00",
-    "ci": [
-     0.4833,
-     0.6512
-    ],
-    "hit_rate": 0.5692,
-    "hits": 74,
-    "label": "4+ goals in the match",
-    "mean_probability": 0.5635,
-    "outcome": "tg_4plus",
-    "picks": 130
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.31,
-     0.5016
-    ],
-    "hit_rate": 0.4021,
-    "hits": 39,
-    "label": "4+ goals in the match",
-    "mean_probability": 0.4724,
-    "outcome": "tg_4plus",
-    "picks": 97
-   },
-   {
-    "band": "2.00-3.00",
-    "ci": [
-     0.0945,
-     0.9055
-    ],
-    "hit_rate": 0.5,
+    "group": "Result & double chance",
+    "hit_rate": 0.027,
     "hits": 1,
-    "label": "5+ goals in the match",
-    "mean_probability": 0.4607,
-    "outcome": "tg_5plus",
-    "picks": 2
+    "mean_probability": 0.0865,
+    "picks": 37,
+    "strategy": "lean"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.3573,
+     0.3797
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.3684,
+    "hits": 2623,
+    "mean_probability": 0.3866,
+    "picks": 7120,
+    "strategy": "lean"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.2388,
+     0.2526
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.2456,
+    "hits": 3659,
+    "mean_probability": 0.2552,
+    "picks": 14898,
+    "strategy": "lean"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1336,
+     0.1461
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.1398,
+    "hits": 1649,
+    "mean_probability": 0.147,
+    "picks": 11798,
+    "strategy": "lean"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5394,
+     0.558
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.5487,
+    "hits": 6008,
+    "mean_probability": 0.539,
+    "picks": 10949,
+    "strategy": "lean"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.3678,
+     0.3874
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.3775,
+    "hits": 3544,
+    "mean_probability": 0.3928,
+    "picks": 9387,
+    "strategy": "lean"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.2409,
+     0.2626
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.2516,
+    "hits": 1545,
+    "mean_probability": 0.2645,
+    "picks": 6141,
+    "strategy": "lean"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1498,
+     0.1784
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.1636,
+    "hits": 420,
+    "mean_probability": 0.1612,
+    "picks": 2568,
+    "strategy": "lean"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5381,
+     0.5955
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.567,
+    "hits": 647,
+    "mean_probability": 0.5834,
+    "picks": 1141,
+    "strategy": "probability"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4926,
+     0.5353
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.514,
+    "hits": 1085,
+    "mean_probability": 0.4975,
+    "picks": 2111,
+    "strategy": "probability"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.2609,
+     0.3599
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.3082,
+    "hits": 102,
+    "mean_probability": 0.3303,
+    "picks": 331,
+    "strategy": "probability"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1749,
+     0.208
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.1909,
+    "hits": 412,
+    "mean_probability": 0.1958,
+    "picks": 2158,
+    "strategy": "probability"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5526,
+     0.5864
+    ],
+    "group": "Combos",
+    "hit_rate": 0.5696,
+    "hits": 1878,
+    "mean_probability": 0.5834,
+    "picks": 3297,
+    "strategy": "probability"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0881,
+     0.1109
+    ],
+    "group": "Combos",
+    "hit_rate": 0.0989,
+    "hits": 260,
+    "mean_probability": 0.0976,
+    "picks": 2628,
+    "strategy": "probability"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4881,
+     0.5209
+    ],
+    "group": "Combos",
+    "hit_rate": 0.5045,
+    "hits": 1795,
+    "mean_probability": 0.4973,
+    "picks": 3558,
+    "strategy": "probability"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3395,
+     0.3554
+    ],
+    "group": "Combos",
+    "hit_rate": 0.3474,
+    "hits": 4769,
+    "mean_probability": 0.33,
+    "picks": 13728,
+    "strategy": "probability"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1828,
+     0.2006
+    ],
+    "group": "Combos",
+    "hit_rate": 0.1915,
+    "hits": 1438,
+    "mean_probability": 0.1948,
+    "picks": 7509,
+    "strategy": "probability"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.1032,
+     0.1155
+    ],
+    "group": "Correct score",
+    "hit_rate": 0.1092,
+    "hits": 1092,
+    "mean_probability": 0.0975,
+    "picks": 9999,
+    "strategy": "probability"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5873,
+     0.6157
+    ],
+    "group": "Goals",
+    "hit_rate": 0.6016,
+    "hits": 2748,
+    "mean_probability": 0.5826,
+    "picks": 4568,
+    "strategy": "probability"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0847,
+     0.111
+    ],
+    "group": "Goals",
+    "hit_rate": 0.0971,
+    "hits": 190,
+    "mean_probability": 0.0978,
+    "picks": 1957,
+    "strategy": "probability"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4945,
+     0.5076
+    ],
+    "group": "Goals",
+    "hit_rate": 0.501,
+    "hits": 11183,
+    "mean_probability": 0.4957,
+    "picks": 22320,
+    "strategy": "probability"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3042,
+     0.3324
+    ],
+    "group": "Goals",
+    "hit_rate": 0.3181,
+    "hits": 1331,
+    "mean_probability": 0.329,
+    "picks": 4184,
+    "strategy": "probability"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1906,
+     0.2119
+    ],
+    "group": "Goals",
+    "hit_rate": 0.201,
+    "hits": 1086,
+    "mean_probability": 0.1962,
+    "picks": 5402,
+    "strategy": "probability"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5487,
+     0.5899
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.5694,
+    "hits": 1259,
+    "mean_probability": 0.584,
+    "picks": 2211,
+    "strategy": "probability"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0887,
+     0.1003
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.0943,
+    "hits": 917,
+    "mean_probability": 0.0969,
+    "picks": 9724,
+    "strategy": "probability"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4828,
+     0.5219
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.5024,
+    "hits": 1262,
+    "mean_probability": 0.4978,
+    "picks": 2512,
+    "strategy": "probability"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3192,
+     0.3549
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.3368,
+    "hits": 905,
+    "mean_probability": 0.33,
+    "picks": 2687,
+    "strategy": "probability"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1922,
+     0.2128
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.2023,
+    "hits": 1190,
+    "mean_probability": 0.196,
+    "picks": 5882,
+    "strategy": "probability"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5886,
+     0.6035
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.5961,
+    "hits": 9970,
+    "mean_probability": 0.5816,
+    "picks": 16726,
+    "strategy": "probability"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.084,
+     0.104
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.0935,
+    "hits": 306,
+    "mean_probability": 0.0976,
+    "picks": 3272,
+    "strategy": "probability"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.4468,
+     0.4984
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.4725,
+    "hits": 679,
+    "mean_probability": 0.4974,
+    "picks": 1437,
+    "strategy": "probability"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3138,
+     0.3338
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.3237,
+    "hits": 2741,
+    "mean_probability": 0.3298,
+    "picks": 8467,
+    "strategy": "probability"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1815,
+     0.2031
+    ],
+    "group": "Half-time",
+    "hit_rate": 0.192,
+    "hits": 985,
+    "mean_probability": 0.1966,
+    "picks": 5129,
+    "strategy": "probability"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5659,
+     0.6195
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.593,
+    "hits": 762,
+    "mean_probability": 0.5836,
+    "picks": 1285,
+    "strategy": "probability"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0796,
+     0.0991
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.0889,
+    "hits": 289,
+    "mean_probability": 0.0976,
+    "picks": 3252,
+    "strategy": "probability"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.463,
+     0.546
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.5045,
+    "hits": 279,
+    "mean_probability": 0.4976,
+    "picks": 553,
+    "strategy": "probability"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.278,
+     0.3322
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.3044,
+    "hits": 337,
+    "mean_probability": 0.329,
+    "picks": 1107,
+    "strategy": "probability"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1753,
+     0.2013
+    ],
+    "group": "Result & double chance",
+    "hit_rate": 0.1879,
+    "hits": 651,
+    "mean_probability": 0.1963,
+    "picks": 3464,
+    "strategy": "probability"
+   },
+   {
+    "band": "1.70-2.00",
+    "ci": [
+     0.5722,
+     0.599
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.5856,
+    "hits": 3040,
+    "mean_probability": 0.5838,
+    "picks": 5191,
+    "strategy": "probability"
+   },
+   {
+    "band": "10.00+",
+    "ci": [
+     0.0903,
+     0.1111
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.1002,
+    "hits": 323,
+    "mean_probability": 0.0979,
+    "picks": 3223,
+    "strategy": "probability"
+   },
+   {
+    "band": "2.00-3.00",
+    "ci": [
+     0.483,
+     0.5138
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.4984,
+    "hits": 2013,
+    "mean_probability": 0.4976,
+    "picks": 4039,
+    "strategy": "probability"
+   },
+   {
+    "band": "3.00-5.00",
+    "ci": [
+     0.3061,
+     0.3367
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.3212,
+    "hits": 1147,
+    "mean_probability": 0.3296,
+    "picks": 3571,
+    "strategy": "probability"
+   },
+   {
+    "band": "5.00-10.00",
+    "ci": [
+     0.1935,
+     0.2167
+    ],
+    "group": "Team goals",
+    "hit_rate": 0.2049,
+    "hits": 954,
+    "mean_probability": 0.1956,
+    "picks": 4657,
+    "strategy": "probability"
    }
   ],
+  "rounds": {
+   "lean|1.70-2.00": 693,
+   "lean|10.00+": 703,
+   "lean|2.00-3.00": 700,
+   "lean|3.00-5.00": 702,
+   "lean|5.00-10.00": 703,
+   "probability|1.70-2.00": 679,
+   "probability|10.00+": 677,
+   "probability|2.00-3.00": 698,
+   "probability|3.00-5.00": 683,
+   "probability|5.00-10.00": 685
+  },
   "seasons": [
    "2019-20",
    "2020-21",
@@ -2252,1388 +2062,31 @@
    "2024-25",
    "2025-26"
   ],
-  "views": {
-   "best_combos": {
-    "by_league": [
-     {
-      "ci": [
-       0.4557,
-       0.504
-      ],
-      "hit_rate": 0.4798,
-      "hits": 784,
-      "label": "Both teams score and 3+ goals",
-      "mean_probability": 0.4623,
-      "name": "EC",
-      "picks": 1634
-     },
-     {
-      "ci": [
-       0.426,
-       0.4745
-      ],
-      "hit_rate": 0.4502,
-      "hits": 727,
-      "label": "A goal in each half",
-      "mean_probability": 0.4371,
-      "name": "E2",
-      "picks": 1615
-     },
-     {
-      "ci": [
-       0.406,
-       0.4545
-      ],
-      "hit_rate": 0.4301,
-      "hits": 686,
-      "label": "Both teams score and 3+ goals",
-      "mean_probability": 0.4213,
-      "name": "E3",
-      "picks": 1595
-     },
-     {
-      "ci": [
-       0.3833,
-       0.4336
-      ],
-      "hit_rate": 0.4082,
-      "hits": 598,
-      "label": "Both teams score and 3+ goals",
-      "mean_probability": 0.4193,
-      "name": "E1",
-      "picks": 1465
-     },
-     {
-      "ci": [
-       0.4373,
-       0.4981
-      ],
-      "hit_rate": 0.4676,
-      "hits": 483,
-      "label": "A goal in the first half and 2+ in the second half",
-      "mean_probability": 0.4677,
-      "name": "E0",
-      "picks": 1033
-     },
-     {
-      "ci": [
-       0.484,
-       0.5463
-      ],
-      "hit_rate": 0.5152,
-      "hits": 508,
-      "label": "Home team scores in the first half and 3+ goals",
-      "mean_probability": 0.4828,
-      "name": "D1",
-      "picks": 986
-     },
-     {
-      "ci": [
-       0.3267,
-       0.3919
-      ],
-      "hit_rate": 0.3587,
-      "hits": 297,
-      "label": "Home win or draw and both teams score",
-      "mean_probability": 0.3393,
-      "name": "SP2",
-      "picks": 828
-     },
-     {
-      "ci": [
-       0.3874,
-       0.4546
-      ],
-      "hit_rate": 0.4206,
-      "hits": 347,
-      "label": "Level at half-time and 2+ goals",
-      "mean_probability": 0.3918,
-      "name": "F2",
-      "picks": 825
-     },
-     {
-      "ci": [
-       0.3763,
-       0.4436
-      ],
-      "hit_rate": 0.4095,
-      "hits": 335,
-      "label": "Home win or draw, and 3+ goals",
-      "mean_probability": 0.4063,
-      "name": "SC0",
-      "picks": 818
-     },
-     {
-      "ci": [
-       0.3818,
-       0.45
-      ],
-      "hit_rate": 0.4155,
-      "hits": 332,
-      "label": "Home win or draw and both teams score",
-      "mean_probability": 0.4517,
-      "name": "SC3",
-      "picks": 799
-     }
-    ],
-    "by_play": [
-     {
-      "ci": [
-       0.4255,
-       0.4485
-      ],
-      "hit_rate": 0.437,
-      "hits": 3116,
-      "label": "Both teams score and 3+ goals",
-      "mean_probability": 0.4454,
-      "name": "c4",
-      "picks": 7131
-     },
-     {
-      "ci": [
-       0.5771,
-       0.6048
-      ],
-      "hit_rate": 0.591,
-      "hits": 2863,
-      "label": "A goal in each half",
-      "mean_probability": 0.5749,
-      "name": "c7",
-      "picks": 4844
-     },
-     {
-      "ci": [
-       0.3959,
-       0.4262
-      ],
-      "hit_rate": 0.411,
-      "hits": 1662,
-      "label": "Home win or draw and both teams score",
-      "mean_probability": 0.395,
-      "name": "c5",
-      "picks": 4044
-     },
-     {
-      "ci": [
-       0.2932,
-       0.326
-      ],
-      "hit_rate": 0.3094,
-      "hits": 947,
-      "label": "Draw or away win, and 3+ goals",
-      "mean_probability": 0.3067,
-      "name": "c6",
-      "picks": 3061
-     },
-     {
-      "ci": [
-       0.4066,
-       0.4419
-      ],
-      "hit_rate": 0.4242,
-      "hits": 1278,
-      "label": "Home win or draw, and 3+ goals",
-      "mean_probability": 0.416,
-      "name": "c1",
-      "picks": 3013
-     },
-     {
-      "ci": [
-       0.225,
-       0.2671
-      ],
-      "hit_rate": 0.2455,
-      "hits": 393,
-      "label": "Level at half-time and 2+ goals",
-      "mean_probability": 0.2444,
-      "name": "c9",
-      "picks": 1601
-     },
-     {
-      "ci": [
-       0.2783,
-       0.3446
-      ],
-      "hit_rate": 0.3105,
-      "hits": 231,
-      "label": "Away team 2+ and both teams score",
-      "mean_probability": 0.2989,
-      "name": "c8",
-      "picks": 744
-     },
-     {
-      "ci": [
-       0.3986,
-       0.4879
-      ],
-      "hit_rate": 0.4428,
-      "hits": 209,
-      "label": "Home team scores in the first half and 3+ goals",
-      "mean_probability": 0.4623,
-      "name": "c10",
-      "picks": 472
-     },
-     {
-      "ci": [
-       0.4168,
-       0.5236
-      ],
-      "hit_rate": 0.4699,
-      "hits": 156,
-      "label": "A goal in the first half and 2+ in the second half",
-      "mean_probability": 0.4422,
-      "name": "c2",
-      "picks": 332
-     },
-     {
-      "ci": [
-       0.1963,
-       0.3422
-      ],
-      "hit_rate": 0.2628,
-      "hits": 36,
-      "label": "Home team 2+ and both teams score",
-      "mean_probability": 0.3058,
-      "name": "c3",
-      "picks": 137
-     }
-    ],
-    "ci": [
-     0.4231,
-     0.4352
-    ],
-    "hit_rate": 0.4291,
-    "hits": 10891,
-    "mean_probability": 0.4244,
-    "no_odds_picks": 5977,
-    "picks": 25379,
-    "rounds": 690
-   },
-   "most_likely": {
-    "by_league": [
-     {
-      "ci": [
-       0.5634,
-       0.6015
-      ],
-      "hit_rate": 0.5826,
-      "hits": 1492,
-      "label": "Draw or away win",
-      "mean_probability": 0.5737,
-      "name": "EC",
-      "picks": 2561
-     },
-     {
-      "ci": [
-       0.5721,
-       0.6102
-      ],
-      "hit_rate": 0.5913,
-      "hits": 1509,
-      "label": "Under 2.5 goals",
-      "mean_probability": 0.5693,
-      "name": "E2",
-      "picks": 2552
-     },
-     {
-      "ci": [
-       0.5688,
-       0.6074
-      ],
-      "hit_rate": 0.5882,
-      "hits": 1467,
-      "label": "Draw or away win",
-      "mean_probability": 0.5707,
-      "name": "E3",
-      "picks": 2494
-     },
-     {
-      "ci": [
-       0.5582,
-       0.5988
-      ],
-      "hit_rate": 0.5787,
-      "hits": 1313,
-      "label": "Draw or away win",
-      "mean_probability": 0.5721,
-      "name": "E1",
-      "picks": 2269
-     },
-     {
-      "ci": [
-       0.582,
-       0.6365
-      ],
-      "hit_rate": 0.6096,
-      "hits": 748,
-      "label": "Under 3.5 goals",
-      "mean_probability": 0.5938,
-      "name": "D1",
-      "picks": 1227
-     },
-     {
-      "ci": [
-       0.5611,
-       0.6161
-      ],
-      "hit_rate": 0.5889,
-      "hits": 722,
-      "label": "Draw or away win",
-      "mean_probability": 0.586,
-      "name": "E0",
-      "picks": 1226
-     },
-     {
-      "ci": [
-       0.5626,
-       0.6178
-      ],
-      "hit_rate": 0.5905,
-      "hits": 718,
-      "label": "Under 2.5 goals",
-      "mean_probability": 0.5906,
-      "name": "F2",
-      "picks": 1216
-     },
-     {
-      "ci": [
-       0.5519,
-       0.6096
-      ],
-      "hit_rate": 0.581,
-      "hits": 649,
-      "label": "Home win or draw",
-      "mean_probability": 0.5804,
-      "name": "JPN",
-      "picks": 1117
-     },
-     {
-      "ci": [
-       0.5438,
-       0.6038
-      ],
-      "hit_rate": 0.574,
-      "hits": 597,
-      "label": "Draw or away win",
-      "mean_probability": 0.566,
-      "name": "I2",
-      "picks": 1040
-     },
-     {
-      "ci": [
-       0.6081,
-       0.6682
-      ],
-      "hit_rate": 0.6387,
-      "hits": 624,
-      "label": "Away team scores",
-      "mean_probability": 0.6,
-      "name": "SP2",
-      "picks": 977
-     }
-    ],
-    "by_play": [
-     {
-      "ci": [
-       0.5623,
-       0.5854
-      ],
-      "hit_rate": 0.5739,
-      "hits": 4037,
-      "label": "Under 2.5 goals",
-      "mean_probability": 0.5748,
-      "name": "ou_u25",
-      "picks": 7034
-     },
-     {
-      "ci": [
-       0.5545,
-       0.5803
-      ],
-      "hit_rate": 0.5674,
-      "hits": 3211,
-      "label": "Both teams score",
-      "mean_probability": 0.569,
-      "name": "btts_yes",
-      "picks": 5659
-     },
-     {
-      "ci": [
-       0.6097,
-       0.6357
-      ],
-      "hit_rate": 0.6228,
-      "hits": 3319,
-      "label": "Draw or away win",
-      "mean_probability": 0.6118,
-      "name": "dc_x2",
-      "picks": 5329
-     },
-     {
-      "ci": [
-       0.5437,
-       0.5823
-      ],
-      "hit_rate": 0.5631,
-      "hits": 1424,
-      "label": "At least one team fails to score",
-      "mean_probability": 0.569,
-      "name": "btts_no",
-      "picks": 2529
-     },
-     {
-      "ci": [
-       0.5455,
-       0.5849
-      ],
-      "hit_rate": 0.5653,
-      "hits": 1368,
-      "label": "Home team scores in the first half",
-      "mean_probability": 0.5647,
-      "name": "home_1h_1plus",
-      "picks": 2420
-     },
-     {
-      "ci": [
-       0.5941,
-       0.6356
-      ],
-      "hit_rate": 0.6151,
-      "hits": 1296,
-      "label": "A goal in each half",
-      "mean_probability": 0.5839,
-      "name": "c7",
-      "picks": 2107
-     },
-     {
-      "ci": [
-       0.5657,
-       0.6147
-      ],
-      "hit_rate": 0.5904,
-      "hits": 911,
-      "label": "3+ goals in the match",
-      "mean_probability": 0.5985,
-      "name": "tg_3plus",
-      "picks": 1543
-     },
-     {
-      "ci": [
-       0.5711,
-       0.6211
-      ],
-      "hit_rate": 0.5963,
-      "hits": 879,
-      "label": "Home team scores 2+",
-      "mean_probability": 0.5839,
-      "name": "home_2plus",
-      "picks": 1474
-     },
-     {
-      "ci": [
-       0.4641,
-       0.5225
-      ],
-      "hit_rate": 0.4933,
-      "hits": 553,
-      "label": "Even number of goals",
-      "mean_probability": 0.5067,
-      "name": "even",
-      "picks": 1121
-     },
-     {
-      "ci": [
-       0.4309,
-       0.5019
-      ],
-      "hit_rate": 0.4662,
-      "hits": 352,
-      "label": "Odd number of goals",
-      "mean_probability": 0.4944,
-      "name": "odd",
-      "picks": 755
-     },
-     {
-      "ci": [
-       0.5126,
-       0.5842
-      ],
-      "hit_rate": 0.5486,
-      "hits": 406,
-      "label": "Away team scores in the first half",
-      "mean_probability": 0.5602,
-      "name": "away_1h_1plus",
-      "picks": 740
-     },
-     {
-      "ci": [
-       0.5202,
-       0.6146
-      ],
-      "hit_rate": 0.568,
-      "hits": 238,
-      "label": "2+ goals in the second half",
-      "mean_probability": 0.593,
-      "name": "h2_2plus",
-      "picks": 419
-     },
-     {
-      "ci": [
-       0.5719,
-       0.6674
-      ],
-      "hit_rate": 0.6209,
-      "hits": 244,
-      "label": "Away team scores",
-      "mean_probability": 0.6323,
-      "name": "away_1plus",
-      "picks": 393
-     },
-     {
-      "ci": [
-       0.613,
-       0.7082
-      ],
-      "hit_rate": 0.6622,
-      "hits": 249,
-      "label": "Under 3.5 goals",
-      "mean_probability": 0.6357,
-      "name": "ou_u35",
-      "picks": 376
-     },
-     {
-      "ci": [
-       0.6196,
-       0.7177
-      ],
-      "hit_rate": 0.6705,
-      "hits": 234,
-      "label": "1+ goals in the first half",
-      "mean_probability": 0.6377,
-      "name": "h1_1plus",
-      "picks": 349
-     },
-     {
-      "ci": [
-       0.5116,
-       0.6416
-      ],
-      "hit_rate": 0.578,
-      "hits": 126,
-      "label": "Away team scores 2+",
-      "mean_probability": 0.5766,
-      "name": "away_2plus",
-      "picks": 218
-     },
-     {
-      "ci": [
-       0.4693,
-       0.6456
-      ],
-      "hit_rate": 0.5593,
-      "hits": 66,
-      "label": "Home win or draw, and 3+ goals",
-      "mean_probability": 0.6084,
-      "name": "c1",
-      "picks": 118
-     },
-     {
-      "ci": [
-       0.4248,
-       0.6116
-      ],
-      "hit_rate": 0.5189,
-      "hits": 55,
-      "label": "Both teams score and 3+ goals",
-      "mean_probability": 0.5795,
-      "name": "c4",
-      "picks": 106
-     },
-     {
-      "ci": [
-       0.4774,
-       0.7061
-      ],
-      "hit_rate": 0.597,
-      "hits": 40,
-      "label": "Home team leading at half-time",
-      "mean_probability": 0.6033,
-      "name": "ht_1",
-      "picks": 67
-     },
-     {
-      "ci": [
-       0.6277,
-       0.8422
-      ],
-      "hit_rate": 0.75,
-      "hits": 45,
-      "label": "2+ goals in the match",
-      "mean_probability": 0.639,
-      "name": "tg_2plus",
-      "picks": 60
-     },
-     {
-      "ci": [
-       0.4963,
-       0.7458
-      ],
-      "hit_rate": 0.6296,
-      "hits": 34,
-      "label": "Home team scores in the first half and 3+ goals",
-      "mean_probability": 0.6031,
-      "name": "c10",
-      "picks": 54
-     },
-     {
-      "ci": [
-       0.4815,
-       0.7414
-      ],
-      "hit_rate": 0.62,
-      "hits": 31,
-      "label": "4+ goals in the match",
-      "mean_probability": 0.5656,
-      "name": "tg_4plus",
-      "picks": 50
-     },
-     {
-      "ci": [
-       0.4029,
-       0.6742
-      ],
-      "hit_rate": 0.5417,
-      "hits": 26,
-      "label": "Level at half-time",
-      "mean_probability": 0.503,
-      "name": "ht_x",
-      "picks": 48
-     },
-     {
-      "ci": [
-       0.4915,
-       0.7917
-      ],
-      "hit_rate": 0.6571,
-      "hits": 23,
-      "label": "Home win or draw",
-      "mean_probability": 0.6416,
-      "name": "dc_1x",
-      "picks": 35
-     },
-     {
-      "ci": [
-       0.2551,
-       0.5926
-      ],
-      "hit_rate": 0.4138,
-      "hits": 12,
-      "label": "More goals in the second half",
-      "mean_probability": 0.4919,
-      "name": "mg_2h",
-      "picks": 29
-     },
-     {
-      "ci": [
-       0.2269,
-       0.56
-      ],
-      "hit_rate": 0.3793,
-      "hits": 11,
-      "label": "2-3 goals in the match",
-      "mean_probability": 0.4622,
-      "name": "tg_2_3",
-      "picks": 29
-     },
-     {
-      "ci": [
-       0.2651,
-       0.6093
-      ],
-      "hit_rate": 0.4286,
-      "hits": 12,
-      "label": "2+ goals in the first half",
-      "mean_probability": 0.5486,
-      "name": "h1_2plus",
-      "picks": 28
-     },
-     {
-      "ci": [
-       0.1793,
-       0.5066
-      ],
-      "hit_rate": 0.3214,
-      "hits": 9,
-      "label": "0-1 goals in the match",
-      "mean_probability": 0.4855,
-      "name": "tg_0_1",
-      "picks": 28
-     },
-     {
-      "ci": [
-       0.3421,
-       0.7418
-      ],
-      "hit_rate": 0.55,
-      "hits": 11,
-      "label": "A goal in the first half and 2+ in the second half",
-      "mean_probability": 0.5692,
-      "name": "c2",
-      "picks": 20
-     },
-     {
-      "ci": [
-       0.3876,
-       0.8366
-      ],
-      "hit_rate": 0.6429,
-      "hits": 9,
-      "label": "Away team leading at half-time",
-      "mean_probability": 0.5823,
-      "name": "ht_2",
-      "picks": 14
-     },
-     {
-      "ci": [
-       0.1682,
-       0.6873
-      ],
-      "hit_rate": 0.4,
-      "hits": 4,
-      "label": "Home win or draw and both teams score",
-      "mean_probability": 0.5145,
-      "name": "c5",
-      "picks": 10
-     },
-     {
-      "ci": [
-       0.2366,
-       0.7634
-      ],
-      "hit_rate": 0.5,
-      "hits": 5,
-      "label": "Draw or away win, and 3+ goals",
-      "mean_probability": 0.5995,
-      "name": "c6",
-      "picks": 10
-     },
-     {
-      "ci": [
-       0.4093,
-       0.9285
-      ],
-      "hit_rate": 0.75,
-      "hits": 6,
-      "label": "Home team scores in both halves",
-      "mean_probability": 0.6063,
-      "name": "home_both_halves",
-      "picks": 8
-     },
-     {
-      "ci": [
-       0.0257,
-       0.5131
-      ],
-      "hit_rate": 0.1429,
-      "hits": 1,
-      "label": "Draw",
-      "mean_probability": 0.3064,
-      "name": "ft_x",
-      "picks": 7
-     },
-     {
-      "ci": [
-       0.3,
-       0.9032
-      ],
-      "hit_rate": 0.6667,
-      "hits": 4,
-      "label": "Home ahead at half-time and full-time",
-      "mean_probability": 0.6262,
-      "name": "htft_11",
-      "picks": 6
-     },
-     {
-      "ci": [
-       0.0945,
-       0.9055
-      ],
-      "hit_rate": 0.5,
-      "hits": 1,
-      "label": "More goals in the first half",
-      "mean_probability": 0.3182,
-      "name": "mg_1h",
-      "picks": 2
-     },
-     {
-      "ci": [
-       0.0,
-       0.7935
-      ],
-      "hit_rate": 0.0,
-      "hits": 0,
-      "label": "Away team scores in both halves",
-      "mean_probability": 0.5812,
-      "name": "away_both_halves",
-      "picks": 1
-     }
-    ],
-    "ci": [
-     0.5746,
-     0.5852
-    ],
-    "hit_rate": 0.5799,
-    "hits": 19252,
-    "mean_probability": 0.5784,
-    "no_odds_picks": 7945,
-    "picks": 33196,
-    "rounds": 701
-   },
-   "stand_out": {
-    "by_league": [
-     {
-      "ci": [
-       0.5101,
-       0.5685
-      ],
-      "hit_rate": 0.5394,
-      "hits": 602,
-      "label": "Home team scores 2+",
-      "mean_probability": 0.5426,
-      "name": "EC",
-      "picks": 1116
-     },
-     {
-      "ci": [
-       0.5361,
-       0.5965
-      ],
-      "hit_rate": 0.5666,
-      "hits": 583,
-      "label": "Home team scores 2+",
-      "mean_probability": 0.5435,
-      "name": "E2",
-      "picks": 1029
-     },
-     {
-      "ci": [
-       0.5146,
-       0.5807
-      ],
-      "hit_rate": 0.5479,
-      "hits": 475,
-      "label": "Under 2.5 goals",
-      "mean_probability": 0.5333,
-      "name": "E3",
-      "picks": 867
-     },
-     {
-      "ci": [
-       0.502,
-       0.5696
-      ],
-      "hit_rate": 0.536,
-      "hits": 447,
-      "label": "Away team scores 2+",
-      "mean_probability": 0.5378,
-      "name": "E1",
-      "picks": 834
-     },
-     {
-      "ci": [
-       0.5002,
-       0.5688
-      ],
-      "hit_rate": 0.5347,
-      "hits": 432,
-      "label": "Home team scores in the first half and 3+ goals",
-      "mean_probability": 0.5425,
-      "name": "D1",
-      "picks": 808
-     },
-     {
-      "ci": [
-       0.5024,
-       0.5715
-      ],
-      "hit_rate": 0.5371,
-      "hits": 427,
-      "label": "Draw or away win",
-      "mean_probability": 0.5515,
-      "name": "E0",
-      "picks": 795
-     },
-     {
-      "ci": [
-       0.5366,
-       0.6165
-      ],
-      "hit_rate": 0.5771,
-      "hits": 337,
-      "label": "Draw or away win, and 3+ goals",
-      "mean_probability": 0.56,
-      "name": "SP1",
-      "picks": 584
-     },
-     {
-      "ci": [
-       0.505,
-       0.5857
-      ],
-      "hit_rate": 0.5456,
-      "hits": 317,
-      "label": "3+ goals in the match",
-      "mean_probability": 0.5597,
-      "name": "JPN",
-      "picks": 581
-     },
-     {
-      "ci": [
-       0.5171,
-       0.6037
-      ],
-      "hit_rate": 0.5609,
-      "hits": 281,
-      "label": "Draw or away win, and 3+ goals",
-      "mean_probability": 0.5472,
-      "name": "N1",
-      "picks": 501
-     },
-     {
-      "ci": [
-       0.4989,
-       0.5875
-      ],
-      "hit_rate": 0.5436,
-      "hits": 262,
-      "label": "Away team scores in the first half",
-      "mean_probability": 0.5476,
-      "name": "I1",
-      "picks": 482
-     }
-    ],
-    "by_play": [
-     {
-      "ci": [
-       0.5518,
-       0.5835
-      ],
-      "hit_rate": 0.5677,
-      "hits": 2121,
-      "label": "Home team scores 2+",
-      "mean_probability": 0.5507,
-      "name": "home_2plus",
-      "picks": 3736
-     },
-     {
-      "ci": [
-       0.4958,
-       0.5377
-      ],
-      "hit_rate": 0.5168,
-      "hits": 1126,
-      "label": "Away team scores 2+",
-      "mean_probability": 0.5083,
-      "name": "away_2plus",
-      "picks": 2179
-     },
-     {
-      "ci": [
-       0.5542,
-       0.5968
-      ],
-      "hit_rate": 0.5757,
-      "hits": 1187,
-      "label": "Under 2.5 goals",
-      "mean_probability": 0.5824,
-      "name": "ou_u25",
-      "picks": 2062
-     },
-     {
-      "ci": [
-       0.4771,
-       0.5367
-      ],
-      "hit_rate": 0.507,
-      "hits": 546,
-      "label": "Away team scores in the first half",
-      "mean_probability": 0.5258,
-      "name": "away_1h_1plus",
-      "picks": 1077
-     },
-     {
-      "ci": [
-       0.5234,
-       0.5837
-      ],
-      "hit_rate": 0.5537,
-      "hits": 577,
-      "label": "At least one team fails to score",
-      "mean_probability": 0.5851,
-      "name": "btts_no",
-      "picks": 1042
-     },
-     {
-      "ci": [
-       0.5024,
-       0.5739
-      ],
-      "hit_rate": 0.5384,
-      "hits": 400,
-      "label": "Home win or draw, and 3+ goals",
-      "mean_probability": 0.5393,
-      "name": "c1",
-      "picks": 743
-     },
-     {
-      "ci": [
-       0.5466,
-       0.6327
-      ],
-      "hit_rate": 0.5904,
-      "hits": 294,
-      "label": "3+ goals in the match",
-      "mean_probability": 0.5753,
-      "name": "tg_3plus",
-      "picks": 498
-     },
-     {
-      "ci": [
-       0.5775,
-       0.6647
-      ],
-      "hit_rate": 0.6221,
-      "hits": 293,
-      "label": "Draw or away win",
-      "mean_probability": 0.6356,
-      "name": "dc_x2",
-      "picks": 471
-     },
-     {
-      "ci": [
-       0.4626,
-       0.5595
-      ],
-      "hit_rate": 0.5111,
-      "hits": 207,
-      "label": "Home team leading at half-time",
-      "mean_probability": 0.5093,
-      "name": "ht_1",
-      "picks": 405
-     },
-     {
-      "ci": [
-       0.5008,
-       0.6
-      ],
-      "hit_rate": 0.5509,
-      "hits": 211,
-      "label": "Both teams score and 3+ goals",
-      "mean_probability": 0.5191,
-      "name": "c4",
-      "picks": 383
-     },
-     {
-      "ci": [
-       0.4866,
-       0.5864
-      ],
-      "hit_rate": 0.5368,
-      "hits": 204,
-      "label": "Home team scores in the first half",
-      "mean_probability": 0.5786,
-      "name": "home_1h_1plus",
-      "picks": 380
-     },
-     {
-      "ci": [
-       0.4363,
-       0.5502
-      ],
-      "hit_rate": 0.4932,
-      "hits": 144,
-      "label": "Home ahead at half-time and full-time",
-      "mean_probability": 0.5037,
-      "name": "htft_11",
-      "picks": 292
-     },
-     {
-      "ci": [
-       0.4527,
-       0.5944
-      ],
-      "hit_rate": 0.5241,
-      "hits": 98,
-      "label": "Home team scores in the first half and 3+ goals",
-      "mean_probability": 0.5352,
-      "name": "c10",
-      "picks": 187
-     },
-     {
-      "ci": [
-       0.3914,
-       0.5367
-      ],
-      "hit_rate": 0.4633,
-      "hits": 82,
-      "label": "4+ goals in the match",
-      "mean_probability": 0.513,
-      "name": "tg_4plus",
-      "picks": 177
-     },
-     {
-      "ci": [
-       0.4147,
-       0.5625
-      ],
-      "hit_rate": 0.4884,
-      "hits": 84,
-      "label": "Draw or away win, and 3+ goals",
-      "mean_probability": 0.5112,
-      "name": "c6",
-      "picks": 172
-     },
-     {
-      "ci": [
-       0.4942,
-       0.6453
-      ],
-      "hit_rate": 0.5714,
-      "hits": 92,
-      "label": "Both teams score",
-      "mean_probability": 0.5855,
-      "name": "btts_yes",
-      "picks": 161
-     },
-     {
-      "ci": [
-       0.4478,
-       0.6017
-      ],
-      "hit_rate": 0.5253,
-      "hits": 83,
-      "label": "2+ goals in the second half",
-      "mean_probability": 0.5567,
-      "name": "h2_2plus",
-      "picks": 158
-     },
-     {
-      "ci": [
-       0.4377,
-       0.5941
-      ],
-      "hit_rate": 0.5163,
-      "hits": 79,
-      "label": "Home team scores in both halves",
-      "mean_probability": 0.5197,
-      "name": "home_both_halves",
-      "picks": 153
-     },
-     {
-      "ci": [
-       0.4945,
-       0.6696
-      ],
-      "hit_rate": 0.5847,
-      "hits": 69,
-      "label": "Away team leading at half-time",
-      "mean_probability": 0.504,
-      "name": "ht_2",
-      "picks": 118
-     },
-     {
-      "ci": [
-       0.3446,
-       0.5219
-      ],
-      "hit_rate": 0.431,
-      "hits": 50,
-      "label": "0-1 goals in the match",
-      "mean_probability": 0.4866,
-      "name": "tg_0_1",
-      "picks": 116
-     },
-     {
-      "ci": [
-       0.3651,
-       0.5523
-      ],
-      "hit_rate": 0.4571,
-      "hits": 48,
-      "label": "Home win or draw and both teams score",
-      "mean_probability": 0.4791,
-      "name": "c5",
-      "picks": 105
-     },
-     {
-      "ci": [
-       0.3506,
-       0.5381
-      ],
-      "hit_rate": 0.4423,
-      "hits": 46,
-      "label": "2+ goals in the first half",
-      "mean_probability": 0.4962,
-      "name": "h1_2plus",
-      "picks": 104
-     },
-     {
-      "ci": [
-       0.3006,
-       0.5427
-      ],
-      "hit_rate": 0.4167,
-      "hits": 25,
-      "label": "Away team 2+ and both teams score",
-      "mean_probability": 0.4742,
-      "name": "c8",
-      "picks": 60
-     },
-     {
-      "ci": [
-       0.4779,
-       0.7296
-      ],
-      "hit_rate": 0.6111,
-      "hits": 33,
-      "label": "Level at half-time",
-      "mean_probability": 0.4781,
-      "name": "ht_x",
-      "picks": 54
-     },
-     {
-      "ci": [
-       0.3664,
-       0.6336
-      ],
-      "hit_rate": 0.5,
-      "hits": 25,
-      "label": "A goal in the first half and 2+ in the second half",
-      "mean_probability": 0.5244,
-      "name": "c2",
-      "picks": 50
-     },
-     {
-      "ci": [
-       0.4104,
-       0.7011
-      ],
-      "hit_rate": 0.561,
-      "hits": 23,
-      "label": "Home team 2+ and both teams score",
-      "mean_probability": 0.4812,
-      "name": "c3",
-      "picks": 41
-     },
-     {
-      "ci": [
-       0.4091,
-       0.7133
-      ],
-      "hit_rate": 0.5676,
-      "hits": 21,
-      "label": "Away team scores in both halves",
-      "mean_probability": 0.5002,
-      "name": "away_both_halves",
-      "picks": 37
-     },
-     {
-      "ci": [
-       0.4551,
-       0.7813
-      ],
-      "hit_rate": 0.6333,
-      "hits": 19,
-      "label": "A goal in each half",
-      "mean_probability": 0.6188,
-      "name": "c7",
-      "picks": 30
-     },
-     {
-      "ci": [
-       0.2025,
-       0.5548
-      ],
-      "hit_rate": 0.36,
-      "hits": 9,
-      "label": "Away ahead at half-time and full-time",
-      "mean_probability": 0.4818,
-      "name": "htft_22",
-      "picks": 25
-     },
-     {
-      "ci": [
-       0.3171,
-       0.7267
-      ],
-      "hit_rate": 0.5263,
-      "hits": 10,
-      "label": "4-6 goals in the match",
-      "mean_probability": 0.4705,
-      "name": "tg_4_6",
-      "picks": 19
-     },
-     {
-      "ci": [
-       0.0945,
-       0.9055
-      ],
-      "hit_rate": 0.5,
-      "hits": 1,
-      "label": "5+ goals in the match",
-      "mean_probability": 0.4607,
-      "name": "tg_5plus",
-      "picks": 2
-     },
-     {
-      "ci": [
-       0.2065,
-       1.0
-      ],
-      "hit_rate": 1.0,
-      "hits": 1,
-      "label": "Away team scores",
-      "mean_probability": 0.6434,
-      "name": "away_1plus",
-      "picks": 1
-     }
-    ],
-    "ci": [
-     0.5378,
-     0.5538
-    ],
-    "hit_rate": 0.5458,
-    "hits": 8208,
-    "mean_probability": 0.5465,
-    "no_odds_picks": 3706,
-    "picks": 15038,
-    "rounds": 665
-   }
-  },
-  "weekdays": [
-   "Tuesday",
-   "Saturday"
+  "strategies": [
+   "lean",
+   "probability"
   ]
  },
  "rounds": [
   {
-   "combos": 5,
    "date": "2026-11-14",
-   "hits": 23,
+   "fixtures": 45,
+   "hits": 1571,
    "kind": "example",
    "label": "Saturday 14 Nov",
-   "picks": 15,
+   "leagues": 7,
+   "picks": 6484,
+   "rows": 6484,
    "settled": true,
-   "settled_count": 35,
-   "stand_out": 15,
+   "settled_count": 6484,
    "weekday": "Saturday"
   }
  ],
  "totals": {
-  "hit_rate": 0.6571,
-  "hits": 23,
-  "picks": 15,
+  "hit_rate": 0.2423,
+  "hits": 1571,
+  "picks": 6484,
   "rounds": 1,
-  "settled": 35
+  "settled": 6484
  }
 }

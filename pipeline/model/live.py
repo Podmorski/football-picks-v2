@@ -9,6 +9,7 @@ import numpy as np
 from . import blend as blend_module
 from .counts_engine import fit as fit_counts
 from .data import build_arrays, subset
+from .empirical import Empirical, build as build_empirical
 from .goals_engine import fit as fit_goals
 from .grid import joint_vector
 
@@ -28,6 +29,7 @@ class Predictor:
     unknown_index: int
     cutoff: dt.date
     trained_matches: int
+    empirical: Empirical
 
     def probabilities(self, home: list[str], away: list[str], odds: list[dict]) -> dict[str, np.ndarray]:
         home_index = np.array([self.team_index.get(name, self.unknown_index) for name in home], dtype=np.int32)
@@ -112,6 +114,7 @@ def build_predictor(
 
     counts = fit_counts(arrays, reference, half_life, k)
     goals = fit_goals(arrays, reference, half_life)
+    empirical = build_empirical(arrays, reference, half_life)
 
     latest = int(season_starts.max())
     calib_mask = np.where(season_starts == latest)[0]
@@ -143,6 +146,10 @@ def build_predictor(
     blender.live = fallback
 
     unknown_index = _pad_counts(counts)
+    empirical.home_rate = np.vstack([empirical.home_rate, np.zeros((1, empirical.home_rate.shape[1]))])
+    empirical.away_rate = np.vstack([empirical.away_rate, np.zeros((1, empirical.away_rate.shape[1]))])
+    empirical.home_n = np.append(empirical.home_n, 0.0)
+    empirical.away_n = np.append(empirical.away_n, 0.0)
     goals.att = np.append(goals.att, 1.0)
     goals.dfn = np.append(goals.dfn, 1.0)
     goals.played = np.append(goals.played, 0.0)
@@ -158,4 +165,5 @@ def build_predictor(
         unknown_index=unknown_index,
         cutoff=cutoff,
         trained_matches=len(train),
+        empirical=empirical,
     )

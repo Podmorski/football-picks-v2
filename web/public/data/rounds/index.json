@@ -1,15 +1,16 @@
 {
  "rounds": [
   {
-   "combos": 5,
    "date": "2026-11-14",
-   "hits": 23,
+   "fixtures": 45,
+   "hits": 1571,
    "kind": "example",
    "label": "Saturday 14 Nov",
-   "picks": 15,
+   "leagues": 7,
+   "picks": 6484,
+   "rows": 6484,
    "settled": true,
-   "settled_count": 35,
-   "stand_out": 15,
+   "settled_count": 6484,
    "weekday": "Saturday"
   }
  ]

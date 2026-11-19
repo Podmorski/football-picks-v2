@@ -124,6 +124,7 @@ export type ModelFile = {
   full_worse_than_base_count: number;
   missing_odds?: { fixtures: number; fixtures_without_odds: number; brier_without_odds: number | null; brier_with_odds: number | null };
   picker_backtest?: PickerBacktest;
+  ranking_backtest?: { seasons: string[]; bands: string[]; strategies?: string[]; groups: RankBacktestRow[] };
 };
 
 export type PickerRow = {
@@ -232,6 +233,60 @@ export type TeamsFile = {
   teams: Record<string, { current: Record<string, Record<string, Stat>>; previous: Record<string, Record<string, Stat>>; streak: Record<string, number> }>;
   top10: Record<string, Partial<Record<ScopeKey, Top10Row[]>>>;
   upcoming: UpcomingFixture[];
+};
+
+export type MarketMeta = {
+  id: string;
+  code: string;
+  mozzart: string;
+  plain: string;
+  group: string;
+  family: string;
+  needs_ht: boolean;
+};
+
+export type RankRow = {
+  d: string;
+  k: string | null;
+  h: string;
+  a: string;
+  m: string;
+  p: number;
+  f: number;
+  lr: number;
+  ln: number;
+  hr: number;
+  hn: number;
+  ar: number;
+  an: number;
+  c: 'High' | 'Medium' | 'Low';
+  s: number;
+  o: number;
+  ld: boolean | null;
+  rs?: string;
+};
+
+export type RankFile = {
+  date: string;
+  label: string;
+  weekday: string;
+  kind?: string;
+  fixtures: number;
+  leagues: number;
+  markets: number;
+  rows: RankRow[];
+  market_bands?: Record<string, { landed: number; shown: number; n: number }>;
+};
+
+export type RankBacktestRow = {
+  strategy: string;
+  group: string;
+  band: string;
+  picks: number;
+  mean_probability: number;
+  hits: number;
+  hit_rate: number;
+  ci: [number, number];
 };
 
 export type LeagueFile = {
