@@ -1,0 +1,80 @@
+name: Prices
+
+# A separate workflow so a price failure can never block publishing or settling.
+# One pass per round, after the round file exists: Saturday 08:00 and Tuesday
+# 16:00 UTC. The global feed is paged only to the round's last kick-off.
+on:
+  schedule:
+    - cron: '0 8 * * 6'    # Saturday round
+    - cron: '0 16 * * 2'   # Tuesday round
+  workflow_dispatch:
+    inputs:
+      date:
+        description: Round date (YYYY-MM-DD); blank = today
+        required: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prices
+  cancel-in-progress: false
+
+jobs:
+  prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install pipeline dependencies
+        run: pip install -r requirements.txt
+
+      - name: Checkout private prices repo
+        uses: actions/checkout@v4
+        with:
+          repository: Podmorski/football-picks-prices
+          ssh-key: ${{ secrets.PRICES_DEPLOY_KEY }}
+          path: prices
+
+      - name: Fetch one pass and freeze the snapshot
+        env:
+          PULSESCORE_API_KEY: ${{ secrets.PULSESCORE_API_KEY }}
+        run: |
+          if [ -n "${{ github.event.inputs.date }}" ]; then
+            python -m pipeline.mozzart.cli --date "${{ github.event.inputs.date }}" --prices-dir prices
+          else
+            python -m pipeline.mozzart.cli --prices-dir prices
+          fi
+
+      - name: Commit the private snapshot
+        id: commit
+        run: |
+          git -C prices config user.name "github-actions[bot]"
+          git -C prices config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C prices add -A
+          if git -C prices diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git -C prices commit -m "prices: snapshot"
+            git -C prices push
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Trigger priced rebuild
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "No VERCEL_DEPLOY_HOOK; skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error --request POST "$DEPLOY_HOOK"
+          echo "Deploy hook triggered."

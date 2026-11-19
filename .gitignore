@@ -4,6 +4,11 @@
 # raw downloads are never committed (public repo)
 data/raw/
 
+# Mozzart prices are private: never commit them or the private checkout
+web/public/data/mozzart-prices.json
+web/public/data/mozzart-record.json
+prices/
+
 # python
 .venv/
 venv/

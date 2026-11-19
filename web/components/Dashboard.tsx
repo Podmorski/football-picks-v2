@@ -5,6 +5,16 @@ import { Check, ChevronDown, Minus, X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import {
+  buildPriceIndex,
+  isOld,
+  priceKey,
+  signedPct,
+  snapshotFor,
+  utcTime,
+  vsFairPct,
+  type MozzartPricesFile,
+} from '@/lib/prices';
 import type { MarketMeta, RankFile, RankRow } from '@/lib/types';
 
 const LEVELS = [
@@ -95,9 +105,12 @@ export default function Dashboard({
   const [minOdds, setMinOdds] = useParam('minodds', 'any');
   const [rank, setRank] = useParam('rank', 'lean');
   const [show, setShow] = useParam('show', 'all');
+  const [mozzart, setMozzart] = useParam('mozzart', '0');
   const [roundParam] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [sheet, setSheet] = useState<'league' | 'bet' | null>(null);
+  const [prices, setPrices] = useState<MozzartPricesFile | null>(null);
+  const [priced, setPriced] = useState(false);
 
   const activeDate = /^\d{4}-\d{2}-\d{2}$/.test(roundParam) ? roundParam : date;
 
@@ -151,6 +164,26 @@ export default function Dashboard({
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/data/mozzart-prices.json')
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload: MozzartPricesFile | null) => {
+        if (cancelled) return;
+        setPrices(payload);
+        setPriced(payload !== null);
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setPrices(null);
+          setPriced(false);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const leagueNames = useMemo(() => {
     const map: Record<string, string> = {};
     for (const [code, name] of leagueOptions) map[code] = name;
@@ -158,6 +191,8 @@ export default function Dashboard({
   }, [leagueOptions]);
 
   const rows = data?.rows ?? [];
+  const priceIndex = useMemo(() => buildPriceIndex(prices, activeDate), [prices, activeDate]);
+  const snapshot = useMemo(() => snapshotFor(prices, activeDate), [prices, activeDate]);
 
   const marketOptions = useMemo(() => {
     const seen = new Set<string>();
@@ -183,6 +218,12 @@ export default function Dashboard({
       filtered = filtered.filter((row) => (markets[row.m]?.group ?? '') === group);
     }
     if (show !== 'all') filtered = filtered.filter((row) => row.st === show);
+    if (mozzart === '1') {
+      filtered = filtered.filter((row) => {
+        const price = priceIndex[priceKey(row.d, row.h, row.a, row.m)];
+        return price !== undefined && price.odds > fairOf(row, rank);
+      });
+    }
 
     const sorted = [...filtered].sort((a, b) =>
       rank === 'lean' ? b.s - a.s || shownOf(b, rank) - shownOf(a, rank) : shownOf(b, rank) - shownOf(a, rank),
@@ -200,7 +241,7 @@ export default function Dashboard({
       if (top.length >= 15) break;
     }
     return { pool: sorted, picks: top };
-  }, [rows, league, bet, minOdds, rank, show, markets]);
+  }, [rows, league, bet, minOdds, rank, show, markets, mozzart, priceIndex]);
 
   const settled = picks.filter((row) => row.st === 'landed' || row.st === 'lost');
   const landed = picks.filter((row) => row.st === 'landed').length;
@@ -322,6 +363,19 @@ export default function Dashboard({
               {option === 'all' ? 'Show all' : option}
             </button>
           ))}
+          {priced ? (
+            <button
+              key="mozzart"
+              type="button"
+              onClick={() => setMozzart(mozzart === '1' ? '0' : '1')}
+              className={cn(
+                'rounded-full border px-3 py-1 text-xs font-medium',
+                mozzart === '1' ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground',
+              )}
+            >
+              Only where Mozzart pays more than fair
+            </button>
+          ) : null}
         </div>
       </div>
 
@@ -353,6 +407,9 @@ export default function Dashboard({
           const fixtureRows = rows.filter((candidate) => candidate.h === row.h && candidate.a === row.a);
           const ladder = ladderRows.map((id) => fixtureRows.find((candidate) => candidate.m === id)).filter(Boolean) as RankRow[];
           const siblings = pool.filter((candidate) => candidate.h === row.h && candidate.a === row.a && candidate.m !== row.m).slice(0, 3);
+          const price = priceIndex[priceKey(row.d, row.h, row.a, row.m)];
+          const pricedFixture = snapshot?.fixtures.find((fixture) => fixture.div === row.d && fixture.home === row.h && fixture.away === row.a) ?? null;
+          const stale = price ? isOld(price.fetchedAt, pricedFixture?.kickoff ?? null) : false;
           return (
             <li key={key} className="px-3 py-2.5">
               <button type="button" onClick={() => setExpanded(open ? null : key)} className="flex w-full items-center gap-3 text-left">
@@ -365,6 +422,19 @@ export default function Dashboard({
                     {leagueNames[row.d] ?? row.d} · {meta?.plain ?? row.m}{' '}
                     <span className="opacity-70">({meta?.mozzart ?? ''})</span>
                   </span>
+                  {priced ? (
+                    price ? (
+                      <span className="tabular block text-xs text-muted-foreground">
+                        Mozzart {price.odds.toFixed(2)} · {utcTime(price.fetchedAt)}
+                        {stale ? ' · old' : ''} ·{' '}
+                        <span className="font-medium text-foreground">
+                          vs fair {signedPct(vsFairPct(price.odds, fairOf(row, rank)))}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="block text-xs text-muted-foreground">no Mozzart price</span>
+                    )
+                  ) : null}
                   {row.st !== 'pending' && row.ht !== null ? (
                     <span className="tabular block text-xs text-muted-foreground">
                       HT {row.ht} · FT {row.ft}
@@ -397,6 +467,12 @@ export default function Dashboard({
                     <p>
                       Fair odds {(1 / percent).toFixed(2)} · lands about 1 in {Math.max(1, Math.round(1 / percent))}
                     </p>
+                    {priced ? (
+                      <p>
+                        Mozzart {price ? `${price.odds.toFixed(2)} · ${utcTime(price.fetchedAt)}` : 'no price'}
+                        {price ? ` · vs fair ${signedPct(vsFairPct(price.odds, fairOf(row, rank)))}` : ''}
+                      </p>
+                    ) : null}
                   </div>
 
                   <div>

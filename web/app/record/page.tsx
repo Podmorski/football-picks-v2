@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import MozzartRecord from '@/components/MozzartRecord';
 import { readModel, readRecord } from '@/lib/data';
 
 function pct(value: number | null) {
@@ -152,6 +153,8 @@ export default function RecordPage() {
           At fair odds the long-run return is about zero; profit needs a bookmaker price above the fair odds.
         </p>
       </section>
+
+      <MozzartRecord />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Published picks</h2>

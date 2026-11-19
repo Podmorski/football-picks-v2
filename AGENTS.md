@@ -73,6 +73,13 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard: League, Bet
    (grouped), Minimum odds Any/2.00+/2.50+/3.00+ (`?minodds=`), Show filter; landed/lost/pending/void
    + HT/FT score; expanded row = goal ladder + "Other strong bets in this match"; `/rounds`; `/record`.
+7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
+   16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
+   `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
+   reports < 60 left. At build time `web/scripts/fetch-prices.mjs` clones the private repo over SSH
+   (deploy key in Vercel env `PRICES_SSH_KEY`, `PRICED=1` in Production) and writes the gitignored
+   `mozzart-prices.json` / `mozzart-record.json`. Prices are never committed to the public repo.
+   Production is protected by Vercel Authentication (`ssoProtection: all`).
 
 ## Schedule (update.yml, UTC)
 
@@ -82,13 +89,18 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Current state
 
-- Milestone 3e complete. Record page now reports the per-pick return at fair odds (mean, plus a
-  95% CI bootstrapped over round dates, seed 20261025); the old "break-even" / "landed − BE"
-  columns are gone. 113 tests passing. `npm run build` green (46 pages).
-- Clean working tree on `main`; no live round published yet.
+- Milestone 3e + M2. Record page reports per-pick return at fair odds and, on the priced build,
+  "Return at Mozzart price" (aggregates only). Dashboard shows "Mozzart x.xx · HH:MM UTC" and
+  "Mozzart vs fair" with an "only where Mozzart pays more than fair" toggle (`?mozzart=1`).
+- Production is private (Vercel Authentication, `deploymentType: all`; unauthenticated requests 302
+  to the Vercel login). A push to main rebuilds a priced production deployment because `PRICED=1`
+  is set in Production and the prebuild clones the private store; a failed private read fails the
+  build so the last priced deployment stays live.
+- 126 tests passing. `npm run build` green (46 pages). No live round published yet (21 Nov is empty).
 
 ## Open items
 
-- **M1 (in progress): Mozzart price feasibility** — read-only study of how v1 fetches Mozzart odds,
-  budget, coverage, storage and a design for showing "Mozzart x.xx (time)" next to fair odds.
-- Round check for Sat 21 Nov 2026 once the publish window opens.
+- **First live Mozzart run**: once 21 Nov fixtures appear and the round publishes, dispatch
+  `prices.yml` once manually (expected 9–16 requests) and check the match rate and the priced URL.
+- **Round check for Sat 21 Nov 2026** once the publish window opens (after Fri 20 Nov 21:00 UTC).
+- Vercel priced-build SSH clone is unverified until the next production deploy logs are read.
