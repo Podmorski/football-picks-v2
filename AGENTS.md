@@ -96,11 +96,12 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   to the Vercel login). A push to main rebuilds a priced production deployment because `PRICED=1`
   is set in Production and the prebuild clones the private store; a failed private read fails the
   build so the last priced deployment stays live.
-- 126 tests passing. `npm run build` green (46 pages). No live round published yet (21 Nov is empty).
+- 128 tests passing. `npm run build` green (46 pages). No live round published yet (21 Nov is empty).
+- Priced production build verified: the prebuild cloned the private repo over SSH (port 443) and
+  embedded 0 snapshots (the private store is empty until the first round). Production stays 302.
 
 ## Open items
 
 - **First live Mozzart run**: once 21 Nov fixtures appear and the round publishes, dispatch
   `prices.yml` once manually (expected 9–16 requests) and check the match rate and the priced URL.
 - **Round check for Sat 21 Nov 2026** once the publish window opens (after Fri 20 Nov 21:00 UTC).
-- Vercel priced-build SSH clone is unverified until the next production deploy logs are read.

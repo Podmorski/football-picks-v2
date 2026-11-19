@@ -194,3 +194,44 @@ def test_prebuild_is_gated_on_priced() -> None:
     script = (ROOT / "web" / "scripts" / "fetch-prices.mjs").read_text(encoding="utf-8")
     assert "process.env.PRICED !== '1'" in script
     assert "mozzart-prices.json" in script
+
+
+def test_snapshot_build_joins_event_to_fixture() -> None:
+    fixture = {"d": "E0", "k": "15:00", "h": "Arsenal", "a": "Chelsea"}
+    event = {
+        "league": "Engleska 1",
+        "home": "Arsenal",
+        "away": "Chelsea",
+        "startTime": "2026-11-21T15:00:00Z",
+        "markets": [
+            {
+                "rawName": "Konačan ishod",
+                "period": "FULL_TIME",
+                "selections": [{"rawName": "1", "odds": 2.1, "isActive": True}],
+            },
+            {
+                "rawName": "Oba tima daju gol",
+                "period": "FULL_TIME",
+                "selections": [{"rawName": "GG", "odds": 1.9, "isActive": True}],
+            },
+        ],
+    }
+    snap = snapshot.build(
+        dt.date(2026, 11, 21),
+        [fixture],
+        [event],
+        dt.datetime(2026, 11, 21, 8, 0, tzinfo=dt.timezone.utc),
+    )
+    assert snap["fixtures"][0]["prices"] == {"RESULT:1": 2.1, "BTTS:GG": 1.9}
+    assert snap["unmatched_fixtures"] == []
+
+
+def test_cli_without_fixtures_is_a_noop(tmp_path, monkeypatch, capsys) -> None:
+    from pipeline.mozzart import cli
+
+    monkeypatch.setattr(cli, "PICKS_DIR", tmp_path)
+    (tmp_path / "2026-11-21.json").write_text(
+        '{"date":"2026-11-21","kind":"round","picks":[]}', encoding="utf-8"
+    )
+    assert cli.main(["--date", "2026-11-21", "--prices-dir", str(tmp_path / "prices")]) == 0
+    assert "no fixtures" in capsys.readouterr().out
