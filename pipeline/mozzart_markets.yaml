@@ -1,0 +1,1460 @@
+# Mozzart market catalogue for football-picks-v2.
+# Generated from pipeline/markets.py — edit the module, not this file.
+# Every entry is settled from (HT, FT) goals only; `settle` is the rule in words.
+#
+# families: 27   markets: 178
+markets:
+  - id: RESULT:1
+    family: RESULT
+    code: "1"
+    mozzart_label: "1"
+    plain: "Home win"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "full-time result is 1"
+  - id: RESULT:X
+    family: RESULT
+    code: "X"
+    mozzart_label: "X"
+    plain: "Draw"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "full-time result is X"
+  - id: RESULT:2
+    family: RESULT
+    code: "2"
+    mozzart_label: "2"
+    plain: "Away win"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "full-time result is 2"
+  - id: DOUBLE_CHANCE:1X
+    family: DOUBLE_CHANCE
+    code: "1X"
+    mozzart_label: "1X"
+    plain: "Home win or draw"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "full-time result is one of 1X"
+  - id: DOUBLE_CHANCE:12
+    family: DOUBLE_CHANCE
+    code: "12"
+    mozzart_label: "12"
+    plain: "Home or away win"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "full-time result is one of 12"
+  - id: DOUBLE_CHANCE:X2
+    family: DOUBLE_CHANCE
+    code: "X2"
+    mozzart_label: "X2"
+    plain: "Draw or away win"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "full-time result is one of X2"
+  - id: HALF_RESULT:I1
+    family: HALF_RESULT
+    code: "I1"
+    mozzart_label: "1"
+    plain: "Home leads at half-time"
+    group: "Half-time"
+    needs_ht: true
+    settle: "half-time result is 1"
+  - id: HALF_RESULT:IX
+    family: HALF_RESULT
+    code: "IX"
+    mozzart_label: "X"
+    plain: "Level at half-time"
+    group: "Half-time"
+    needs_ht: true
+    settle: "half-time result is X"
+  - id: HALF_RESULT:I2
+    family: HALF_RESULT
+    code: "I2"
+    mozzart_label: "2"
+    plain: "Away leads at half-time"
+    group: "Half-time"
+    needs_ht: true
+    settle: "half-time result is 2"
+  - id: SECOND_HALF_RESULT:II1
+    family: SECOND_HALF_RESULT
+    code: "II1"
+    mozzart_label: "1"
+    plain: "Home leads the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half result is 1"
+  - id: SECOND_HALF_RESULT:IIX
+    family: SECOND_HALF_RESULT
+    code: "IIX"
+    mozzart_label: "X"
+    plain: "Second half level"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half result is X"
+  - id: SECOND_HALF_RESULT:II2
+    family: SECOND_HALF_RESULT
+    code: "II2"
+    mozzart_label: "2"
+    plain: "Away leads the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half result is 2"
+  - id: HALF_DC:I1X
+    family: HALF_DC
+    code: "I1X"
+    mozzart_label: "1X"
+    plain: "Home or level at half-time"
+    group: "Half-time"
+    needs_ht: true
+    settle: "half-time result is one of 1X"
+  - id: HALF_DC:I12
+    family: HALF_DC
+    code: "I12"
+    mozzart_label: "12"
+    plain: "No draw at half-time"
+    group: "Half-time"
+    needs_ht: true
+    settle: "half-time result is one of 12"
+  - id: HALF_DC:IX2
+    family: HALF_DC
+    code: "IX2"
+    mozzart_label: "X2"
+    plain: "Level or away ahead at half-time"
+    group: "Half-time"
+    needs_ht: true
+    settle: "half-time result is one of X2"
+  - id: SECOND_HALF_DC:II1X
+    family: SECOND_HALF_DC
+    code: "II1X"
+    mozzart_label: "1X"
+    plain: "Home or level in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half result is one of 1X"
+  - id: SECOND_HALF_DC:II12
+    family: SECOND_HALF_DC
+    code: "II12"
+    mozzart_label: "12"
+    plain: "No draw in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half result is one of 12"
+  - id: SECOND_HALF_DC:IIX2
+    family: SECOND_HALF_DC
+    code: "IIX2"
+    mozzart_label: "X2"
+    plain: "Level or away ahead in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half result is one of X2"
+  - id: BTTS:GG
+    family: BTTS
+    code: "GG"
+    mozzart_label: "GG"
+    plain: "Both teams score"
+    group: "BTTS"
+    needs_ht: false
+    settle: "both teams score"
+  - id: BTTS:NG
+    family: BTTS
+    code: "NG"
+    mozzart_label: "NG"
+    plain: "At least one team fails to score"
+    group: "BTTS"
+    needs_ht: false
+    settle: "both teams score"
+  - id: BTTS_1H:IGG
+    family: BTTS_1H
+    code: "IGG"
+    mozzart_label: "IGG"
+    plain: "Both teams score in the first half"
+    group: "BTTS"
+    needs_ht: true
+    settle: "both teams score before half-time"
+  - id: BTTS_1H:ING
+    family: BTTS_1H
+    code: "ING"
+    mozzart_label: "ING"
+    plain: "At least one team fails to score in the first half"
+    group: "BTTS"
+    needs_ht: true
+    settle: "both teams score before half-time"
+  - id: BTTS_2H:IIGG
+    family: BTTS_2H
+    code: "IIGG"
+    mozzart_label: "IIGG"
+    plain: "Both teams score in the second half"
+    group: "BTTS"
+    needs_ht: true
+    settle: "both teams score after half-time"
+  - id: BTTS_2H:IING
+    family: BTTS_2H
+    code: "IING"
+    mozzart_label: "IING"
+    plain: "At least one team fails to score in the second half"
+    group: "BTTS"
+    needs_ht: true
+    settle: "both teams score after half-time"
+  - id: PARITY:PAR
+    family: PARITY
+    code: "PAR"
+    mozzart_label: "PAR"
+    plain: "Even number of goals"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals are even"
+  - id: PARITY:NEPAR
+    family: PARITY
+    code: "NEPAR"
+    mozzart_label: "NEPAR"
+    plain: "Odd number of goals"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals are odd"
+  - id: GOAL_RANGE_FT:0-1
+    family: GOAL_RANGE_FT
+    code: "0-1"
+    mozzart_label: "0-1"
+    plain: "0-1 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 0-1"
+  - id: GOAL_RANGE_FT:0-2
+    family: GOAL_RANGE_FT
+    code: "0-2"
+    mozzart_label: "0-2"
+    plain: "0-2 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 0-2"
+  - id: GOAL_RANGE_FT:0-3
+    family: GOAL_RANGE_FT
+    code: "0-3"
+    mozzart_label: "0-3"
+    plain: "0-3 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 0-3"
+  - id: GOAL_RANGE_FT:0-4
+    family: GOAL_RANGE_FT
+    code: "0-4"
+    mozzart_label: "0-4"
+    plain: "0-4 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 0-4"
+  - id: GOAL_RANGE_FT:1
+    family: GOAL_RANGE_FT
+    code: "1"
+    mozzart_label: "1"
+    plain: "1 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 1"
+  - id: GOAL_RANGE_FT:1+
+    family: GOAL_RANGE_FT
+    code: "1+"
+    mozzart_label: "1+"
+    plain: "1+ goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 1+"
+  - id: GOAL_RANGE_FT:1-2
+    family: GOAL_RANGE_FT
+    code: "1-2"
+    mozzart_label: "1-2"
+    plain: "1-2 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 1-2"
+  - id: GOAL_RANGE_FT:1-3
+    family: GOAL_RANGE_FT
+    code: "1-3"
+    mozzart_label: "1-3"
+    plain: "1-3 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 1-3"
+  - id: GOAL_RANGE_FT:1-4
+    family: GOAL_RANGE_FT
+    code: "1-4"
+    mozzart_label: "1-4"
+    plain: "1-4 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 1-4"
+  - id: GOAL_RANGE_FT:1-5
+    family: GOAL_RANGE_FT
+    code: "1-5"
+    mozzart_label: "1-5"
+    plain: "1-5 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 1-5"
+  - id: GOAL_RANGE_FT:1-6
+    family: GOAL_RANGE_FT
+    code: "1-6"
+    mozzart_label: "1-6"
+    plain: "1-6 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 1-6"
+  - id: GOAL_RANGE_FT:2
+    family: GOAL_RANGE_FT
+    code: "2"
+    mozzart_label: "2"
+    plain: "2 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 2"
+  - id: GOAL_RANGE_FT:2+
+    family: GOAL_RANGE_FT
+    code: "2+"
+    mozzart_label: "2+"
+    plain: "2+ goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 2+"
+  - id: GOAL_RANGE_FT:2-3
+    family: GOAL_RANGE_FT
+    code: "2-3"
+    mozzart_label: "2-3"
+    plain: "2-3 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 2-3"
+  - id: GOAL_RANGE_FT:2-4
+    family: GOAL_RANGE_FT
+    code: "2-4"
+    mozzart_label: "2-4"
+    plain: "2-4 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 2-4"
+  - id: GOAL_RANGE_FT:2-5
+    family: GOAL_RANGE_FT
+    code: "2-5"
+    mozzart_label: "2-5"
+    plain: "2-5 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 2-5"
+  - id: GOAL_RANGE_FT:2-6
+    family: GOAL_RANGE_FT
+    code: "2-6"
+    mozzart_label: "2-6"
+    plain: "2-6 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 2-6"
+  - id: GOAL_RANGE_FT:3
+    family: GOAL_RANGE_FT
+    code: "3"
+    mozzart_label: "3"
+    plain: "3 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 3"
+  - id: GOAL_RANGE_FT:3+
+    family: GOAL_RANGE_FT
+    code: "3+"
+    mozzart_label: "3+"
+    plain: "3+ goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 3+"
+  - id: GOAL_RANGE_FT:3-4
+    family: GOAL_RANGE_FT
+    code: "3-4"
+    mozzart_label: "3-4"
+    plain: "3-4 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 3-4"
+  - id: GOAL_RANGE_FT:3-5
+    family: GOAL_RANGE_FT
+    code: "3-5"
+    mozzart_label: "3-5"
+    plain: "3-5 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 3-5"
+  - id: GOAL_RANGE_FT:4
+    family: GOAL_RANGE_FT
+    code: "4"
+    mozzart_label: "4"
+    plain: "4 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 4"
+  - id: GOAL_RANGE_FT:4+
+    family: GOAL_RANGE_FT
+    code: "4+"
+    mozzart_label: "4+"
+    plain: "4+ goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 4+"
+  - id: GOAL_RANGE_FT:5
+    family: GOAL_RANGE_FT
+    code: "5"
+    mozzart_label: "5"
+    plain: "5 goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 5"
+  - id: GOAL_RANGE_FT:5+
+    family: GOAL_RANGE_FT
+    code: "5+"
+    mozzart_label: "5+"
+    plain: "5+ goals in the match"
+    group: "Goals"
+    needs_ht: false
+    settle: "total goals 5+"
+  - id: GOAL_RANGE_1H:I0
+    family: GOAL_RANGE_1H
+    code: "I0"
+    mozzart_label: "0"
+    plain: "0 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 0"
+  - id: GOAL_RANGE_1H:I1
+    family: GOAL_RANGE_1H
+    code: "I1"
+    mozzart_label: "1"
+    plain: "1 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 1"
+  - id: GOAL_RANGE_1H:I2
+    family: GOAL_RANGE_1H
+    code: "I2"
+    mozzart_label: "2"
+    plain: "2 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 2"
+  - id: GOAL_RANGE_1H:I3
+    family: GOAL_RANGE_1H
+    code: "I3"
+    mozzart_label: "3"
+    plain: "3 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 3"
+  - id: GOAL_RANGE_1H:I1+
+    family: GOAL_RANGE_1H
+    code: "I1+"
+    mozzart_label: "1+"
+    plain: "1+ goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 1+"
+  - id: GOAL_RANGE_1H:I2+
+    family: GOAL_RANGE_1H
+    code: "I2+"
+    mozzart_label: "2+"
+    plain: "2+ goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 2+"
+  - id: GOAL_RANGE_1H:I3+
+    family: GOAL_RANGE_1H
+    code: "I3+"
+    mozzart_label: "3+"
+    plain: "3+ goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 3+"
+  - id: GOAL_RANGE_1H:I0-1
+    family: GOAL_RANGE_1H
+    code: "I0-1"
+    mozzart_label: "0-1"
+    plain: "0-1 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 0-1"
+  - id: GOAL_RANGE_1H:I0-2
+    family: GOAL_RANGE_1H
+    code: "I0-2"
+    mozzart_label: "0-2"
+    plain: "0-2 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 0-2"
+  - id: GOAL_RANGE_1H:I1-2
+    family: GOAL_RANGE_1H
+    code: "I1-2"
+    mozzart_label: "1-2"
+    plain: "1-2 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 1-2"
+  - id: GOAL_RANGE_1H:I2-3
+    family: GOAL_RANGE_1H
+    code: "I2-3"
+    mozzart_label: "2-3"
+    plain: "2-3 goals in the first half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "first-half goals 2-3"
+  - id: GOAL_RANGE_2H:II0
+    family: GOAL_RANGE_2H
+    code: "II0"
+    mozzart_label: "0"
+    plain: "0 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 0"
+  - id: GOAL_RANGE_2H:II1
+    family: GOAL_RANGE_2H
+    code: "II1"
+    mozzart_label: "1"
+    plain: "1 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 1"
+  - id: GOAL_RANGE_2H:II2
+    family: GOAL_RANGE_2H
+    code: "II2"
+    mozzart_label: "2"
+    plain: "2 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 2"
+  - id: GOAL_RANGE_2H:II3
+    family: GOAL_RANGE_2H
+    code: "II3"
+    mozzart_label: "3"
+    plain: "3 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 3"
+  - id: GOAL_RANGE_2H:II1+
+    family: GOAL_RANGE_2H
+    code: "II1+"
+    mozzart_label: "1+"
+    plain: "1+ goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 1+"
+  - id: GOAL_RANGE_2H:II2+
+    family: GOAL_RANGE_2H
+    code: "II2+"
+    mozzart_label: "2+"
+    plain: "2+ goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 2+"
+  - id: GOAL_RANGE_2H:II3+
+    family: GOAL_RANGE_2H
+    code: "II3+"
+    mozzart_label: "3+"
+    plain: "3+ goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 3+"
+  - id: GOAL_RANGE_2H:II0-1
+    family: GOAL_RANGE_2H
+    code: "II0-1"
+    mozzart_label: "0-1"
+    plain: "0-1 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 0-1"
+  - id: GOAL_RANGE_2H:II0-2
+    family: GOAL_RANGE_2H
+    code: "II0-2"
+    mozzart_label: "0-2"
+    plain: "0-2 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 0-2"
+  - id: GOAL_RANGE_2H:II1-2
+    family: GOAL_RANGE_2H
+    code: "II1-2"
+    mozzart_label: "1-2"
+    plain: "1-2 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 1-2"
+  - id: GOAL_RANGE_2H:II2-3
+    family: GOAL_RANGE_2H
+    code: "II2-3"
+    mozzart_label: "2-3"
+    plain: "2-3 goals in the second half"
+    group: "Half-time"
+    needs_ht: true
+    settle: "second-half goals 2-3"
+  - id: TEAM_GOALS:I1 0
+    family: TEAM_GOALS
+    code: "I1 0"
+    mozzart_label: "0"
+    plain: "Home team does not score"
+    group: "Team goals"
+    needs_ht: false
+    settle: "home goals I1 0"
+  - id: TEAM_GOALS:I1 1+
+    family: TEAM_GOALS
+    code: "I1 1+"
+    mozzart_label: "1+"
+    plain: "Home team scores 1+"
+    group: "Team goals"
+    needs_ht: false
+    settle: "home goals I1 1+"
+  - id: TEAM_GOALS:I1 2+
+    family: TEAM_GOALS
+    code: "I1 2+"
+    mozzart_label: "2+"
+    plain: "Home team scores 2+"
+    group: "Team goals"
+    needs_ht: false
+    settle: "home goals I1 2+"
+  - id: TEAM_GOALS:I1 3+
+    family: TEAM_GOALS
+    code: "I1 3+"
+    mozzart_label: "3+"
+    plain: "Home team scores 3+"
+    group: "Team goals"
+    needs_ht: false
+    settle: "home goals I1 3+"
+  - id: TEAM_GOALS:I2 0
+    family: TEAM_GOALS
+    code: "I2 0"
+    mozzart_label: "0"
+    plain: "Away team does not score"
+    group: "Team goals"
+    needs_ht: false
+    settle: "away goals I2 0"
+  - id: TEAM_GOALS:I2 1+
+    family: TEAM_GOALS
+    code: "I2 1+"
+    mozzart_label: "1+"
+    plain: "Away team scores 1+"
+    group: "Team goals"
+    needs_ht: false
+    settle: "away goals I2 1+"
+  - id: TEAM_GOALS:I2 2+
+    family: TEAM_GOALS
+    code: "I2 2+"
+    mozzart_label: "2+"
+    plain: "Away team scores 2+"
+    group: "Team goals"
+    needs_ht: false
+    settle: "away goals I2 2+"
+  - id: TEAM_GOALS:I2 3+
+    family: TEAM_GOALS
+    code: "I2 3+"
+    mozzart_label: "3+"
+    plain: "Away team scores 3+"
+    group: "Team goals"
+    needs_ht: false
+    settle: "away goals I2 3+"
+  - id: TEAM_GOALS_HALF:I1 0
+    family: TEAM_GOALS_HALF
+    code: "I1 0"
+    mozzart_label: "0"
+    plain: "Home team does not score in the 1st half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "home goals in that half I1 0"
+  - id: TEAM_GOALS_HALF:I1 1+
+    family: TEAM_GOALS_HALF
+    code: "I1 1+"
+    mozzart_label: "1+"
+    plain: "Home team scores in the 1st half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "home goals in that half I1 1+"
+  - id: TEAM_GOALS_HALF:I1 2+
+    family: TEAM_GOALS_HALF
+    code: "I1 2+"
+    mozzart_label: "2+"
+    plain: "Home team scores 2+ in the 1st half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "home goals in that half I1 2+"
+  - id: TEAM_GOALS_HALF:I2 0
+    family: TEAM_GOALS_HALF
+    code: "I2 0"
+    mozzart_label: "0"
+    plain: "Away team does not score in the 1st half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half I2 0"
+  - id: TEAM_GOALS_HALF:I2 1+
+    family: TEAM_GOALS_HALF
+    code: "I2 1+"
+    mozzart_label: "1+"
+    plain: "Away team scores in the 1st half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half I2 1+"
+  - id: TEAM_GOALS_HALF:I2 2+
+    family: TEAM_GOALS_HALF
+    code: "I2 2+"
+    mozzart_label: "2+"
+    plain: "Away team scores 2+ in the 1st half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half I2 2+"
+  - id: TEAM_GOALS_HALF:II1 0
+    family: TEAM_GOALS_HALF
+    code: "II1 0"
+    mozzart_label: "0"
+    plain: "Home team does not score in the 2nd half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half II1 0"
+  - id: TEAM_GOALS_HALF:II1 1+
+    family: TEAM_GOALS_HALF
+    code: "II1 1+"
+    mozzart_label: "1+"
+    plain: "Home team scores in the 2nd half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half II1 1+"
+  - id: TEAM_GOALS_HALF:II1 2+
+    family: TEAM_GOALS_HALF
+    code: "II1 2+"
+    mozzart_label: "2+"
+    plain: "Home team scores 2+ in the 2nd half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half II1 2+"
+  - id: TEAM_GOALS_HALF:II2 0
+    family: TEAM_GOALS_HALF
+    code: "II2 0"
+    mozzart_label: "0"
+    plain: "Away team does not score in the 2nd half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half II2 0"
+  - id: TEAM_GOALS_HALF:II2 1+
+    family: TEAM_GOALS_HALF
+    code: "II2 1+"
+    mozzart_label: "1+"
+    plain: "Away team scores in the 2nd half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half II2 1+"
+  - id: TEAM_GOALS_HALF:II2 2+
+    family: TEAM_GOALS_HALF
+    code: "II2 2+"
+    mozzart_label: "2+"
+    plain: "Away team scores 2+ in the 2nd half"
+    group: "Team goals"
+    needs_ht: true
+    settle: "away goals in that half II2 2+"
+  - id: HALF_GOAL_COMBOS:I1+&II1+
+    family: HALF_GOAL_COMBOS
+    code: "I1+&II1+"
+    mozzart_label: "I1+&II1+"
+    plain: "1+ goals in the first half and 1+ in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: HALF_GOAL_COMBOS:I1+&II2+
+    family: HALF_GOAL_COMBOS
+    code: "I1+&II2+"
+    mozzart_label: "I1+&II2+"
+    plain: "1+ goals in the first half and 2+ in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: HALF_GOAL_COMBOS:I1+&II3+
+    family: HALF_GOAL_COMBOS
+    code: "I1+&II3+"
+    mozzart_label: "I1+&II3+"
+    plain: "1+ goals in the first half and 3+ in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: HALF_GOAL_COMBOS:I2+&II1+
+    family: HALF_GOAL_COMBOS
+    code: "I2+&II1+"
+    mozzart_label: "I2+&II1+"
+    plain: "2+ goals in the first half and 1+ in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: HALF_GOAL_COMBOS:I2+&II2+
+    family: HALF_GOAL_COMBOS
+    code: "I2+&II2+"
+    mozzart_label: "I2+&II2+"
+    plain: "2+ goals in the first half and 2+ in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: HALF_GOAL_COMBOS:I2+&II3+
+    family: HALF_GOAL_COMBOS
+    code: "I2+&II3+"
+    mozzart_label: "I2+&II3+"
+    plain: "2+ goals in the first half and 3+ in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: HALF_GOAL_COMBOS:I1-2&II1-2
+    family: HALF_GOAL_COMBOS
+    code: "I1-2&II1-2"
+    mozzart_label: "I1-2&II1-2"
+    plain: "1-2 goals in the first half and 1-2 in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: HALF_GOAL_COMBOS:I1-3&II1-3
+    family: HALF_GOAL_COMBOS
+    code: "I1-3&II1-3"
+    mozzart_label: "I1-3&II1-3"
+    plain: "1-3 goals in the first half and 1-3 in the second"
+    group: "Combos"
+    needs_ht: true
+    settle: "first-half goals and second-half goals both match the code"
+  - id: MORE_GOALS_HALF:I>II
+    family: MORE_GOALS_HALF
+    code: "I>II"
+    mozzart_label: "I>II"
+    plain: "More goals in the first half"
+    group: "Goals"
+    needs_ht: true
+    settle: "goals compare between halves as the code says"
+  - id: MORE_GOALS_HALF:I=II
+    family: MORE_GOALS_HALF
+    code: "I=II"
+    mozzart_label: "I=II"
+    plain: "Same number of goals in each half"
+    group: "Goals"
+    needs_ht: true
+    settle: "goals compare between halves as the code says"
+  - id: MORE_GOALS_HALF:I<II
+    family: MORE_GOALS_HALF
+    code: "I<II"
+    mozzart_label: "I<II"
+    plain: "More goals in the second half"
+    group: "Goals"
+    needs_ht: true
+    settle: "goals compare between halves as the code says"
+  - id: HTFT:1-1
+    family: HTFT
+    code: "1-1"
+    mozzart_label: "1-1"
+    plain: "1 at half-time, 1 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is 1-1, full-time result is 1"
+  - id: HTFT:1-X
+    family: HTFT
+    code: "1-X"
+    mozzart_label: "1-X"
+    plain: "1 at half-time, X at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is 1-X, full-time result is X"
+  - id: HTFT:1-2
+    family: HTFT
+    code: "1-2"
+    mozzart_label: "1-2"
+    plain: "1 at half-time, 2 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is 1-2, full-time result is 2"
+  - id: HTFT:X-1
+    family: HTFT
+    code: "X-1"
+    mozzart_label: "X-1"
+    plain: "X at half-time, 1 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is X-1, full-time result is 1"
+  - id: HTFT:X-X
+    family: HTFT
+    code: "X-X"
+    mozzart_label: "X-X"
+    plain: "X at half-time, X at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is X-X, full-time result is X"
+  - id: HTFT:X-2
+    family: HTFT
+    code: "X-2"
+    mozzart_label: "X-2"
+    plain: "X at half-time, 2 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is X-2, full-time result is 2"
+  - id: HTFT:2-1
+    family: HTFT
+    code: "2-1"
+    mozzart_label: "2-1"
+    plain: "2 at half-time, 1 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is 2-1, full-time result is 1"
+  - id: HTFT:2-X
+    family: HTFT
+    code: "2-X"
+    mozzart_label: "2-X"
+    plain: "2 at half-time, X at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is 2-X, full-time result is X"
+  - id: HTFT:2-2
+    family: HTFT
+    code: "2-2"
+    mozzart_label: "2-2"
+    plain: "2 at half-time, 2 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result is 2-2, full-time result is 2"
+  - id: HTFT_AND_GOALS:1-1&2+
+    family: HTFT_AND_GOALS
+    code: "1-1&2+"
+    mozzart_label: "1-1&2+"
+    plain: "Home ahead at HT and FT with 2+ goals"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 1-1 and total goals -1&2+"
+  - id: HTFT_AND_GOALS:1-1&3+
+    family: HTFT_AND_GOALS
+    code: "1-1&3+"
+    mozzart_label: "1-1&3+"
+    plain: "Home ahead at HT and FT with 3+ goals"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 1-1 and total goals -1&3+"
+  - id: HTFT_AND_GOALS:2-2&2+
+    family: HTFT_AND_GOALS
+    code: "2-2&2+"
+    mozzart_label: "2-2&2+"
+    plain: "Away ahead at HT and FT with 2+ goals"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 2-2 and total goals -2&2+"
+  - id: HTFT_AND_GOALS:2-2&3+
+    family: HTFT_AND_GOALS
+    code: "2-2&3+"
+    mozzart_label: "2-2&3+"
+    plain: "Away ahead at HT and FT with 3+ goals"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 2-2 and total goals -2&3+"
+  - id: HTFT_COMBO:1-1&gg
+    family: HTFT_COMBO
+    code: "1-1&gg"
+    mozzart_label: "1-1&gg"
+    plain: "1 at half-time, 1 at full-time and both teams score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 1-1 and both teams score"
+  - id: HTFT_COMBO:1-1&ng
+    family: HTFT_COMBO
+    code: "1-1&ng"
+    mozzart_label: "1-1&ng"
+    plain: "1 at half-time, 1 at full-time and both teams do not both score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 1-1 and both teams do not both score"
+  - id: HTFT_COMBO:X-1&gg
+    family: HTFT_COMBO
+    code: "X-1&gg"
+    mozzart_label: "X-1&gg"
+    plain: "X at half-time, 1 at full-time and both teams score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is X-1 and both teams score"
+  - id: HTFT_COMBO:X-1&ng
+    family: HTFT_COMBO
+    code: "X-1&ng"
+    mozzart_label: "X-1&ng"
+    plain: "X at half-time, 1 at full-time and both teams do not both score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is X-1 and both teams do not both score"
+  - id: HTFT_COMBO:X-X&gg
+    family: HTFT_COMBO
+    code: "X-X&gg"
+    mozzart_label: "X-X&gg"
+    plain: "X at half-time, X at full-time and both teams score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is X-X and both teams score"
+  - id: HTFT_COMBO:X-2&gg
+    family: HTFT_COMBO
+    code: "X-2&gg"
+    mozzart_label: "X-2&gg"
+    plain: "X at half-time, 2 at full-time and both teams score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is X-2 and both teams score"
+  - id: HTFT_COMBO:X-2&ng
+    family: HTFT_COMBO
+    code: "X-2&ng"
+    mozzart_label: "X-2&ng"
+    plain: "X at half-time, 2 at full-time and both teams do not both score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is X-2 and both teams do not both score"
+  - id: HTFT_COMBO:2-2&gg
+    family: HTFT_COMBO
+    code: "2-2&gg"
+    mozzart_label: "2-2&gg"
+    plain: "2 at half-time, 2 at full-time and both teams score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 2-2 and both teams score"
+  - id: HTFT_COMBO:2-2&ng
+    family: HTFT_COMBO
+    code: "2-2&ng"
+    mozzart_label: "2-2&ng"
+    plain: "2 at half-time, 2 at full-time and both teams do not both score"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "HT/FT result is 2-2 and both teams do not both score"
+  - id: HTFT_DC:1X-1X
+    family: HTFT_DC
+    code: "1X-1X"
+    mozzart_label: "1X-1X"
+    plain: "1X at half-time, 1X at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:1X-12
+    family: HTFT_DC
+    code: "1X-12"
+    mozzart_label: "1X-12"
+    plain: "1X at half-time, 12 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:1X-X2
+    family: HTFT_DC
+    code: "1X-X2"
+    mozzart_label: "1X-X2"
+    plain: "1X at half-time, X2 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:12-1X
+    family: HTFT_DC
+    code: "12-1X"
+    mozzart_label: "12-1X"
+    plain: "12 at half-time, 1X at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:12-12
+    family: HTFT_DC
+    code: "12-12"
+    mozzart_label: "12-12"
+    plain: "12 at half-time, 12 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:12-X2
+    family: HTFT_DC
+    code: "12-X2"
+    mozzart_label: "12-X2"
+    plain: "12 at half-time, X2 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:X2-1X
+    family: HTFT_DC
+    code: "X2-1X"
+    mozzart_label: "X2-1X"
+    plain: "X2 at half-time, 1X at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:X2-12
+    family: HTFT_DC
+    code: "X2-12"
+    mozzart_label: "X2-12"
+    plain: "X2 at half-time, 12 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: HTFT_DC:X2-X2
+    family: HTFT_DC
+    code: "X2-X2"
+    mozzart_label: "X2-X2"
+    plain: "X2 at half-time, X2 at full-time"
+    group: "HT/FT"
+    needs_ht: true
+    settle: "half-time result in the first double chance and full-time in the second"
+  - id: WIN_BOTH_HALVES:DP 1
+    family: WIN_BOTH_HALVES
+    code: "DP 1"
+    mozzart_label: "DP1"
+    plain: "Home team wins both halves"
+    group: "Result & double chance"
+    needs_ht: true
+    settle: "the named team wins both halves"
+  - id: WIN_BOTH_HALVES:DP 2
+    family: WIN_BOTH_HALVES
+    code: "DP 2"
+    mozzart_label: "DP2"
+    plain: "Away team wins both halves"
+    group: "Result & double chance"
+    needs_ht: true
+    settle: "the named team wins both halves"
+  - id: WIN_TO_NIL:SP 1
+    family: WIN_TO_NIL
+    code: "SP 1"
+    mozzart_label: "SP 1"
+    plain: "Home wins to nil"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "the named team wins and the other does not score"
+  - id: WIN_TO_NIL:SP 2
+    family: WIN_TO_NIL
+    code: "SP 2"
+    mozzart_label: "SP 2"
+    plain: "Away wins to nil"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "the named team wins and the other does not score"
+  - id: MARGIN:HP 1
+    family: MARGIN
+    code: "HP 1"
+    mozzart_label: "HP 1"
+    plain: "Home wins by 2+"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "the named team wins by the stated margin or more"
+  - id: MARGIN:HP 2
+    family: MARGIN
+    code: "HP 2"
+    mozzart_label: "HP 2"
+    plain: "Away wins by 2+"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "the named team wins by the stated margin or more"
+  - id: MARGIN:HH 1 3+
+    family: MARGIN
+    code: "HH 1 3+"
+    mozzart_label: "HH 1 3+"
+    plain: "Home wins by 3+"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "the named team wins by the stated margin or more"
+  - id: MARGIN:HH 2 3+
+    family: MARGIN
+    code: "HH 2 3+"
+    mozzart_label: "HH 2 3+"
+    plain: "Away wins by 3+"
+    group: "Result & double chance"
+    needs_ht: false
+    settle: "the named team wins by the stated margin or more"
+  - id: CORRECT_SCORE:0:0
+    family: CORRECT_SCORE
+    code: "0:0"
+    mozzart_label: "0:0"
+    plain: "Correct score 0-0"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 0:0"
+  - id: CORRECT_SCORE:0:2
+    family: CORRECT_SCORE
+    code: "0:2"
+    mozzart_label: "0:2"
+    plain: "Correct score 0-2"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 0:2"
+  - id: CORRECT_SCORE:0:3
+    family: CORRECT_SCORE
+    code: "0:3"
+    mozzart_label: "0:3"
+    plain: "Correct score 0-3"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 0:3"
+  - id: CORRECT_SCORE:0:4
+    family: CORRECT_SCORE
+    code: "0:4"
+    mozzart_label: "0:4"
+    plain: "Correct score 0-4"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 0:4"
+  - id: CORRECT_SCORE:1:1
+    family: CORRECT_SCORE
+    code: "1:1"
+    mozzart_label: "1:1"
+    plain: "Correct score 1-1"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 1:1"
+  - id: CORRECT_SCORE:1:2
+    family: CORRECT_SCORE
+    code: "1:2"
+    mozzart_label: "1:2"
+    plain: "Correct score 1-2"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 1:2"
+  - id: CORRECT_SCORE:1:3
+    family: CORRECT_SCORE
+    code: "1:3"
+    mozzart_label: "1:3"
+    plain: "Correct score 1-3"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 1:3"
+  - id: CORRECT_SCORE:1:4
+    family: CORRECT_SCORE
+    code: "1:4"
+    mozzart_label: "1:4"
+    plain: "Correct score 1-4"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 1:4"
+  - id: CORRECT_SCORE:2:0
+    family: CORRECT_SCORE
+    code: "2:0"
+    mozzart_label: "2:0"
+    plain: "Correct score 2-0"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 2:0"
+  - id: CORRECT_SCORE:2:1
+    family: CORRECT_SCORE
+    code: "2:1"
+    mozzart_label: "2:1"
+    plain: "Correct score 2-1"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 2:1"
+  - id: CORRECT_SCORE:2:2
+    family: CORRECT_SCORE
+    code: "2:2"
+    mozzart_label: "2:2"
+    plain: "Correct score 2-2"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 2:2"
+  - id: CORRECT_SCORE:2:3
+    family: CORRECT_SCORE
+    code: "2:3"
+    mozzart_label: "2:3"
+    plain: "Correct score 2-3"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 2:3"
+  - id: CORRECT_SCORE:2:4
+    family: CORRECT_SCORE
+    code: "2:4"
+    mozzart_label: "2:4"
+    plain: "Correct score 2-4"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 2:4"
+  - id: CORRECT_SCORE:3:0
+    family: CORRECT_SCORE
+    code: "3:0"
+    mozzart_label: "3:0"
+    plain: "Correct score 3-0"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 3:0"
+  - id: CORRECT_SCORE:3:1
+    family: CORRECT_SCORE
+    code: "3:1"
+    mozzart_label: "3:1"
+    plain: "Correct score 3-1"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 3:1"
+  - id: CORRECT_SCORE:3:2
+    family: CORRECT_SCORE
+    code: "3:2"
+    mozzart_label: "3:2"
+    plain: "Correct score 3-2"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 3:2"
+  - id: CORRECT_SCORE:3:3
+    family: CORRECT_SCORE
+    code: "3:3"
+    mozzart_label: "3:3"
+    plain: "Correct score 3-3"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 3:3"
+  - id: CORRECT_SCORE:3:4
+    family: CORRECT_SCORE
+    code: "3:4"
+    mozzart_label: "3:4"
+    plain: "Correct score 3-4"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 3:4"
+  - id: CORRECT_SCORE:4:0
+    family: CORRECT_SCORE
+    code: "4:0"
+    mozzart_label: "4:0"
+    plain: "Correct score 4-0"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 4:0"
+  - id: CORRECT_SCORE:4:1
+    family: CORRECT_SCORE
+    code: "4:1"
+    mozzart_label: "4:1"
+    plain: "Correct score 4-1"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 4:1"
+  - id: CORRECT_SCORE:4:2
+    family: CORRECT_SCORE
+    code: "4:2"
+    mozzart_label: "4:2"
+    plain: "Correct score 4-2"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 4:2"
+  - id: CORRECT_SCORE:4:3
+    family: CORRECT_SCORE
+    code: "4:3"
+    mozzart_label: "4:3"
+    plain: "Correct score 4-3"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 4:3"
+  - id: CORRECT_SCORE:4:4
+    family: CORRECT_SCORE
+    code: "4:4"
+    mozzart_label: "4:4"
+    plain: "Correct score 4-4"
+    group: "Correct score"
+    needs_ht: false
+    settle: "full-time score is exactly 4:4"
+  - id: RESULT_AND_GOALS:1&2+
+    family: RESULT_AND_GOALS
+    code: "1&2+"
+    mozzart_label: "1&2+"
+    plain: "Home win and 2+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time result is 1 and total goals &2+"
+  - id: RESULT_AND_GOALS:1&3+
+    family: RESULT_AND_GOALS
+    code: "1&3+"
+    mozzart_label: "1&3+"
+    plain: "Home win and 3+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time result is 1 and total goals &3+"
+  - id: RESULT_AND_GOALS:X&2+
+    family: RESULT_AND_GOALS
+    code: "X&2+"
+    mozzart_label: "X&2+"
+    plain: "Draw and 2+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time result is X and total goals &2+"
+  - id: RESULT_AND_GOALS:2&2+
+    family: RESULT_AND_GOALS
+    code: "2&2+"
+    mozzart_label: "2&2+"
+    plain: "Away win and 2+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time result is 2 and total goals &2+"
+  - id: RESULT_AND_GOALS:2&3+
+    family: RESULT_AND_GOALS
+    code: "2&3+"
+    mozzart_label: "2&3+"
+    plain: "Away win and 3+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time result is 2 and total goals &3+"
+  - id: RESULT_AND_GOALS:1&0-2
+    family: RESULT_AND_GOALS
+    code: "1&0-2"
+    mozzart_label: "1&0-2"
+    plain: "Home win and 0-2 goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time result is 1 and total goals &0-2"
+  - id: DC_AND_GOALS:1X&0-2
+    family: DC_AND_GOALS
+    code: "1X&0-2"
+    mozzart_label: "1X&0-2"
+    plain: "Home or draw with 0-2 goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time double chance is 1X and total goals X&0-2"
+  - id: DC_AND_GOALS:1X&2+
+    family: DC_AND_GOALS
+    code: "1X&2+"
+    mozzart_label: "1X&2+"
+    plain: "Home or draw with 2+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time double chance is 1X and total goals X&2+"
+  - id: DC_AND_GOALS:1X&3+
+    family: DC_AND_GOALS
+    code: "1X&3+"
+    mozzart_label: "1X&3+"
+    plain: "Home or draw with 3+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time double chance is 1X and total goals X&3+"
+  - id: DC_AND_GOALS:X2&0-2
+    family: DC_AND_GOALS
+    code: "X2&0-2"
+    mozzart_label: "X2&0-2"
+    plain: "Draw or away win with 0-2 goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time double chance is X2 and total goals 2&0-2"
+  - id: DC_AND_GOALS:X2&2+
+    family: DC_AND_GOALS
+    code: "X2&2+"
+    mozzart_label: "X2&2+"
+    plain: "Draw or away win with 2+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time double chance is X2 and total goals 2&2+"
+  - id: DC_AND_GOALS:12&2+
+    family: DC_AND_GOALS
+    code: "12&2+"
+    mozzart_label: "12&2+"
+    plain: "No draw with 2+ goals"
+    group: "Combos"
+    needs_ht: false
+    settle: "full-time double chance is 12 and total goals 2&2+"
+
+not_settleable:
+  - family: "Daje prvi gol"
+    reason: "needs the identity of the first scorer — not derivable from goals per half"
+  - family: "Daje prvi gol - Kraj"
+    reason: "first goal combined with the result; the first-goal half is not the same as the score at half-time"
+  - family: "Prvi gol na meču - *"
+    reason: "how the first goal was scored (header, penalty, free kick, own goal)"
+  - family: "Prvi događaj na meču - *"
+    reason: "first event (corner, foul, offside, throw-in) needs event data"
+  - family: "Mozzart šansa"
+    reason: "proprietary combined offer with an unpublished formula"
+  - family: "Broj golova <player>"
+    reason: "player-level goals"
+  - family: "<player> daje gol i <team> pobeđuje"
+    reason: "player-level goals"
+  - family: "Broj žutih kartona / kornera / šuteva"
+    reason: "cards, corners and shots per team or match"
+  - family: "Oba tima po N+ kartona/kornera/šuteva"
+    reason: "cards, corners and shots"
+  - family: "UG 1-15 MIN / UG 1-30 MIN / KI 1-15 MIN / KI 1-30 MIN"
+    reason: "goal and card windows inside the half"
+  - family: "Penal na meču / Penal u prvom poluvremenu / Promašen penal"
+    reason: "penalty events"
+  - family: "Crveni karton / Oba tima dobijaju crveni karton / Autogol"
+    reason: "card and own-goal events"
+  - family: "Gol glavom / Gol direktno iz slobodnog udarca / Het-trik"
+    reason: "how goals were scored"
+  - family: "PD 1 / PD 2 (to qualify)"
+    reason: "aggregate qualification, not a single match score"

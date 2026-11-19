@@ -82,12 +82,16 @@ OUTCOME_MASK = _build_outcome_mask()
 ANCHOR_MASK = _build_anchor_mask()
 
 
-def outcome_probabilities(lh1: float, la1: float, lh2: float, la2: float, rho: float = -0.05) -> np.ndarray:
-    """Probability of every registry outcome, in OUTCOMES order."""
+def joint_vector(lh1: float, la1: float, lh2: float, la2: float, rho: float = -0.05) -> np.ndarray:
+    """Flat joint distribution over (h1, a1, h2, a2) in grid ordering."""
     g1 = half_grid(lh1, la1, rho)
     g2 = half_grid(lh2, la2, rho)
-    joint = np.outer(g1.ravel(), g2.ravel()).ravel()
-    return joint @ OUTCOME_MASK
+    return np.outer(g1.ravel(), g2.ravel()).ravel()
+
+
+def outcome_probabilities(lh1: float, la1: float, lh2: float, la2: float, rho: float = -0.05) -> np.ndarray:
+    """Probability of every registry outcome, in OUTCOMES order."""
+    return joint_vector(lh1, la1, lh2, la2, rho) @ OUTCOME_MASK
 
 
 def ft_aggregates(lh: float, la: float, rho: float = -0.05) -> tuple[float, float, float, float]:
