@@ -101,6 +101,9 @@ export type RoundIndexRow = {
   label: string;
   weekday: string;
   kind: string;
+  fixtures?: number;
+  leagues?: number;
+  rows?: number;
   picks: number;
   stand_out?: number;
   hits: number;
@@ -252,7 +255,8 @@ export type RankRow = {
   a: string;
   m: string;
   p: number;
-  f: number;
+  pl: number;
+  pp: number;
   lr: number;
   ln: number;
   hr: number;
@@ -261,8 +265,10 @@ export type RankRow = {
   an: number;
   c: 'High' | 'Medium' | 'Low';
   s: number;
-  o: number;
-  ld: boolean | null;
+  st: 'pending' | 'landed' | 'lost' | 'void';
+  ht: string | null;
+  ft: string | null;
+  ld?: boolean | null;
   rs?: string;
 };
 

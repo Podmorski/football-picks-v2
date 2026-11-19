@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { LeagueFile, LeagueIndex, ModelFile, RecordFile, RoundDocument, RoundIndexRow } from './types';
+import type { LeagueFile, LeagueIndex, ModelFile, RankRow, RecordFile, RoundDocument, RoundIndexRow } from './types';
 
 // The pipeline writes here; Next serves the same files statically. Reads happen at build time.
 const DATA_DIR = path.join(process.cwd(), 'public', 'data');
@@ -35,6 +35,40 @@ export function readRound(date: string): RoundDocument | null {
   const file = path.join(DATA_DIR, 'rounds', `${date}.json`);
   if (!fs.existsSync(file)) return null;
   return readJson<RoundDocument>(path.join('rounds', `${date}.json`));
+}
+
+export function readRankRound(date: string): (RoundDocument & { rows: RankRow[] }) | null {
+  const document = readRound(date) as unknown as Record<string, unknown> | null;
+  if (!document) return null;
+  const raw = document.rows as unknown[] | undefined;
+  if (raw && raw.length && Array.isArray(raw[0])) {
+    const fixtures = (document.fixture_list ?? []) as { d: string; k: string | null; h: string; a: string }[];
+    document.rows = (raw as unknown[][]).map((values) => {
+      const fixture = fixtures[values[0] as number];
+      return {
+        d: fixture.d,
+        k: fixture.k,
+        h: fixture.h,
+        a: fixture.a,
+        m: values[1],
+        p: values[2],
+        pl: values[3],
+        pp: values[4],
+        lr: values[5],
+        ln: values[6],
+        hr: values[7],
+        hn: values[8],
+        ar: values[9],
+        an: values[10],
+        c: values[11],
+        s: values[12],
+        st: values[13],
+        ht: values[14],
+        ft: values[15],
+      } as RankRow;
+    });
+  }
+  return document as unknown as RoundDocument & { rows: RankRow[] };
 }
 
 export function readModel(): ModelFile | null {

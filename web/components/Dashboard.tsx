@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Minus, X } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -18,7 +18,8 @@ const QUICK = [
   { key: 'group:Half-time', label: 'Goal in 1st half' },
 ];
 
-function bandOf(fair: number): string {
+function bandOf(probability: number): string {
+  const fair = 1 / Math.max(probability, 0.0001);
   if (fair < 2) return '1.70-2.00';
   if (fair < 3) return '2.00-3.00';
   if (fair < 5) return '3.00-5.00';
@@ -28,6 +29,10 @@ function bandOf(fair: number): string {
 
 function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
+}
+
+function shownOf(row: RankRow, strategy: string): number {
+  return strategy === 'lean' ? row.pl ?? row.p : row.pp ?? row.p;
 }
 
 function useParam(key: string, initial: string): [string, (next: string) => void] {
@@ -46,14 +51,28 @@ function useParam(key: string, initial: string): [string, (next: string) => void
   return [value, update];
 }
 
+const STATUS_VARIANT = { landed: 'success', lost: 'destructive', pending: 'secondary', void: 'outline' } as const;
+
+function StatusBadge({ status }: { status: RankRow['st'] }) {
+  const label = status === 'landed' ? 'Landed' : status === 'lost' ? 'Lost' : status === 'void' ? 'Void' : 'Pending';
+  return (
+    <Badge variant={STATUS_VARIANT[status] ?? 'secondary'} className="shrink-0">
+      {status === 'landed' ? <Check className="h-3 w-3" /> : status === 'lost' ? <X className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+      {label}
+    </Badge>
+  );
+}
+
 export default function Dashboard({
   date,
   kind,
   leagueOptions,
+  initialRound,
 }: {
   date: string;
   kind: string;
   leagueOptions: [string, string, string][];
+  initialRound?: string;
 }) {
   const [data, setData] = useState<RankFile | null>(null);
   const [markets, setMarkets] = useState<Record<string, MarketMeta>>({});
@@ -62,12 +81,17 @@ export default function Dashboard({
   const [bet, setBet] = useParam('bet', 'any');
   const [band, setBand] = useParam('band', '2.00-3.00');
   const [rank, setRank] = useParam('rank', 'lean');
+  const [show, setShow] = useParam('show', 'all');
+  const [roundParam, setRoundParam] = useParam('round', initialRound ?? date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [sheet, setSheet] = useState<'league' | 'bet' | null>(null);
 
+  const activeDate = /^\d{4}-\d{2}-\d{2}$/.test(roundParam) ? roundParam : date;
+
   useEffect(() => {
     let cancelled = false;
-    fetch(`/data/rounds/${date}.json`)
+    setData(null);
+    fetch(`/data/rounds/${activeDate}.json`)
       .then((response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.json();
@@ -80,23 +104,11 @@ export default function Dashboard({
           payload.rows = (raw as unknown[][]).map((values) => {
             const fixture = fixtures[values[0] as number];
             return {
-              d: fixture.d,
-              k: fixture.k,
-              h: fixture.h,
-              a: fixture.a,
-              m: values[1],
-              p: values[2],
-              f: values[3],
-              lr: values[4],
-              ln: values[5],
-              hr: values[6],
-              hn: values[7],
-              ar: values[8],
-              an: values[9],
-              c: values[10],
-              s: values[11],
-              ld: values[12],
-              rs: values[13],
+              d: fixture.d, k: fixture.k, h: fixture.h, a: fixture.a,
+              m: values[1], p: values[2], pl: values[3], pp: values[4],
+              lr: values[5], ln: values[6], hr: values[7], hn: values[8],
+              ar: values[9], an: values[10], c: values[11], s: values[12],
+              st: values[13], ht: values[14], ft: values[15],
             } as RankRow;
           }) as RankRow[];
         }
@@ -105,6 +117,13 @@ export default function Dashboard({
       .catch((cause: unknown) => {
         if (!cancelled) setError(cause instanceof Error ? cause.message : 'failed to load');
       });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeDate]);
+
+  useEffect(() => {
+    let cancelled = false;
     fetch('/data/markets.json')
       .then((response) => (response.ok ? response.json() : { markets: [] }))
       .then((payload: { markets: MarketMeta[] }) => {
@@ -117,7 +136,7 @@ export default function Dashboard({
     return () => {
       cancelled = true;
     };
-  }, [date]);
+  }, []);
 
   const leagueNames = useMemo(() => {
     const map: Record<string, string> = {};
@@ -136,28 +155,28 @@ export default function Dashboard({
   }, [rows, markets]);
 
   const picks = useMemo(() => {
-    const filterLean = (row: RankRow) => row.ln >= 200 && row.lr > 0 && row.p >= row.lr * 1.1;
-    let filtered = rows.filter((row) => bandOf(row.f) === band);
+    let filtered = rows.filter((row) => bandOf(shownOf(row, rank)) === band);
     if (league !== 'all') filtered = filtered.filter((row) => row.d === league);
-    if (rank === 'lean') filtered = filtered.filter(filterLean);
-
-    const sortRows = (items: RankRow[]) =>
-      rank === 'lean'
-        ? items.sort((a, b) => b.s - a.s || b.p - a.p)
-        : items.sort((a, b) => b.p - a.p);
-
+    if (rank === 'lean') {
+      filtered = filtered.filter((row) => row.ln >= 200 && row.lr > 0 && shownOf(row, 'lean') >= row.lr * 1.1);
+    }
     if (bet.startsWith('market:')) {
       const id = bet.slice(7);
-      return sortRows(filtered.filter((row) => row.m === id)).slice(0, 15);
-    }
-    if (bet.startsWith('group:')) {
+      filtered = filtered.filter((row) => row.m === id);
+    } else if (bet.startsWith('group:')) {
       const group = bet.slice(6);
       filtered = filtered.filter((row) => (markets[row.m]?.group ?? '') === group);
     }
-    const ordered = sortRows(filtered);
+    if (show !== 'all') filtered = filtered.filter((row) => row.st === show);
+
+    const sorted = filtered.sort((a, b) =>
+      rank === 'lean' ? b.s - a.s || shownOf(b, rank) - shownOf(a, rank) : shownOf(b, rank) - shownOf(a, rank),
+    );
+    if (bet.startsWith('market:')) return sorted.slice(0, 15);
+
     const seen = new Set<string>();
     const out: RankRow[] = [];
-    for (const row of ordered) {
+    for (const row of sorted) {
       const key = `${row.h}|${row.a}`;
       if (seen.has(key)) continue;
       seen.add(key);
@@ -165,7 +184,11 @@ export default function Dashboard({
       if (out.length >= 15) break;
     }
     return out;
-  }, [rows, league, bet, band, rank, markets]);
+  }, [rows, league, bet, band, rank, show, markets]);
+
+  const settled = picks.filter((row) => row.st === 'landed' || row.st === 'lost');
+  const landed = picks.filter((row) => row.st === 'landed').length;
+  const expected = settled.reduce((total, row) => total + shownOf(row, rank), 0);
 
   const betLabel =
     bet === 'any'
@@ -178,10 +201,7 @@ export default function Dashboard({
     <div className="space-y-4">
       <div className="space-y-2 rounded-xl border p-3">
         <div className="flex flex-wrap gap-1.5">
-          {[
-            { key: 'lean', label: 'Strongest lean' },
-            { key: 'probability', label: 'Most likely' },
-          ].map((option) => (
+          {[{ key: 'lean', label: 'Strongest lean' }, { key: 'probability', label: 'Most likely' }].map((option) => (
             <button
               key={option.key}
               type="button"
@@ -200,6 +220,7 @@ export default function Dashboard({
           <select
             value={league}
             onChange={(event) => setLeague(event.target.value)}
+            aria-label="League"
             className="hidden max-w-[16rem] rounded-md border bg-background px-2 py-1.5 text-sm sm:block"
           >
             <option value="all">All leagues</option>
@@ -212,6 +233,7 @@ export default function Dashboard({
           <select
             value={bet}
             onChange={(event) => setBet(event.target.value)}
+            aria-label="Bet"
             className="hidden max-w-[18rem] rounded-md border bg-background px-2 py-1.5 text-sm sm:block"
           >
             <option value="any">Any bet</option>
@@ -253,7 +275,7 @@ export default function Dashboard({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {QUICK.map((chip) => (
             <button
               key={chip.key}
@@ -267,6 +289,20 @@ export default function Dashboard({
               {chip.label}
             </button>
           ))}
+          <span className="mx-1 h-4 w-px bg-border" />
+          {['all', 'landed', 'lost'].map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => setShow(option)}
+              className={cn(
+                'rounded-full border px-3 py-1 text-xs font-medium capitalize',
+                show === option ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground',
+              )}
+            >
+              {option === 'all' ? 'Show all' : option}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -276,6 +312,15 @@ export default function Dashboard({
         {kind === 'example' ? ' · Example round' : ''}
       </p>
 
+      {settled.length > 0 ? (
+        <p className="text-sm">
+          Result: <span className="font-medium">{landed} of {settled.length} landed</span> · expected about{' '}
+          {expected.toFixed(1)}
+        </p>
+      ) : (
+        <p className="text-sm text-muted-foreground">Results appear after the matches (usually by Monday)</p>
+      )}
+
       {error ? <p className="text-sm text-destructive">Could not load the round: {error}</p> : null}
       {!data && !error ? <p className="text-sm text-muted-foreground">Loading the round…</p> : null}
 
@@ -283,7 +328,7 @@ export default function Dashboard({
         {picks.map((row) => {
           const meta = markets[row.m];
           const key = `${row.h}|${row.a}|${row.m}`;
-          const bandRow = data?.market_bands?.[`${meta?.group ?? ''}|${bandOf(row.f)}`];
+          const percent = shownOf(row, rank);
           const open = expanded === key;
           return (
             <li key={key} className="px-3 py-2.5">
@@ -297,47 +342,41 @@ export default function Dashboard({
                     {leagueNames[row.d] ?? row.d} · {meta?.plain ?? row.m}{' '}
                     <span className="opacity-70">({meta?.mozzart ?? ''})</span>
                   </span>
+                  {row.st !== 'pending' && row.ht !== null ? (
+                    <span className="tabular block text-xs text-muted-foreground">
+                      HT {row.ht} · FT {row.ft}
+                    </span>
+                  ) : row.ft ? (
+                    <span className="tabular block text-xs text-muted-foreground">FT {row.ft}</span>
+                  ) : null}
                 </span>
                 <span className="tabular shrink-0 text-right text-sm">
-                  <span className="block font-semibold">{pct(row.p)}</span>
+                  <span className="block font-semibold">{pct(percent)}</span>
                   <span className="block text-xs text-muted-foreground">usual {pct(row.lr)}</span>
                 </span>
                 <span className="tabular hidden w-12 shrink-0 text-right text-sm text-muted-foreground sm:block">
-                  {row.f.toFixed(2)}
+                  {(1 / percent).toFixed(2)}
                 </span>
-                <Badge
-                  variant={row.c === 'High' ? 'success' : row.c === 'Medium' ? 'warning' : 'secondary'}
-                  className="shrink-0"
-                >
-                  {row.c[0]}
-                </Badge>
+                <StatusBadge status={row.st} />
                 <ChevronDown className={cn('h-4 w-4 shrink-0 text-muted-foreground transition-transform', open && 'rotate-180')} />
               </button>
 
               {open ? (
                 <div className="mt-2 space-y-1 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
                   <p>
-                    This match {pct(row.p)} vs league usual {pct(row.lr)} (n={row.ln.toLocaleString('en-GB')}) · lean{' '}
-                    {row.s.toFixed(2)}x
+                    This match {pct(percent)} (model {pct(row.p)}, calibrated {pct(percent)}) vs league usual {pct(row.lr)}{' '}
+                    (n={row.ln.toLocaleString('en-GB')}) · lean {row.s.toFixed(2)}x
                   </p>
                   <p>
                     Home at home {pct(row.hr)} ({row.hn}) · away away {pct(row.ar)} ({row.an})
                   </p>
-                  <p>Fair odds {row.f.toFixed(2)} · lands about 1 in {Math.max(1, Math.round(1 / row.p))}</p>
-                  {bandRow ? (
+                  <p>Fair odds {(1 / percent).toFixed(2)} · lands about 1 in {Math.max(1, Math.round(1 / percent))}</p>
+                  {row.st === 'landed' || row.st === 'lost' ? (
                     <p>
-                      Past picks like this: <span className="tabular text-foreground">{pct(bandRow.landed)}</span> of{' '}
-                      {bandRow.n.toLocaleString('en-GB')} in {meta?.group} at {bandOf(row.f)}
-                    </p>
-                  ) : (
-                    <p>Past history: not enough data for this group and price range yet.</p>
-                  )}
-                  {row.o ? <p>No pre-match odds: goals model used without odds anchoring.</p> : null}
-                  {row.ld !== null && row.ld !== undefined ? (
-                    <p>
-                      Result: {row.rs} — {row.ld ? 'landed' : 'missed'}
+                      Result: {row.ht ? `HT ${row.ht} · ` : ''}FT {row.ft}
                     </p>
                   ) : null}
+                  {row.st === 'void' ? <p>Void — no result available for this fixture.</p> : null}
                 </div>
               ) : null}
             </li>
@@ -392,8 +431,9 @@ export default function Dashboard({
       ) : null}
 
       <p className="text-xs text-muted-foreground">
-        Bet: {betLabel}. Strongest lean = model probability divided by the league&apos;s usual rate, needing 1.10x and
-        200+ league matches. One pick per match unless a single bet is chosen. Nothing under fair odds 1.70.
+        Bet: {betLabel}. Percentages are calibrated on held-out seasons. Strongest lean needs 1.10x the league&apos;s
+        usual rate and 200+ league matches. One pick per match unless a single bet is chosen. Nothing under fair
+        odds 1.70.
       </p>
     </div>
   );

@@ -14,7 +14,7 @@ from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, l
 from .extras import parse_extra_csv
 from .fixtures import Fixture, current_or_next_round_date, fixtures_for_date, last_saturday, parse_fixtures
 from . import ranking
-from .model import backtest, live, picker_backtest, ranking_backtest
+from .model import backtest, live, ranking_backtest
 from .parse import parse_season_csv
 from .picks import read_results
 from .run import cached_seasons
@@ -126,6 +126,11 @@ def build_predictors(by_division: dict[str, list], cutoff: dt.date, half_life: f
     return predictors
 
 
+def is_settle_only(day: dt.date) -> bool:
+    """Monday's run settles results only; it never publishes a new round."""
+    return day.weekday() == 0
+
+
 def market_band_map(ranking_bt: dict) -> dict:
     """Group|band -> the row confidence_badge expects (landed, shown, n)."""
     return {
@@ -207,6 +212,8 @@ def main(argv=None) -> int:
     half_life = float(hyper["half_life_days"])
     k = float(hyper["k"])
     market_bands = market_band_map(model_payload.get("ranking_backtest", {}))
+    market_calibration = model_payload.get("ranking_backtest", {}).get("calibration", {})
+    settle_only = is_settle_only(today)
 
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
     divisions_set = {league.code for league in divisions}
@@ -229,16 +236,21 @@ def main(argv=None) -> int:
         return "publish" if fixtures else "skip"
 
     action = action_for(existing, round_fixtures)
-    if action == "settle":
-        ranking.settle_document(existing, results)
+    if settle_only and action == "publish":
+        action = "settle"
+        existing = None
+    if action == "settle" and existing is not None:
+        ranking.settle_document(existing, results, today)
         if not args.no_publish:
             ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
         print(f"round {round_date}: already published, settled only")
+    elif action == "settle" and settle_only:
+        print(f"round {round_date}: Monday settle-only run, nothing published")
     elif action == "publish":
-        document = ranking.build_ranking(predictors, round_fixtures, round_date, market_bands)
+        document = ranking.build_ranking(predictors, round_fixtures, round_date, {**market_calibration, "__bands__": market_bands})
         document["kind"] = "round"
         document["market_bands"] = market_bands
-        ranking.settle_document(document, results)
+        ranking.settle_document(document, results, today)
         if not args.no_publish:
             ranking.publish(document, PICKS_DIR, ROUNDS_DIR)
         replaced = " (replaced an empty round file)" if existing is not None else ""
@@ -251,10 +263,10 @@ def main(argv=None) -> int:
         by_division, example_date
     )
     example_predictors = build_predictors(by_division, example_date, half_life, k, decisions)
-    example = ranking.build_ranking(example_predictors, example_fixtures, example_date, market_bands)
+    example = ranking.build_ranking(example_predictors, example_fixtures, example_date, {**market_calibration, "__bands__": market_bands})
     example["kind"] = "example"
     example["market_bands"] = market_bands
-    ranking.settle_document(example, results)
+    ranking.settle_document(example, results, today)
     print(f"example round {example_date}: {len(example['rows'])} rows")
     if not args.no_publish and example["rows"]:
         ranking.publish(example, PICKS_DIR, ROUNDS_DIR)
@@ -263,7 +275,7 @@ def main(argv=None) -> int:
         stored = ranking.load(path)
         if stored["date"] in (round_date.isoformat(), example_date.isoformat()):
             continue
-        if ranking.settle_document(stored, results) and not args.no_publish:
+        if ranking.settle_document(stored, results, today) and not args.no_publish:
             ranking.publish(stored, PICKS_DIR, ROUNDS_DIR)
 
     if args.no_publish:

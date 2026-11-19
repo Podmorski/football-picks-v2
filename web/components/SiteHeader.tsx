@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const LINKS = [
+  { href: '/rounds', label: 'Rounds' },
   { href: '/leagues', label: 'Leagues' },
   { href: '/record', label: 'Record' },
   { href: '/how-it-works', label: 'How it works' },
