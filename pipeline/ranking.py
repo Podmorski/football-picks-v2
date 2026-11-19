@@ -86,9 +86,7 @@ def build_ranking(
                 league_n = int(empirical.league_n[position])
                 lean = probability / league_rate if league_rate > 0 else 0.0
                 bin_row = (market_bands or {}).get(f"{market.group}|{band}")
-                badge = confidence_badge(
-                    min(home_n, away_n), abs(probability - league_rate), bin_row, 100
-                )
+                badge = confidence_badge(min(home_n, away_n), 0.0, bin_row, 100)
                 if no_odds and badge == "High":
                     badge = "Medium"
 

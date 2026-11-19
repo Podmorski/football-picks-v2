@@ -248,7 +248,7 @@ markets:
     family: GOAL_RANGE_FT
     code: "1"
     mozzart_label: "1"
-    plain: "1 goals in the match"
+    plain: "1 goal in the match"
     group: "Goals"
     needs_ht: false
     settle: "total goals 1"
@@ -424,7 +424,7 @@ markets:
     family: GOAL_RANGE_1H
     code: "I1"
     mozzart_label: "1"
-    plain: "1 goals in the first half"
+    plain: "1 goal in the first half"
     group: "Half-time"
     needs_ht: true
     settle: "first-half goals 1"
@@ -512,7 +512,7 @@ markets:
     family: GOAL_RANGE_2H
     code: "II1"
     mozzart_label: "1"
-    plain: "1 goals in the second half"
+    plain: "1 goal in the second half"
     group: "Half-time"
     needs_ht: true
     settle: "second-half goals 1"
@@ -840,7 +840,7 @@ markets:
     family: HTFT
     code: "1-1"
     mozzart_label: "1-1"
-    plain: "1 at half-time, 1 at full-time"
+    plain: "Home team ahead at half-time, home win at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is 1-1, full-time result is 1"
@@ -848,7 +848,7 @@ markets:
     family: HTFT
     code: "1-X"
     mozzart_label: "1-X"
-    plain: "1 at half-time, X at full-time"
+    plain: "Home team ahead at half-time, draw at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is 1-X, full-time result is X"
@@ -856,7 +856,7 @@ markets:
     family: HTFT
     code: "1-2"
     mozzart_label: "1-2"
-    plain: "1 at half-time, 2 at full-time"
+    plain: "Home team ahead at half-time, away win at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is 1-2, full-time result is 2"
@@ -864,7 +864,7 @@ markets:
     family: HTFT
     code: "X-1"
     mozzart_label: "X-1"
-    plain: "X at half-time, 1 at full-time"
+    plain: "Level at half-time, home win at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is X-1, full-time result is 1"
@@ -872,7 +872,7 @@ markets:
     family: HTFT
     code: "X-X"
     mozzart_label: "X-X"
-    plain: "X at half-time, X at full-time"
+    plain: "Level at half-time, draw at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is X-X, full-time result is X"
@@ -880,7 +880,7 @@ markets:
     family: HTFT
     code: "X-2"
     mozzart_label: "X-2"
-    plain: "X at half-time, 2 at full-time"
+    plain: "Level at half-time, away win at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is X-2, full-time result is 2"
@@ -888,7 +888,7 @@ markets:
     family: HTFT
     code: "2-1"
     mozzart_label: "2-1"
-    plain: "2 at half-time, 1 at full-time"
+    plain: "Away team ahead at half-time, home win at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is 2-1, full-time result is 1"
@@ -896,7 +896,7 @@ markets:
     family: HTFT
     code: "2-X"
     mozzart_label: "2-X"
-    plain: "2 at half-time, X at full-time"
+    plain: "Away team ahead at half-time, draw at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is 2-X, full-time result is X"
@@ -904,7 +904,7 @@ markets:
     family: HTFT
     code: "2-2"
     mozzart_label: "2-2"
-    plain: "2 at half-time, 2 at full-time"
+    plain: "Away team ahead at half-time, away win at full-time"
     group: "HT/FT"
     needs_ht: true
     settle: "half-time result is 2-2, full-time result is 2"
@@ -944,7 +944,7 @@ markets:
     family: HTFT_COMBO
     code: "1-1&gg"
     mozzart_label: "1-1&gg"
-    plain: "1 at half-time, 1 at full-time and both teams score"
+    plain: "Home team ahead at half-time, home win at full-time and both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is 1-1 and both teams score"
@@ -952,7 +952,7 @@ markets:
     family: HTFT_COMBO
     code: "1-1&ng"
     mozzart_label: "1-1&ng"
-    plain: "1 at half-time, 1 at full-time and both teams do not both score"
+    plain: "Home team ahead at half-time, home win at full-time and not both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is 1-1 and both teams do not both score"
@@ -960,7 +960,7 @@ markets:
     family: HTFT_COMBO
     code: "X-1&gg"
     mozzart_label: "X-1&gg"
-    plain: "X at half-time, 1 at full-time and both teams score"
+    plain: "Level at half-time, home win at full-time and both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is X-1 and both teams score"
@@ -968,7 +968,7 @@ markets:
     family: HTFT_COMBO
     code: "X-1&ng"
     mozzart_label: "X-1&ng"
-    plain: "X at half-time, 1 at full-time and both teams do not both score"
+    plain: "Level at half-time, home win at full-time and not both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is X-1 and both teams do not both score"
@@ -976,7 +976,7 @@ markets:
     family: HTFT_COMBO
     code: "X-X&gg"
     mozzart_label: "X-X&gg"
-    plain: "X at half-time, X at full-time and both teams score"
+    plain: "Level at half-time, draw at full-time and both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is X-X and both teams score"
@@ -984,7 +984,7 @@ markets:
     family: HTFT_COMBO
     code: "X-2&gg"
     mozzart_label: "X-2&gg"
-    plain: "X at half-time, 2 at full-time and both teams score"
+    plain: "Level at half-time, away win at full-time and both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is X-2 and both teams score"
@@ -992,7 +992,7 @@ markets:
     family: HTFT_COMBO
     code: "X-2&ng"
     mozzart_label: "X-2&ng"
-    plain: "X at half-time, 2 at full-time and both teams do not both score"
+    plain: "Level at half-time, away win at full-time and not both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is X-2 and both teams do not both score"
@@ -1000,7 +1000,7 @@ markets:
     family: HTFT_COMBO
     code: "2-2&gg"
     mozzart_label: "2-2&gg"
-    plain: "2 at half-time, 2 at full-time and both teams score"
+    plain: "Away team ahead at half-time, away win at full-time and both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is 2-2 and both teams score"
@@ -1008,7 +1008,7 @@ markets:
     family: HTFT_COMBO
     code: "2-2&ng"
     mozzart_label: "2-2&ng"
-    plain: "2 at half-time, 2 at full-time and both teams do not both score"
+    plain: "Away team ahead at half-time, away win at full-time and not both teams score"
     group: "HT/FT"
     needs_ht: true
     settle: "HT/FT result is 2-2 and both teams do not both score"

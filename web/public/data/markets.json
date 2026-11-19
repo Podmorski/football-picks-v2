@@ -277,7 +277,7 @@
    "id": "GOAL_RANGE_FT:1",
    "mozzart": "1",
    "needs_ht": false,
-   "plain": "1 goals in the match"
+   "plain": "1 goal in the match"
   },
   {
    "code": "1+",
@@ -475,7 +475,7 @@
    "id": "GOAL_RANGE_1H:I1",
    "mozzart": "1",
    "needs_ht": true,
-   "plain": "1 goals in the first half"
+   "plain": "1 goal in the first half"
   },
   {
    "code": "I2",
@@ -574,7 +574,7 @@
    "id": "GOAL_RANGE_2H:II1",
    "mozzart": "1",
    "needs_ht": true,
-   "plain": "1 goals in the second half"
+   "plain": "1 goal in the second half"
   },
   {
    "code": "II2",
@@ -943,7 +943,7 @@
    "id": "HTFT:1-1",
    "mozzart": "1-1",
    "needs_ht": true,
-   "plain": "1 at half-time, 1 at full-time"
+   "plain": "Home team ahead at half-time, home win at full-time"
   },
   {
    "code": "1-X",
@@ -952,7 +952,7 @@
    "id": "HTFT:1-X",
    "mozzart": "1-X",
    "needs_ht": true,
-   "plain": "1 at half-time, X at full-time"
+   "plain": "Home team ahead at half-time, draw at full-time"
   },
   {
    "code": "1-2",
@@ -961,7 +961,7 @@
    "id": "HTFT:1-2",
    "mozzart": "1-2",
    "needs_ht": true,
-   "plain": "1 at half-time, 2 at full-time"
+   "plain": "Home team ahead at half-time, away win at full-time"
   },
   {
    "code": "X-1",
@@ -970,7 +970,7 @@
    "id": "HTFT:X-1",
    "mozzart": "X-1",
    "needs_ht": true,
-   "plain": "X at half-time, 1 at full-time"
+   "plain": "Level at half-time, home win at full-time"
   },
   {
    "code": "X-X",
@@ -979,7 +979,7 @@
    "id": "HTFT:X-X",
    "mozzart": "X-X",
    "needs_ht": true,
-   "plain": "X at half-time, X at full-time"
+   "plain": "Level at half-time, draw at full-time"
   },
   {
    "code": "X-2",
@@ -988,7 +988,7 @@
    "id": "HTFT:X-2",
    "mozzart": "X-2",
    "needs_ht": true,
-   "plain": "X at half-time, 2 at full-time"
+   "plain": "Level at half-time, away win at full-time"
   },
   {
    "code": "2-1",
@@ -997,7 +997,7 @@
    "id": "HTFT:2-1",
    "mozzart": "2-1",
    "needs_ht": true,
-   "plain": "2 at half-time, 1 at full-time"
+   "plain": "Away team ahead at half-time, home win at full-time"
   },
   {
    "code": "2-X",
@@ -1006,7 +1006,7 @@
    "id": "HTFT:2-X",
    "mozzart": "2-X",
    "needs_ht": true,
-   "plain": "2 at half-time, X at full-time"
+   "plain": "Away team ahead at half-time, draw at full-time"
   },
   {
    "code": "2-2",
@@ -1015,7 +1015,7 @@
    "id": "HTFT:2-2",
    "mozzart": "2-2",
    "needs_ht": true,
-   "plain": "2 at half-time, 2 at full-time"
+   "plain": "Away team ahead at half-time, away win at full-time"
   },
   {
    "code": "1-1&2+",
@@ -1060,7 +1060,7 @@
    "id": "HTFT_COMBO:1-1&gg",
    "mozzart": "1-1&gg",
    "needs_ht": true,
-   "plain": "1 at half-time, 1 at full-time and both teams score"
+   "plain": "Home team ahead at half-time, home win at full-time and both teams score"
   },
   {
    "code": "1-1&ng",
@@ -1069,7 +1069,7 @@
    "id": "HTFT_COMBO:1-1&ng",
    "mozzart": "1-1&ng",
    "needs_ht": true,
-   "plain": "1 at half-time, 1 at full-time and both teams do not both score"
+   "plain": "Home team ahead at half-time, home win at full-time and not both teams score"
   },
   {
    "code": "X-1&gg",
@@ -1078,7 +1078,7 @@
    "id": "HTFT_COMBO:X-1&gg",
    "mozzart": "X-1&gg",
    "needs_ht": true,
-   "plain": "X at half-time, 1 at full-time and both teams score"
+   "plain": "Level at half-time, home win at full-time and both teams score"
   },
   {
    "code": "X-1&ng",
@@ -1087,7 +1087,7 @@
    "id": "HTFT_COMBO:X-1&ng",
    "mozzart": "X-1&ng",
    "needs_ht": true,
-   "plain": "X at half-time, 1 at full-time and both teams do not both score"
+   "plain": "Level at half-time, home win at full-time and not both teams score"
   },
   {
    "code": "X-X&gg",
@@ -1096,7 +1096,7 @@
    "id": "HTFT_COMBO:X-X&gg",
    "mozzart": "X-X&gg",
    "needs_ht": true,
-   "plain": "X at half-time, X at full-time and both teams score"
+   "plain": "Level at half-time, draw at full-time and both teams score"
   },
   {
    "code": "X-2&gg",
@@ -1105,7 +1105,7 @@
    "id": "HTFT_COMBO:X-2&gg",
    "mozzart": "X-2&gg",
    "needs_ht": true,
-   "plain": "X at half-time, 2 at full-time and both teams score"
+   "plain": "Level at half-time, away win at full-time and both teams score"
   },
   {
    "code": "X-2&ng",
@@ -1114,7 +1114,7 @@
    "id": "HTFT_COMBO:X-2&ng",
    "mozzart": "X-2&ng",
    "needs_ht": true,
-   "plain": "X at half-time, 2 at full-time and both teams do not both score"
+   "plain": "Level at half-time, away win at full-time and not both teams score"
   },
   {
    "code": "2-2&gg",
@@ -1123,7 +1123,7 @@
    "id": "HTFT_COMBO:2-2&gg",
    "mozzart": "2-2&gg",
    "needs_ht": true,
-   "plain": "2 at half-time, 2 at full-time and both teams score"
+   "plain": "Away team ahead at half-time, away win at full-time and both teams score"
   },
   {
    "code": "2-2&ng",
@@ -1132,7 +1132,7 @@
    "id": "HTFT_COMBO:2-2&ng",
    "mozzart": "2-2&ng",
    "needs_ht": true,
-   "plain": "2 at half-time, 2 at full-time and both teams do not both score"
+   "plain": "Away team ahead at half-time, away win at full-time and not both teams score"
   },
   {
    "code": "1X-1X",

@@ -79,6 +79,24 @@ NOT_SETTLABLE = (
 )
 
 
+def _goal_words(code: str) -> str:
+    """'1' -> '1 goal', '2' -> '2 goals', '2+' -> '2+ goals', '0-2' -> '0-2 goals'."""
+    unit = code in ("1",)
+    return f"{code} goal" if unit else f"{code} goals"
+
+
+HT_WORDS = {
+    "1": "Home team ahead",
+    "X": "Level",
+    "2": "Away team ahead",
+}
+FT_WORDS = {
+    "1": "home win",
+    "X": "draw",
+    "2": "away win",
+}
+
+
 def _build() -> list[Market]:
     markets: list[Market] = []
 
@@ -129,15 +147,15 @@ def _build() -> list[Market]:
     ft_codes = ("0-1", "0-2", "0-3", "0-4", "1", "1+", "1-2", "1-3", "1-4", "1-5", "1-6",
                 "2", "2+", "2-3", "2-4", "2-5", "2-6", "3", "3+", "3-4", "3-5", "4", "4+", "5", "5+")
     for code in ft_codes:
-        add("GOAL_RANGE_FT", code, code, f"{code} goals in the match", "Goals",
+        add("GOAL_RANGE_FT", code, code, f"{_goal_words(code)} in the match", "Goals",
             lambda f, a, h1, a1, r=_range(code): r(f + a), needs_ht=False)
     for code in ("I0", "I1", "I2", "I3", "I1+", "I2+", "I3+", "I0-1", "I0-2", "I1-2", "I2-3"):
         bare = code[1:]
-        add("GOAL_RANGE_1H", code, bare, f"{bare} goals in the first half", "Half-time",
+        add("GOAL_RANGE_1H", code, bare, f"{_goal_words(bare)} in the first half", "Half-time",
             lambda f, a, h1, a1, r=_range(bare): r(h1 + a1))
     for code in ("II0", "II1", "II2", "II3", "II1+", "II2+", "II3+", "II0-1", "II0-2", "II1-2", "II2-3"):
         bare = code[2:]
-        add("GOAL_RANGE_2H", code, bare, f"{bare} goals in the second half", "Half-time",
+        add("GOAL_RANGE_2H", code, bare, f"{_goal_words(bare)} in the second half", "Half-time",
             lambda f, a, h1, a1, r=_range(bare): r((f - h1) + (a - a1)))
 
     # --- team goals ----------------------------------------------------------
@@ -182,7 +200,8 @@ def _build() -> list[Market]:
     # --- HT/FT ---------------------------------------------------------------
     for ht in "1X2":
         for ft in "1X2":
-            add("HTFT", f"{ht}-{ft}", f"{ht}-{ft}", f"{ht} at half-time, {ft} at full-time", "HT/FT",
+            add("HTFT", f"{ht}-{ft}", f"{ht}-{ft}",
+                f"{HT_WORDS[ht]} at half-time, {FT_WORDS[ft]} at full-time", "HT/FT",
                 lambda f, a, h1, a1, x=ht, y=ft: result(h1, a1) == x and result(f, a) == y)
     for ht, ft, plain in (("1-1", "2+", "Home ahead at HT and FT with 2+ goals"), ("1-1", "3+", "Home ahead at HT and FT with 3+ goals"),
                           ("2-2", "2+", "Away ahead at HT and FT with 2+ goals"), ("2-2", "3+", "Away ahead at HT and FT with 3+ goals")):
@@ -192,7 +211,8 @@ def _build() -> list[Market]:
                    ("X-2", "gg"), ("X-2", "ng"), ("2-2", "gg"), ("2-2", "ng")):
         is_gg = ft == "gg"
         add("HTFT_COMBO", f"{ht}&{ft}", f"{ht}&{ft}",
-            f"{ht.replace('-', ' at half-time, ')} at full-time and both teams {'score' if is_gg else 'do not both score'}",
+            f"{HT_WORDS[ht[0]]} at half-time, {FT_WORDS[ht[2]]} at full-time and "
+            + ("both teams score" if is_gg else "not both teams score"),
             "HT/FT",
             lambda f, a, h1, a1, x=ht, gg=is_gg: (
                 result(h1, a1) == x[0] and result(f, a) == x[2]
