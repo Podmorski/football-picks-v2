@@ -134,7 +134,7 @@ def is_settle_only(day: dt.date) -> bool:
 def market_band_map(ranking_bt: dict) -> dict:
     """Group|band -> the row confidence_badge expects (landed, shown, n)."""
     return {
-        f"{row['group']}|{row['band']}": {
+        f"{row['group']}|{row.get('level') or row.get('band')}": {
             "landed": row["hit_rate"],
             "shown": row["mean_probability"],
             "n": row["picks"],
@@ -212,7 +212,8 @@ def main(argv=None) -> int:
     half_life = float(hyper["half_life_days"])
     k = float(hyper["k"])
     market_bands = market_band_map(model_payload.get("ranking_backtest", {}))
-    market_calibration = model_payload.get("ranking_backtest", {}).get("calibration", {})
+    market_calibration = dict(model_payload.get("ranking_backtest", {}).get("calibration", {}))
+    market_calibration["__k__"] = k
     settle_only = is_settle_only(today)
 
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
@@ -302,7 +303,7 @@ def main(argv=None) -> int:
         write_json(MODEL_JSON, model_payload)
         for row in ranking_bt["groups"]:
             print(
-                f"ranking backtest {row['group'][:26]:26s} {row['band']:10s} n={row['picks']:6d} "
+                f"ranking backtest {row['group'][:26]:26s} {row['level']:8s} n={row['picks']:6d} "
                 f"pred={row['mean_probability'] * 100:5.1f}% hit={row['hit_rate'] * 100:5.1f}%"
             )
 

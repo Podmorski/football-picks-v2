@@ -107,48 +107,47 @@ export default function RecordPage() {
         <p className="text-sm text-muted-foreground">
           Every Tuesday and Saturday round from {model?.ranking_backtest?.seasons[0] ?? '2019-20'} to{' '}
           {model?.ranking_backtest?.seasons.at(-1) ?? '2025-26'}, replayed with each ranking and only the data
-          available before each round date. Shown where at least 30 past picks exist.
+          available before each round date. Break-even % is 1 divided by the average fair odds.
         </p>
-        {(['lean', 'probability'] as const).map((strategy) => {
-          const rows = (model?.ranking_backtest?.groups ?? [])
-            .filter((row) => row.strategy === strategy && row.picks >= 30)
-            .sort((a, b) => b.picks - a.picks);
-          return (
-            <div key={strategy} className="space-y-2 rounded-xl border p-4">
-              <h3 className="text-base font-semibold">
-                {strategy === 'lean' ? 'Strongest lean' : 'Most likely'}
-              </h3>
-              <div className="overflow-x-auto rounded-lg border">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
-                      <th className="px-3 py-2 text-left font-semibold">Group</th>
-                      <th className="px-3 py-2 text-right font-semibold">Band</th>
-                      <th className="px-3 py-2 text-right font-semibold">n</th>
-                      <th className="px-3 py-2 text-right font-semibold">Predicted</th>
-                      <th className="px-3 py-2 text-right font-semibold">Landed</th>
-                      <th className="px-3 py-2 text-right font-semibold">95% CI</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row) => (
-                      <tr key={`${row.group}-${row.band}`} className="border-t">
-                        <td className="px-3 py-1.5">{row.group}</td>
-                        <td className="tabular px-3 py-1.5 text-right text-muted-foreground">{row.band}</td>
-                        <td className="tabular px-3 py-1.5 text-right">{row.picks.toLocaleString('en-GB')}</td>
-                        <td className="tabular px-3 py-1.5 text-right">{pct(row.mean_probability)}</td>
-                        <td className="tabular px-3 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
-                        <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">
-                          {pct(row.ci[0])}–{pct(row.ci[1])}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          );
-        })}
+        <div className="overflow-x-auto rounded-xl border">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                <th className="px-3 py-2 text-left font-semibold">Ranking</th>
+                <th className="px-3 py-2 text-right font-semibold">Min odds</th>
+                <th className="px-3 py-2 text-right font-semibold">n</th>
+                <th className="px-3 py-2 text-right font-semibold">Avg fair</th>
+                <th className="px-3 py-2 text-right font-semibold">Landed</th>
+                <th className="px-3 py-2 text-right font-semibold">Break-even</th>
+                <th className="px-3 py-2 text-right font-semibold">Landed − BE</th>
+                <th className="px-3 py-2 text-right font-semibold">95% CI</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(model?.ranking_backtest?.level_summary ?? [])
+                .filter((row) => row.picks >= 30)
+                .map((row) => (
+                  <tr key={`${row.strategy}-${row.level}`} className="border-t">
+                    <td className="px-3 py-1.5">{row.strategy === 'lean' ? 'Strongest lean' : 'Most likely'}</td>
+                    <td className="tabular px-3 py-1.5 text-right text-muted-foreground">{row.level}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{row.picks.toLocaleString('en-GB')}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{row.mean_fair_odds.toFixed(2)}</td>
+                    <td className="tabular px-3 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{pct(row.break_even)}</td>
+                    <td className="tabular px-3 py-1.5 text-right">
+                      {row.edge === null ? '–' : `${row.edge > 0 ? '+' : ''}${(row.edge * 100).toFixed(1)}`}
+                    </td>
+                    <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">
+                      {pct(row.ci[0])}–{pct(row.ci[1])}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          At fair odds the long-run return is about zero; profit needs a bookmaker price above the fair odds.
+        </p>
       </section>
 
       <section className="space-y-3">

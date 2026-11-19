@@ -7,7 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { MarketMeta, RankFile, RankRow } from '@/lib/types';
 
-const BANDS = ['1.70-2.00', '2.00-3.00', '3.00-5.00', '5.00-10.00', '10.00+'];
+const LEVELS = [
+  { key: 'any', label: 'Any', low: 1.5 },
+  { key: '2.00+', label: '2.00+', low: 2.0 },
+  { key: '2.50+', label: '2.50+', low: 2.5 },
+  { key: '3.00+', label: '3.00+', low: 3.0 },
+];
+const FAIR_MIN = 1.5;
+const FAIR_MAX = 4.0;
 const GROUPS = ['Combos', 'HT/FT', 'Goals', 'BTTS', 'Half-time', 'Team goals', 'Result & double chance', 'Correct score'];
 const QUICK = [
   { key: 'any', label: 'Any' },
@@ -17,15 +24,19 @@ const QUICK = [
   { key: 'market:GOAL_RANGE_FT:2+', label: 'Over 2.5' },
   { key: 'group:Half-time', label: 'Goal in 1st half' },
 ];
-
-function bandOf(probability: number): string {
-  const fair = 1 / Math.max(probability, 0.0001);
-  if (fair < 2) return '1.70-2.00';
-  if (fair < 3) return '2.00-3.00';
-  if (fair < 5) return '3.00-5.00';
-  if (fair < 10) return '5.00-10.00';
-  return '10.00+';
-}
+const LADDER_LABELS: Record<string, string> = {
+  'GOAL_RANGE_FT:1+': 'FT 1+ goals',
+  'GOAL_RANGE_FT:2+': 'FT 2+ goals',
+  'GOAL_RANGE_FT:3+': 'FT 3+ goals',
+  'GOAL_RANGE_FT:4+': 'FT 4+ goals',
+  'GOAL_RANGE_FT:5+': 'FT 5+ goals',
+  'GOAL_RANGE_FT:0-1': 'Under 1.5',
+  'GOAL_RANGE_FT:0-2': 'Under 2.5',
+  'GOAL_RANGE_FT:0-3': 'Under 3.5',
+  'GOAL_RANGE_1H:I1+': '1st half 1+',
+  'GOAL_RANGE_1H:I2+': '1st half 2+',
+  'BTTS:GG': 'Both teams score',
+};
 
 function pct(value: number) {
   return `${(value * 100).toFixed(1)}%`;
@@ -33,6 +44,10 @@ function pct(value: number) {
 
 function shownOf(row: RankRow, strategy: string): number {
   return strategy === 'lean' ? row.pl ?? row.p : row.pp ?? row.p;
+}
+
+function fairOf(row: RankRow, strategy: string): number {
+  return 1 / Math.max(shownOf(row, strategy), 0.0001);
 }
 
 function useParam(key: string, initial: string): [string, (next: string) => void] {
@@ -67,22 +82,20 @@ export default function Dashboard({
   date,
   kind,
   leagueOptions,
-  initialRound,
 }: {
   date: string;
   kind: string;
   leagueOptions: [string, string, string][];
-  initialRound?: string;
 }) {
   const [data, setData] = useState<RankFile | null>(null);
   const [markets, setMarkets] = useState<Record<string, MarketMeta>>({});
   const [error, setError] = useState<string | null>(null);
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
-  const [band, setBand] = useParam('band', '2.00-3.00');
+  const [minOdds, setMinOdds] = useParam('minodds', 'any');
   const [rank, setRank] = useParam('rank', 'lean');
   const [show, setShow] = useParam('show', 'all');
-  const [roundParam, setRoundParam] = useParam('round', initialRound ?? date);
+  const [roundParam] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [sheet, setSheet] = useState<'league' | 'bet' | null>(null);
 
@@ -154,12 +167,14 @@ export default function Dashboard({
       .sort((a, b) => a[1].localeCompare(b[1]));
   }, [rows, markets]);
 
-  const picks = useMemo(() => {
-    let filtered = rows.filter((row) => bandOf(shownOf(row, rank)) === band);
+  const { pool, picks } = useMemo(() => {
+    const levelLow = LEVELS.find((level) => level.key === minOdds)?.low ?? FAIR_MIN;
+    let filtered = rows.filter((row) => {
+      const fair = fairOf(row, rank);
+      return fair >= Math.max(FAIR_MIN, levelLow) && fair <= FAIR_MAX;
+    });
     if (league !== 'all') filtered = filtered.filter((row) => row.d === league);
-    if (rank === 'lean') {
-      filtered = filtered.filter((row) => row.ln >= 200 && row.lr > 0 && shownOf(row, 'lean') >= row.lr * 1.1);
-    }
+    if (rank === 'lean') filtered = filtered.filter((row) => row.ln >= 200 && row.s >= 0.2);
     if (bet.startsWith('market:')) {
       const id = bet.slice(7);
       filtered = filtered.filter((row) => row.m === id);
@@ -169,22 +184,23 @@ export default function Dashboard({
     }
     if (show !== 'all') filtered = filtered.filter((row) => row.st === show);
 
-    const sorted = filtered.sort((a, b) =>
+    const sorted = [...filtered].sort((a, b) =>
       rank === 'lean' ? b.s - a.s || shownOf(b, rank) - shownOf(a, rank) : shownOf(b, rank) - shownOf(a, rank),
     );
-    if (bet.startsWith('market:')) return sorted.slice(0, 15);
-
+    const top: RankRow[] = [];
+    if (bet.startsWith('market:')) {
+      return { pool: sorted, picks: sorted.slice(0, 15) };
+    }
     const seen = new Set<string>();
-    const out: RankRow[] = [];
     for (const row of sorted) {
       const key = `${row.h}|${row.a}`;
       if (seen.has(key)) continue;
       seen.add(key);
-      out.push(row);
-      if (out.length >= 15) break;
+      top.push(row);
+      if (top.length >= 15) break;
     }
-    return out;
-  }, [rows, league, bet, band, rank, show, markets]);
+    return { pool: sorted, picks: top };
+  }, [rows, league, bet, minOdds, rank, show, markets]);
 
   const settled = picks.filter((row) => row.st === 'landed' || row.st === 'lost');
   const landed = picks.filter((row) => row.st === 'landed').length;
@@ -196,6 +212,8 @@ export default function Dashboard({
       : bet.startsWith('group:')
         ? bet.slice(6)
         : markets[bet.slice(7)]?.plain ?? 'Bet';
+
+  const levelLabel = LEVELS.find((level) => level.key === minOdds)?.label ?? 'Any';
 
   return (
     <div className="space-y-4">
@@ -258,18 +276,19 @@ export default function Dashboard({
               Bet
             </button>
           </div>
-          <div className="flex flex-wrap gap-1">
-            {BANDS.map((option) => (
+          <div className="flex flex-wrap items-center gap-1">
+            <span className="text-xs text-muted-foreground">Min odds</span>
+            {LEVELS.map((level) => (
               <button
-                key={option}
+                key={level.key}
                 type="button"
-                onClick={() => setBand(option)}
+                onClick={() => setMinOdds(level.key)}
                 className={cn(
                   'rounded-full border px-2.5 py-1 text-xs font-medium',
-                  band === option ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground',
+                  minOdds === level.key ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground',
                 )}
               >
-                {option}
+                {level.label}
               </button>
             ))}
           </div>
@@ -307,8 +326,8 @@ export default function Dashboard({
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {picks.length} {rank === 'lean' ? 'strongest leans' : 'most likely picks'} · {band} · {data?.fixtures ?? 0}{' '}
-        matches checked in {data?.leagues ?? 0} leagues · {data?.label ?? date}
+        {picks.length} {rank === 'lean' ? 'strongest leans' : 'most likely picks'} · min odds {levelLabel} ·{' '}
+        {data?.fixtures ?? 0} matches checked in {data?.leagues ?? 0} leagues · {data?.label ?? date}
         {kind === 'example' ? ' · Example round' : ''}
       </p>
 
@@ -330,6 +349,10 @@ export default function Dashboard({
           const key = `${row.h}|${row.a}|${row.m}`;
           const percent = shownOf(row, rank);
           const open = expanded === key;
+          const ladderRows = data?.ladder ?? [];
+          const fixtureRows = rows.filter((candidate) => candidate.h === row.h && candidate.a === row.a);
+          const ladder = ladderRows.map((id) => fixtureRows.find((candidate) => candidate.m === id)).filter(Boolean) as RankRow[];
+          const siblings = pool.filter((candidate) => candidate.h === row.h && candidate.a === row.a && candidate.m !== row.m).slice(0, 3);
           return (
             <li key={key} className="px-3 py-2.5">
               <button type="button" onClick={() => setExpanded(open ? null : key)} className="flex w-full items-center gap-3 text-left">
@@ -362,21 +385,58 @@ export default function Dashboard({
               </button>
 
               {open ? (
-                <div className="mt-2 space-y-1 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                  <p>
-                    This match {pct(percent)} (model {pct(row.p)}, calibrated {pct(percent)}) vs league usual {pct(row.lr)}{' '}
-                    (n={row.ln.toLocaleString('en-GB')}) · lean {row.s.toFixed(2)}x
-                  </p>
-                  <p>
-                    Home at home {pct(row.hr)} ({row.hn}) · away away {pct(row.ar)} ({row.an})
-                  </p>
-                  <p>Fair odds {(1 / percent).toFixed(2)} · lands about 1 in {Math.max(1, Math.round(1 / percent))}</p>
-                  {row.st === 'landed' || row.st === 'lost' ? (
+                <div className="mt-2 space-y-3 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                  <div>
                     <p>
-                      Result: {row.ht ? `HT ${row.ht} · ` : ''}FT {row.ft}
+                      This match {pct(percent)} (model {pct(row.p)}) vs league usual {pct(row.lr)}{' '}
+                      (n={row.ln.toLocaleString('en-GB')}) · lift {row.s.toFixed(2)}
                     </p>
+                    <p>
+                      Home at home {pct(row.hr)} ({row.hn}) · away away {pct(row.ar)} ({row.an})
+                    </p>
+                    <p>
+                      Fair odds {(1 / percent).toFixed(2)} · lands about 1 in {Math.max(1, Math.round(1 / percent))}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Goal ladder</h4>
+                    <ul className="grid gap-x-4 gap-y-0.5 sm:grid-cols-2">
+                      {ladder.map((line) => (
+                        <li
+                          key={line.m}
+                          className={cn(
+                            'flex items-baseline justify-between gap-2 rounded px-1',
+                            line.m === row.m && 'bg-accent/60 font-medium text-foreground',
+                          )}
+                        >
+                          <span>{LADDER_LABELS[line.m] ?? line.m}</span>
+                          <span className="tabular">
+                            {pct(line.p)} <span className="text-xs">· usual {pct(line.lr)} ({line.ln})</span>{' '}
+                            <span className="text-xs">· {(1 / line.p).toFixed(2)}</span>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {siblings.length > 0 ? (
+                    <div>
+                      <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Other strong bets in this match</h4>
+                      <ul className="space-y-0.5">
+                        {siblings.map((sibling) => (
+                          <li key={sibling.m} className="flex items-baseline justify-between gap-2">
+                            <span>{markets[sibling.m]?.plain ?? sibling.m}</span>
+                            <span className="tabular">
+                              {pct(shownOf(sibling, rank))} · {(1 / shownOf(sibling, rank)).toFixed(2)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   ) : null}
-                  {row.st === 'void' ? <p>Void — no result available for this fixture.</p> : null}
+
+                  {row.st === 'void' ? <p>Void — no settlement possible for this fixture.</p> : null}
                 </div>
               ) : null}
             </li>
@@ -386,7 +446,7 @@ export default function Dashboard({
 
       {data && picks.length === 0 ? (
         <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
-          No play passes these filters in this price range.
+          No play passes these filters at this minimum odds.
         </p>
       ) : null}
 
@@ -431,9 +491,9 @@ export default function Dashboard({
       ) : null}
 
       <p className="text-xs text-muted-foreground">
-        Bet: {betLabel}. Percentages are calibrated on held-out seasons. Strongest lean needs 1.10x the league&apos;s
-        usual rate and 200+ league matches. One pick per match unless a single bet is chosen. Nothing under fair
-        odds 1.70.
+        Bet: {betLabel}. Percentages are calibrated on held-out seasons. Strongest lean ranks by log-odds lift over
+        the league&apos;s usual rate (0.20 minimum, 200+ league matches). Only fair odds 1.50–4.00 are shown; one pick
+        per match unless a single bet is chosen.
       </p>
     </div>
   );

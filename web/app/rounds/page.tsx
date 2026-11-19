@@ -3,20 +3,19 @@ import Link from 'next/link';
 import { readRankRound, readRoundIndex } from '@/lib/data';
 import type { RankRow } from '@/lib/types';
 
-const BAND = '2.00-3.00';
+const FAIR_MIN = 1.5;
+const FAIR_MAX = 4.0;
 
-function bandOf(probability: number): string {
-  const fair = 1 / Math.max(probability, 0.0001);
-  if (fair < 2) return '1.70-2.00';
-  if (fair < 3) return '2.00-3.00';
-  if (fair < 5) return '3.00-5.00';
-  if (fair < 10) return '5.00-10.00';
-  return '10.00+';
+function fairOf(row: RankRow): number {
+  return 1 / Math.max(row.pl ?? row.p, 0.0001);
 }
 
 function defaultPicks(rows: RankRow[]): RankRow[] {
   const filtered = rows
-    .filter((row) => bandOf(row.pl ?? row.p) === BAND && row.ln >= 200 && row.lr > 0 && (row.pl ?? row.p) >= 1.1 * row.lr)
+    .filter((row) => {
+      const fair = fairOf(row);
+      return fair >= FAIR_MIN && fair <= FAIR_MAX && row.ln >= 200 && row.s >= 0.2;
+    })
     .sort((a, b) => b.s - a.s || (b.pl ?? b.p) - (a.pl ?? a.p));
   const seen = new Set<string>();
   const out: RankRow[] = [];
@@ -39,8 +38,8 @@ export default function RoundsPage() {
       <header className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Past rounds</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Every published round, newest first, with the tally for the default filters (Any bet, {BAND}, Strongest
-          lean). Open a round to see the full dashboard for it.
+          Every published round, newest first, with the tally for the default filters (Any bet, min odds Any,
+          Strongest lean). Open a round to see the full dashboard for it.
         </p>
       </header>
 

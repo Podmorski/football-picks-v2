@@ -127,7 +127,7 @@ export type ModelFile = {
   full_worse_than_base_count: number;
   missing_odds?: { fixtures: number; fixtures_without_odds: number; brier_without_odds: number | null; brier_with_odds: number | null };
   picker_backtest?: PickerBacktest;
-  ranking_backtest?: { seasons: string[]; bands: string[]; strategies?: string[]; groups: RankBacktestRow[] };
+  ranking_backtest?: { seasons: string[]; levels?: string[]; strategies?: string[]; groups: RankBacktestRow[]; level_summary?: LevelSummaryRow[] };
 };
 
 export type PickerRow = {
@@ -280,8 +280,21 @@ export type RankFile = {
   fixtures: number;
   leagues: number;
   markets: number;
+  levels?: { key: string; label: string }[];
+  ladder?: string[];
   rows: RankRow[];
   market_bands?: Record<string, { landed: number; shown: number; n: number }>;
+};
+
+export type LevelSummaryRow = {
+  strategy: string;
+  level: string;
+  picks: number;
+  mean_fair_odds: number;
+  hit_rate: number;
+  break_even: number | null;
+  edge: number | null;
+  ci: [number, number];
 };
 
 export type RankBacktestRow = {

@@ -3,14 +3,14 @@
   {
    "date": "2026-11-14",
    "fixtures": 45,
-   "hits": 1571,
+   "hits": 2007,
    "kind": "example",
    "label": "Saturday 14 Nov",
    "leagues": 7,
-   "picks": 6484,
-   "rows": 6484,
+   "picks": 7087,
+   "rows": 7087,
    "settled": true,
-   "settled_count": 6484,
+   "settled_count": 7087,
    "weekday": "Saturday"
   }
  ]

@@ -117,6 +117,26 @@ def test_grid_probabilities_match_brute_force() -> None:
         assert model_p[position] == pytest.approx(truth[market.id] / total, abs=1e-6), market.id
 
 
+def test_ladder_is_monotone_and_over_under_complementary() -> None:
+    joint = joint_vector(0.62, 0.48, 0.85, 0.70, rho=-0.05)
+    probs = probabilities(joint)
+    index = {market.id: position for position, market in enumerate(MARKETS)}
+
+    def p(market_id: str) -> float:
+        return float(probs[index[market_id]])
+
+    ladder = [p(f"GOAL_RANGE_FT:{n}+") for n in range(1, 6)]
+    assert all(a >= b - 1e-9 for a, b in zip(ladder, ladder[1:])), ladder
+    assert p("GOAL_RANGE_1H:I1+") >= p("GOAL_RANGE_1H:I2+")
+
+    for under, over in (
+        ("GOAL_RANGE_FT:0-1", "GOAL_RANGE_FT:2+"),
+        ("GOAL_RANGE_FT:0-2", "GOAL_RANGE_FT:3+"),
+        ("GOAL_RANGE_FT:0-3", "GOAL_RANGE_FT:4+"),
+    ):
+        assert p(under) + p(over) == pytest.approx(1.0, abs=1e-9), (under, over)
+
+
 def test_mutually_exclusive_families_sum_to_one() -> None:
     joint = joint_vector(0.6, 0.5, 0.7, 0.6, rho=-0.05)
     probs = probabilities(joint)

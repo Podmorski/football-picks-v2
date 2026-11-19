@@ -8,26 +8,41 @@ calibrated value for the strategy in use.
 from __future__ import annotations
 
 import json
+import math
 from collections import defaultdict
 from pathlib import Path
+
+import numpy as np
 
 from .fixtures import Fixture, WEEKDAY_NAMES
 from .markets import MARKETS, MARKET_BY_ID, settle
 from .model.goals_engine import extract_targets
 from .picks import MONTHS, confidence_badge
 
-MIN_FAIR_ODDS = 1.70
-DEFAULT_BAND = "2.00-3.00"
+MIN_FAIR_ODDS = 1.50
+MAX_FAIR_ODDS = 4.00
+DEFAULT_LEVEL = "any"
 EXCLUDED_MARKETS = {"RESULT:1", "RESULT:2"}
 TOP_N = 15
 STRATEGIES = ("lean", "probability")
+LEAN_MIN_LIFT = 0.20
+LEAN_MIN_LEAGUE_N = 200
 
-PRICE_BANDS = (
-    {"key": "1.70-2.00", "label": "1.70–2.00", "low": 1.70, "high": 2.00},
-    {"key": "2.00-3.00", "label": "2.00–3.00", "low": 2.00, "high": 3.00},
-    {"key": "3.00-5.00", "label": "3.00–5.00", "low": 3.00, "high": 5.00},
-    {"key": "5.00-10.00", "label": "5.00–10.00", "low": 5.00, "high": 10.00},
-    {"key": "10.00+", "label": "10.00+", "low": 10.00, "high": float("inf")},
+# Minimum-odds levels (fair odds = 1 / probability).
+LEVELS = (
+    {"key": "any", "label": "Any", "low": 1.50},
+    {"key": "2.00+", "label": "2.00+", "low": 2.00},
+    {"key": "2.50+", "label": "2.50+", "low": 2.50},
+    {"key": "3.00+", "label": "3.00+", "low": 3.00},
+)
+LEVEL_BY_KEY = {level["key"]: level for level in LEVELS}
+
+# Markets the goal ladder shows whatever their price.
+LADDER_MARKETS = (
+    "GOAL_RANGE_FT:1+", "GOAL_RANGE_FT:2+", "GOAL_RANGE_FT:3+",
+    "GOAL_RANGE_FT:4+", "GOAL_RANGE_FT:5+",
+    "GOAL_RANGE_FT:0-1", "GOAL_RANGE_FT:0-2", "GOAL_RANGE_FT:0-3",
+    "GOAL_RANGE_1H:I1+", "GOAL_RANGE_1H:I2+", "BTTS:GG",
 )
 
 ROW_FIELDS = [
@@ -37,10 +52,24 @@ ROW_FIELDS = [
 
 
 def band_for(fair_odds: float) -> str | None:
-    for band in PRICE_BANDS:
-        if band["low"] <= fair_odds < band["high"]:
-            return band["key"]
-    return None
+    """Highest minimum-odds level this price satisfies."""
+    chosen = None
+    for level in LEVELS:
+        if fair_odds >= level["low"]:
+            chosen = level["key"]
+    return chosen
+
+
+def in_price_window(probability: float) -> bool:
+    if probability <= 0:
+        return False
+    fair = 1.0 / probability
+    return MIN_FAIR_ODDS <= fair <= MAX_FAIR_ODDS
+
+
+def logit(probability: float) -> float:
+    p = min(max(probability, 1e-6), 1.0 - 1e-6)
+    return math.log(p / (1.0 - p))
 
 
 def round_label(date) -> str:
@@ -70,6 +99,17 @@ def build_ranking(
             grouped[fixture.div].append(fixture)
 
     factors = calibration or {}
+    shrink_k = float(factors.get("__k__", 20.0))
+
+    # Pooled all-league empirical rate per market, weighted by league sample size.
+    pooled_num = np.zeros(len(MARKETS))
+    pooled_den = np.zeros(len(MARKETS))
+    for predictor in predictors.values():
+        empirical = predictor.empirical
+        pooled_num += empirical.league_rate * empirical.league_n
+        pooled_den += empirical.league_n
+    pooled = np.divide(pooled_num, np.where(pooled_den > 0, pooled_den, 1.0))
+
     rows: list[dict] = []
     for div, group in sorted(grouped.items()):
         predictor = predictors[div]
@@ -95,22 +135,23 @@ def build_ranking(
                 if probability <= 0:
                     continue
                 fair = 1.0 / probability
-                if fair < MIN_FAIR_ODDS:
-                    continue
-                band = band_for(fair)
-                if band is None:
+                ladder = market.id in LADDER_MARKETS
+                if fair < MIN_FAIR_ODDS and not ladder:
                     continue
 
+                level = band_for(fair) or "any"
                 league_rate = float(empirical.league_rate[position])
                 league_n = int(empirical.league_n[position])
-                lean_factor = factors.get(f"lean|{market.group}|{band}", 1.0)
-                prob_factor = factors.get(f"probability|{market.group}|{band}", 1.0)
+                lean_factor = factors.get(f"lean|{market.group}|{level}", 1.0)
+                prob_factor = factors.get(f"probability|{market.group}|{level}", 1.0)
                 p_lean = min(0.999, max(0.001, probability * lean_factor))
                 p_prob = min(0.999, max(0.001, probability * prob_factor))
-                if band_for(1.0 / p_lean) != band and band_for(1.0 / p_prob) != band:
-                    continue
 
-                bin_row = (calibration or {}).get("__bands__", {}).get(f"{market.group}|{band}")
+                # League rate shrunk toward the pooled all-league rate.
+                shrunk = (league_n * league_rate + shrink_k * float(pooled[position])) / (league_n + shrink_k) if league_n + shrink_k > 0 else league_rate
+                lift = logit(p_lean) - logit(shrunk)
+
+                bin_row = factors.get("__bands__", {}).get(f"{market.group}|{level}")
                 badge = confidence_badge(min(home_n, away_n), 0.0, bin_row, 100)
                 if no_odds and badge == "High":
                     badge = "Medium"
@@ -132,7 +173,7 @@ def build_ranking(
                         "ar": round(float(away_rate[position]), 4),
                         "an": int(away_n),
                         "c": badge,
-                        "s": round(p_lean / league_rate, 4) if league_rate > 0 else 0.0,
+                        "s": round(lift, 4),
                         "st": "pending",
                         "ht": None,
                         "ft": None,
@@ -145,7 +186,8 @@ def build_ranking(
         "weekday": WEEKDAY_NAMES[round_date.weekday()],
         "fixtures": len(fixtures),
         "leagues": len({fixture.div for fixture in fixtures}),
-        "bands": [{"key": band["key"], "label": band["label"]} for band in PRICE_BANDS],
+        "levels": [{"key": level["key"], "label": level["label"]} for level in LEVELS],
+        "ladder": list(LADDER_MARKETS),
         "markets": len(MARKETS),
         "rows": rows,
     }
@@ -184,12 +226,21 @@ def rank_rows(
     league: str = "all",
     group: str = "any",
     market: str = "all",
-    band: str = DEFAULT_BAND,
+    level: str = DEFAULT_LEVEL,
     strategy: str = "lean",
     show: str = "all",
 ) -> list[dict]:
     """Filter, rank, top 15. One pick per match unless a single market is chosen."""
-    filtered = [row for row in rows if row_band(row, strategy) == band]
+    floor = LEVEL_BY_KEY.get(level, LEVEL_BY_KEY[DEFAULT_LEVEL])["low"]
+    filtered = []
+    for row in rows:
+        probability = shown(row, strategy)
+        if probability <= 0:
+            continue
+        fair = 1.0 / probability
+        if fair < max(MIN_FAIR_ODDS, floor) or fair > MAX_FAIR_ODDS:
+            continue
+        filtered.append(row)
     if league != "all":
         filtered = [row for row in filtered if row["d"] == league]
     if market != "all":
@@ -198,9 +249,7 @@ def rank_rows(
         filtered = [row for row in filtered if MARKET_BY_ID[row["m"]].group == group]
 
     if strategy == "lean":
-        filtered = [
-            row for row in filtered if row["ln"] >= 200 and row["lr"] > 0 and shown(row, "lean") >= 1.10 * row["lr"]
-        ]
+        filtered = [row for row in filtered if row["ln"] >= LEAN_MIN_LEAGUE_N and row["s"] >= LEAN_MIN_LIFT]
         filtered.sort(key=lambda row: (-row["s"], -shown(row, "lean"), row["h"]))
     else:
         filtered.sort(key=lambda row: (-shown(row, "probability"), row["h"]))
@@ -286,6 +335,8 @@ def encode(document: dict) -> dict:
         "leagues": document.get("leagues", 0),
         "markets": document.get("markets", len(MARKETS)),
         "bands": document.get("bands", []),
+        "levels": document.get("levels", []),
+        "ladder": document.get("ladder", []),
         "market_bands": document.get("market_bands", {}),
         "fields": ROW_FIELDS,
         "fixture_list": fixtures,
