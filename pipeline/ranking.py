@@ -251,6 +251,13 @@ def market_catalogue() -> dict:
     }
 
 
+def round_action(existing: dict | None, fixtures: list) -> str:
+    """'settle' when a round already has rows, 'publish' when fixtures exist, else 'skip'."""
+    if existing and existing.get("rows"):
+        return "settle"
+    return "publish" if fixtures else "skip"
+
+
 def encode(document: dict) -> dict:
     fixtures: list[dict] = []
     index: dict[tuple, int] = {}

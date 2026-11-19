@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from pipeline.ranking import decode, encode, rank_rows, settle_document, tally
+from pipeline.ranking import decode, encode, rank_rows, round_action, settle_document, tally
 from pipeline.run_model import is_settle_only
 
 
@@ -91,6 +91,17 @@ def test_show_filter() -> None:
     assert len(rank_rows(rows, show="all")) == 3
     assert [r["h"] for r in rank_rows(rows, show="landed")] == ["A"]
     assert [r["h"] for r in rank_rows(rows, show="lost")] == ["C"]
+
+
+def test_empty_round_file_is_replaced_but_a_filled_one_is_not() -> None:
+    empty = {"date": "2026-11-21", "rows": []}
+    filled = {"date": "2026-11-21", "rows": [row()]}
+    fixtures = ["fixture"]
+
+    assert round_action(None, fixtures) == "publish"
+    assert round_action(empty, fixtures) == "publish"
+    assert round_action(empty, []) == "skip"
+    assert round_action(filled, fixtures) == "settle"
 
 
 def test_monday_is_settle_only() -> None:

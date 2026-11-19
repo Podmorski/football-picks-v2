@@ -230,12 +230,7 @@ def main(argv=None) -> int:
     else:
         existing = None
 
-    def action_for(document, fixtures):
-        if document and document.get("rows"):
-            return "settle"
-        return "publish" if fixtures else "skip"
-
-    action = action_for(existing, round_fixtures)
+    action = ranking.round_action(existing, round_fixtures)
     if settle_only and action == "publish":
         action = "settle"
         existing = None
