@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 
 from pipeline.ranking import decode, encode, rank_rows, round_action, settle_document, tally
+from pipeline.model.ranking_backtest import mean_return_ci, pick_return
 from pipeline.run_model import is_settle_only
 
 
@@ -129,3 +130,28 @@ def test_round_file_round_trips(tmp_path: Path) -> None:
     assert decoded_rows[0]["st"] == "landed"
     assert decoded_rows[0]["ft"] == "2-1"
     assert decoded_rows[0]["pl"] == 0.38
+
+
+def test_pick_return_at_fair_odds() -> None:
+    # A winning pick returns fair - 1; a loser returns -1 whatever the price.
+    assert pick_return(2.50, True) == pytest.approx(1.50)
+    assert pick_return(1.80, False) == pytest.approx(-1.0)
+
+
+def test_mean_return_ci_on_known_sequence() -> None:
+    picks = [
+        {"date": "2024-01-06", "return": pick_return(2.0, True)},  # +1.0
+        {"date": "2024-01-06", "return": pick_return(4.0, False)},  # -1.0
+        {"date": "2024-01-13", "return": pick_return(3.0, True)},  # +2.0
+        {"date": "2024-01-13", "return": pick_return(2.0, True)},  # +1.0
+    ]
+    mean, (low, high) = mean_return_ci(picks, resamples=2000, seed=20261025)
+    assert mean == pytest.approx(0.75)
+    # With two round dates the bootstrap draws one or both: means 0, 0.75 and 1.5.
+    assert low == pytest.approx(0.0, abs=0.01)
+    assert high == pytest.approx(1.5, abs=0.01)
+    assert low <= mean <= high
+
+
+def test_mean_return_ci_on_no_picks() -> None:
+    assert mean_return_ci([]) == (None, [None, None])

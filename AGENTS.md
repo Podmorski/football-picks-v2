@@ -82,13 +82,13 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Current state
 
-- Milestone 3e complete. HEAD `adf34d4` (feat: log-odds lean, minimum-odds filter, goal ladder,
-  level backtest). Last CI run `44589074026` green. 110 tests passing. `npm run build` green (46 pages).
+- Milestone 3e complete. Record page now reports the per-pick return at fair odds (mean, plus a
+  95% CI bootstrapped over round dates, seed 20261025); the old "break-even" / "landed − BE"
+  columns are gone. 113 tests passing. `npm run build` green (46 pages).
 - Clean working tree on `main`; no live round published yet.
 
 ## Open items
 
 - **M1 (in progress): Mozzart price feasibility** — read-only study of how v1 fetches Mozzart odds,
   budget, coverage, storage and a design for showing "Mozzart x.xx (time)" next to fair odds.
-- Record page: replace "break-even" columns with per-pick return at fair odds + bootstrap CI.
 - Round check for Sat 21 Nov 2026 once the publish window opens.

@@ -3455,107 +3455,107 @@
   ],
   "level_summary": [
    {
-    "break_even": 0.3281,
-    "ci": [
-     0.3321,
-     0.3435
-    ],
-    "edge": 0.0097,
     "hit_rate": 0.3378,
     "level": "2.00+",
     "mean_fair_odds": 3.047,
+    "mean_return": -0.0017,
+    "mean_shown": 0.3388,
     "picks": 26382,
+    "return_ci": [
+     -0.0191,
+     0.0157
+    ],
     "strategy": "lean"
    },
    {
-    "break_even": 0.3073,
-    "ci": [
-     0.3041,
-     0.3154
-    ],
-    "edge": 0.0024,
     "hit_rate": 0.3097,
     "level": "2.50+",
     "mean_fair_odds": 3.254,
+    "mean_return": -0.0077,
+    "mean_shown": 0.3121,
     "picks": 25467,
+    "return_ci": [
+     -0.0258,
+     0.0108
+    ],
     "strategy": "lean"
    },
    {
-    "break_even": 0.2837,
-    "ci": [
-     0.2753,
-     0.287
-    ],
-    "edge": -0.0027,
     "hit_rate": 0.2811,
     "level": "3.00+",
     "mean_fair_odds": 3.524,
+    "mean_return": -0.0143,
+    "mean_shown": 0.2853,
     "picks": 22705,
+    "return_ci": [
+     -0.0332,
+     0.0051
+    ],
     "strategy": "lean"
    },
    {
-    "break_even": 0.3686,
-    "ci": [
-     0.3951,
-     0.4067
-    ],
-    "edge": 0.0324,
     "hit_rate": 0.4009,
     "level": "any",
     "mean_fair_odds": 2.713,
+    "mean_return": -0.0043,
+    "mean_shown": 0.4027,
     "picks": 27419,
+    "return_ci": [
+     -0.0207,
+     0.0115
+    ],
     "strategy": "lean"
    },
    {
-    "break_even": 0.4931,
-    "ci": [
-     0.4955,
-     0.51
-    ],
-    "edge": 0.0096,
     "hit_rate": 0.5027,
     "level": "2.00+",
     "mean_fair_odds": 2.028,
+    "mean_return": 0.0192,
+    "mean_shown": 0.4933,
     "picks": 18318,
+    "return_ci": [
+     0.005,
+     0.0351
+    ],
     "strategy": "probability"
    },
    {
-    "break_even": 0.3824,
-    "ci": [
-     0.3837,
-     0.3978
-    ],
-    "edge": 0.0083,
     "hit_rate": 0.3907,
     "level": "2.50+",
     "mean_fair_odds": 2.615,
+    "mean_return": 0.0207,
+    "mean_shown": 0.3829,
     "picks": 18383,
+    "return_ci": [
+     0.0008,
+     0.0392
+    ],
     "strategy": "probability"
    },
    {
-    "break_even": 0.3194,
-    "ci": [
-     0.3169,
-     0.3306
-    ],
-    "edge": 0.0043,
     "hit_rate": 0.3237,
     "level": "3.00+",
     "mean_fair_odds": 3.131,
+    "mean_return": 0.0132,
+    "mean_shown": 0.3198,
     "picks": 18053,
+    "return_ci": [
+     -0.0083,
+     0.0349
+    ],
     "strategy": "probability"
    },
    {
-    "break_even": 0.6555,
-    "ci": [
-     0.6534,
-     0.6664
-    ],
-    "edge": 0.0044,
     "hit_rate": 0.6599,
     "level": "any",
     "mean_fair_odds": 1.525,
+    "mean_return": 0.0065,
+    "mean_shown": 0.6557,
     "picks": 20350,
+    "return_ci": [
+     -0.0034,
+     0.0158
+    ],
     "strategy": "probability"
    }
   ],

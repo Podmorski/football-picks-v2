@@ -292,9 +292,9 @@ export type LevelSummaryRow = {
   picks: number;
   mean_fair_odds: number;
   hit_rate: number;
-  break_even: number | null;
-  edge: number | null;
-  ci: [number, number];
+  mean_shown: number;
+  mean_return: number | null;
+  return_ci: [number | null, number | null];
 };
 
 export type RankBacktestRow = {

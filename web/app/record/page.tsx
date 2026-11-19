@@ -6,6 +6,10 @@ function pct(value: number | null) {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
 }
 
+function signedPct(value: number | null) {
+  return value === null ? '–' : `${value > 0 ? '+' : ''}${(value * 100).toFixed(1)}%`;
+}
+
 export default function RecordPage() {
   const record = readRecord();
   const model = readModel();
@@ -107,7 +111,8 @@ export default function RecordPage() {
         <p className="text-sm text-muted-foreground">
           Every Tuesday and Saturday round from {model?.ranking_backtest?.seasons[0] ?? '2019-20'} to{' '}
           {model?.ranking_backtest?.seasons.at(-1) ?? '2025-26'}, replayed with each ranking and only the data
-          available before each round date. Break-even % is 1 divided by the average fair odds.
+          available before each round date. Return is the mean result per unit staked at each pick&apos;s own fair
+          odds: fair − 1 when it lands, −1 when it loses. The 95% interval is bootstrapped over round dates.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -118,8 +123,8 @@ export default function RecordPage() {
                 <th className="px-3 py-2 text-right font-semibold">n</th>
                 <th className="px-3 py-2 text-right font-semibold">Avg fair</th>
                 <th className="px-3 py-2 text-right font-semibold">Landed</th>
-                <th className="px-3 py-2 text-right font-semibold">Break-even</th>
-                <th className="px-3 py-2 text-right font-semibold">Landed − BE</th>
+                <th className="px-3 py-2 text-right font-semibold">Mean shown</th>
+                <th className="px-3 py-2 text-right font-semibold">Return</th>
                 <th className="px-3 py-2 text-right font-semibold">95% CI</th>
               </tr>
             </thead>
@@ -133,12 +138,10 @@ export default function RecordPage() {
                     <td className="tabular px-3 py-1.5 text-right">{row.picks.toLocaleString('en-GB')}</td>
                     <td className="tabular px-3 py-1.5 text-right">{row.mean_fair_odds.toFixed(2)}</td>
                     <td className="tabular px-3 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{pct(row.break_even)}</td>
-                    <td className="tabular px-3 py-1.5 text-right">
-                      {row.edge === null ? '–' : `${row.edge > 0 ? '+' : ''}${(row.edge * 100).toFixed(1)}`}
-                    </td>
+                    <td className="tabular px-3 py-1.5 text-right">{pct(row.mean_shown)}</td>
+                    <td className="tabular px-3 py-1.5 text-right font-medium">{signedPct(row.mean_return)}</td>
                     <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">
-                      {pct(row.ci[0])}–{pct(row.ci[1])}
+                      {row.return_ci[0] === null ? '–' : `${signedPct(row.return_ci[0])} to ${signedPct(row.return_ci[1])}`}
                     </td>
                   </tr>
                 ))}

@@ -33,6 +33,8 @@ LEAN_MIN_LIFT = 0.20
 LEAN_MIN_LEAGUE_N = 200
 SHRINK_K = 20.0
 CALIBRATION_CLIP = (0.70, 1.15)
+RETURN_BOOTSTRAP_RESAMPLES = 2000
+RETURN_BOOTSTRAP_SEED = 20261025
 
 
 def season_start(match) -> int:
@@ -42,6 +44,36 @@ def season_start(match) -> int:
 def logit(probability: float) -> float:
     p = min(max(probability, 1e-6), 1.0 - 1e-6)
     return math.log(p / (1.0 - p))
+
+
+def pick_return(fair_odds: float, landed: bool) -> float:
+    """Per-unit-stake result at the pick's fair odds: profit if landed, else the stake lost."""
+    return (fair_odds - 1.0) if landed else -1.0
+
+
+def mean_return_ci(picks: list[dict], resamples: int = RETURN_BOOTSTRAP_RESAMPLES, seed: int = RETURN_BOOTSTRAP_SEED):
+    """Mean per-pick return and a 95% CI bootstrapped over round dates.
+
+    ``picks`` carry ``date`` and ``return``. Resampling whole dates (not picks) keeps
+    the within-round correlation of picks, so the interval is not too narrow.
+    """
+    if not picks:
+        return None, [None, None]
+    returns = np.array([pick["return"] for pick in picks], dtype=float)
+    mean = float(returns.mean())
+    by_date: dict[object, list[int]] = defaultdict(list)
+    for index, pick in enumerate(picks):
+        by_date[pick["date"]].append(index)
+    groups = [np.array(indices, dtype=np.int64) for indices in by_date.values()]
+    rng = np.random.default_rng(seed)
+    count = len(groups)
+    draws = np.empty(resamples, dtype=float)
+    for draw in range(resamples):
+        chosen = rng.integers(0, count, count)
+        indices = np.concatenate([groups[position] for position in chosen])
+        draws[draw] = returns[indices].mean()
+    low, high = np.percentile(draws, [2.5, 97.5])
+    return mean, [float(low), float(high)]
 
 
 def _bucket() -> dict:
@@ -73,8 +105,12 @@ def _table(buckets: dict, calibrated: bool) -> list[dict]:
     return out
 
 
-def _level_table(buckets: dict) -> list[dict]:
-    """Per strategy x level summary for the Record page."""
+def _level_table(buckets: dict, return_picks: dict) -> list[dict]:
+    """Per strategy x level summary for the Record page.
+
+    Return is measured per pick at that pick's own fair odds (fair - 1 if landed, else -1),
+    never at break-even = 1 / average fair odds, which understates mixed-odds break-even.
+    """
     merged: dict[tuple[str, str], dict] = defaultdict(_bucket)
     for (strategy, _group, level), data in buckets.items():
         cell = merged[(strategy, level)]
@@ -85,8 +121,8 @@ def _level_table(buckets: dict) -> list[dict]:
         if data["n"] < 30:
             continue
         hits = data["hits"]
-        low, high = wilson_interval(hits, data["n"])
         average_fair = data["fair"] / data["n"]
+        mean_return, return_ci = mean_return_ci(return_picks.get((strategy, level), []))
         out.append(
             {
                 "strategy": strategy,
@@ -94,9 +130,9 @@ def _level_table(buckets: dict) -> list[dict]:
                 "picks": data["n"],
                 "mean_fair_odds": round(average_fair, 3),
                 "hit_rate": round(hits / data["n"], 4),
-                "break_even": round(1.0 / average_fair, 4) if average_fair else None,
-                "edge": round(hits / data["n"] - 1.0 / average_fair, 4) if average_fair else None,
-                "ci": [round(low, 4), round(high, 4)],
+                "mean_shown": round(data["p"] / data["n"], 4),
+                "mean_return": None if mean_return is None else round(mean_return, 4),
+                "return_ci": [None if value is None else round(value, 4) for value in return_ci],
             }
         )
     return out
@@ -106,6 +142,7 @@ def run(matches_by_division: dict[str, list], half_life: float, k: float = SHRIN
     del k  # the tuned k is the shrinkage constant; accepted for call-site symmetry
     raw: dict[tuple[str, str, str], dict] = defaultdict(_bucket)
     calibrated: dict[tuple[str, str, str], dict] = defaultdict(_bucket)
+    return_picks: dict[tuple[str, str], list[dict]] = defaultdict(list)
     season_raw: dict[int, dict[tuple[str, str, str], dict]] = defaultdict(lambda: defaultdict(_bucket))
     mask = market_mask()
 
@@ -234,6 +271,9 @@ def run(matches_by_division: dict[str, list], half_life: float, k: float = SHRIN
                             calibrated[key]["n"] += 1
                             calibrated[key]["hits"] += 1 if hit else 0
                             calibrated[key]["fair"] += shown_fair
+                            return_picks[(strategy, level)].append(
+                                {"date": round_date, "return": pick_return(shown_fair, bool(hit))}
+                            )
 
                             taken += 1
                             if taken >= TOP_N:
@@ -256,6 +296,6 @@ def run(matches_by_division: dict[str, list], half_life: float, k: float = SHRIN
         "strategies": list(STRATEGIES),
         "groups": _table(calibrated, True),
         "before": _table(raw, False),
-        "level_summary": _level_table(calibrated),
+        "level_summary": _level_table(calibrated, return_picks),
         "calibration": calibration,
     }
