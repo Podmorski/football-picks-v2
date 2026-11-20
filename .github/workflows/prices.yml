@@ -6,6 +6,7 @@ name: Prices
 on:
   schedule:
     - cron: '0 8 * * 6'    # Saturday round
+    - cron: '0 8 * * 0'    # Sunday round
     - cron: '0 16 * * 2'   # Tuesday round
   workflow_dispatch:
     inputs:

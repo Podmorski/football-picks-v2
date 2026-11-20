@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import math
 from collections import defaultdict
+from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
@@ -400,7 +401,10 @@ def rebuild_index(picks_dir: Path, web_dir: Path) -> dict:
                 "settled": stats["settled"] == len(rows),
             }
         )
-    index = {"rounds": rounds}
+    index = {
+        "rounds": rounds,
+        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+    }
     (web_dir / "index.json").write_text(
         json.dumps(index, ensure_ascii=False, sort_keys=True, indent=1) + "\n", encoding="utf-8"
     )

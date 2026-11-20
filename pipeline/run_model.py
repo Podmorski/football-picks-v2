@@ -12,7 +12,7 @@ from pathlib import Path
 
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
 from .extras import parse_extra_csv
-from .fixtures import Fixture, current_or_next_round_date, fixtures_for_date, last_saturday, parse_fixtures
+from .fixtures import Fixture, fixtures_for_date, last_saturday, parse_fixtures, round_dates_for
 from . import ranking
 from .model import backtest, live, ranking_backtest
 from .parse import parse_season_csv
@@ -220,39 +220,41 @@ def main(argv=None) -> int:
     divisions_set = {league.code for league in divisions}
     results = read_results(all_matches)
 
-    round_date = current_or_next_round_date(today)
-    round_fixtures = fixtures_for_date(fixtures, round_date, divisions_set)
-    round_path = PICKS_DIR / f"{round_date.isoformat()}.json"
+    round_dates = round_dates_for(today)
+    round_keys = {date.isoformat() for date in round_dates}
+    primary_round = round_dates[0]
 
-    predictors = build_predictors(by_division, round_date, half_life, k, decisions)
+    for round_date in round_dates:
+        round_fixtures = fixtures_for_date(fixtures, round_date, divisions_set)
+        round_path = PICKS_DIR / f"{round_date.isoformat()}.json"
+        if round_path.exists():
+            existing = ranking.load(round_path)
+        else:
+            existing = None
 
-    if round_path.exists():
-        existing = ranking.load(round_path)
-    else:
-        existing = None
-
-    action = ranking.round_action(existing, round_fixtures)
-    if settle_only and action == "publish":
-        action = "settle"
-        existing = None
-    if action == "settle" and existing is not None:
-        ranking.settle_document(existing, results, today)
-        if not args.no_publish:
-            ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
-        print(f"round {round_date}: already published, settled only")
-    elif action == "settle" and settle_only:
-        print(f"round {round_date}: Monday settle-only run, nothing published")
-    elif action == "publish":
-        document = ranking.build_ranking(predictors, round_fixtures, round_date, {**market_calibration, "__bands__": market_bands})
-        document["kind"] = "round"
-        document["market_bands"] = market_bands
-        ranking.settle_document(document, results, today)
-        if not args.no_publish:
-            ranking.publish(document, PICKS_DIR, ROUNDS_DIR)
-        replaced = " (replaced an empty round file)" if existing is not None else ""
-        print(f"round {round_date}: published {len(document['rows'])} rows{replaced}")
-    else:
-        print(f"round {round_date}: no fixtures published by the source, nothing to publish")
+        action = ranking.round_action(existing, round_fixtures)
+        if settle_only and action == "publish":
+            action = "settle"
+            existing = None
+        if action == "settle" and existing is not None:
+            ranking.settle_document(existing, results, today)
+            if not args.no_publish:
+                ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
+            print(f"round {round_date}: already published, settled only")
+        elif action == "settle" and settle_only:
+            print(f"round {round_date}: Monday settle-only run, nothing published")
+        elif action == "publish":
+            predictors = build_predictors(by_division, round_date, half_life, k, decisions)
+            document = ranking.build_ranking(predictors, round_fixtures, round_date, {**market_calibration, "__bands__": market_bands})
+            document["kind"] = "round"
+            document["market_bands"] = market_bands
+            ranking.settle_document(document, results, today)
+            if not args.no_publish:
+                ranking.publish(document, PICKS_DIR, ROUNDS_DIR)
+            replaced = " (replaced an empty round file)" if existing is not None else ""
+            print(f"round {round_date}: published {len(document['rows'])} rows{replaced}")
+        else:
+            print(f"round {round_date}: no fixtures published by the source, nothing to publish")
 
     example_date = last_saturday(today)
     example_fixtures = fixtures_for_date(fixtures, example_date, divisions_set) or historical_fixtures(
@@ -269,7 +271,7 @@ def main(argv=None) -> int:
 
     for path in sorted(PICKS_DIR.glob("*.json")):
         stored = ranking.load(path)
-        if stored["date"] in (round_date.isoformat(), example_date.isoformat()):
+        if stored["date"] in (round_keys | {example_date.isoformat()}):
             continue
         if ranking.settle_document(stored, results, today) and not args.no_publish:
             ranking.publish(stored, PICKS_DIR, ROUNDS_DIR)
@@ -316,14 +318,15 @@ def main(argv=None) -> int:
     for fixture in upcoming:
         by_div[fixture.div].append(fixture)
 
+    predictors = build_predictors(by_division, primary_round, half_life, k, decisions)
     for code, items in by_div.items():
         teams_path = TEAMS_DIR / f"{code}.json"
         if not teams_path.exists():
             continue
         teams_document = json.loads(teams_path.read_text(encoding="utf-8"))
-        built = ranking.build_ranking(predictors, items, round_date, market_bands)
+        built = ranking.build_ranking(predictors, items, primary_round, {**market_calibration, "__bands__": market_bands})
         best: dict[tuple[str, str], dict] = {}
-        for row in ranking.rank_rows(built["rows"], band=ranking.DEFAULT_BAND):
+        for row in ranking.rank_rows(built["rows"]):
             best.setdefault((row["h"], row["a"]), row)
         teams_document["upcoming"] = [
             {

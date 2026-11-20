@@ -24,10 +24,10 @@ export function readLeague(code: string): LeagueFile | null {
   return readJson<LeagueFile>(`${code}.json`);
 }
 
-export function readRoundIndex(): { rounds: RoundIndexRow[] } {
+export function readRoundIndex(): { rounds: RoundIndexRow[]; generated_at?: string } {
   const file = path.join(DATA_DIR, 'rounds', 'index.json');
   if (!fs.existsSync(file)) return { rounds: [] };
-  return readJson<{ rounds: RoundIndexRow[] }>(path.join('rounds', 'index.json'));
+  return readJson<{ rounds: RoundIndexRow[]; generated_at?: string }>(path.join('rounds', 'index.json'));
 }
 
 export function readRound(date: string): RoundDocument | null {

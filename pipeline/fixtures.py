@@ -1,4 +1,4 @@
-"""fixtures.csv parsing and round selection (Tuesday / Saturday only)."""
+"""fixtures.csv parsing and round selection (Tuesday / Saturday / Sunday)."""
 from __future__ import annotations
 
 import datetime as dt
@@ -8,8 +8,11 @@ from pathlib import Path
 from .parse import ODDS_COLUMNS, normalise, parse_date, parse_float, read_text
 
 TUESDAY = 1
+FRIDAY = 4
 SATURDAY = 5
-ROUND_WEEKDAYS = (TUESDAY, SATURDAY)
+SUNDAY = 6
+MONDAY = 0
+ROUND_WEEKDAYS = (TUESDAY, SATURDAY, SUNDAY)
 
 
 @dataclass(slots=True)
@@ -71,12 +74,12 @@ def parse_fixtures(path: Path | str) -> list[Fixture]:
 
 
 def next_round_date(today: dt.date) -> dt.date:
-    """Earliest Tuesday or Saturday strictly after today (UK date)."""
+    """Earliest Tuesday, Saturday or Sunday strictly after today (UK date)."""
     for offset in range(1, 8):
         candidate = today + dt.timedelta(days=offset)
         if candidate.weekday() in ROUND_WEEKDAYS:
             return candidate
-    raise ValueError("no Tuesday or Saturday found within a week")
+    raise ValueError("no round day found within a week")
 
 
 def current_or_next_round_date(today: dt.date) -> dt.date:
@@ -84,6 +87,28 @@ def current_or_next_round_date(today: dt.date) -> dt.date:
     if today.weekday() in ROUND_WEEKDAYS:
         return today
     return next_round_date(today)
+
+
+def round_dates_for(today: dt.date) -> list[dt.date]:
+    """The rounds a run should handle, in priority order.
+
+    Friday publishes BOTH weekend rounds; Saturday retries both; Sunday only
+    touches Sunday; Tuesday only Tuesday; Monday settles the weekend. Friday
+    itself is never a round day.
+    """
+    weekday = today.weekday()
+    if weekday == FRIDAY:
+        saturday = today + dt.timedelta(days=1)
+        return [saturday, saturday + dt.timedelta(days=1)]
+    if weekday == SATURDAY:
+        return [today, today + dt.timedelta(days=1)]
+    if weekday == SUNDAY:
+        return [today]
+    if weekday == TUESDAY:
+        return [today]
+    if weekday == MONDAY:
+        return [today - dt.timedelta(days=2), today - dt.timedelta(days=1)]
+    return [current_or_next_round_date(today)]
 
 
 def last_saturday(today: dt.date) -> dt.date:

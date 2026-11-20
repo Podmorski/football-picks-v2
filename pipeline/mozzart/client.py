@@ -16,7 +16,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 BASE = "https://api.pulsescore.net/api/mozzart"
 PAGE_SIZE = 30
@@ -24,6 +24,11 @@ THROTTLE_SECONDS = 1.2
 TIMEOUT = 30
 MONTHLY_CAP = 90
 PROVIDER_RESERVE = 60  # refuse when the provider says fewer than this remain
+
+SATURDAY = 5
+SUNDAY = 6
+TUESDAY = 1
+PRIORITY_ESTIMATE = {"saturday": 16, "sunday": 8, "tuesday": 8}
 
 _REMAINING_HEADERS = ("x-ratelimit-remaining", "x-quota-remaining", "x-requests-remaining")
 _REMAINING_KEYS = ("remaining", "quotaRemaining", "remainingRequests", "remaining_requests")
@@ -76,6 +81,43 @@ class Budget:
 
 def month_key(when: datetime | None = None) -> str:
     return (when or datetime.now(timezone.utc)).strftime("%Y-%m")
+
+
+def round_kind(day) -> str:
+    """saturday / sunday / tuesday; anything else is treated as saturday (top priority)."""
+    weekday = day.weekday()
+    if weekday == SUNDAY:
+        return "sunday"
+    if weekday == TUESDAY:
+        return "tuesday"
+    return "saturday"
+
+
+def may_fetch(kind: str, used: int, cap: int, day, estimate: int) -> tuple[bool, str]:
+    """Priority gate: Saturday always, then Sunday, then Tuesday.
+
+    Sunday and Tuesday fetches must leave enough inside the cap for the
+    higher-priority rounds still to come this month (Saturday costs up to 16,
+    Sunday up to 8), so a tight month drops Tuesday first, then Sunday.
+    """
+    if kind == "saturday":
+        return used < cap, "" if used < cap else f"monthly cap {cap} reached"
+    reserve = 0
+    cursor = day + timedelta(days=1)
+    current_month = day.month
+    while cursor.month == current_month:
+        if cursor.weekday() == SATURDAY:
+            reserve += PRIORITY_ESTIMATE["saturday"]
+        if kind == "tuesday" and cursor.weekday() == SUNDAY:
+            reserve += PRIORITY_ESTIMATE["sunday"]
+        cursor += timedelta(days=1)
+    remaining = cap - used
+    if estimate + reserve > remaining:
+        return False, (
+            f"{kind} needs {estimate} with {remaining} left, "
+            f"reserving {reserve} for higher-priority rounds"
+        )
+    return used < cap, ""
 
 
 def parse_kickoff(event: dict) -> datetime | None:

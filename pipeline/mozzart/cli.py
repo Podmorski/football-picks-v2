@@ -103,7 +103,25 @@ def main(argv=None) -> int:
             print("PULSESCORE_API_KEY is not set")
             return 2
         budget = client.Budget.load(_load_json(prices_dir / "usage.json", None), client.month_key())
-        print(f"budget before: {budget.used}/{budget.monthly_cap} requests this month")
+        kind = client.round_kind(round_date)
+        allowed, reason = client.may_fetch(
+            kind, budget.used, budget.monthly_cap, round_date, client.PRIORITY_ESTIMATE[kind]
+        )
+        if not allowed:
+            budget.entries.append(
+                {
+                    "timestamp": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+                    "endpoint": "skip",
+                    "page": 0,
+                    "status": 0,
+                    "remaining": None,
+                    "note": f"{kind}: {reason}",
+                }
+            )
+            _write_json(prices_dir / "usage.json", budget.dump())
+            print(f"budget priority: skipping {kind} fetch: {reason}")
+            return 0
+        print(f"budget before: {budget.used}/{budget.monthly_cap} requests this month ({kind})")
         until = _until(round_date, fixtures)
         events: list[dict] = []
         try:

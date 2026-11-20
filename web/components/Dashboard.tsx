@@ -92,10 +92,12 @@ export default function Dashboard({
   date,
   kind,
   leagueOptions,
+  roundOptions = [],
 }: {
   date: string;
   kind: string;
   leagueOptions: [string, string, string][];
+  roundOptions?: [string, string][];
 }) {
   const [data, setData] = useState<RankFile | null>(null);
   const [markets, setMarkets] = useState<Record<string, MarketMeta>>({});
@@ -106,7 +108,7 @@ export default function Dashboard({
   const [rank, setRank] = useParam('rank', 'lean');
   const [show, setShow] = useParam('show', 'all');
   const [mozzart, setMozzart] = useParam('mozzart', '0');
-  const [roundParam] = useParam('round', date);
+  const [roundParam, setRound] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [sheet, setSheet] = useState<'league' | 'bet' | null>(null);
   const [prices, setPrices] = useState<MozzartPricesFile | null>(null);
@@ -258,6 +260,26 @@ export default function Dashboard({
 
   return (
     <div className="space-y-4">
+      {roundOptions.length > 1 ? (
+        <div className="flex flex-wrap gap-1.5">
+          {roundOptions.map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setRound(value)}
+              className={cn(
+                'rounded-full border px-3 py-1 text-xs font-medium',
+                activeDate === value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'text-muted-foreground',
+              )}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      ) : null}
+
       <div className="space-y-2 rounded-xl border p-3">
         <div className="flex flex-wrap gap-1.5">
           {[{ key: 'lean', label: 'Strongest lean' }, { key: 'probability', label: 'Most likely' }].map((option) => (

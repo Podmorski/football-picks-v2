@@ -1,4 +1,4 @@
-"""Round selection: only Tuesday and Saturday, always in the future / recent past."""
+"""Round selection: Tuesday, Saturday and Sunday, always in the future / recent past."""
 from __future__ import annotations
 
 import datetime as dt
@@ -12,24 +12,24 @@ def make(day: int, month: int = 11, year: int = 2026, div: str = "E2") -> Fixtur
     return Fixture(div=div, date=dt.date(year, month, day), time="15:00", home="A", away="B", odds={})
 
 
-def test_next_round_is_the_next_tuesday_or_saturday() -> None:
+def test_next_round_is_the_next_tuesday_saturday_or_sunday() -> None:
     wednesday = dt.date(2026, 11, 18)
     assert wednesday.weekday() == 2
     assert next_round_date(wednesday) == dt.date(2026, 11, 21)
 
     saturday = dt.date(2026, 11, 21)
-    assert next_round_date(saturday) == dt.date(2026, 11, 24)
+    assert next_round_date(saturday) == dt.date(2026, 11, 22)
 
     monday = dt.date(2026, 11, 23)
     assert next_round_date(monday) == dt.date(2026, 11, 24)
 
 
-def test_next_round_is_always_tuesday_or_saturday_and_in_the_future() -> None:
+def test_next_round_is_always_a_round_day_and_in_the_future() -> None:
     start = dt.date(2026, 11, 1)
     for offset in range(0, 60):
         today = start + dt.timedelta(days=offset)
         candidate = next_round_date(today)
-        assert candidate.weekday() in (1, 5)
+        assert candidate.weekday() in (1, 5, 6)
         assert candidate > today
         assert (candidate - today).days <= 7
 
@@ -65,5 +65,5 @@ def test_a_monday_fixture_can_never_be_in_a_round() -> None:
 
 
 @pytest.mark.parametrize("day", [14, 17, 18, 19, 20, 21])
-def test_round_dates_are_never_weekdays_other_than_tue_sat(day: int) -> None:
-    assert next_round_date(dt.date(2026, 11, day)).weekday() in (1, 5)
+def test_round_dates_are_only_tuesday_saturday_or_sunday(day: int) -> None:
+    assert next_round_date(dt.date(2026, 11, day)).weekday() in (1, 5, 6)

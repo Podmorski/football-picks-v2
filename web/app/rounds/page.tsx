@@ -36,7 +36,7 @@ export default function RoundsPage() {
   return (
     <div className="space-y-5">
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Past rounds</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Rounds</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
           Every published round, newest first, with the tally for the default filters (Any bet, min odds Any,
           Strongest lean). Open a round to see the full dashboard for it.
