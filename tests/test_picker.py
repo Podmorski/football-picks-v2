@@ -74,6 +74,16 @@ def test_below_floor_count_for_single_market() -> None:
     assert picker.below_floor_count(rows, "market:BTTS:GG", "all", 1.50) == 1
 
 
+def test_picker_calibration_is_walk_forward() -> None:
+    import inspect
+
+    from pipeline.model import picker_backtest
+
+    data = json.loads((Path(__file__).resolve().parents[1] / "web" / "public" / "data" / "picker.json").read_text())
+    assert data["season_factors"]["2019-20"] == {}  # no earlier season to fit on
+    assert "if earlier >= target" in inspect.getsource(picker_backtest)
+
+
 def test_no_empty_list_when_fixtures_exist() -> None:
     rows = [row("A", "B", "BTTS:GG", 0.5)]
     assert picker.pick_rows(rows, "group:BTTS", "all", GROUPS)
