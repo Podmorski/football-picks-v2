@@ -1,14 +1,12 @@
 import Link from 'next/link';
 
+import ComboRecord from '@/components/ComboRecord';
 import MozzartRecord from '@/components/MozzartRecord';
+import PickerRecord from '@/components/PickerRecord';
 import { readModel, readRecord } from '@/lib/data';
 
 function pct(value: number | null) {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
-}
-
-function signedPct(value: number | null) {
-  return value === null ? '–' : `${value > 0 ? '+' : ''}${(value * 100).toFixed(1)}%`;
 }
 
 export default function RecordPage() {
@@ -107,52 +105,9 @@ export default function RecordPage() {
         </section>
       ) : null}
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">How past picks landed</h2>
-        <p className="text-sm text-muted-foreground">
-          Every Tuesday and Saturday round from {model?.ranking_backtest?.seasons[0] ?? '2019-20'} to{' '}
-          {model?.ranking_backtest?.seasons.at(-1) ?? '2025-26'}, replayed with each ranking and only the data
-          available before each round date. Return is the mean result per unit staked at each pick&apos;s own fair
-          odds: fair − 1 when it lands, −1 when it loses. The 95% interval is bootstrapped over round dates.
-        </p>
-        <div className="overflow-x-auto rounded-xl border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
-                <th className="px-3 py-2 text-left font-semibold">Ranking</th>
-                <th className="px-3 py-2 text-right font-semibold">Min odds</th>
-                <th className="px-3 py-2 text-right font-semibold">n</th>
-                <th className="px-3 py-2 text-right font-semibold">Avg fair</th>
-                <th className="px-3 py-2 text-right font-semibold">Landed</th>
-                <th className="px-3 py-2 text-right font-semibold">Mean shown</th>
-                <th className="px-3 py-2 text-right font-semibold">Return</th>
-                <th className="px-3 py-2 text-right font-semibold">95% CI</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(model?.ranking_backtest?.level_summary ?? [])
-                .filter((row) => row.picks >= 30)
-                .map((row) => (
-                  <tr key={`${row.strategy}-${row.level}`} className="border-t">
-                    <td className="px-3 py-1.5">{row.strategy === 'lean' ? 'Strongest lean' : 'Most likely'}</td>
-                    <td className="tabular px-3 py-1.5 text-right text-muted-foreground">{row.level}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{row.picks.toLocaleString('en-GB')}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{row.mean_fair_odds.toFixed(2)}</td>
-                    <td className="tabular px-3 py-1.5 text-right font-medium">{pct(row.hit_rate)}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{pct(row.mean_shown)}</td>
-                    <td className="tabular px-3 py-1.5 text-right font-medium">{signedPct(row.mean_return)}</td>
-                    <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">
-                      {row.return_ci[0] === null ? '–' : `${signedPct(row.return_ci[0])} to ${signedPct(row.return_ci[1])}`}
-                    </td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="text-xs text-muted-foreground">
-          At fair odds the long-run return is about zero; profit needs a bookmaker price above the fair odds.
-        </p>
-      </section>
+      <PickerRecord />
+
+      <ComboRecord />
 
       <MozzartRecord />
 

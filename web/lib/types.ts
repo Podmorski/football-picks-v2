@@ -255,6 +255,7 @@ export type RankRow = {
   a: string;
   m: string;
   p: number;
+  pc?: number;
   pl: number;
   pp: number;
   lr: number;

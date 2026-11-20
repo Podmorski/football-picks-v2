@@ -1,4 +1,4 @@
-import Dashboard from '@/components/Dashboard';
+import Picker from '@/components/Picker';
 import { Badge } from '@/components/ui/badge';
 import { readIndex, readRoundIndex } from '@/lib/data';
 
@@ -94,7 +94,7 @@ export default function HomePage() {
       ) : null}
 
       {chosen ? (
-        <Dashboard
+        <Picker
           date={chosen.date}
           kind={chosen.kind}
           leagueOptions={leagueOptions}

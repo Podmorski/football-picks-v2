@@ -1,0 +1,125 @@
+{
+ "independence": [
+  {
+   "landed": 0.6429,
+   "predicted": 0.6374,
+   "ratio": 1.009,
+   "size": 2
+  },
+  {
+   "landed": 0.5145,
+   "predicted": 0.5053,
+   "ratio": 1.018,
+   "size": 3
+  },
+  {
+   "landed": 0.4095,
+   "predicted": 0.3999,
+   "ratio": 1.024,
+   "size": 4
+  },
+  {
+   "landed": 0.3214,
+   "predicted": 0.3184,
+   "ratio": 1.009,
+   "size": 5
+  }
+ ],
+ "note": "Returns at fair odds; Mozzart returns only for settled live rounds with frozen prices.",
+ "seasons": [
+  "2019-20",
+  "2020-21",
+  "2021-22",
+  "2022-23",
+  "2023-24",
+  "2024-25",
+  "2025-26"
+ ],
+ "strategies": [
+  {
+   "ci": [
+    0.7914,
+    0.799
+   ],
+   "landed": 0.7952,
+   "longest_losing": 7,
+   "mozzart": {
+    "n": 0,
+    "return": null
+   },
+   "predicted": 0.7911,
+   "return": 0.0052,
+   "strategy": "Singles (top 15)",
+   "tickets": 42923,
+   "worst_drawdown": -72.777
+  },
+  {
+   "ci": [
+    0.6327,
+    0.653
+   ],
+   "landed": 0.6429,
+   "longest_losing": 8,
+   "mozzart": {
+    "n": 0,
+    "return": null
+   },
+   "predicted": 0.6374,
+   "return": 0.0086,
+   "strategy": "2-leg best",
+   "tickets": 8631,
+   "worst_drawdown": -60.856
+  },
+  {
+   "ci": [
+    0.5033,
+    0.5257
+   ],
+   "landed": 0.5145,
+   "longest_losing": 11,
+   "mozzart": {
+    "n": 0,
+    "return": null
+   },
+   "predicted": 0.5053,
+   "return": 0.0179,
+   "strategy": "3-leg best",
+   "tickets": 7619,
+   "worst_drawdown": -50.136
+  },
+  {
+   "ci": [
+    0.3968,
+    0.4222
+   ],
+   "landed": 0.4095,
+   "longest_losing": 14,
+   "mozzart": {
+    "n": 0,
+    "return": null
+   },
+   "predicted": 0.3999,
+   "return": 0.0238,
+   "strategy": "4-leg best",
+   "tickets": 5749,
+   "worst_drawdown": -94.017
+  },
+  {
+   "ci": [
+    0.306,
+    0.3373
+   ],
+   "landed": 0.3214,
+   "longest_losing": 18,
+   "mozzart": {
+    "n": 0,
+    "return": null
+   },
+   "predicted": 0.3184,
+   "return": 0.0085,
+   "strategy": "5-leg best",
+   "tickets": 3413,
+   "worst_drawdown": -94.495
+  }
+ ]
+}

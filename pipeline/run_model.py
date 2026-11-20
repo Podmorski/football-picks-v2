@@ -24,6 +24,7 @@ MODEL_DIR = Path(__file__).resolve().parent / "model"
 DECISIONS_FILE = MODEL_DIR / "decisions.json"
 MODEL_JSON = WEB_DATA_DIR / "model.json"
 RECORD_JSON = WEB_DATA_DIR / "record.json"
+PICKER_JSON = WEB_DATA_DIR / "picker.json"
 ROUNDS_DIR = WEB_DATA_DIR / "rounds"
 BY_PLAY_DIR = WEB_DATA_DIR / "by-play"
 TEAMS_DIR = WEB_DATA_DIR / "teams"
@@ -214,6 +215,9 @@ def main(argv=None) -> int:
     market_bands = market_band_map(model_payload.get("ranking_backtest", {}))
     market_calibration = dict(model_payload.get("ranking_backtest", {}).get("calibration", {}))
     market_calibration["__k__"] = k
+    picker_factors = {}
+    if PICKER_JSON.exists():
+        picker_factors = json.loads(PICKER_JSON.read_text(encoding="utf-8")).get("factors", {})
     settle_only = is_settle_only(today)
 
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
@@ -237,15 +241,15 @@ def main(argv=None) -> int:
             action = "settle"
             existing = None
         if action == "settle" and existing is not None:
-            ranking.settle_document(existing, results, today)
-            if not args.no_publish:
+            changed = ranking.settle_document(existing, results, today)
+            if changed and not args.no_publish:
                 ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
             print(f"round {round_date}: already published, settled only")
         elif action == "settle" and settle_only:
             print(f"round {round_date}: Monday settle-only run, nothing published")
         elif action == "publish":
             predictors = build_predictors(by_division, round_date, half_life, k, decisions)
-            document = ranking.build_ranking(predictors, round_fixtures, round_date, {**market_calibration, "__bands__": market_bands})
+            document = ranking.build_ranking(predictors, round_fixtures, round_date, {**market_calibration, "__bands__": market_bands}, min_fair=0.0, excluded=set(), picker_factors=picker_factors)
             document["kind"] = "round"
             document["market_bands"] = market_bands
             ranking.settle_document(document, results, today)
@@ -261,7 +265,7 @@ def main(argv=None) -> int:
         by_division, example_date
     )
     example_predictors = build_predictors(by_division, example_date, half_life, k, decisions)
-    example = ranking.build_ranking(example_predictors, example_fixtures, example_date, {**market_calibration, "__bands__": market_bands})
+    example = ranking.build_ranking(example_predictors, example_fixtures, example_date, {**market_calibration, "__bands__": market_bands}, min_fair=0.0, excluded=set(), picker_factors=picker_factors)
     example["kind"] = "example"
     example["market_bands"] = market_bands
     ranking.settle_document(example, results, today)

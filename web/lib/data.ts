@@ -43,29 +43,15 @@ export function readRankRound(date: string): (RoundDocument & { rows: RankRow[] 
   const raw = document.rows as unknown[] | undefined;
   if (raw && raw.length && Array.isArray(raw[0])) {
     const fixtures = (document.fixture_list ?? []) as { d: string; k: string | null; h: string; a: string }[];
+    const fields = (document.fields as string[] | undefined) ?? [];
     document.rows = (raw as unknown[][]).map((values) => {
       const fixture = fixtures[values[0] as number];
-      return {
-        d: fixture.d,
-        k: fixture.k,
-        h: fixture.h,
-        a: fixture.a,
-        m: values[1],
-        p: values[2],
-        pl: values[3],
-        pp: values[4],
-        lr: values[5],
-        ln: values[6],
-        hr: values[7],
-        hn: values[8],
-        ar: values[9],
-        an: values[10],
-        c: values[11],
-        s: values[12],
-        st: values[13],
-        ht: values[14],
-        ft: values[15],
-      } as RankRow;
+      const row: Record<string, unknown> = { d: fixture.d, k: fixture.k, h: fixture.h, a: fixture.a };
+      fields.forEach((name, index) => {
+        if (index < values.length) row[name] = values[index];
+      });
+      if (row.pc === undefined) row.pc = row.p;
+      return row as RankRow;
     });
   }
   return document as unknown as RoundDocument & { rows: RankRow[] };

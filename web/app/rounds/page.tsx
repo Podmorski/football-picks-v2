@@ -3,30 +3,20 @@ import Link from 'next/link';
 import { readRankRound, readRoundIndex } from '@/lib/data';
 import type { RankRow } from '@/lib/types';
 
-const FAIR_MIN = 1.5;
-const FAIR_MAX = 4.0;
-
-function fairOf(row: RankRow): number {
-  return 1 / Math.max(row.pl ?? row.p, 0.0001);
+function pcOf(row: RankRow): number {
+  return row.pc ?? row.pl ?? row.p;
 }
 
 function defaultPicks(rows: RankRow[]): RankRow[] {
-  const filtered = rows
-    .filter((row) => {
-      const fair = fairOf(row);
-      return fair >= FAIR_MIN && fair <= FAIR_MAX && row.ln >= 200 && row.s >= 0.2;
-    })
-    .sort((a, b) => b.s - a.s || (b.pl ?? b.p) - (a.pl ?? a.p));
-  const seen = new Set<string>();
-  const out: RankRow[] = [];
-  for (const row of filtered) {
+  const best = new Map<string, RankRow>();
+  for (const row of rows) {
+    if (row.m === 'RESULT:1' || row.m === 'RESULT:2') continue;
+    if (pcOf(row) > 0.8) continue;
     const key = `${row.h}|${row.a}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(row);
-    if (out.length >= 15) break;
+    const current = best.get(key);
+    if (!current || pcOf(row) > pcOf(current)) best.set(key, row);
   }
-  return out;
+  return [...best.values()].sort((a, b) => pcOf(b) - pcOf(a)).slice(0, 15);
 }
 
 export default function RoundsPage() {
@@ -54,7 +44,7 @@ export default function RoundsPage() {
             const picks = document ? defaultPicks(document.rows) : [];
             const settled = picks.filter((row) => row.st === 'landed' || row.st === 'lost');
             const landed = picks.filter((row) => row.st === 'landed').length;
-            const expected = settled.reduce((total, row) => total + (row.pl ?? row.p), 0);
+            const expected = settled.reduce((total, row) => total + pcOf(row), 0);
             return (
               <li key={`${round.date}-${round.kind}`}>
                 <Link href={`/?round=${round.date}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-3 hover:bg-muted/40">

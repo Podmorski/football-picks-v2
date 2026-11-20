@@ -47,9 +47,24 @@ LADDER_MARKETS = (
 )
 
 ROW_FIELDS = [
-    "fi", "m", "p", "pl", "pp", "lr", "ln", "hr", "hn", "ar", "an",
+    "fi", "m", "p", "pc", "pl", "pp", "lr", "ln", "hr", "hn", "ar", "an",
     "c", "s", "st", "ht", "ft",
 ]
+
+# Picker calibration bands (shown probability). Above 80% is not calibrated and
+# is skipped by the "Any bet" picker.
+PICKER_BANDS = (
+    ("20-30", 0.20, 0.30), ("30-40", 0.30, 0.40), ("40-50", 0.40, 0.50),
+    ("50-60", 0.50, 0.60), ("60-70", 0.60, 0.70), ("70-80", 0.70, 0.80),
+)
+
+
+def picker_band(probability: float) -> str | None:
+    """The 20-30 ... 70-80 band for a raw probability, or None outside it."""
+    for label, low, high in PICKER_BANDS:
+        if low <= probability < high:
+            return label
+    return None
 
 
 def band_for(fair_odds: float) -> str | None:
@@ -93,7 +108,11 @@ def build_ranking(
     fixtures: list[Fixture],
     round_date,
     calibration: dict | None = None,
+    min_fair: float = MIN_FAIR_ODDS,
+    excluded: set[str] | None = None,
+    picker_factors: dict | None = None,
 ) -> dict:
+    excluded = EXCLUDED_MARKETS if excluded is None else excluded
     grouped: dict[str, list[Fixture]] = defaultdict(list)
     for fixture in fixtures:
         if fixture.div in predictors:
@@ -130,14 +149,14 @@ def build_ranking(
             away_n = float(empirical.away_n[away_index])
 
             for position, market in enumerate(MARKETS):
-                if market.id in EXCLUDED_MARKETS:
+                if market.id in excluded:
                     continue
                 probability = float(probabilities[index][position])
                 if probability <= 0:
                     continue
                 fair = 1.0 / probability
                 ladder = market.id in LADDER_MARKETS
-                if fair < MIN_FAIR_ODDS and not ladder:
+                if fair < min_fair and not ladder:
                     continue
 
                 level = band_for(fair) or "any"
@@ -147,6 +166,9 @@ def build_ranking(
                 prob_factor = factors.get(f"probability|{market.group}|{level}", 1.0)
                 p_lean = min(0.999, max(0.001, probability * lean_factor))
                 p_prob = min(0.999, max(0.001, probability * prob_factor))
+                band = picker_band(probability)
+                picker_factor = (picker_factors or {}).get(f"{market.group}|{band}", 1.0) if band else 1.0
+                p_picker = min(0.999, max(0.001, probability * picker_factor))
 
                 # League rate shrunk toward the pooled all-league rate.
                 shrunk = (league_n * league_rate + shrink_k * float(pooled[position])) / (league_n + shrink_k) if league_n + shrink_k > 0 else league_rate
@@ -165,6 +187,7 @@ def build_ranking(
                         "a": fixture.away,
                         "m": market.id,
                         "p": round(probability, 4),
+                        "pc": round(p_picker, 4),
                         "pl": round(p_lean, 4),
                         "pp": round(p_prob, 4),
                         "lr": round(league_rate, 4),
@@ -320,7 +343,7 @@ def encode(document: dict) -> dict:
     rows = [
         [
             index[(row["d"], row["k"], row["h"], row["a"])],
-            row["m"], row["p"], row["pl"], row["pp"], row["lr"], row["ln"],
+            row["m"], row["p"], row.get("pc", row["p"]), row["pl"], row["pp"], row["lr"], row["ln"],
             row["hr"], row["hn"], row["ar"], row["an"], row["c"], row["s"],
             row.get("st"), row.get("ht"), row.get("ft"),
         ]
@@ -349,18 +372,14 @@ def decode(document: dict) -> dict:
     if not document.get("rows") or not isinstance(document["rows"][0], list):
         return document
     fixture_list = document.get("fixture_list", [])
+    fields = document.get("fields") or ROW_FIELDS
     rows = []
     for values in document["rows"]:
         fixture = fixture_list[values[0]]
-        rows.append(
-            {
-                "d": fixture["d"], "k": fixture["k"], "h": fixture["h"], "a": fixture["a"],
-                "m": values[1], "p": values[2], "pl": values[3], "pp": values[4],
-                "lr": values[5], "ln": values[6], "hr": values[7], "hn": values[8],
-                "ar": values[9], "an": values[10], "c": values[11], "s": values[12],
-                "st": values[13], "ht": values[14], "ft": values[15],
-            }
-        )
+        row = {name: values[index] for index, name in enumerate(fields) if index < len(values)}
+        row.update({"d": fixture["d"], "k": fixture["k"], "h": fixture["h"], "a": fixture["a"]})
+        row.setdefault("pc", row.get("p"))
+        rows.append(row)
     decoded = dict(document)
     decoded["rows"] = rows
     return decoded

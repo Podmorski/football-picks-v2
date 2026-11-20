@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 
 const LINKS = [
   { href: '/rounds', label: 'Rounds' },
+  { href: '/tickets', label: 'My tickets' },
   { href: '/leagues', label: 'Leagues' },
   { href: '/record', label: 'Record' },
   { href: '/how-it-works', label: 'How it works' },

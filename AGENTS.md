@@ -5,8 +5,8 @@ Read this first. It is the durable context for any worker on this repo.
 ## Product
 
 Private web app that, for each Tuesday, Saturday and Sunday round, ranks football bets by statistical
-probability. For a chosen League and Bet type it shows the 15 strongest picks. It leans toward
-higher-paying bets (combos, HT/FT, goal lines), not heavy short-priced favourites. It is a
+probability. It shows a probability-sorted picker: choose League and Bet (Any bet, a whole group, or
+one market), sorted high-to-low, with a ticket builder and suggested 2-5 leg tickets. It is a
 statistics app — probabilities, not certainties — covering every Mozzart market that can be settled
 from half-time and full-time scores. Next goal: show Mozzart's actual price next to our fair odds.
 
@@ -27,6 +27,9 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 - No shell substitutions (`$VAR`, `$(...)`, backticks, `<(...)`).
 - `npx vercel deploy --prod` is blocked; `--environment production` works. Do NOT bypass permission
   rules (no `--dangerously-skip-permissions` or similar) — if blocked, STOP and ask.
+- Vercel CLI deploys must run from the **repo root** (Root Directory is `web`); running from `web/`
+  fails with "Root Directory web does not exist". Use `VERCEL_ORG_ID`/`VERCEL_PROJECT_ID` from
+  `web/.vercel/project.json` when there is no root link.
 - Screenshots: Playwright with `--no-save` only, and only if `ldd` on chrome-headless-shell shows no
   "not found" (currently libnspr4/libnss3/libnssutil3/libasound missing → skip). Screenshots go to
   "/mnt/c/Users/Nikola/Desktop/Zed Backup/screens/", never into the repo.
@@ -65,14 +68,19 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 3. **Calibration** — `pipeline/model/empirical.py` computes league / home-at-home / away-at-away
    rates for all markets; `pipeline/model/ranking_backtest.py` fits a multiplicative factor per
    ranking × group × minimum-odds level, walk-forward, and writes `model.json`.
-4. **Ranking** — `pipeline/ranking.py`: "Strongest lean" (default) = log-odds lift
-   `logit(p) − logit(league rate shrunk to pooled rate by n/(n+20))`, lift ≥ 0.20, league n ≥ 200,
-   tie-break p; "Most likely" = by p. Dashboard shows fair odds 1.50–4.00 only.
-5. **Round files** — `picks/YYYY-MM-DD.json` (compact: fixtures once + array rows, ~800 KB for 45
-   fixtures). Published and settled by `run_model.py`; only real fixtures from `fixtures.csv`.
-6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard: League, Bet
-   (grouped), Minimum odds Any/2.00+/2.50+/3.00+ (`?minodds=`), Show filter; landed/lost/pending/void
-   + HT/FT score; expanded row = goal ladder + "Other strong bets in this match"; `/rounds`; `/record`.
+4. **Picker** — `pipeline/ranking.py` builds every one of the 178 markets per fixture with the model
+   probability, league rate and a calibrated `pc` (group × 20-80% band, walk-forward from
+   `pipeline/model/picker_backtest.py`). The dashboard sorts by probability and keeps "vs league
+   usual" as a column. There is no lean ranking and no minimum-odds window.
+5. **Round files** — `picks/YYYY-MM-DD.json` (compact: fixtures once + array rows). Published and
+   settled by `run_model.py`; future rounds carry every market. The already-published 21/22 Nov
+   rounds are never edited; their all-market companions are `picks/<date>.full.json`, verified on the
+   model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
+6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard: round switch,
+   League (search, grouped by country), Bet (Any / a group / a market, default All combos), sortable
+   columns, 15 then Show all, expanded row = goal ladder + next 5 bets. Ticket builder (localStorage
+   only), suggested 2-5 leg tickets, `/tickets`, `/rounds`, `/record` (picker calibration, combos,
+   Mozzart return).
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -92,24 +100,22 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Current state
 
-- Milestone 3e + M2 + Sunday rounds. Record page reports per-pick return at fair odds and, on the
-  priced build, "Return at Mozzart price" (aggregates only). Dashboard shows "Mozzart x.xx · HH:MM
-  UTC" and "Mozzart vs fair" with an "only where Mozzart pays more than fair" toggle (`?mozzart=1`),
-  plus a round switch (`?round=`) and a no-picks banner with "Last updated: HH:MM UTC".
-- Round days are Tuesday, Saturday, Sunday. The first live rounds are published: 21 Nov (122
-  fixtures, 19,076 rows) and 22 Nov (44 fixtures, 6,810 rows); the 14 Nov example round is retained.
-- Production is private (Vercel Authentication, `deploymentType: all`; unauthenticated requests 302).
-  A push to main rebuilds a priced production deployment because `PRICED=1` is set in Production and
-  the prebuild clones the private store; a failed private read fails the build so the last priced
-  deployment stays live.
-- Deploy keys are split: Vercel uses the read-only `vercel-read` key (Vercel env `PRICES_SSH_KEY`);
-  Actions uses the read-write `actions-write` key (secret `PRICES_DEPLOY_KEY`). The old combined key
-  was deleted.
-- 138 tests passing. `npm run build` green (46 pages).
+- Milestone 4 + 5 complete. The Strongest lean ranking, Most likely toggle, Minimum odds and the
+  1.50-4.00 display window are gone. The picker is sorted by probability with "vs league usual" as a
+  column; every market is available (Any bet, group, or single market). 21/22 Nov companions
+  (`picks/*.full.json`) carry all markets. `picker.json` (calibration) and `combo.json` (combo
+  backtest) are committed and served on the Record page. Ticket builder and suggested tickets are
+  browser-only (localStorage).
+- Round days are Tuesday, Saturday, Sunday. 21 Nov (122 fixtures, 19,076 rows) and 22 Nov (44
+  fixtures, 6,810 rows) are published; companions add 2,640 and 1,022 extra market rows.
+- Production is private (Vercel Authentication, `deploymentType: all`; unauthenticated 302), priced
+  (`PRICED=1` + read-only `vercel-read` key). Actions uses `actions-write`.
+- 148 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
-- **First priced runs** (Sat 08:00 / Sun 08:00): the new `actions-write` key has only been exercised by
-  a no-op checkout; the first real fetch is the first push test. Expect Sat 9–16 and Sun 4–8 requests.
-- **Saturday check** after Sat 21 Nov 08:30 UTC and **Sunday check** after Sun 22 Nov 08:30 UTC; report
-  fixture and market match rates and 10 real priced rows.
+- **First priced runs / weekend checks**: Sat 08:00 and Sun 08:00 prices; report match rates and 10
+  real priced rows. The `actions-write` key's first real push is still untested.
+- **Recalibration**: `picker.json` and `combo.json` are computed once and committed. Recompute with
+  `python -c` calling `pipeline.model.picker_backtest.write` / `combo_backtest.write` when the model
+  or seasons change; CI reuses the committed files.
