@@ -78,6 +78,7 @@ def run(matches_by_division: dict[str, list], half_life: float) -> dict:
 
     season_raw: dict[int, dict[tuple[str, str], dict]] = defaultdict(lambda: defaultdict(_bucket))
     season_test: dict[int, dict[tuple[str, str], dict]] = defaultdict(lambda: defaultdict(_bucket))
+    season_factors: dict[str, dict[str, float]] = {}
 
     for target in SEASONS:
         prior: dict[tuple[str, str], dict] = defaultdict(_bucket)
@@ -91,6 +92,10 @@ def run(matches_by_division: dict[str, list], half_life: float) -> dict:
             key: _clip(data["hits"] / data["p"])
             for key, data in prior.items()
             if data["n"] >= 50 and data["p"] > 0
+        }
+        season_label = f"{target}-{(target + 1) % 100:02d}"
+        season_factors[season_label] = {
+            f"{group}|{band}": round(value, 4) for (group, band), value in factors.items()
         }
 
         for _code, arrays, starts in prepared:
@@ -208,6 +213,7 @@ def run(matches_by_division: dict[str, list], half_life: float) -> dict:
         "groups": GROUPS + [ANY],
         "bands": list(BANDS),
         "factors": live_factors,
+        "season_factors": season_factors,
         "record": record,
     }
 

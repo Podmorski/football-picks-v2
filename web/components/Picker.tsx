@@ -26,6 +26,7 @@ import {
   ticketVsFair,
   type TicketLeg,
 } from '@/lib/ticket';
+import { optimiseTickets } from '@/lib/ticketOpt';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
 const GROUP_ORDER = [
@@ -48,6 +49,15 @@ const GROUP_LABEL: Record<string, string> = {
   'Result & double chance': 'All result & double chance',
   'Correct score': 'All correct score',
 };
+const FLOORS: [string, string, number][] = [
+  ['any', 'Any', 0],
+  ['1.30', '1.30+', 1.3],
+  ['1.50', '1.50+', 1.5],
+  ['2.00', '2.00+', 2.0],
+  ['3.00', '3.00+', 3.0],
+];
+const TARGETS = [2, 3, 5, 10, 20];
+const MAX_LEG_OPTIONS = [2, 3, 4, 5];
 const LADDER_LABELS: Record<string, string> = {
   'GOAL_RANGE_FT:1+': 'FT 1+ goals',
   'GOAL_RANGE_FT:2+': 'FT 2+ goals',
@@ -108,25 +118,12 @@ function decodeRows(payload: Record<string, unknown>): RankRow[] {
   });
 }
 
-function* combinations<T>(items: T[], k: number): Generator<T[]> {
-  if (k === 0) {
-    yield [];
-    return;
-  }
-  for (let i = 0; i <= items.length - k; i += 1) {
-    for (const rest of combinations(items.slice(i + 1), k - 1)) {
-      yield [items[i], ...rest];
-    }
-  }
-}
-
-function pickPool(rows: RankRow[], bet: string, league: string, markets: Record<string, MarketMeta>): RankRow[] {
-  const filtered = rows.filter((row) => league === 'all' || row.d === league);
+function pickPool(rows: RankRow[], bet: string, league: string, markets: Record<string, MarketMeta>, minFair: number): RankRow[] {
+  const filtered = rows.filter((row) => (league === 'all' || row.d === league) && fairOf(row) >= minFair);
   if (bet === 'any') {
     const best = new Map<string, RankRow>();
     for (const row of filtered) {
       if (row.m === 'RESULT:1' || row.m === 'RESULT:2') continue;
-      if (pcOf(row) > 0.8) continue;
       const key = `${row.h}|${row.a}`;
       const current = best.get(key);
       if (!current || pcOf(row) > pcOf(current)) best.set(key, row);
@@ -206,6 +203,9 @@ export default function Picker({
   const [showAll, setShowAll] = useParam('all', '0');
   const [roundParam, setRound] = useParam('round', date);
   const [mozzartOnly, setMozzartOnly] = useParam('mozzart', '0');
+  const [min, setMin] = useParam('min', '1.50');
+  const [target, setTarget] = useParam('target', '5');
+  const [maxLegs, setMaxLegs] = useParam('legs', '5');
   const [expanded, setExpanded] = useState<string | null>(null);
   const [leagueQuery, setLeagueQuery] = useState('');
   const [betQuery, setBetQuery] = useState('');
@@ -309,7 +309,11 @@ export default function Picker({
   const priceIndex = useMemo(() => buildPriceIndex(prices, activeDate), [prices, activeDate]);
   const snapshot = useMemo(() => snapshotFor(prices, activeDate), [prices, activeDate]);
 
-  const pool = useMemo(() => pickPool(data?.rows ?? [], bet, league, markets), [data, bet, league, markets]);
+  const floor = min === 'any' ? 0 : Number(min);
+  const pool = useMemo(
+    () => pickPool(data?.rows ?? [], bet, league, markets, floor),
+    [data, bet, league, markets, floor],
+  );
   const valuePool = useMemo(() => {
     if (mozzartOnly !== '1') return pool;
     return pool.filter((row) => {
@@ -324,6 +328,19 @@ export default function Picker({
   const settled = sorted.filter((row) => row.st === 'landed' || row.st === 'lost');
   const landed = settled.filter((row) => row.st === 'landed').length;
   const expected = settled.reduce((total, row) => total + pcOf(row), 0);
+  const belowFloor = useMemo(() => {
+    if (!bet.startsWith('market:')) return 0;
+    const id = bet.slice(7);
+    const byMatch = new Map<string, number>();
+    for (const row of data?.rows ?? []) {
+      if (league !== 'all' && row.d !== league) continue;
+      if (row.m !== id) continue;
+      byMatch.set(`${row.h}|${row.a}`, fairOf(row));
+    }
+    let count = 0;
+    for (const value of byMatch.values()) if (value < floor) count += 1;
+    return count;
+  }, [data, bet, league, floor]);
 
   function priceOf(row: RankRow) {
     return priceIndex[priceKey(row.d, row.h, row.a, row.m)];
@@ -365,33 +382,12 @@ export default function Picker({
     setTicketOpen(false);
   }
 
+  const targetValue = Number(target) || 5;
+  const maxLegsValue = Number(maxLegs) || 5;
   const suggestions = useMemo(() => {
-    const top = [...valuePool].sort((a, b) => pcOf(b) - pcOf(a)).slice(0, 15);
-    const out: { size: number; legs: TicketLeg[]; probability: number; fair: number; mozzart: number | null; vsFair: number | null }[] = [];
-    for (const size of [2, 3, 4, 5]) {
-      if (top.length < size) continue;
-      let best: RankRow[] | null = null;
-      let bestProbability = -1;
-      for (const combo of combinations(top, size)) {
-        const probability = combo.reduce((total, row) => total * pcOf(row), 1);
-        if (probability > bestProbability) {
-          bestProbability = probability;
-          best = combo;
-        }
-      }
-      if (!best) continue;
-      const legs = best.map(toLeg);
-      out.push({
-        size,
-        legs,
-        probability: combinedProbability(legs),
-        fair: combinedFair(legs),
-        mozzart: combinedMozzart(legs),
-        vsFair: ticketVsFair(legs, 0),
-      });
-    }
-    return out;
-  }, [valuePool, markets, priceIndex, snapshot]);
+    const legs = valuePool.map(toLeg);
+    return optimiseTickets(legs, targetValue, maxLegsValue, 3, floor);
+  }, [valuePool, targetValue, maxLegsValue, floor, markets, priceIndex, snapshot]);
 
   const ticketProbability = combinedProbability(ticket);
   const ticketFair = combinedFair(ticket);
@@ -532,6 +528,19 @@ export default function Picker({
             </button>
           ) : null}
         </div>
+        <div className="flex flex-wrap items-center gap-1">
+          <span className="text-xs text-muted-foreground">Odds floor</span>
+          {FLOORS.map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setMin(key)}
+              className={cn('rounded-full border px-2.5 py-1 text-xs', min === key ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <p className="text-sm text-muted-foreground">
@@ -542,6 +551,9 @@ export default function Picker({
       ) : (
         <p className="text-sm text-muted-foreground">Results appear after the matches (usually by Monday)</p>
       )}
+      {bet.startsWith('market:') && belowFloor > 0 ? (
+        <p className="text-xs text-muted-foreground">{belowFloor} matches below {floor > 0 ? floor.toFixed(2) : 'the floor'}</p>
+      ) : null}
 
       {leagueMissing ? (
         <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
@@ -669,40 +681,61 @@ export default function Picker({
         </button>
       ) : null}
 
-      {suggestions.length > 0 ? (
-        <section className="space-y-2">
-          <h2 className="text-lg font-semibold">Suggested tickets</h2>
-          <p className="text-sm text-muted-foreground">
-            Highest combined probability per size, one leg per match, from the current filters.{' '}
-            {priced ? (mozzartOnly === '1' ? 'Only legs where Mozzart pays at least fair.' : 'Mozzart odds shown when priced.') : ''}
+      <section className="space-y-2">
+        <h2 className="text-lg font-semibold">Target tickets</h2>
+        <p className="text-sm text-muted-foreground">
+          Highest combined probability whose combined fair odds reach the target, one leg per match, from the current filters.
+          {priced ? (mozzartOnly === '1' ? ' Only legs where Mozzart pays at least fair.' : ' Mozzart odds shown when priced.') : ''}
+        </p>
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <label className="flex items-center gap-1">Target
+            <select value={target} onChange={(event) => setTarget(event.target.value)} className="rounded-md border bg-background px-2 py-1">
+              {TARGETS.map((value) => <option key={value} value={String(value)}>{value.toFixed(2)}</option>)}
+            </select>
+          </label>
+          <label className="flex items-center gap-1">Max legs
+            <select value={maxLegs} onChange={(event) => setMaxLegs(event.target.value)} className="rounded-md border bg-background px-2 py-1">
+              {MAX_LEG_OPTIONS.map((value) => <option key={value} value={String(value)}>{value}</option>)}
+            </select>
+          </label>
+          <span className="text-xs text-muted-foreground">{suggestions.length} ticket(s) found</span>
+        </div>
+        {suggestions.length === 0 ? (
+          <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">
+            No ticket of at most {maxLegs} legs reaches {Number(target).toFixed(2)} at this floor.
           </p>
+        ) : (
           <ul className="grid gap-2 sm:grid-cols-2">
-            {suggestions.map((suggestion) => (
-              <li key={suggestion.size} className="rounded-xl border p-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">{suggestion.size}-leg ticket</span>
-                  <span className="tabular">{pct(suggestion.probability)}</span>
-                </div>
-                <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
-                  {suggestion.legs.map((leg) => (
-                    <li key={legKey(leg)} className="flex justify-between gap-2">
-                      <span className="truncate">{leg.h} v {leg.a} · {leg.label}</span>
-                      <span className="tabular">{pct(leg.pc)} · {leg.fair.toFixed(2)}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-1 tabular text-xs text-muted-foreground">
-                  Fair {suggestion.fair.toFixed(2)}
-                  {suggestion.mozzart !== null ? ` · Mozzart ${suggestion.mozzart.toFixed(2)} · vs fair ${suggestion.vsFair === null ? '–' : signedPct((suggestion.vsFair ?? 0) * 100)}` : ' · Mozzart incomplete'}
-                </div>
-                <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">
-                  Add to my ticket
-                </button>
-              </li>
-            ))}
+            {suggestions.map((suggestion, index) => {
+              const mozzart = combinedMozzart(suggestion.legs);
+              const vs = ticketVsFair(suggestion.legs, 0);
+              return (
+                <li key={`${index}-${suggestion.fair}`} className="rounded-xl border p-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">{suggestion.legs.length}-leg · #{index + 1}</span>
+                    <span className="tabular">{pct(suggestion.probability)}</span>
+                  </div>
+                  <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                    {suggestion.legs.map((leg) => (
+                      <li key={legKey(leg)} className="flex justify-between gap-2">
+                        <span className="truncate">{leg.h} v {leg.a} · {leg.label}</span>
+                        <span className="tabular">{pct(leg.pc)} · {leg.fair.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="mt-1 tabular text-xs text-muted-foreground">
+                    Fair {suggestion.fair.toFixed(2)}
+                    {mozzart !== null ? ` · Mozzart ${mozzart.toFixed(2)} · vs fair ${vs === null ? '–' : signedPct(vs * 100)}` : ' · Mozzart incomplete'}
+                  </div>
+                  <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">
+                    Add to my ticket
+                  </button>
+                </li>
+              );
+            })}
           </ul>
-        </section>
-      ) : null}
+        )}
+      </section>
 
       {ticket.length > 0 ? (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur">

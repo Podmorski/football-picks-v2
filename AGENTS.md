@@ -70,17 +70,19 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
    ranking × group × minimum-odds level, walk-forward, and writes `model.json`.
 4. **Picker** — `pipeline/ranking.py` builds every one of the 178 markets per fixture with the model
    probability, league rate and a calibrated `pc` (group × 20-80% band, walk-forward from
-   `pipeline/model/picker_backtest.py`). The dashboard sorts by probability and keeps "vs league
-   usual" as a column. There is no lean ranking and no minimum-odds window.
+   `pipeline/model/picker_backtest.py`; `picker.json` also carries the per-season factors). The
+   dashboard sorts by probability and keeps "vs league usual" as a column. An odds floor (`?min=`,
+   default 1.50) is applied to fair odds before the best-per-match pick; there is no >80% rule.
 5. **Round files** — `picks/YYYY-MM-DD.json` (compact: fixtures once + array rows). Published and
    settled by `run_model.py`; future rounds carry every market. The already-published 21/22 Nov
    rounds are never edited; their all-market companions are `picks/<date>.full.json`, verified on the
    model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
 6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard: round switch,
-   League (search, grouped by country), Bet (Any / a group / a market, default All combos), sortable
-   columns, 15 then Show all, expanded row = goal ladder + next 5 bets. Ticket builder (localStorage
-   only), suggested 2-5 leg tickets, `/tickets`, `/rounds`, `/record` (picker calibration, combos,
-   Mozzart return).
+   League (search, grouped by country), Bet (Any / a group / a market, default All combos), odds floor
+   `?min=` (Any/1.30/1.50/2.00/3.00, default 1.50), sortable columns, 15 then Show all, expanded row =
+   goal ladder + next 5 bets. Target-payout tickets (`?target=` 2/3/5/10/20, `?legs=` 2-5; top 3),
+   ticket builder (localStorage only), `/tickets`, `/rounds`, `/record` (per-season picker
+   calibration, target × max-legs combos, Mozzart return).
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -100,22 +102,21 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Current state
 
-- Milestone 4 + 5 complete. The Strongest lean ranking, Most likely toggle, Minimum odds and the
-  1.50-4.00 display window are gone. The picker is sorted by probability with "vs league usual" as a
-  column; every market is available (Any bet, group, or single market). 21/22 Nov companions
-  (`picks/*.full.json`) carry all markets. `picker.json` (calibration) and `combo.json` (combo
-  backtest) are committed and served on the Record page. Ticket builder and suggested tickets are
-  browser-only (localStorage).
-- Round days are Tuesday, Saturday, Sunday. 21 Nov (122 fixtures, 19,076 rows) and 22 Nov (44
-  fixtures, 6,810 rows) are published; companions add 2,640 and 1,022 extra market rows.
-- Production is private (Vercel Authentication, `deploymentType: all`; unauthenticated 302), priced
-  (`PRICED=1` + read-only `vercel-read` key). Actions uses `actions-write`.
-- 148 tests passing. `npm run build` green (47 pages).
+- Milestone 5b. Picker calibration factors are walk-forward per target season (2019-20..2025-26 +
+  the live 2026-27 factors fitted on all prior seasons); `picker.json` exposes `season_factors` and
+  the combo backtest uses them. The Record picker table was already walk-forward and is unchanged.
+- Odds floor `?min=` (default 1.50) is applied to fair odds before the best-per-match pick; the
+  Any-bet >80% rule is gone. Target-payout tickets (`?target=`, `?legs=`) replace the best 2-5
+  suggestions; the combo backtest is per target × max legs (walk-forward, floor 1.50).
+- 21 Nov (122 fixtures, 19,076 rows) and 22 Nov (44 fixtures, 6,810 rows) are published; companions
+  (`picks/*.full.json`) add 2,640 / 1,022 market rows and are verified on the model fields.
+- Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
+- 156 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
-- **First priced runs / weekend checks**: Sat 08:00 and Sun 08:00 prices; report match rates and 10
-  real priced rows. The `actions-write` key's first real push is still untested.
-- **Recalibration**: `picker.json` and `combo.json` are computed once and committed. Recompute with
-  `python -c` calling `pipeline.model.picker_backtest.write` / `combo_backtest.write` when the model
-  or seasons change; CI reuses the committed files.
+- **Saturday check** after Sat 21 Nov 08:30 UTC and **Sunday check** after Sun 22 Nov 08:30 UTC:
+  prices run, fixture/market match rates, prebuild snapshot count, Mozzart-vs-fair distribution and
+  10 real rows.
+- **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
+  backtest optimises one ticket per division-round (the model's round unit), not across all divisions.

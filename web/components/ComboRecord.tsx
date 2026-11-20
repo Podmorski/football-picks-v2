@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 
 type Strategy = {
   strategy: string;
+  target: number;
+  max_legs: number;
   tickets: number;
   predicted: number | null;
   landed: number | null;
@@ -13,8 +15,7 @@ type Strategy = {
   worst_drawdown: number;
   mozzart: { n: number; return: number | null };
 };
-type Independence = { size: number; predicted: number; landed: number; ratio: number };
-type Payload = { strategies?: Strategy[]; independence?: Independence[] };
+type Payload = { strategies?: Strategy[] };
 
 function pct(value: number | null): string {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
@@ -43,21 +44,22 @@ export default function ComboRecord() {
 
   const strategies = data?.strategies ?? [];
   if (strategies.length === 0) return null;
-  const short = (data?.independence ?? []).filter((row) => row.ratio < 1);
 
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-semibold">Combos</h2>
       <p className="text-sm text-muted-foreground">
-        Walk-forward on 2019-20 to 2025-26, model fitted on matches before each round. Singles are the top 15 by
-        calibrated probability; each k-leg ticket is the best k of those, one leg per match. Returns are at fair
-        odds with flat 1-unit stakes.
+        Walk-forward on 2019-20 to 2025-26, model fitted on matches before each round and calibrated with that
+        season&apos;s earlier-season factors. For each target payout and max leg count the optimiser picks the
+        highest-probability ticket whose combined fair odds reach the target, one leg per match, each leg at
+        fair odds 1.50 or more. Returns are at fair odds with flat 1-unit stakes.
       </p>
       <div className="overflow-x-auto rounded-xl border">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
-              <th className="px-3 py-2 text-left font-semibold">Strategy</th>
+              <th className="px-3 py-2 text-right font-semibold">Target</th>
+              <th className="px-3 py-2 text-right font-semibold">Max legs</th>
               <th className="px-3 py-2 text-right font-semibold">Tickets</th>
               <th className="px-3 py-2 text-right font-semibold">Predicted</th>
               <th className="px-3 py-2 text-right font-semibold">Landed</th>
@@ -71,7 +73,8 @@ export default function ComboRecord() {
           <tbody>
             {strategies.map((row) => (
               <tr key={row.strategy} className="border-t">
-                <td className="px-3 py-1.5">{row.strategy}</td>
+                <td className="tabular px-3 py-1.5 text-right font-medium">{row.target.toFixed(2)}</td>
+                <td className="tabular px-3 py-1.5 text-right">{row.max_legs}</td>
                 <td className="tabular px-3 py-1.5 text-right">{row.tickets.toLocaleString('en-GB')}</td>
                 <td className="tabular px-3 py-1.5 text-right">{pct(row.predicted)}</td>
                 <td className="tabular px-3 py-1.5 text-right font-medium">{pct(row.landed)}</td>
@@ -89,15 +92,6 @@ export default function ComboRecord() {
           </tbody>
         </table>
       </div>
-      {(data?.independence ?? []).length > 0 ? (
-        <p className="text-sm text-muted-foreground">
-          Independence check (landed / predicted):{' '}
-          {(data?.independence ?? []).map((row) => `${row.size}-leg ${row.ratio.toFixed(3)}`).join(' · ')}.
-          {short.length > 0
-            ? ' Multis land LESS often than predicted, so the combined % is optimistic.'
-            : ' Multis land slightly more often than predicted, so the combined % is not optimistic.'}
-        </p>
-      ) : null}
       <p className="text-xs text-muted-foreground">
         Mozzart returns appear once settled live rounds carry frozen prices; there are none yet.
       </p>

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 EXCLUDED = {"RESULT:1", "RESULT:2"}
-MAX_ANY = 0.80
+DEFAULT_FLOOR = 1.50
 
 
 def pc(row: dict) -> float:
@@ -13,13 +13,19 @@ def fair(row: dict) -> float:
     return 1.0 / max(pc(row), 1e-4)
 
 
-def pick_rows(rows: list[dict], bet: str, league: str = "all", groups: dict[str, str] | None = None) -> list[dict]:
+def pick_rows(
+    rows: list[dict], bet: str, league: str = "all", groups: dict[str, str] | None = None,
+    min_fair: float = DEFAULT_FLOOR,
+) -> list[dict]:
     groups = groups or {}
-    filtered = [row for row in rows if league == "all" or row.get("d") == league]
+    filtered = [
+        row for row in rows
+        if (league == "all" or row.get("d") == league) and fair(row) >= min_fair
+    ]
     if bet == "any":
         best: dict[tuple, dict] = {}
         for row in filtered:
-            if row.get("m") in EXCLUDED or pc(row) > MAX_ANY:
+            if row.get("m") in EXCLUDED:
                 continue
             key = (row.get("h"), row.get("a"))
             if key not in best or pc(row) > pc(best[key]):
@@ -37,6 +43,21 @@ def pick_rows(rows: list[dict], bet: str, league: str = "all", groups: dict[str,
         return list(best.values())
     market_id = bet.split(":", 1)[1]
     return [row for row in filtered if row.get("m") == market_id]
+
+
+def below_floor_count(rows: list[dict], bet: str, league: str = "all", min_fair: float = DEFAULT_FLOOR) -> int:
+    """Matches whose single-market row is below the floor (hidden and counted)."""
+    if not bet.startswith("market:"):
+        return 0
+    market_id = bet.split(":", 1)[1]
+    by_match: dict[tuple, float] = {}
+    for row in rows:
+        if league != "all" and row.get("d") != league:
+            continue
+        if row.get("m") != market_id:
+            continue
+        by_match[(row.get("h"), row.get("a"))] = fair(row)
+    return sum(1 for value in by_match.values() if value < min_fair)
 
 
 def _metric(row: dict, key: str, price_index: dict | None) -> float | str:

@@ -29,11 +29,18 @@ def test_group_picks_best_per_match() -> None:
         row("A", "B", "GOAL_RANGE_FT:1+", 0.85),
         row("C", "D", "GOAL_RANGE_FT:2+", 0.70),
     ]
-    picked = picker.pick_rows(rows, "group:Goals", "all", GROUPS)
+    picked = picker.pick_rows(rows, "group:Goals", "all", GROUPS, min_fair=0.0)
     assert len(picked) == 2
     by_match = {(r["h"], r["a"]): r for r in picked}
     assert by_match[("A", "B")]["m"] == "GOAL_RANGE_FT:1+"
     assert by_match[("C", "D")]["m"] == "GOAL_RANGE_FT:2+"
+
+
+def test_floor_is_applied_before_best_per_match() -> None:
+    rows = [row("A", "B", "GOAL_RANGE_FT:1+", 0.85), row("A", "B", "GOAL_RANGE_FT:2+", 0.60)]
+    picked = picker.pick_rows(rows, "group:Goals", "all", GROUPS, min_fair=1.50)
+    assert len(picked) == 1
+    assert picked[0]["m"] == "GOAL_RANGE_FT:2+"
 
 
 def test_single_market_returns_every_fixture() -> None:
@@ -43,16 +50,28 @@ def test_single_market_returns_every_fixture() -> None:
     assert {r["h"] for r in picked} == {"A", "C"}
 
 
-def test_any_skips_above_80_and_ft_1_2() -> None:
+def test_any_skips_ft_1_2_but_not_high_probability() -> None:
     rows = [
         row("A", "B", "RESULT:1", 0.90),
-        row("A", "B", "GOAL_RANGE_FT:1+", 0.85),
-        row("A", "B", "BTTS:GG", 0.55),
+        row("A", "B", "GOAL_RANGE_FT:1+", 0.90),
         row("C", "D", "RESULT:2", 0.50),
-        row("C", "D", "GOAL_RANGE_FT:2+", 0.60),
+        row("C", "D", "BTTS:GG", 0.55),
     ]
-    picked = picker.pick_rows(rows, "any", "all", GROUPS)
-    assert {r["m"] for r in picked} == {"BTTS:GG", "GOAL_RANGE_FT:2+"}
+    picked = picker.pick_rows(rows, "any", "all", GROUPS, min_fair=0.0)
+    by_match = {(r["h"], r["a"]): r for r in picked}
+    assert by_match[("A", "B")]["m"] == "GOAL_RANGE_FT:1+"
+    assert by_match[("C", "D")]["m"] == "BTTS:GG"
+
+
+def test_any_floor_hides_low_fair() -> None:
+    rows = [row("A", "B", "GOAL_RANGE_FT:1+", 0.90), row("A", "B", "BTTS:GG", 0.55)]
+    picked = picker.pick_rows(rows, "any", "all", GROUPS, min_fair=1.50)
+    assert [r["m"] for r in picked] == ["BTTS:GG"]
+
+
+def test_below_floor_count_for_single_market() -> None:
+    rows = [row("A", "B", "BTTS:GG", 0.90), row("C", "D", "BTTS:GG", 0.50)]
+    assert picker.below_floor_count(rows, "market:BTTS:GG", "all", 1.50) == 1
 
 
 def test_no_empty_list_when_fixtures_exist() -> None:
