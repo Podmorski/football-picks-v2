@@ -4,7 +4,7 @@ Read this first. It is the durable context for any worker on this repo.
 
 ## Product
 
-Private web app that, for each Tuesday and Saturday round, ranks football bets by statistical
+Private web app that, for each Tuesday, Saturday and Sunday round, ranks football bets by statistical
 probability. For a chosen League and Bet type it shows the 15 strongest picks. It leans toward
 higher-paying bets (combos, HT/FT, goal lines), not heavy short-priced favourites. It is a
 statistics app — probabilities, not certainties — covering every Mozzart market that can be settled
@@ -83,25 +83,33 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Schedule (update.yml, UTC)
 
-- Tue 14:00 + 16:00, Fri 18:00 + 21:00, Sat 08:00 — publish/settle.
-- Mon 12:00 — settle only, never publish.
-- First live round expected Sat 21 Nov 2026 (fixtures usually appear Friday).
+- Tue 14:00 + 16:00 — Tuesday round.
+- Fri 18:00 + 21:00 — publish BOTH weekend rounds (Saturday and Sunday) when their fixtures exist.
+- Sat 08:00 — retry both weekend rounds; Sun 08:00 — retry Sunday only.
+- Mon 12:00 — settle only (settles both weekend rounds), never publish.
+- Round days are Tuesday, Saturday and Sunday; Friday is never a round day.
+- `prices.yml`: Sat 08:00, Sun 08:00, Tue 16:00 — one pass per round, budget priority Sat > Sun > Tue.
 
 ## Current state
 
-- Milestone 3e + M2. Record page reports per-pick return at fair odds and, on the priced build,
-  "Return at Mozzart price" (aggregates only). Dashboard shows "Mozzart x.xx · HH:MM UTC" and
-  "Mozzart vs fair" with an "only where Mozzart pays more than fair" toggle (`?mozzart=1`).
-- Production is private (Vercel Authentication, `deploymentType: all`; unauthenticated requests 302
-  to the Vercel login). A push to main rebuilds a priced production deployment because `PRICED=1`
-  is set in Production and the prebuild clones the private store; a failed private read fails the
-  build so the last priced deployment stays live.
-- 128 tests passing. `npm run build` green (46 pages). No live round published yet (21 Nov is empty).
-- Priced production build verified: the prebuild cloned the private repo over SSH (port 443) and
-  embedded 0 snapshots (the private store is empty until the first round). Production stays 302.
+- Milestone 3e + M2 + Sunday rounds. Record page reports per-pick return at fair odds and, on the
+  priced build, "Return at Mozzart price" (aggregates only). Dashboard shows "Mozzart x.xx · HH:MM
+  UTC" and "Mozzart vs fair" with an "only where Mozzart pays more than fair" toggle (`?mozzart=1`),
+  plus a round switch (`?round=`) and a no-picks banner with "Last updated: HH:MM UTC".
+- Round days are Tuesday, Saturday, Sunday. The first live rounds are published: 21 Nov (122
+  fixtures, 19,076 rows) and 22 Nov (44 fixtures, 6,810 rows); the 14 Nov example round is retained.
+- Production is private (Vercel Authentication, `deploymentType: all`; unauthenticated requests 302).
+  A push to main rebuilds a priced production deployment because `PRICED=1` is set in Production and
+  the prebuild clones the private store; a failed private read fails the build so the last priced
+  deployment stays live.
+- Deploy keys are split: Vercel uses the read-only `vercel-read` key (Vercel env `PRICES_SSH_KEY`);
+  Actions uses the read-write `actions-write` key (secret `PRICES_DEPLOY_KEY`). The old combined key
+  was deleted.
+- 138 tests passing. `npm run build` green (46 pages).
 
 ## Open items
 
-- **First live Mozzart run**: once 21 Nov fixtures appear and the round publishes, dispatch
-  `prices.yml` once manually (expected 9–16 requests) and check the match rate and the priced URL.
-- **Round check for Sat 21 Nov 2026** once the publish window opens (after Fri 20 Nov 21:00 UTC).
+- **First priced runs** (Sat 08:00 / Sun 08:00): the new `actions-write` key has only been exercised by
+  a no-op checkout; the first real fetch is the first push test. Expect Sat 9–16 and Sun 4–8 requests.
+- **Saturday check** after Sat 21 Nov 08:30 UTC and **Sunday check** after Sun 22 Nov 08:30 UTC; report
+  fixture and market match rates and 10 real priced rows.
