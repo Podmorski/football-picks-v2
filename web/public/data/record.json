@@ -1150,35 +1150,35 @@
  "ranking_backtest": {
   "before": [
    {
-    "break_even": 0.2991,
+    "break_even": 0.3017,
     "calibrated": false,
     "ci": [
-     0.2447,
-     0.3046
+     0.2489,
+     0.3084
     ],
     "group": "BTTS",
-    "hit_rate": 0.2736,
-    "hits": 232,
+    "hit_rate": 0.2776,
+    "hits": 241,
     "level": "2.00+",
-    "mean_fair_odds": 3.343,
-    "mean_probability": 0.3042,
-    "picks": 848,
+    "mean_fair_odds": 3.315,
+    "mean_probability": 0.3082,
+    "picks": 868,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2972,
+    "break_even": 0.2971,
     "calibrated": false,
     "ci": [
-     0.2406,
-     0.2965
+     0.2409,
+     0.2968
     ],
     "group": "BTTS",
-    "hit_rate": 0.2676,
+    "hit_rate": 0.2679,
     "hits": 258,
     "level": "2.50+",
-    "mean_fair_odds": 3.365,
+    "mean_fair_odds": 3.366,
     "mean_probability": 0.3005,
-    "picks": 964,
+    "picks": 963,
     "strategy": "lean"
    },
    {
@@ -1198,595 +1198,595 @@
     "strategy": "lean"
    },
    {
+    "break_even": 0.3903,
+    "calibrated": false,
+    "ci": [
+     0.3789,
+     0.432
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.4052,
+    "hits": 532,
+    "level": "any",
+    "mean_fair_odds": 2.562,
+    "mean_probability": 0.438,
+    "picks": 1313,
+    "strategy": "lean"
+   },
+   {
+    "break_even": 0.344,
+    "calibrated": false,
+    "ci": [
+     0.3435,
+     0.3638
+    ],
+    "group": "Combos",
+    "hit_rate": 0.3536,
+    "hits": 2986,
+    "level": "2.00+",
+    "mean_fair_odds": 2.907,
+    "mean_probability": 0.3571,
+    "picks": 8445,
+    "strategy": "lean"
+   },
+   {
+    "break_even": 0.3133,
+    "calibrated": false,
+    "ci": [
+     0.3002,
+     0.3212
+    ],
+    "group": "Combos",
+    "hit_rate": 0.3106,
+    "hits": 2326,
+    "level": "2.50+",
+    "mean_fair_odds": 3.192,
+    "mean_probability": 0.3187,
+    "picks": 7488,
+    "strategy": "lean"
+   },
+   {
+    "break_even": 0.287,
+    "calibrated": false,
+    "ci": [
+     0.2693,
+     0.2903
+    ],
+    "group": "Combos",
+    "hit_rate": 0.2797,
+    "hits": 1965,
+    "level": "3.00+",
+    "mean_fair_odds": 3.484,
+    "mean_probability": 0.2887,
+    "picks": 7025,
+    "strategy": "lean"
+   },
+   {
     "break_even": 0.372,
     "calibrated": false,
     "ci": [
-     0.3616,
-     0.4181
+     0.3896,
+     0.4128
     ],
-    "group": "BTTS",
-    "hit_rate": 0.3895,
-    "hits": 444,
+    "group": "Combos",
+    "hit_rate": 0.4011,
+    "hits": 2745,
     "level": "any",
     "mean_fair_odds": 2.688,
-    "mean_probability": 0.4159,
-    "picks": 1140,
+    "mean_probability": 0.4003,
+    "picks": 6843,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3414,
+    "break_even": 0.3385,
     "calibrated": false,
     "ci": [
-     0.3441,
-     0.3677
-    ],
-    "group": "Combos",
-    "hit_rate": 0.3558,
-    "hits": 2248,
-    "level": "2.00+",
-    "mean_fair_odds": 2.929,
-    "mean_probability": 0.3541,
-    "picks": 6318,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.3141,
-    "calibrated": false,
-    "ci": [
-     0.3015,
-     0.3259
-    ],
-    "group": "Combos",
-    "hit_rate": 0.3136,
-    "hits": 1738,
-    "level": "2.50+",
-    "mean_fair_odds": 3.184,
-    "mean_probability": 0.3194,
-    "picks": 5542,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.2874,
-    "calibrated": false,
-    "ci": [
-     0.2677,
-     0.2925
-    ],
-    "group": "Combos",
-    "hit_rate": 0.28,
-    "hits": 1416,
-    "level": "3.00+",
-    "mean_fair_odds": 3.48,
-    "mean_probability": 0.2891,
-    "picks": 5058,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.3689,
-    "calibrated": false,
-    "ci": [
-     0.3899,
-     0.4175
-    ],
-    "group": "Combos",
-    "hit_rate": 0.4036,
-    "hits": 1968,
-    "level": "any",
-    "mean_fair_odds": 2.711,
-    "mean_probability": 0.3969,
-    "picks": 4876,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.3274,
-    "calibrated": false,
-    "ci": [
-     0.3132,
-     0.3541
+     0.3136,
+     0.3458
     ],
     "group": "Goals",
-    "hit_rate": 0.3333,
-    "hits": 677,
+    "hit_rate": 0.3295,
+    "hits": 1077,
     "level": "2.00+",
-    "mean_fair_odds": 3.054,
-    "mean_probability": 0.3375,
-    "picks": 2031,
+    "mean_fair_odds": 2.954,
+    "mean_probability": 0.3507,
+    "picks": 3269,
+    "strategy": "lean"
+   },
+   {
+    "break_even": 0.3153,
+    "calibrated": false,
+    "ci": [
+     0.2822,
+     0.3125
+    ],
+    "group": "Goals",
+    "hit_rate": 0.2971,
+    "hits": 1036,
+    "level": "2.50+",
+    "mean_fair_odds": 3.171,
+    "mean_probability": 0.3205,
+    "picks": 3487,
+    "strategy": "lean"
+   },
+   {
+    "break_even": 0.2883,
+    "calibrated": false,
+    "ci": [
+     0.2542,
+     0.2842
+    ],
+    "group": "Goals",
+    "hit_rate": 0.2689,
+    "hits": 899,
+    "level": "3.00+",
+    "mean_fair_odds": 3.469,
+    "mean_probability": 0.2904,
+    "picks": 3343,
+    "strategy": "lean"
+   },
+   {
+    "break_even": 0.4002,
+    "calibrated": false,
+    "ci": [
+     0.4046,
+     0.4363
+    ],
+    "group": "Goals",
+    "hit_rate": 0.4204,
+    "hits": 1560,
+    "level": "any",
+    "mean_fair_odds": 2.499,
+    "mean_probability": 0.4434,
+    "picks": 3711,
+    "strategy": "lean"
+   },
+   {
+    "break_even": 0.3174,
+    "calibrated": false,
+    "ci": [
+     0.307,
+     0.3572
+    ],
+    "group": "HT/FT",
+    "hit_rate": 0.3316,
+    "hits": 447,
+    "level": "2.00+",
+    "mean_fair_odds": 3.15,
+    "mean_probability": 0.3283,
+    "picks": 1348,
     "strategy": "lean"
    },
    {
     "break_even": 0.3144,
     "calibrated": false,
     "ci": [
-     0.2872,
-     0.3255
-    ],
-    "group": "Goals",
-    "hit_rate": 0.306,
-    "hits": 680,
-    "level": "2.50+",
-    "mean_fair_odds": 3.181,
-    "mean_probability": 0.3191,
-    "picks": 2222,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.2901,
-    "calibrated": false,
-    "ci": [
-     0.2653,
-     0.3038
-    ],
-    "group": "Goals",
-    "hit_rate": 0.2842,
-    "hits": 597,
-    "level": "3.00+",
-    "mean_fair_odds": 3.447,
-    "mean_probability": 0.2922,
-    "picks": 2101,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.383,
-    "calibrated": false,
-    "ci": [
-     0.4078,
-     0.4483
-    ],
-    "group": "Goals",
-    "hit_rate": 0.4279,
-    "hits": 980,
-    "level": "any",
-    "mean_fair_odds": 2.611,
-    "mean_probability": 0.4258,
-    "picks": 2290,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.3173,
-    "calibrated": false,
-    "ci": [
-     0.3067,
-     0.3569
-    ],
-    "group": "HT/FT",
-    "hit_rate": 0.3314,
-    "hits": 446,
-    "level": "2.00+",
-    "mean_fair_odds": 3.151,
-    "mean_probability": 0.3282,
-    "picks": 1346,
-    "strategy": "lean"
-   },
-   {
-    "break_even": 0.3143,
-    "calibrated": false,
-    "ci": [
-     0.3041,
+     0.3042,
      0.3454
     ],
     "group": "HT/FT",
     "hit_rate": 0.3244,
-    "hits": 642,
+    "hits": 643,
     "level": "2.50+",
     "mean_fair_odds": 3.181,
     "mean_probability": 0.3203,
-    "picks": 1979,
+    "picks": 1982,
     "strategy": "lean"
    },
    {
     "break_even": 0.2892,
     "calibrated": false,
     "ci": [
-     0.2859,
-     0.3153
+     0.2853,
+     0.3147
     ],
     "group": "HT/FT",
-    "hit_rate": 0.3004,
-    "hits": 1116,
+    "hit_rate": 0.2998,
+    "hits": 1114,
     "level": "3.00+",
-    "mean_fair_odds": 3.458,
-    "mean_probability": 0.291,
-    "picks": 3715,
+    "mean_fair_odds": 3.457,
+    "mean_probability": 0.2911,
+    "picks": 3716,
     "strategy": "lean"
    },
    {
-    "break_even": 0.5018,
+    "break_even": 0.5015,
     "calibrated": false,
     "ci": [
-     0.531,
-     0.5615
+     0.5308,
+     0.5614
     ],
     "group": "HT/FT",
-    "hit_rate": 0.5463,
-    "hits": 2235,
+    "hit_rate": 0.5461,
+    "hits": 2231,
     "level": "any",
-    "mean_fair_odds": 1.993,
-    "mean_probability": 0.5457,
-    "picks": 4091,
+    "mean_fair_odds": 1.994,
+    "mean_probability": 0.5455,
+    "picks": 4085,
     "strategy": "lean"
    },
    {
     "break_even": 0.3328,
     "calibrated": false,
     "ci": [
-     0.3198,
-     0.3599
+     0.3195,
+     0.3596
     ],
     "group": "Half-time",
-    "hit_rate": 0.3396,
+    "hit_rate": 0.3392,
     "hits": 727,
     "level": "2.00+",
     "mean_fair_odds": 3.005,
     "mean_probability": 0.3429,
-    "picks": 2141,
+    "picks": 2143,
     "strategy": "lean"
    },
    {
     "break_even": 0.3156,
     "calibrated": false,
     "ci": [
-     0.2975,
-     0.3353
+     0.2976,
+     0.3355
     ],
     "group": "Half-time",
-    "hit_rate": 0.3161,
+    "hit_rate": 0.3162,
     "hits": 734,
     "level": "2.50+",
-    "mean_fair_odds": 3.168,
+    "mean_fair_odds": 3.169,
     "mean_probability": 0.3221,
-    "picks": 2322,
+    "picks": 2321,
     "strategy": "lean"
    },
    {
     "break_even": 0.2889,
     "calibrated": false,
     "ci": [
-     0.2531,
-     0.287
+     0.2532,
+     0.2871
     ],
     "group": "Half-time",
-    "hit_rate": 0.2697,
+    "hit_rate": 0.2698,
     "hits": 708,
     "level": "3.00+",
     "mean_fair_odds": 3.461,
     "mean_probability": 0.2905,
-    "picks": 2625,
+    "picks": 2624,
     "strategy": "lean"
    },
    {
     "break_even": 0.3418,
     "calibrated": false,
     "ci": [
-     0.3308,
-     0.3766
+     0.3306,
+     0.3764
     ],
     "group": "Half-time",
-    "hit_rate": 0.3534,
+    "hit_rate": 0.3532,
     "hits": 588,
     "level": "any",
     "mean_fair_odds": 2.925,
     "mean_probability": 0.3582,
-    "picks": 1664,
+    "picks": 1665,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3233,
+    "break_even": 0.3241,
     "calibrated": false,
     "ci": [
-     0.3083,
-     0.3267
+     0.3102,
+     0.3265
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.3174,
-    "hits": 3112,
+    "hit_rate": 0.3183,
+    "hits": 3961,
     "level": "2.00+",
-    "mean_fair_odds": 3.093,
-    "mean_probability": 0.3338,
-    "picks": 9804,
+    "mean_fair_odds": 3.086,
+    "mean_probability": 0.3345,
+    "picks": 12445,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3055,
+    "break_even": 0.3066,
     "calibrated": false,
     "ci": [
-     0.287,
-     0.3051
+     0.2898,
+     0.3057
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.296,
-    "hits": 2893,
+    "hit_rate": 0.2976,
+    "hits": 3778,
     "level": "2.50+",
-    "mean_fair_odds": 3.273,
-    "mean_probability": 0.3108,
-    "picks": 9774,
+    "mean_fair_odds": 3.262,
+    "mean_probability": 0.3118,
+    "picks": 12693,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2848,
+    "break_even": 0.2859,
     "calibrated": false,
     "ci": [
-     0.2621,
-     0.2813
+     0.2644,
+     0.2811
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.2716,
-    "hits": 2231,
+    "hit_rate": 0.2727,
+    "hits": 2998,
     "level": "3.00+",
-    "mean_fair_odds": 3.511,
-    "mean_probability": 0.2867,
-    "picks": 8214,
+    "mean_fair_odds": 3.498,
+    "mean_probability": 0.2878,
+    "picks": 10995,
     "strategy": "lean"
    },
    {
-    "break_even": 0.339,
+    "break_even": 0.3415,
     "calibrated": false,
     "ci": [
-     0.3361,
-     0.3551
+     0.3423,
+     0.3592
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.3455,
-    "hits": 3338,
+    "hit_rate": 0.3507,
+    "hits": 4341,
     "level": "any",
-    "mean_fair_odds": 2.95,
-    "mean_probability": 0.362,
-    "picks": 9660,
+    "mean_fair_odds": 2.929,
+    "mean_probability": 0.3661,
+    "picks": 12378,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3459,
+    "break_even": 0.3484,
     "calibrated": false,
     "ci": [
-     0.3277,
-     0.3522
+     0.3282,
+     0.3489
     ],
     "group": "Team goals",
-    "hit_rate": 0.3399,
-    "hits": 1943,
+    "hit_rate": 0.3385,
+    "hits": 2705,
     "level": "2.00+",
-    "mean_fair_odds": 2.891,
-    "mean_probability": 0.3584,
-    "picks": 5717,
+    "mean_fair_odds": 2.87,
+    "mean_probability": 0.3611,
+    "picks": 7992,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3223,
+    "break_even": 0.3232,
     "calibrated": false,
     "ci": [
-     0.2988,
-     0.3241
+     0.2983,
+     0.3198
     ],
     "group": "Team goals",
-    "hit_rate": 0.3113,
-    "hits": 1592,
+    "hit_rate": 0.3089,
+    "hits": 2204,
     "level": "2.50+",
-    "mean_fair_odds": 3.103,
-    "mean_probability": 0.3274,
-    "picks": 5114,
+    "mean_fair_odds": 3.094,
+    "mean_probability": 0.3283,
+    "picks": 7134,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2953,
+    "break_even": 0.2947,
     "calibrated": false,
     "ci": [
-     0.2706,
-     0.2972
+     0.2733,
+     0.2961
     ],
     "group": "Team goals",
-    "hit_rate": 0.2837,
-    "hits": 1253,
+    "hit_rate": 0.2846,
+    "hits": 1723,
     "level": "3.00+",
-    "mean_fair_odds": 3.386,
-    "mean_probability": 0.2971,
-    "picks": 4417,
+    "mean_fair_odds": 3.393,
+    "mean_probability": 0.2966,
+    "picks": 6055,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3682,
+    "break_even": 0.3701,
     "calibrated": false,
     "ci": [
-     0.3542,
-     0.3813
+     0.3525,
+     0.375
     ],
     "group": "Team goals",
-    "hit_rate": 0.3677,
-    "hits": 1782,
+    "hit_rate": 0.3637,
+    "hits": 2554,
     "level": "any",
-    "mean_fair_odds": 2.716,
-    "mean_probability": 0.3916,
-    "picks": 4847,
+    "mean_fair_odds": 2.702,
+    "mean_probability": 0.3928,
+    "picks": 7022,
     "strategy": "lean"
    },
    {
-    "break_even": 0.4977,
+    "break_even": 0.4974,
     "calibrated": false,
     "ci": [
-     0.4775,
-     0.5262
+     0.4926,
+     0.5353
     ],
     "group": "BTTS",
-    "hit_rate": 0.5019,
-    "hits": 810,
-    "level": "2.00+",
-    "mean_fair_odds": 2.009,
-    "mean_probability": 0.4977,
-    "picks": 1614,
-    "strategy": "probability"
-   },
-   {
-    "break_even": 0.3964,
-    "calibrated": false,
-    "ci": [
-     0.3503,
-     0.4423
-    ],
-    "group": "BTTS",
-    "hit_rate": 0.3953,
-    "hits": 170,
-    "level": "2.50+",
-    "mean_fair_odds": 2.523,
-    "mean_probability": 0.3965,
-    "picks": 430,
-    "strategy": "probability"
-   },
-   {
-    "break_even": 0.3304,
-    "calibrated": false,
-    "ci": [
-     0.253,
-     0.3575
-    ],
-    "group": "BTTS",
-    "hit_rate": 0.3027,
-    "hits": 89,
-    "level": "3.00+",
-    "mean_fair_odds": 3.026,
-    "mean_probability": 0.3305,
-    "picks": 294,
-    "strategy": "probability"
-   },
-   {
-    "break_even": 0.6607,
-    "calibrated": false,
-    "ci": [
-     0.6143,
-     0.6916
-    ],
-    "group": "BTTS",
-    "hit_rate": 0.654,
-    "hits": 378,
-    "level": "any",
-    "mean_fair_odds": 1.514,
-    "mean_probability": 0.6607,
-    "picks": 578,
-    "strategy": "probability"
-   },
-   {
-    "break_even": 0.4975,
-    "calibrated": false,
-    "ci": [
-     0.4868,
-     0.5232
-    ],
-    "group": "Combos",
-    "hit_rate": 0.505,
-    "hits": 1460,
+    "hit_rate": 0.514,
+    "hits": 1085,
     "level": "2.00+",
     "mean_fair_odds": 2.01,
-    "mean_probability": 0.4976,
-    "picks": 2891,
+    "mean_probability": 0.4975,
+    "picks": 2111,
     "strategy": "probability"
    },
    {
-    "break_even": 0.395,
+    "break_even": 0.3961,
     "calibrated": false,
     "ci": [
-     0.3827,
-     0.4117
+     0.384,
+     0.4583
     ],
-    "group": "Combos",
-    "hit_rate": 0.3971,
-    "hits": 1740,
+    "group": "BTTS",
+    "hit_rate": 0.4207,
+    "hits": 284,
     "level": "2.50+",
-    "mean_fair_odds": 2.532,
-    "mean_probability": 0.395,
-    "picks": 4382,
+    "mean_fair_odds": 2.524,
+    "mean_probability": 0.3962,
+    "picks": 675,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3302,
+    "break_even": 0.3303,
     "calibrated": false,
     "ci": [
-     0.3405,
-     0.3572
+     0.2609,
+     0.3599
     ],
-    "group": "Combos",
-    "hit_rate": 0.3488,
-    "hits": 4383,
+    "group": "BTTS",
+    "hit_rate": 0.3082,
+    "hits": 102,
     "level": "3.00+",
-    "mean_fair_odds": 3.029,
-    "mean_probability": 0.3302,
-    "picks": 12566,
+    "mean_fair_odds": 3.028,
+    "mean_probability": 0.3303,
+    "picks": 331,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6585,
+    "break_even": 0.6602,
     "calibrated": false,
     "ci": [
-     0.6344,
-     0.6868
+     0.6074,
+     0.6788
+    ],
+    "group": "BTTS",
+    "hit_rate": 0.6439,
+    "hits": 443,
+    "level": "any",
+    "mean_fair_odds": 1.515,
+    "mean_probability": 0.6602,
+    "picks": 688,
+    "strategy": "probability"
+   },
+   {
+    "break_even": 0.4973,
+    "calibrated": false,
+    "ci": [
+     0.4881,
+     0.5209
     ],
     "group": "Combos",
-    "hit_rate": 0.6611,
-    "hits": 827,
-    "level": "any",
-    "mean_fair_odds": 1.519,
-    "mean_probability": 0.6586,
-    "picks": 1251,
-    "strategy": "probability"
-   },
-   {
-    "break_even": 0.4961,
-    "calibrated": false,
-    "ci": [
-     0.4963,
-     0.511
-    ],
-    "group": "Goals",
-    "hit_rate": 0.5036,
-    "hits": 9044,
+    "hit_rate": 0.5045,
+    "hits": 1795,
     "level": "2.00+",
-    "mean_fair_odds": 2.016,
-    "mean_probability": 0.4961,
-    "picks": 17957,
+    "mean_fair_odds": 2.011,
+    "mean_probability": 0.4973,
+    "picks": 3558,
     "strategy": "probability"
    },
    {
-    "break_even": 0.395,
+    "break_even": 0.3948,
     "calibrated": false,
     "ci": [
-     0.3921,
-     0.4194
+     0.3855,
+     0.4111
     ],
-    "group": "Goals",
-    "hit_rate": 0.4056,
-    "hits": 2016,
+    "group": "Combos",
+    "hit_rate": 0.3983,
+    "hits": 2241,
     "level": "2.50+",
-    "mean_fair_odds": 2.532,
-    "mean_probability": 0.395,
-    "picks": 4970,
+    "mean_fair_odds": 2.533,
+    "mean_probability": 0.3949,
+    "picks": 5627,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3294,
+    "break_even": 0.33,
     "calibrated": false,
     "ci": [
-     0.2967,
-     0.3293
+     0.3395,
+     0.3554
     ],
-    "group": "Goals",
-    "hit_rate": 0.3127,
-    "hits": 971,
+    "group": "Combos",
+    "hit_rate": 0.3474,
+    "hits": 4769,
     "level": "3.00+",
-    "mean_fair_odds": 3.036,
-    "mean_probability": 0.3294,
-    "picks": 3105,
+    "mean_fair_odds": 3.03,
+    "mean_probability": 0.33,
+    "picks": 13728,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6591,
+    "break_even": 0.6573,
     "calibrated": false,
     "ci": [
-     0.6551,
-     0.6754
+     0.6332,
+     0.6781
+    ],
+    "group": "Combos",
+    "hit_rate": 0.656,
+    "hits": 1129,
+    "level": "any",
+    "mean_fair_odds": 1.521,
+    "mean_probability": 0.6574,
+    "picks": 1721,
+    "strategy": "probability"
+   },
+   {
+    "break_even": 0.4957,
+    "calibrated": false,
+    "ci": [
+     0.4945,
+     0.5076
     ],
     "group": "Goals",
-    "hit_rate": 0.6653,
-    "hits": 5511,
+    "hit_rate": 0.501,
+    "hits": 11183,
+    "level": "2.00+",
+    "mean_fair_odds": 2.018,
+    "mean_probability": 0.4957,
+    "picks": 22320,
+    "strategy": "probability"
+   },
+   {
+    "break_even": 0.3946,
+    "calibrated": false,
+    "ci": [
+     0.3857,
+     0.4091
+    ],
+    "group": "Goals",
+    "hit_rate": 0.3973,
+    "hits": 2678,
+    "level": "2.50+",
+    "mean_fair_odds": 2.534,
+    "mean_probability": 0.3947,
+    "picks": 6740,
+    "strategy": "probability"
+   },
+   {
+    "break_even": 0.329,
+    "calibrated": false,
+    "ci": [
+     0.304,
+     0.3322
+    ],
+    "group": "Goals",
+    "hit_rate": 0.3179,
+    "hits": 1329,
+    "level": "3.00+",
+    "mean_fair_odds": 3.039,
+    "mean_probability": 0.3291,
+    "picks": 4180,
+    "strategy": "probability"
+   },
+   {
+    "break_even": 0.6589,
+    "calibrated": false,
+    "ci": [
+     0.6532,
+     0.6715
+    ],
+    "group": "Goals",
+    "hit_rate": 0.6624,
+    "hits": 6822,
     "level": "any",
-    "mean_fair_odds": 1.517,
-    "mean_probability": 0.6592,
-    "picks": 8283,
+    "mean_fair_odds": 1.518,
+    "mean_probability": 0.659,
+    "picks": 10299,
     "strategy": "probability"
    },
    {
@@ -1918,175 +1918,175 @@
     "strategy": "probability"
    },
    {
-    "break_even": 0.4977,
+    "break_even": 0.4976,
     "calibrated": false,
     "ci": [
-     0.4445,
-     0.5429
+     0.463,
+     0.546
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.4936,
-    "hits": 194,
+    "hit_rate": 0.5045,
+    "hits": 279,
     "level": "2.00+",
-    "mean_fair_odds": 2.009,
-    "mean_probability": 0.4977,
-    "picks": 393,
+    "mean_fair_odds": 2.01,
+    "mean_probability": 0.4976,
+    "picks": 553,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3938,
+    "break_even": 0.3937,
     "calibrated": false,
     "ci": [
-     0.3548,
-     0.4235
+     0.3589,
+     0.4189
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.3886,
-    "hits": 300,
+    "hit_rate": 0.3885,
+    "hits": 392,
     "level": "2.50+",
-    "mean_fair_odds": 2.539,
-    "mean_probability": 0.3939,
-    "picks": 772,
+    "mean_fair_odds": 2.54,
+    "mean_probability": 0.3938,
+    "picks": 1009,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3297,
+    "break_even": 0.3289,
     "calibrated": false,
     "ci": [
-     0.2606,
-     0.3286
+     0.278,
+     0.3322
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.2934,
-    "hits": 201,
+    "hit_rate": 0.3044,
+    "hits": 337,
     "level": "3.00+",
-    "mean_fair_odds": 3.033,
-    "mean_probability": 0.3297,
-    "picks": 685,
+    "mean_fair_odds": 3.04,
+    "mean_probability": 0.329,
+    "picks": 1107,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6563,
+    "break_even": 0.6571,
     "calibrated": false,
     "ci": [
-     0.6519,
-     0.696
+     0.6536,
+     0.693
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.6744,
-    "hits": 1170,
+    "hit_rate": 0.6736,
+    "hits": 1463,
     "level": "any",
-    "mean_fair_odds": 1.524,
-    "mean_probability": 0.6565,
-    "picks": 1735,
+    "mean_fair_odds": 1.522,
+    "mean_probability": 0.6572,
+    "picks": 2172,
     "strategy": "probability"
    },
    {
     "break_even": 0.4976,
     "calibrated": false,
     "ci": [
-     0.4845,
-     0.5162
+     0.483,
+     0.5138
     ],
     "group": "Team goals",
-    "hit_rate": 0.5004,
-    "hits": 1911,
+    "hit_rate": 0.4984,
+    "hits": 2013,
     "level": "2.00+",
     "mean_fair_odds": 2.01,
     "mean_probability": 0.4976,
-    "picks": 3819,
+    "picks": 4039,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3949,
+    "break_even": 0.3947,
     "calibrated": false,
     "ci": [
-     0.3832,
-     0.4099
+     0.381,
+     0.406
     ],
     "group": "Team goals",
-    "hit_rate": 0.3965,
-    "hits": 2042,
+    "hit_rate": 0.3934,
+    "hits": 2298,
     "level": "2.50+",
-    "mean_fair_odds": 2.532,
-    "mean_probability": 0.395,
-    "picks": 5150,
+    "mean_fair_odds": 2.533,
+    "mean_probability": 0.3948,
+    "picks": 5841,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3299,
+    "break_even": 0.3296,
     "calibrated": false,
     "ci": [
-     0.3019,
-     0.3363
+     0.3061,
+     0.3367
     ],
     "group": "Team goals",
-    "hit_rate": 0.3189,
-    "hits": 897,
+    "hit_rate": 0.3212,
+    "hits": 1147,
     "level": "3.00+",
-    "mean_fair_odds": 3.031,
-    "mean_probability": 0.33,
-    "picks": 2813,
+    "mean_fair_odds": 3.034,
+    "mean_probability": 0.3296,
+    "picks": 3571,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6581,
+    "break_even": 0.6583,
     "calibrated": false,
     "ci": [
-     0.6374,
-     0.6637
+     0.6448,
+     0.6696
     ],
     "group": "Team goals",
-    "hit_rate": 0.6507,
-    "hits": 3297,
+    "hit_rate": 0.6573,
+    "hits": 3706,
     "level": "any",
     "mean_fair_odds": 1.519,
-    "mean_probability": 0.6582,
-    "picks": 5067,
+    "mean_probability": 0.6583,
+    "picks": 5638,
     "strategy": "probability"
    }
   ],
   "calibration": {
-   "lean|BTTS|2.00+": 0.8992,
-   "lean|BTTS|2.50+": 0.8906,
+   "lean|BTTS|2.00+": 0.9009,
+   "lean|BTTS|2.50+": 0.8917,
    "lean|BTTS|3.00+": 0.9254,
-   "lean|BTTS|any": 0.9365,
-   "lean|Combos|2.00+": 1.0049,
-   "lean|Combos|2.50+": 0.9818,
-   "lean|Combos|3.00+": 0.9685,
-   "lean|Combos|any": 1.0169,
-   "lean|Goals|2.00+": 0.9878,
-   "lean|Goals|2.50+": 0.9591,
-   "lean|Goals|3.00+": 0.9725,
-   "lean|Goals|any": 1.005,
-   "lean|HT/FT|2.00+": 1.0096,
-   "lean|HT/FT|2.50+": 1.0129,
-   "lean|HT/FT|3.00+": 1.0322,
+   "lean|BTTS|any": 0.9251,
+   "lean|Combos|2.00+": 0.9902,
+   "lean|Combos|2.50+": 0.9748,
+   "lean|Combos|3.00+": 0.9688,
+   "lean|Combos|any": 1.0022,
+   "lean|Goals|2.00+": 0.9394,
+   "lean|Goals|2.50+": 0.927,
+   "lean|Goals|3.00+": 0.9262,
+   "lean|Goals|any": 0.9481,
+   "lean|HT/FT|2.00+": 1.01,
+   "lean|HT/FT|2.50+": 1.0127,
+   "lean|HT/FT|3.00+": 1.03,
    "lean|HT/FT|any": 1.0012,
-   "lean|Half-time|2.00+": 0.9902,
-   "lean|Half-time|2.50+": 0.9813,
-   "lean|Half-time|3.00+": 0.9283,
-   "lean|Half-time|any": 0.9866,
-   "lean|Result & double chance|2.00+": 0.951,
-   "lean|Result & double chance|2.50+": 0.9523,
-   "lean|Result & double chance|3.00+": 0.9472,
-   "lean|Result & double chance|any": 0.9546,
-   "lean|Team goals|2.00+": 0.9483,
-   "lean|Team goals|2.50+": 0.9508,
-   "lean|Team goals|3.00+": 0.9547,
-   "lean|Team goals|any": 0.9389,
-   "probability|BTTS|2.00+": 1.0083,
-   "probability|BTTS|2.50+": 0.9972,
-   "probability|BTTS|3.00+": 0.9161,
-   "probability|BTTS|any": 0.9898,
-   "probability|Combos|2.00+": 1.015,
-   "probability|Combos|2.50+": 1.0052,
-   "probability|Combos|3.00+": 1.0563,
-   "probability|Combos|any": 1.0038,
-   "probability|Goals|2.00+": 1.0152,
-   "probability|Goals|2.50+": 1.0268,
-   "probability|Goals|3.00+": 0.9493,
-   "probability|Goals|any": 1.0094,
+   "lean|Half-time|2.00+": 0.9893,
+   "lean|Half-time|2.50+": 0.9818,
+   "lean|Half-time|3.00+": 0.9287,
+   "lean|Half-time|any": 0.986,
+   "lean|Result & double chance|2.00+": 0.9516,
+   "lean|Result & double chance|2.50+": 0.9545,
+   "lean|Result & double chance|3.00+": 0.9474,
+   "lean|Result & double chance|any": 0.958,
+   "lean|Team goals|2.00+": 0.9373,
+   "lean|Team goals|2.50+": 0.941,
+   "lean|Team goals|3.00+": 0.9595,
+   "lean|Team goals|any": 0.9259,
+   "probability|BTTS|2.00+": 1.0332,
+   "probability|BTTS|2.50+": 1.062,
+   "probability|BTTS|3.00+": 0.9329,
+   "probability|BTTS|any": 0.9752,
+   "probability|Combos|2.00+": 1.0144,
+   "probability|Combos|2.50+": 1.0086,
+   "probability|Combos|3.00+": 1.0526,
+   "probability|Combos|any": 0.9979,
+   "probability|Goals|2.00+": 1.0108,
+   "probability|Goals|2.50+": 1.0067,
+   "probability|Goals|3.00+": 0.9661,
+   "probability|Goals|any": 1.0051,
    "probability|HT/FT|2.00+": 1.0092,
    "probability|HT/FT|2.50+": 1.0241,
    "probability|HT/FT|3.00+": 1.0205,
@@ -2095,46 +2095,46 @@
    "probability|Half-time|2.50+": 0.9476,
    "probability|Half-time|3.00+": 0.9817,
    "probability|Half-time|any": 1.0024,
-   "probability|Result & double chance|2.00+": 0.9919,
-   "probability|Result & double chance|2.50+": 0.9865,
-   "probability|Result & double chance|3.00+": 0.8899,
-   "probability|Result & double chance|any": 1.0273,
-   "probability|Team goals|2.00+": 1.0056,
-   "probability|Team goals|2.50+": 1.0039,
-   "probability|Team goals|3.00+": 0.9664,
-   "probability|Team goals|any": 0.9885
+   "probability|Result & double chance|2.00+": 1.014,
+   "probability|Result & double chance|2.50+": 0.9866,
+   "probability|Result & double chance|3.00+": 0.9254,
+   "probability|Result & double chance|any": 1.0249,
+   "probability|Team goals|2.00+": 1.0017,
+   "probability|Team goals|2.50+": 0.9966,
+   "probability|Team goals|3.00+": 0.9744,
+   "probability|Team goals|any": 0.9985
   },
   "groups": [
    {
-    "break_even": 0.2887,
+    "break_even": 0.2918,
     "calibrated": true,
     "ci": [
-     0.2413,
-     0.3254
+     0.2483,
+     0.3289
     ],
     "group": "BTTS",
-    "hit_rate": 0.2815,
-    "hits": 123,
+    "hit_rate": 0.2869,
+    "hits": 138,
     "level": "2.00+",
-    "mean_fair_odds": 3.464,
-    "mean_probability": 0.2934,
-    "picks": 437,
+    "mean_fair_odds": 3.427,
+    "mean_probability": 0.2975,
+    "picks": 481,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2829,
+    "break_even": 0.283,
     "calibrated": true,
     "ci": [
-     0.2361,
-     0.3211
+     0.2367,
+     0.3218
     ],
     "group": "BTTS",
-    "hit_rate": 0.2766,
+    "hit_rate": 0.2773,
     "hits": 117,
     "level": "2.50+",
-    "mean_fair_odds": 3.535,
-    "mean_probability": 0.2855,
-    "picks": 423,
+    "mean_fair_odds": 3.534,
+    "mean_probability": 0.2856,
+    "picks": 422,
     "strategy": "lean"
    },
    {
@@ -2154,595 +2154,595 @@
     "strategy": "lean"
    },
    {
-    "break_even": 0.3685,
+    "break_even": 0.3896,
     "calibrated": true,
     "ci": [
-     0.3713,
-     0.4306
+     0.3997,
+     0.4572
     ],
     "group": "BTTS",
-    "hit_rate": 0.4006,
-    "hits": 419,
+    "hit_rate": 0.4282,
+    "hits": 486,
     "level": "any",
-    "mean_fair_odds": 2.714,
-    "mean_probability": 0.4108,
-    "picks": 1046,
+    "mean_fair_odds": 2.566,
+    "mean_probability": 0.4314,
+    "picks": 1135,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3394,
+    "break_even": 0.3434,
     "calibrated": true,
     "ci": [
      0.344,
-     0.3678
+     0.3645
     ],
     "group": "Combos",
-    "hit_rate": 0.3558,
-    "hits": 2221,
+    "hit_rate": 0.3542,
+    "hits": 2961,
     "level": "2.00+",
-    "mean_fair_odds": 2.946,
-    "mean_probability": 0.3517,
-    "picks": 6242,
+    "mean_fair_odds": 2.912,
+    "mean_probability": 0.3561,
+    "picks": 8360,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3072,
+    "break_even": 0.3088,
     "calibrated": true,
     "ci": [
-     0.3033,
-     0.3288
+     0.3013,
+     0.3228
     ],
     "group": "Combos",
-    "hit_rate": 0.3159,
-    "hits": 1611,
+    "hit_rate": 0.3119,
+    "hits": 2227,
     "level": "2.50+",
-    "mean_fair_odds": 3.256,
-    "mean_probability": 0.3117,
-    "picks": 5100,
+    "mean_fair_odds": 3.238,
+    "mean_probability": 0.3136,
+    "picks": 7139,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2792,
+    "break_even": 0.2827,
     "calibrated": true,
     "ci": [
-     0.267,
-     0.2944
+     0.2717,
+     0.2936
     ],
     "group": "Combos",
-    "hit_rate": 0.2805,
-    "hits": 1162,
+    "hit_rate": 0.2825,
+    "hits": 1834,
     "level": "3.00+",
-    "mean_fair_odds": 3.582,
-    "mean_probability": 0.2805,
-    "picks": 4143,
+    "mean_fair_odds": 3.537,
+    "mean_probability": 0.2842,
+    "picks": 6492,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3699,
+    "break_even": 0.3752,
     "calibrated": true,
     "ci": [
-     0.3894,
-     0.417
+     0.3885,
+     0.4117
     ],
     "group": "Combos",
-    "hit_rate": 0.4031,
-    "hits": 1962,
+    "hit_rate": 0.4001,
+    "hits": 2726,
     "level": "any",
-    "mean_fair_odds": 2.704,
-    "mean_probability": 0.3979,
-    "picks": 4867,
+    "mean_fair_odds": 2.665,
+    "mean_probability": 0.4034,
+    "picks": 6814,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3245,
+    "break_even": 0.3265,
     "calibrated": true,
     "ci": [
-     0.3128,
-     0.3545
+     0.3179,
+     0.3519
     ],
     "group": "Goals",
-    "hit_rate": 0.3333,
-    "hits": 654,
+    "hit_rate": 0.3347,
+    "hits": 988,
     "level": "2.00+",
-    "mean_fair_odds": 3.082,
-    "mean_probability": 0.3337,
-    "picks": 1962,
+    "mean_fair_odds": 3.062,
+    "mean_probability": 0.3366,
+    "picks": 2952,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3102,
+    "break_even": 0.3064,
     "calibrated": true,
     "ci": [
-     0.2873,
-     0.3263
+     0.2855,
+     0.3172
     ],
     "group": "Goals",
-    "hit_rate": 0.3065,
-    "hits": 658,
+    "hit_rate": 0.3011,
+    "hits": 965,
     "level": "2.50+",
-    "mean_fair_odds": 3.224,
-    "mean_probability": 0.3144,
-    "picks": 2147,
+    "mean_fair_odds": 3.264,
+    "mean_probability": 0.3105,
+    "picks": 3205,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2873,
+    "break_even": 0.2799,
     "calibrated": true,
     "ci": [
-     0.2626,
-     0.3032
+     0.2583,
+     0.2922
     ],
     "group": "Goals",
-    "hit_rate": 0.2824,
-    "hits": 531,
+    "hit_rate": 0.2749,
+    "hits": 728,
     "level": "3.00+",
-    "mean_fair_odds": 3.48,
-    "mean_probability": 0.2891,
-    "picks": 1880,
+    "mean_fair_odds": 3.572,
+    "mean_probability": 0.2813,
+    "picks": 2648,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3847,
+    "break_even": 0.3934,
     "calibrated": true,
     "ci": [
-     0.4018,
-     0.4428
+     0.4095,
+     0.4418
     ],
     "group": "Goals",
-    "hit_rate": 0.4222,
-    "hits": 941,
+    "hit_rate": 0.4255,
+    "hits": 1529,
     "level": "any",
-    "mean_fair_odds": 2.599,
-    "mean_probability": 0.4242,
-    "picks": 2229,
+    "mean_fair_odds": 2.542,
+    "mean_probability": 0.4333,
+    "picks": 3593,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3303,
+    "break_even": 0.3296,
     "calibrated": true,
     "ci": [
-     0.3045,
-     0.3555
+     0.3048,
+     0.3557
     ],
     "group": "HT/FT",
-    "hit_rate": 0.3295,
-    "hits": 430,
+    "hit_rate": 0.3298,
+    "hits": 431,
     "level": "2.00+",
-    "mean_fair_odds": 3.027,
-    "mean_probability": 0.3402,
-    "picks": 1305,
+    "mean_fair_odds": 3.034,
+    "mean_probability": 0.3394,
+    "picks": 1307,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3184,
+    "break_even": 0.3182,
     "calibrated": true,
     "ci": [
-     0.3006,
-     0.3429
+     0.3012,
+     0.3435
     ],
     "group": "HT/FT",
-    "hit_rate": 0.3214,
-    "hits": 601,
+    "hit_rate": 0.322,
+    "hits": 605,
     "level": "2.50+",
-    "mean_fair_odds": 3.141,
-    "mean_probability": 0.3238,
-    "picks": 1870,
+    "mean_fair_odds": 3.142,
+    "mean_probability": 0.3237,
+    "picks": 1879,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2953,
+    "break_even": 0.2948,
     "calibrated": true,
     "ci": [
-     0.2785,
-     0.3103
+     0.2801,
+     0.3116
     ],
     "group": "HT/FT",
-    "hit_rate": 0.2941,
-    "hits": 928,
+    "hit_rate": 0.2956,
+    "hits": 950,
     "level": "3.00+",
-    "mean_fair_odds": 3.386,
-    "mean_probability": 0.2968,
-    "picks": 3155,
+    "mean_fair_odds": 3.392,
+    "mean_probability": 0.2964,
+    "picks": 3214,
     "strategy": "lean"
    },
    {
-    "break_even": 0.5002,
+    "break_even": 0.5,
     "calibrated": true,
     "ci": [
-     0.5314,
-     0.562
+     0.5315,
+     0.5622
     ],
     "group": "HT/FT",
-    "hit_rate": 0.5467,
-    "hits": 2211,
+    "hit_rate": 0.5469,
+    "hits": 2205,
     "level": "any",
-    "mean_fair_odds": 1.999,
-    "mean_probability": 0.5427,
-    "picks": 4044,
+    "mean_fair_odds": 2.0,
+    "mean_probability": 0.5426,
+    "picks": 4032,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3415,
+    "break_even": 0.3414,
     "calibrated": true,
     "ci": [
-     0.3189,
-     0.359
+     0.3186,
+     0.3587
     ],
     "group": "Half-time",
-    "hit_rate": 0.3387,
+    "hit_rate": 0.3383,
     "hits": 721,
     "level": "2.00+",
-    "mean_fair_odds": 2.928,
+    "mean_fair_odds": 2.929,
     "mean_probability": 0.3511,
-    "picks": 2129,
+    "picks": 2131,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3191,
+    "break_even": 0.3194,
     "calibrated": true,
     "ci": [
-     0.2937,
-     0.3321
+     0.2932,
+     0.3317
     ],
     "group": "Half-time",
-    "hit_rate": 0.3126,
-    "hits": 697,
+    "hit_rate": 0.3121,
+    "hits": 692,
     "level": "2.50+",
-    "mean_fair_odds": 3.134,
-    "mean_probability": 0.325,
-    "picks": 2230,
+    "mean_fair_odds": 3.131,
+    "mean_probability": 0.3252,
+    "picks": 2217,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2863,
+    "break_even": 0.2864,
     "calibrated": true,
     "ci": [
-     0.2544,
-     0.2905
+     0.2524,
+     0.2887
     ],
     "group": "Half-time",
-    "hit_rate": 0.2721,
-    "hits": 632,
+    "hit_rate": 0.2702,
+    "hits": 623,
     "level": "3.00+",
-    "mean_fair_odds": 3.493,
-    "mean_probability": 0.2878,
-    "picks": 2323,
+    "mean_fair_odds": 3.492,
+    "mean_probability": 0.288,
+    "picks": 2306,
     "strategy": "lean"
    },
    {
     "break_even": 0.3451,
     "calibrated": true,
     "ci": [
-     0.3283,
-     0.3746
+     0.3275,
+     0.3738
     ],
     "group": "Half-time",
-    "hit_rate": 0.3511,
-    "hits": 572,
+    "hit_rate": 0.3503,
+    "hits": 571,
     "level": "any",
-    "mean_fair_odds": 2.898,
+    "mean_fair_odds": 2.897,
     "mean_probability": 0.3596,
-    "picks": 1629,
+    "picks": 1630,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3193,
+    "break_even": 0.3197,
     "calibrated": true,
     "ci": [
-     0.3129,
-     0.332
+     0.3147,
+     0.3317
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.3224,
-    "hits": 2942,
+    "hit_rate": 0.3231,
+    "hits": 3753,
     "level": "2.00+",
-    "mean_fair_odds": 3.132,
-    "mean_probability": 0.3288,
-    "picks": 9126,
+    "mean_fair_odds": 3.127,
+    "mean_probability": 0.3291,
+    "picks": 11614,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3027,
+    "break_even": 0.303,
     "calibrated": true,
     "ci": [
-     0.291,
-     0.3099
+     0.2928,
+     0.3093
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.3004,
-    "hits": 2721,
+    "hit_rate": 0.301,
+    "hits": 3572,
     "level": "2.50+",
-    "mean_fair_odds": 3.304,
-    "mean_probability": 0.3075,
-    "picks": 9059,
+    "mean_fair_odds": 3.3,
+    "mean_probability": 0.3077,
+    "picks": 11867,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2814,
+    "break_even": 0.2829,
     "calibrated": true,
     "ci": [
-     0.2649,
-     0.2853
+     0.2671,
+     0.2846
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.275,
-    "hits": 2011,
+    "hit_rate": 0.2757,
+    "hits": 2779,
     "level": "3.00+",
-    "mean_fair_odds": 3.554,
-    "mean_probability": 0.283,
-    "picks": 7313,
+    "mean_fair_odds": 3.535,
+    "mean_probability": 0.2845,
+    "picks": 10078,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3354,
+    "break_even": 0.3382,
     "calibrated": true,
     "ci": [
-     0.34,
-     0.3596
+     0.3464,
+     0.3636
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.3497,
-    "hits": 3197,
+    "hit_rate": 0.355,
+    "hits": 4216,
     "level": "any",
-    "mean_fair_odds": 2.981,
-    "mean_probability": 0.3576,
-    "picks": 9141,
+    "mean_fair_odds": 2.956,
+    "mean_probability": 0.362,
+    "picks": 11877,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3304,
+    "break_even": 0.3316,
     "calibrated": true,
     "ci": [
-     0.3386,
-     0.3646
+     0.3373,
+     0.3593
     ],
     "group": "Team goals",
-    "hit_rate": 0.3515,
-    "hits": 1821,
+    "hit_rate": 0.3482,
+    "hits": 2501,
     "level": "2.00+",
-    "mean_fair_odds": 3.027,
-    "mean_probability": 0.341,
-    "picks": 5181,
+    "mean_fair_odds": 3.016,
+    "mean_probability": 0.3421,
+    "picks": 7183,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3083,
+    "break_even": 0.3069,
     "calibrated": true,
     "ci": [
-     0.3065,
-     0.3333
+     0.3042,
+     0.327
     ],
     "group": "Team goals",
-    "hit_rate": 0.3197,
-    "hits": 1483,
+    "hit_rate": 0.3155,
+    "hits": 2012,
     "level": "2.50+",
-    "mean_fair_odds": 3.244,
-    "mean_probability": 0.3121,
-    "picks": 4638,
+    "mean_fair_odds": 3.258,
+    "mean_probability": 0.3107,
+    "picks": 6378,
     "strategy": "lean"
    },
    {
-    "break_even": 0.2817,
+    "break_even": 0.2818,
     "calibrated": true,
     "ci": [
-     0.2749,
-     0.3053
+     0.277,
+     0.3024
     ],
     "group": "Team goals",
-    "hit_rate": 0.2899,
-    "hits": 989,
+    "hit_rate": 0.2895,
+    "hits": 1426,
     "level": "3.00+",
-    "mean_fair_odds": 3.55,
+    "mean_fair_odds": 3.549,
     "mean_probability": 0.2831,
-    "picks": 3412,
+    "picks": 4925,
     "strategy": "lean"
    },
    {
-    "break_even": 0.3556,
+    "break_even": 0.3538,
     "calibrated": true,
     "ci": [
-     0.3648,
-     0.3932
+     0.3619,
+     0.3856
     ],
     "group": "Team goals",
-    "hit_rate": 0.3789,
-    "hits": 1691,
+    "hit_rate": 0.3736,
+    "hits": 2385,
     "level": "any",
-    "mean_fair_odds": 2.812,
-    "mean_probability": 0.3764,
-    "picks": 4463,
+    "mean_fair_odds": 2.826,
+    "mean_probability": 0.373,
+    "picks": 6383,
     "strategy": "lean"
    },
    {
-    "break_even": 0.498,
+    "break_even": 0.4975,
     "calibrated": true,
     "ci": [
-     0.459,
-     0.564
+     0.4575,
+     0.5748
     ],
     "group": "BTTS",
-    "hit_rate": 0.5116,
-    "hits": 176,
+    "hit_rate": 0.5164,
+    "hits": 142,
     "level": "2.00+",
-    "mean_fair_odds": 2.008,
-    "mean_probability": 0.498,
-    "picks": 344,
+    "mean_fair_odds": 2.01,
+    "mean_probability": 0.4975,
+    "picks": 275,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3936,
+    "break_even": 0.396,
     "calibrated": true,
     "ci": [
-     0.3801,
-     0.5188
+     0.4127,
+     0.6069
     ],
     "group": "BTTS",
-    "hit_rate": 0.4485,
-    "hits": 87,
+    "hit_rate": 0.5102,
+    "hits": 50,
     "level": "2.50+",
-    "mean_fair_odds": 2.541,
-    "mean_probability": 0.3936,
-    "picks": 194,
+    "mean_fair_odds": 2.525,
+    "mean_probability": 0.396,
+    "picks": 98,
     "strategy": "probability"
    },
    {
-    "break_even": 0.299,
+    "break_even": 0.3055,
     "calibrated": true,
     "ci": [
-     0.253,
-     0.3575
+     0.2609,
+     0.3599
     ],
     "group": "BTTS",
-    "hit_rate": 0.3027,
-    "hits": 89,
+    "hit_rate": 0.3082,
+    "hits": 102,
     "level": "3.00+",
-    "mean_fair_odds": 3.344,
-    "mean_probability": 0.3002,
-    "picks": 294,
+    "mean_fair_odds": 3.273,
+    "mean_probability": 0.3063,
+    "picks": 331,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6606,
+    "break_even": 0.6543,
     "calibrated": true,
     "ci": [
-     0.6067,
-     0.7173
+     0.6092,
+     0.6844
     ],
     "group": "BTTS",
-    "hit_rate": 0.6643,
-    "hits": 184,
+    "hit_rate": 0.6477,
+    "hits": 399,
     "level": "any",
-    "mean_fair_odds": 1.514,
-    "mean_probability": 0.6607,
-    "picks": 277,
+    "mean_fair_odds": 1.528,
+    "mean_probability": 0.6544,
+    "picks": 616,
     "strategy": "probability"
    },
    {
-    "break_even": 0.496,
+    "break_even": 0.4947,
     "calibrated": true,
     "ci": [
-     0.4781,
-     0.5329
+     0.4836,
+     0.5265
     ],
     "group": "Combos",
-    "hit_rate": 0.5055,
-    "hits": 644,
+    "hit_rate": 0.5051,
+    "hits": 1050,
     "level": "2.00+",
-    "mean_fair_odds": 2.016,
-    "mean_probability": 0.496,
-    "picks": 1274,
+    "mean_fair_odds": 2.021,
+    "mean_probability": 0.4947,
+    "picks": 2079,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3925,
+    "break_even": 0.3938,
     "calibrated": true,
     "ci": [
-     0.3883,
-     0.4236
+     0.3856,
+     0.4208
     ],
     "group": "Combos",
-    "hit_rate": 0.4059,
-    "hits": 1205,
+    "hit_rate": 0.4031,
+    "hits": 1202,
     "level": "2.50+",
-    "mean_fair_odds": 2.548,
-    "mean_probability": 0.3926,
-    "picks": 2969,
+    "mean_fair_odds": 2.539,
+    "mean_probability": 0.3939,
+    "picks": 2982,
     "strategy": "probability"
    },
    {
     "break_even": 0.3299,
     "calibrated": true,
     "ci": [
-     0.3195,
-     0.3654
+     0.3147,
+     0.3544
     ],
     "group": "Combos",
-    "hit_rate": 0.3421,
-    "hits": 560,
+    "hit_rate": 0.3343,
+    "hits": 724,
     "level": "3.00+",
     "mean_fair_odds": 3.031,
     "mean_probability": 0.3299,
-    "picks": 1637,
+    "picks": 2166,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6556,
+    "break_even": 0.65,
     "calibrated": true,
     "ci": [
-     0.6278,
-     0.6856
+     0.6338,
+     0.6787
     ],
     "group": "Combos",
-    "hit_rate": 0.6573,
-    "hits": 677,
+    "hit_rate": 0.6566,
+    "hits": 1128,
     "level": "any",
-    "mean_fair_odds": 1.525,
-    "mean_probability": 0.6558,
-    "picks": 1030,
+    "mean_fair_odds": 1.538,
+    "mean_probability": 0.6502,
+    "picks": 1718,
     "strategy": "probability"
    },
    {
-    "break_even": 0.4949,
+    "break_even": 0.4942,
     "calibrated": true,
     "ci": [
-     0.4949,
-     0.512
+     0.4938,
+     0.508
     ],
     "group": "Goals",
-    "hit_rate": 0.5034,
-    "hits": 6664,
+    "hit_rate": 0.5009,
+    "hits": 9448,
     "level": "2.00+",
-    "mean_fair_odds": 2.021,
-    "mean_probability": 0.4949,
-    "picks": 13237,
+    "mean_fair_odds": 2.023,
+    "mean_probability": 0.4943,
+    "picks": 18862,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3908,
+    "break_even": 0.3924,
     "calibrated": true,
     "ci": [
-     0.3925,
-     0.4259
+     0.3894,
+     0.4154
     ],
     "group": "Goals",
-    "hit_rate": 0.4091,
-    "hits": 1362,
+    "hit_rate": 0.4023,
+    "hits": 2212,
     "level": "2.50+",
-    "mean_fair_odds": 2.559,
-    "mean_probability": 0.3909,
-    "picks": 3329,
+    "mean_fair_odds": 2.548,
+    "mean_probability": 0.3925,
+    "picks": 5498,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3068,
+    "break_even": 0.3157,
     "calibrated": true,
     "ci": [
-     0.2967,
-     0.3293
+     0.3038,
+     0.3321
     ],
     "group": "Goals",
-    "hit_rate": 0.3127,
-    "hits": 971,
+    "hit_rate": 0.3178,
+    "hits": 1328,
     "level": "3.00+",
-    "mean_fair_odds": 3.259,
-    "mean_probability": 0.3074,
-    "picks": 3105,
+    "mean_fair_odds": 3.167,
+    "mean_probability": 0.316,
+    "picks": 4179,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6571,
+    "break_even": 0.6592,
     "calibrated": true,
     "ci": [
-     0.6503,
-     0.6782
+     0.6484,
+     0.6724
     ],
     "group": "Goals",
-    "hit_rate": 0.6644,
-    "hits": 2918,
+    "hit_rate": 0.6605,
+    "hits": 3947,
     "level": "any",
-    "mean_fair_odds": 1.522,
-    "mean_probability": 0.6571,
-    "picks": 4392,
+    "mean_fair_odds": 1.517,
+    "mean_probability": 0.6592,
+    "picks": 5976,
     "strategy": "probability"
    },
    {
@@ -2874,236 +2874,236 @@
     "strategy": "probability"
    },
    {
-    "break_even": 0.4846,
+    "break_even": 0.4817,
     "calibrated": true,
     "ci": [
-     0.4242,
-     0.5453
+     0.4471,
+     0.5739
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.4845,
-    "hits": 125,
+    "hit_rate": 0.5106,
+    "hits": 120,
     "level": "2.00+",
-    "mean_fair_odds": 2.064,
-    "mean_probability": 0.4856,
-    "picks": 258,
+    "mean_fair_odds": 2.076,
+    "mean_probability": 0.482,
+    "picks": 235,
     "strategy": "probability"
    },
    {
-    "break_even": 0.394,
+    "break_even": 0.3935,
     "calibrated": true,
     "ci": [
-     0.3549,
-     0.4644
+     0.3525,
+     0.4554
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.4085,
-    "hits": 125,
+    "hit_rate": 0.4029,
+    "hits": 139,
     "level": "2.50+",
-    "mean_fair_odds": 2.538,
-    "mean_probability": 0.3941,
-    "picks": 306,
+    "mean_fair_odds": 2.541,
+    "mean_probability": 0.3936,
+    "picks": 345,
     "strategy": "probability"
    },
    {
-    "break_even": 0.304,
+    "break_even": 0.2939,
     "calibrated": true,
     "ci": [
-     0.2587,
-     0.3291
+     0.2781,
+     0.3324
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.2926,
-    "hits": 187,
+    "hit_rate": 0.3045,
+    "hits": 335,
     "level": "3.00+",
-    "mean_fair_odds": 3.29,
-    "mean_probability": 0.3047,
-    "picks": 639,
+    "mean_fair_odds": 3.402,
+    "mean_probability": 0.295,
+    "picks": 1100,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6565,
+    "break_even": 0.6572,
     "calibrated": true,
     "ci": [
-     0.631,
-     0.713
+     0.6432,
+     0.719
     ],
     "group": "Result & double chance",
-    "hit_rate": 0.6733,
-    "hits": 336,
+    "hit_rate": 0.6823,
+    "hits": 393,
     "level": "any",
-    "mean_fair_odds": 1.523,
-    "mean_probability": 0.6567,
-    "picks": 499,
+    "mean_fair_odds": 1.522,
+    "mean_probability": 0.6574,
+    "picks": 576,
     "strategy": "probability"
    },
    {
-    "break_even": 0.4981,
+    "break_even": 0.498,
     "calibrated": true,
     "ci": [
-     0.496,
-     0.5668
+     0.4833,
+     0.5413
     ],
     "group": "Team goals",
-    "hit_rate": 0.5316,
-    "hits": 404,
+    "hit_rate": 0.5123,
+    "hits": 582,
     "level": "2.00+",
     "mean_fair_odds": 2.008,
-    "mean_probability": 0.4981,
-    "picks": 760,
+    "mean_probability": 0.498,
+    "picks": 1136,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3954,
+    "break_even": 0.395,
     "calibrated": true,
     "ci": [
-     0.384,
-     0.4325
+     0.3757,
+     0.4072
     ],
     "group": "Team goals",
-    "hit_rate": 0.408,
-    "hits": 641,
+    "hit_rate": 0.3914,
+    "hits": 1448,
     "level": "2.50+",
-    "mean_fair_odds": 2.529,
-    "mean_probability": 0.3954,
-    "picks": 1571,
+    "mean_fair_odds": 2.532,
+    "mean_probability": 0.395,
+    "picks": 3700,
     "strategy": "probability"
    },
    {
-    "break_even": 0.3244,
+    "break_even": 0.3251,
     "calibrated": true,
     "ci": [
-     0.3019,
-     0.3428
+     0.3046,
+     0.3405
     ],
     "group": "Team goals",
-    "hit_rate": 0.322,
-    "hits": 646,
+    "hit_rate": 0.3223,
+    "hits": 839,
     "level": "3.00+",
-    "mean_fair_odds": 3.083,
-    "mean_probability": 0.3245,
-    "picks": 2006,
+    "mean_fair_odds": 3.076,
+    "mean_probability": 0.3252,
+    "picks": 2603,
     "strategy": "probability"
    },
    {
-    "break_even": 0.6534,
+    "break_even": 0.6576,
     "calibrated": true,
     "ci": [
-     0.6373,
-     0.6637
+     0.6394,
+     0.6684
     ],
     "group": "Team goals",
-    "hit_rate": 0.6506,
-    "hits": 3263,
+    "hit_rate": 0.654,
+    "hits": 2694,
     "level": "any",
-    "mean_fair_odds": 1.53,
-    "mean_probability": 0.6535,
-    "picks": 5015,
+    "mean_fair_odds": 1.521,
+    "mean_probability": 0.6577,
+    "picks": 4119,
     "strategy": "probability"
    }
   ],
   "level_summary": [
    {
-    "hit_rate": 0.3378,
+    "hit_rate": 0.3377,
     "level": "2.00+",
-    "mean_fair_odds": 3.047,
-    "mean_return": -0.0017,
-    "mean_shown": 0.3388,
-    "picks": 26382,
+    "mean_fair_odds": 3.034,
+    "mean_return": -0.0074,
+    "mean_shown": 0.3404,
+    "picks": 34050,
     "return_ci": [
-     -0.0191,
-     0.0157
+     -0.023,
+     0.0086
     ],
     "strategy": "lean"
    },
    {
-    "hit_rate": 0.3097,
+    "hit_rate": 0.3077,
     "level": "2.50+",
-    "mean_fair_odds": 3.254,
-    "mean_return": -0.0077,
-    "mean_shown": 0.3121,
-    "picks": 25467,
+    "mean_fair_odds": 3.258,
+    "mean_return": -0.013,
+    "mean_shown": 0.3116,
+    "picks": 33128,
     "return_ci": [
-     -0.0258,
-     0.0108
+     -0.0294,
+     0.0028
     ],
     "strategy": "lean"
    },
    {
-    "hit_rate": 0.2811,
+    "hit_rate": 0.2809,
     "level": "3.00+",
     "mean_fair_odds": 3.524,
-    "mean_return": -0.0143,
+    "mean_return": -0.015,
     "mean_shown": 0.2853,
-    "picks": 22705,
+    "picks": 30159,
     "return_ci": [
-     -0.0332,
-     0.0051
+     -0.0317,
+     0.0021
     ],
     "strategy": "lean"
    },
    {
-    "hit_rate": 0.4009,
+    "hit_rate": 0.398,
     "level": "any",
-    "mean_fair_odds": 2.713,
-    "mean_return": -0.0043,
-    "mean_shown": 0.4027,
-    "picks": 27419,
+    "mean_fair_odds": 2.711,
+    "mean_return": -0.0104,
+    "mean_shown": 0.4018,
+    "picks": 35469,
     "return_ci": [
-     -0.0207,
-     0.0115
+     -0.0249,
+     0.0043
     ],
     "strategy": "lean"
    },
    {
-    "hit_rate": 0.5027,
+    "hit_rate": 0.5009,
     "level": "2.00+",
     "mean_fair_odds": 2.028,
-    "mean_return": 0.0192,
-    "mean_shown": 0.4933,
-    "picks": 18318,
+    "mean_return": 0.0156,
+    "mean_shown": 0.4932,
+    "picks": 25032,
     "return_ci": [
-     0.005,
-     0.0351
+     0.0032,
+     0.0281
     ],
     "strategy": "probability"
    },
    {
-    "hit_rate": 0.3907,
+    "hit_rate": 0.3894,
     "level": "2.50+",
-    "mean_fair_odds": 2.615,
-    "mean_return": 0.0207,
-    "mean_shown": 0.3829,
-    "picks": 18383,
+    "mean_fair_odds": 2.598,
+    "mean_return": 0.011,
+    "mean_shown": 0.3853,
+    "picks": 22637,
     "return_ci": [
-     0.0008,
-     0.0392
+     -0.0062,
+     0.0273
     ],
     "strategy": "probability"
    },
    {
-    "hit_rate": 0.3237,
+    "hit_rate": 0.3238,
     "level": "3.00+",
-    "mean_fair_odds": 3.131,
-    "mean_return": 0.0132,
-    "mean_shown": 0.3198,
-    "picks": 18053,
+    "mean_fair_odds": 3.123,
+    "mean_return": 0.0111,
+    "mean_shown": 0.3206,
+    "picks": 20751,
     "return_ci": [
-     -0.0083,
-     0.0349
+     -0.0096,
+     0.0318
     ],
     "strategy": "probability"
    },
    {
     "hit_rate": 0.6599,
     "level": "any",
-    "mean_fair_odds": 1.525,
-    "mean_return": 0.0065,
-    "mean_shown": 0.6557,
-    "picks": 20350,
+    "mean_fair_odds": 1.523,
+    "mean_return": 0.005,
+    "mean_shown": 0.6567,
+    "picks": 22142,
     "return_ci": [
-     -0.0034,
-     0.0158
+     -0.0047,
+     0.0146
     ],
     "strategy": "probability"
    }
@@ -3131,23 +3131,49 @@
  "rounds": [
   {
    "date": "2026-11-14",
-   "fixtures": 45,
-   "hits": 2007,
+   "fixtures": 48,
+   "hits": 2051,
    "kind": "example",
    "label": "Saturday 14 Nov",
-   "leagues": 7,
-   "picks": 7087,
-   "rows": 7087,
-   "settled": true,
-   "settled_count": 7087,
+   "leagues": 9,
+   "picks": 7548,
+   "rows": 7548,
+   "settled": false,
+   "settled_count": 7304,
    "weekday": "Saturday"
+  },
+  {
+   "date": "2026-11-21",
+   "fixtures": 122,
+   "hits": 0,
+   "kind": "round",
+   "label": "Saturday 21 Nov",
+   "leagues": 21,
+   "picks": 19076,
+   "rows": 19076,
+   "settled": false,
+   "settled_count": 0,
+   "weekday": "Saturday"
+  },
+  {
+   "date": "2026-11-22",
+   "fixtures": 44,
+   "hits": 0,
+   "kind": "round",
+   "label": "Sunday 22 Nov",
+   "leagues": 13,
+   "picks": 6810,
+   "rows": 6810,
+   "settled": false,
+   "settled_count": 0,
+   "weekday": "Sunday"
   }
  ],
  "totals": {
-  "hit_rate": 0.2832,
-  "hits": 2007,
-  "picks": 7087,
-  "rounds": 1,
-  "settled": 7087
+  "hit_rate": 0.2808,
+  "hits": 2051,
+  "picks": 33434,
+  "rounds": 3,
+  "settled": 7304
  }
 }
