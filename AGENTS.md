@@ -111,7 +111,7 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 - 21 Nov (122 fixtures, 19,076 rows) and 22 Nov (44 fixtures, 6,810 rows) are published; companions
   (`picks/*.full.json`) add 2,640 / 1,022 market rows and are verified on the model fields.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 156 tests passing. `npm run build` green (47 pages).
+- 157 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
