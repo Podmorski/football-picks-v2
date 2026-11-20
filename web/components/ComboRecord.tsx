@@ -11,6 +11,7 @@ type Strategy = {
   landed: number | null;
   ci: [number | null, number | null];
   return: number | null;
+  return_ci: [number | null, number | null];
   longest_losing: number;
   worst_drawdown: number;
   mozzart: { n: number; return: number | null };
@@ -65,6 +66,7 @@ export default function ComboRecord() {
               <th className="px-3 py-2 text-right font-semibold">Landed</th>
               <th className="px-3 py-2 text-right font-semibold">95% CI</th>
               <th className="px-3 py-2 text-right font-semibold">Return</th>
+              <th className="px-3 py-2 text-right font-semibold">Return 95% CI</th>
               <th className="px-3 py-2 text-right font-semibold">Longest losing</th>
               <th className="px-3 py-2 text-right font-semibold">Worst drawdown</th>
               <th className="px-3 py-2 text-right font-semibold">Mozzart</th>
@@ -82,6 +84,9 @@ export default function ComboRecord() {
                   {row.ci[0] === null ? '–' : `${pct(row.ci[0])} to ${pct(row.ci[1])}`}
                 </td>
                 <td className="tabular px-3 py-1.5 text-right">{signed(row.return)}</td>
+                <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">
+                  {row.return_ci[0] === null ? '–' : `${signed(row.return_ci[0])} to ${signed(row.return_ci[1])}`}
+                </td>
                 <td className="tabular px-3 py-1.5 text-right">{row.longest_losing}</td>
                 <td className="tabular px-3 py-1.5 text-right">{row.worst_drawdown.toFixed(2)}</td>
                 <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">

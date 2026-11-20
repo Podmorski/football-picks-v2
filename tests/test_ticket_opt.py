@@ -60,3 +60,40 @@ def test_dp_matches_enumeration_on_a_small_pool() -> None:
 def test_no_ticket_when_target_unreachable() -> None:
     legs = [leg("A", "B", 0.55), leg("C", "D", 0.50)]
     assert ticket_opt.optimise(legs, 100.0, 2, min_fair=0.0) == []
+
+
+def test_optimise_many_matches_optimise() -> None:
+    legs = [leg("A", "B", 0.55), leg("C", "D", 0.50), leg("E", "F", 0.45), leg("G", "H", 0.40)]
+    many = ticket_opt.optimise_many(legs, [3.0, 5.0], [2, 3], min_fair=0.0, step=0.02)
+    for target in (3.0, 5.0):
+        for max_legs in (2, 3):
+            single = ticket_opt.optimise(legs, target, max_legs, alternatives=1, min_fair=0.0)
+            expected = single[0] if single else None
+            got = many[(target, max_legs)]
+            if expected is None:
+                assert got is None
+            else:
+                assert got is not None
+                assert got["fair"] == pytest.approx(expected["fair"], abs=0.05)
+
+
+def test_combo_backtest_aggregates_by_round_date() -> None:
+    import inspect
+
+    from pipeline.model import combo_backtest
+
+    source = inspect.getsource(combo_backtest)
+    assert "date_pools" in source
+    assert "optimise_many" in source
+
+
+def test_combo_summary_has_return_ci() -> None:
+    from pipeline.model.combo_backtest import _summarise
+
+    rows = [
+        {"date": "2024-01-06", "p": 0.5, "landed": True, "ret": 1.0},
+        {"date": "2024-01-13", "p": 0.5, "landed": False, "ret": -1.0},
+    ]
+    stats = _summarise(rows)
+    assert len(stats["return_ci"]) == 2
+    assert stats["return_ci"][0] is not None

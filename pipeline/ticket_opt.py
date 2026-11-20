@@ -120,3 +120,54 @@ def optimise(legs: list[dict], target: float, max_legs: int, alternatives: int =
     if len(pool) <= ENUMERATE_LIMIT:
         return _enumerate(pool, target, max_legs, alternatives)
     return _dp(pool, target, max_legs, alternatives)
+
+
+def optimise_many(
+    legs: list[dict], targets, max_legs_list, min_fair: float = 1.50, step: float = 0.02,
+) -> dict:
+    """Best ticket for every (target, max_legs) from one reachable DP.
+
+    Used by the per-date backtest, where running the DP once per date is far
+    cheaper than once per target. Small pools use exact enumeration.
+    """
+    pool = _dedupe(legs, min_fair)
+    results: dict[tuple[float, int], dict | None] = {}
+    if len(pool) <= ENUMERATE_LIMIT:
+        for target in targets:
+            for max_legs in max_legs_list:
+                tickets = _enumerate(pool, target, max_legs, 1)
+                results[(target, max_legs)] = tickets[0] if tickets else None
+        return results
+
+    weights = [max(1, math.ceil(math.log(max(float(leg["fair"]), 1.0)) / step)) for leg in pool]
+    top = max(max_legs_list)
+    max_weight = top * max(weights) if weights else 0
+    reachable: list[dict] = [dict() for _ in range(top + 1)]
+    reachable[0][0] = None
+    for index, weight in enumerate(weights):
+        for size in range(top, 0, -1):
+            previous = reachable[size - 1]
+            current = reachable[size]
+            for prev_weight in list(previous.keys()):
+                new_weight = prev_weight + weight
+                if new_weight > max_weight:
+                    continue
+                if new_weight not in current:
+                    current[new_weight] = (index, prev_weight)
+
+    for target in targets:
+        target_weight = math.ceil(math.log(target) / step)
+        for max_legs in max_legs_list:
+            best = None
+            for size in range(1, max_legs + 1):
+                for weight in sorted(value for value in reachable[size] if value >= target_weight):
+                    combo = _reconstruct(reachable, size, weight, pool)
+                    if combo is None:
+                        continue
+                    _probability, fair = _combined(combo)
+                    if fair >= target:
+                        if best is None or fair < best["fair"]:
+                            best = {"legs": combo, "probability": 1.0 / fair, "fair": fair}
+                        break
+            results[(target, max_legs)] = best
+    return results

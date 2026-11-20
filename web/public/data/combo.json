@@ -5,7 +5,7 @@
   4,
   5
  ],
- "note": "Walk-forward model fit and calibration; returns at fair odds; Mozzart only for settled live rounds.",
+ "note": "One ticket per round date across all divisions; walk-forward model fit and calibration; returns at fair odds.",
  "seasons": [
   "2019-20",
   "2020-21",
@@ -18,231 +18,279 @@
  "strategies": [
   {
    "ci": [
-    0.4163,
-    0.437
+    0.4354,
+    0.5016
    ],
-   "landed": 0.4266,
-   "longest_losing": 15,
+   "landed": 0.4684,
+   "longest_losing": 11,
    "max_legs": 2,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.4177,
-   "return": 0.0211,
+   "predicted": 0.4723,
+   "return": -0.0063,
+   "return_ci": [
+    -0.0776,
+    0.0636
+   ],
    "strategy": "target 2.00 / max 2",
    "target": 2.0,
-   "tickets": 8748,
-   "worst_drawdown": -93.325
+   "tickets": 869,
+   "worst_drawdown": -33.221
   },
   {
    "ci": [
-    0.4163,
-    0.437
+    0.4354,
+    0.5016
    ],
-   "landed": 0.4266,
-   "longest_losing": 15,
+   "landed": 0.4684,
+   "longest_losing": 11,
    "max_legs": 3,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.4177,
-   "return": 0.0211,
+   "predicted": 0.4723,
+   "return": -0.0063,
+   "return_ci": [
+    -0.0776,
+    0.0636
+   ],
    "strategy": "target 2.00 / max 3",
    "target": 2.0,
-   "tickets": 8748,
-   "worst_drawdown": -93.325
+   "tickets": 869,
+   "worst_drawdown": -33.221
   },
   {
    "ci": [
-    0.4163,
-    0.437
+    0.4354,
+    0.5016
    ],
-   "landed": 0.4266,
-   "longest_losing": 15,
+   "landed": 0.4684,
+   "longest_losing": 11,
    "max_legs": 4,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.4177,
-   "return": 0.0211,
+   "predicted": 0.4723,
+   "return": -0.0063,
+   "return_ci": [
+    -0.0776,
+    0.0636
+   ],
    "strategy": "target 2.00 / max 4",
    "target": 2.0,
-   "tickets": 8748,
-   "worst_drawdown": -93.325
+   "tickets": 869,
+   "worst_drawdown": -33.221
   },
   {
    "ci": [
-    0.4163,
-    0.437
+    0.4354,
+    0.5016
    ],
-   "landed": 0.4266,
-   "longest_losing": 15,
+   "landed": 0.4684,
+   "longest_losing": 11,
    "max_legs": 5,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.4177,
-   "return": 0.0211,
+   "predicted": 0.4723,
+   "return": -0.0063,
+   "return_ci": [
+    -0.0776,
+    0.0636
+   ],
    "strategy": "target 2.00 / max 5",
    "target": 2.0,
-   "tickets": 8748,
-   "worst_drawdown": -93.325
+   "tickets": 869,
+   "worst_drawdown": -33.221
   },
   {
    "ci": [
-    0.2968,
-    0.319
+    0.3038,
+    0.3676
    ],
-   "landed": 0.3078,
-   "longest_losing": 22,
+   "landed": 0.3349,
+   "longest_losing": 16,
    "max_legs": 2,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.3139,
-   "return": -0.0184,
+   "predicted": 0.3278,
+   "return": 0.0217,
+   "return_ci": [
+    -0.0711,
+    0.1142
+   ],
    "strategy": "target 3.00 / max 2",
    "target": 3.0,
-   "tickets": 6640,
-   "worst_drawdown": -154.207
+   "tickets": 836,
+   "worst_drawdown": -53.523
   },
   {
    "ci": [
-    0.289,
-    0.3089
+    0.3056,
+    0.3687
    ],
-   "landed": 0.2989,
-   "longest_losing": 22,
+   "landed": 0.3364,
+   "longest_losing": 16,
    "max_legs": 3,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.3021,
-   "return": -0.0089,
+   "predicted": 0.3258,
+   "return": 0.0363,
+   "return_ci": [
+    -0.056,
+    0.1347
+   ],
    "strategy": "target 3.00 / max 3",
    "target": 3.0,
-   "tickets": 8127,
-   "worst_drawdown": -140.084
+   "tickets": 859,
+   "worst_drawdown": -42.664
   },
   {
    "ci": [
-    0.289,
-    0.3089
+    0.3056,
+    0.3687
    ],
-   "landed": 0.2989,
-   "longest_losing": 22,
+   "landed": 0.3364,
+   "longest_losing": 16,
    "max_legs": 4,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.3021,
-   "return": -0.0089,
+   "predicted": 0.3258,
+   "return": 0.0363,
+   "return_ci": [
+    -0.056,
+    0.1347
+   ],
    "strategy": "target 3.00 / max 4",
    "target": 3.0,
-   "tickets": 8127,
-   "worst_drawdown": -140.084
+   "tickets": 859,
+   "worst_drawdown": -42.664
   },
   {
    "ci": [
-    0.289,
-    0.3089
+    0.3056,
+    0.3687
    ],
-   "landed": 0.2989,
-   "longest_losing": 22,
+   "landed": 0.3364,
+   "longest_losing": 16,
    "max_legs": 5,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.3021,
-   "return": -0.0089,
+   "predicted": 0.3258,
+   "return": 0.0363,
+   "return_ci": [
+    -0.056,
+    0.1347
+   ],
    "strategy": "target 3.00 / max 5",
    "target": 3.0,
-   "tickets": 8127,
-   "worst_drawdown": -140.084
+   "tickets": 859,
+   "worst_drawdown": -42.664
   },
   {
    "ci": [
-    0.1257,
-    0.1995
+    0.1548,
+    0.2335
    ],
-   "landed": 0.1592,
-   "longest_losing": 22,
+   "landed": 0.1911,
+   "longest_losing": 18,
    "max_legs": 2,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.1963,
-   "return": -0.1926,
+   "predicted": 0.1973,
+   "return": -0.0343,
+   "return_ci": [
+    -0.2328,
+    0.1649
+   ],
    "strategy": "target 5.00 / max 2",
    "target": 5.0,
-   "tickets": 377,
-   "worst_drawdown": -103.324
+   "tickets": 382,
+   "worst_drawdown": -43.007
   },
   {
    "ci": [
-    0.1701,
-    0.19
+    0.1727,
+    0.2272
    ],
-   "landed": 0.1798,
-   "longest_losing": 30,
+   "landed": 0.1985,
+   "longest_losing": 19,
    "max_legs": 3,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.1829,
-   "return": -0.0093,
+   "predicted": 0.1969,
+   "return": 0.0139,
+   "return_ci": [
+    -0.1212,
+    0.1555
+   ],
    "strategy": "target 5.00 / max 3",
    "target": 5.0,
-   "tickets": 5689,
-   "worst_drawdown": -175.633
+   "tickets": 821,
+   "worst_drawdown": -52.82
   },
   {
    "ci": [
-    0.1677,
-    0.1859
+    0.1712,
+    0.2249
    ],
-   "landed": 0.1766,
-   "longest_losing": 34,
+   "landed": 0.1967,
+   "longest_losing": 19,
    "max_legs": 4,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.1783,
-   "return": -0.0037,
+   "predicted": 0.1961,
+   "return": 0.0059,
+   "return_ci": [
+    -0.1229,
+    0.1431
+   ],
    "strategy": "target 5.00 / max 4",
    "target": 5.0,
-   "tickets": 6739,
-   "worst_drawdown": -198.714
+   "tickets": 839,
+   "worst_drawdown": -53.978
   },
   {
    "ci": [
-    0.1677,
-    0.1859
+    0.1712,
+    0.2249
    ],
-   "landed": 0.1766,
-   "longest_losing": 34,
+   "landed": 0.1967,
+   "longest_losing": 19,
    "max_legs": 5,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.1783,
-   "return": -0.0037,
+   "predicted": 0.1961,
+   "return": 0.0059,
+   "return_ci": [
+    -0.1229,
+    0.1431
+   ],
    "strategy": "target 5.00 / max 5",
    "target": 5.0,
-   "tickets": 6739,
-   "worst_drawdown": -198.714
+   "tickets": 839,
+   "worst_drawdown": -53.978
   },
   {
    "ci": [
@@ -258,6 +306,10 @@
    },
    "predicted": null,
    "return": null,
+   "return_ci": [
+    null,
+    null
+   ],
    "strategy": "target 10.00 / max 2",
    "target": 10.0,
    "tickets": 0,
@@ -265,60 +317,72 @@
   },
   {
    "ci": [
-    0.0821,
-    0.1398
+    0.0817,
+    0.1351
    ],
-   "landed": 0.1076,
-   "longest_losing": 40,
+   "landed": 0.1055,
+   "longest_losing": 50,
    "max_legs": 3,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.0969,
-   "return": 0.105,
+   "predicted": 0.0983,
+   "return": 0.0754,
+   "return_ci": [
+    -0.1874,
+    0.3555
+   ],
    "strategy": "target 10.00 / max 3",
    "target": 10.0,
-   "tickets": 446,
-   "worst_drawdown": -48.797
+   "tickets": 512,
+   "worst_drawdown": -59.231
   },
   {
    "ci": [
-    0.0871,
-    0.1071
+    0.0943,
+    0.1386
    ],
-   "landed": 0.0966,
-   "longest_losing": 83,
+   "landed": 0.1146,
+   "longest_losing": 50,
    "max_legs": 4,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.0919,
-   "return": 0.0556,
+   "predicted": 0.0986,
+   "return": 0.1641,
+   "return_ci": [
+    -0.0559,
+    0.4013
+   ],
    "strategy": "target 10.00 / max 4",
    "target": 10.0,
-   "tickets": 3353,
-   "worst_drawdown": -212.027
+   "tickets": 794,
+   "worst_drawdown": -60.621
   },
   {
    "ci": [
-    0.0843,
-    0.1017
+    0.0909,
+    0.1338
    ],
-   "landed": 0.0927,
-   "longest_losing": 79,
+   "landed": 0.1106,
+   "longest_losing": 50,
    "max_legs": 5,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.0902,
-   "return": 0.0284,
+   "predicted": 0.0986,
+   "return": 0.1246,
+   "return_ci": [
+    -0.0941,
+    0.356
+   ],
    "strategy": "target 10.00 / max 5",
    "target": 10.0,
-   "tickets": 4273,
-   "worst_drawdown": -205.828
+   "tickets": 823,
+   "worst_drawdown": -82.604
   },
   {
    "ci": [
@@ -334,6 +398,10 @@
    },
    "predicted": null,
    "return": null,
+   "return_ci": [
+    null,
+    null
+   ],
    "strategy": "target 20.00 / max 2",
    "target": 20.0,
    "tickets": 0,
@@ -353,6 +421,10 @@
    },
    "predicted": null,
    "return": null,
+   "return_ci": [
+    null,
+    null
+   ],
    "strategy": "target 20.00 / max 3",
    "target": 20.0,
    "tickets": 0,
@@ -360,41 +432,49 @@
   },
   {
    "ci": [
-    0.0197,
-    0.059
+    0.0379,
+    0.0766
    ],
-   "landed": 0.0343,
-   "longest_losing": 144,
+   "landed": 0.0541,
+   "longest_losing": 61,
    "max_legs": 4,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.0487,
-   "return": -0.2909,
+   "predicted": 0.0494,
+   "return": 0.0991,
+   "return_ci": [
+    -0.2811,
+    0.5092
+   ],
    "strategy": "target 20.00 / max 4",
    "target": 20.0,
-   "tickets": 350,
-   "worst_drawdown": -144.0
+   "tickets": 536,
+   "worst_drawdown": -88.649
   },
   {
    "ci": [
-    0.0355,
-    0.054
+    0.0444,
+    0.0781
    ],
-   "landed": 0.0438,
-   "longest_losing": 78,
+   "landed": 0.0591,
+   "longest_losing": 52,
    "max_legs": 5,
    "mozzart": {
     "n": 0,
     "return": null
    },
-   "predicted": 0.0471,
-   "return": -0.0681,
+   "predicted": 0.0494,
+   "return": 0.2007,
+   "return_ci": [
+    -0.1174,
+    0.5614
+   ],
    "strategy": "target 20.00 / max 5",
    "target": 20.0,
-   "tickets": 1893,
-   "worst_drawdown": -223.367
+   "tickets": 762,
+   "worst_drawdown": -68.414
   }
  ],
  "targets": [

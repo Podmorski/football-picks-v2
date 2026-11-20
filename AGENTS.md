@@ -107,11 +107,12 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   the combo backtest uses them. The Record picker table was already walk-forward and is unchanged.
 - Odds floor `?min=` (default 1.50) is applied to fair odds before the best-per-match pick; the
   Any-bet >80% rule is gone. Target-payout tickets (`?target=`, `?legs=`) replace the best 2-5
-  suggestions; the combo backtest is per target × max legs (walk-forward, floor 1.50).
+  suggestions; the combo backtest is per target × max legs, one ticket per round date across all
+  divisions playing that date (walk-forward, floor 1.50), with a return 95% CI bootstrapped over dates.
 - 21 Nov (122 fixtures, 19,076 rows) and 22 Nov (44 fixtures, 6,810 rows) are published; companions
   (`picks/*.full.json`) add 2,640 / 1,022 market rows and are verified on the model fields.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 157 tests passing. `npm run build` green (47 pages).
+- 160 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
@@ -119,4 +120,4 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   prices run, fixture/market match rates, prebuild snapshot count, Mozzart-vs-fair distribution and
   10 real rows.
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
-  backtest optimises one ticket per division-round (the model's round unit), not across all divisions.
+  backtest optimises one ticket per round date across all divisions playing that date.

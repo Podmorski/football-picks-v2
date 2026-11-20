@@ -1,27 +1,29 @@
-"""Target-payout combo backtest, walk-forward.
+"""Target-payout combo backtest per round DATE, walk-forward.
 
-For every Tuesday/Saturday/Sunday round from 2019-20 to 2025-26 the model is
-fitted on matches before the round and calibrated with that season's walk-forward
-factors (fitted on earlier seasons only). The pool is each match's best "Combos"
-bet with fair odds at least 1.50. For every target payout and max leg count the
-optimiser (pipeline.ticket_opt) picks the highest-probability ticket whose
-combined fair odds reach the target.
+For every round date from 2019-20 to 2025-26 the model is fitted on matches
+before that date (per division) and calibrated with the target season's
+walk-forward factors. All divisions playing that date contribute to one pool of
+each match's best "Combos" bet with fair odds at least 1.50. For every target
+payout and max leg count the optimiser picks the highest-probability ticket
+whose combined fair odds reach the target, one leg per match.
 """
 from __future__ import annotations
 
 import datetime as dt
 import json
+from collections import defaultdict
 from pathlib import Path
 
 import numpy as np
 
 from ..counts import wilson_interval
 from ..markets import MARKETS, market_mask, settle
-from ..ticket_opt import optimise
+from ..ticket_opt import optimise_many
 from .data import EPOCH, build_arrays, subset
 from .goals_engine import fit as fit_goals
 from .grid import joint_vector
 from .picker_backtest import band_of
+from .ranking_backtest import mean_return_ci
 
 SEASONS = tuple(range(2019, 2026))
 ROUND_WEEKDAYS = (1, 5, 6)
@@ -31,6 +33,7 @@ FLOOR = 1.50
 TARGETS = (2.0, 3.0, 5.0, 10.0, 20.0)
 MAX_LEGS = (2, 3, 4, 5)
 GROUP = "Combos"
+DP_STEP = 0.02
 
 
 def season_start(match) -> int:
@@ -48,6 +51,11 @@ def _summarise(rows: list[dict]) -> dict:
     predicted = sum(row["p"] for row in rows) / n if n else None
     mean_return = sum(row["ret"] for row in rows) / n if n else None
     low, high = wilson_interval(hits, n) if n else (None, None)
+    return_low = return_high = None
+    if rows:
+        _, (return_low, return_high) = mean_return_ci(
+            [{"date": row.get("date"), "return": row["ret"]} for row in rows]
+        )
     longest = 0
     current = 0
     equity = 0.0
@@ -68,6 +76,10 @@ def _summarise(rows: list[dict]) -> dict:
         "landed": None if landed is None else round(landed, 4),
         "ci": [None if low is None else round(low, 4), None if high is None else round(high, 4)],
         "return": None if mean_return is None else round(mean_return, 4),
+        "return_ci": [
+            None if return_low is None else round(return_low, 4),
+            None if return_high is None else round(return_high, 4),
+        ],
         "longest_losing": longest,
         "worst_drawdown": round(worst, 3),
     }
@@ -85,9 +97,8 @@ def run(matches_by_division: dict[str, list], half_life: float, season_factors: 
         ordered = sorted(matches, key=lambda match: (match.date, match.home, match.away))
         prepared.append((_code, build_arrays(ordered), np.array([season_start(m) for m in ordered], dtype=np.int32)))
 
-    strategies: dict[tuple[float, int], list[dict]] = {
-        (target, legs): [] for target in TARGETS for legs in MAX_LEGS
-    }
+    date_pools: dict[str, list[dict]] = defaultdict(list)
+    date_season: dict[str, str] = {}
 
     for target_season in SEASONS:
         factors = season_factors.get(season_label(target_season), {})
@@ -130,7 +141,7 @@ def run(matches_by_division: dict[str, list], half_life: float, season_factors: 
                         if fair < FLOOR:
                             continue
                         if best is None or shown > best["pc"]:
-                            best = {"pc": shown, "fair": fair, "position": position, "row": row}
+                            best = {"pc": shown, "fair": fair, "position": position}
                     if best is None:
                         continue
                     position = best["position"]
@@ -148,24 +159,29 @@ def run(matches_by_division: dict[str, list], half_life: float, season_factors: 
                             "a": test.away[row],
                         }
                     )
-                if not pool:
-                    continue
+                if pool:
+                    iso = round_date.isoformat()
+                    date_pools[iso].extend(pool)
+                    date_season[iso] = season_label(target_season)
 
-                for target in TARGETS:
-                    for legs in MAX_LEGS:
-                        tickets = optimise(pool, target, legs, alternatives=1, min_fair=FLOOR)
-                        if not tickets:
-                            continue
-                        ticket = tickets[0]
-                        probability = 1.0 / ticket["fair"]
-                        all_hit = all(leg["hit"] for leg in ticket["legs"])
-                        strategies[(target, legs)].append(
-                            {
-                                "p": probability,
-                                "landed": all_hit,
-                                "ret": (ticket["fair"] - 1.0) if all_hit else -1.0,
-                            }
-                        )
+    strategies: dict[tuple[float, int], list[dict]] = {
+        (target, legs): [] for target in TARGETS for legs in MAX_LEGS
+    }
+    for iso in sorted(date_pools):
+        pool = date_pools[iso]
+        tickets = optimise_many(pool, TARGETS, MAX_LEGS, min_fair=FLOOR, step=DP_STEP)
+        for (target, legs), ticket in tickets.items():
+            if ticket is None:
+                continue
+            all_hit = all(leg["hit"] for leg in ticket["legs"])
+            strategies[(target, legs)].append(
+                {
+                    "date": iso,
+                    "p": 1.0 / ticket["fair"],
+                    "landed": all_hit,
+                    "ret": (ticket["fair"] - 1.0) if all_hit else -1.0,
+                }
+            )
 
     summary = []
     for target in TARGETS:
@@ -182,7 +198,7 @@ def run(matches_by_division: dict[str, list], half_life: float, season_factors: 
         "targets": list(TARGETS),
         "max_legs": list(MAX_LEGS),
         "strategies": summary,
-        "note": "Walk-forward model fit and calibration; returns at fair odds; Mozzart only for settled live rounds.",
+        "note": "One ticket per round date across all divisions; walk-forward model fit and calibration; returns at fair odds.",
     }
 
 
