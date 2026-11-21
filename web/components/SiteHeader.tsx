@@ -6,6 +6,11 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import ThemeToggle from '@/components/ThemeToggle';
 
+const PRIMARY = [
+  { href: '/', label: 'Best bets' },
+  { href: '/explore', label: 'Explore' },
+];
+
 const LINKS = [
   { href: '/rounds', label: 'Rounds' },
   { href: '/tickets', label: 'My tickets' },
@@ -28,6 +33,25 @@ export default function SiteHeader() {
           <ThemeToggle />
         </div>
       </header>
+      <nav className="border-t bg-background">
+        <div className="mx-auto flex max-w-5xl items-center gap-1 px-4 py-1.5">
+          {PRIMARY.map((link) => {
+            const active = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={cn(
+                  'rounded-md px-2.5 py-1 text-sm font-medium transition-colors',
+                  active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground hover:text-foreground',
+                )}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
       <nav className="border-t bg-muted/40">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-1 px-4 py-2">
           {LINKS.map((link) => {

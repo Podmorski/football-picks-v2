@@ -93,6 +93,7 @@ export default function VettedList({
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
   const [mozzartOnly, setMozzartOnly] = useParam('mozzart', '0');
+  const [minOdds, setMinOdds] = useParam('min', '1.70');
   const [roundParam, setRound] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketLeg[]>([]);
@@ -188,18 +189,20 @@ export default function VettedList({
     return row.m === bet.slice(7);
   };
   const baseFiltered = evaluated.filter((item) => (league === 'all' || item.row.d === league) && betMatches(item.row));
+  const minFair = Number(minOdds) || 1.70;
 
   const passing = useMemo(() => {
     const best = new Map<string, Evaluated>();
     for (const item of baseFiltered) {
       if (!item.passed) continue;
+      if (item.candidate.fairOdds < minFair) continue;
       if (mozzartOnly === '1' && !(item.price && item.price.odds >= item.candidate.fairOdds)) continue;
       const key = `${item.row.h}|${item.row.a}`;
       const current = best.get(key);
       if (!current || item.candidate.probability > current.candidate.probability) best.set(key, item);
     }
     return [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
-  }, [baseFiltered, mozzartOnly]);
+  }, [baseFiltered, mozzartOnly, minFair]);
 
   const closest = useMemo(() => {
     if (passing.length > 0) return [];
@@ -264,7 +267,7 @@ export default function VettedList({
         </div>
       ) : null}
 
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className="grid gap-2 sm:grid-cols-4">
         <select value={league} onChange={(event) => setLeague(event.target.value)} aria-label="League" className="rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="all">All leagues</option>
           {countries.map(([country, leagues]) => (
@@ -285,10 +288,15 @@ export default function VettedList({
         <button type="button" onClick={() => setMozzartOnly(mozzartOnly === '1' ? '0' : '1')} className={cn('rounded-md border px-2.5 py-1.5 text-sm', mozzartOnly === '1' ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>
           Only where Mozzart pays at least fair
         </button>
+        <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="rounded-md border bg-background px-2 py-1.5 text-sm">
+          <option value="1.40">Min fair odds 1.40</option>
+          <option value="1.70">Min fair odds 1.70</option>
+          <option value="2.00">Min fair odds 2.00</option>
+        </select>
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel}
+        {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel} · fair ≥ {minFair.toFixed(2)}
         {kind === 'example' ? ' · Example round' : ''}
       </p>
 

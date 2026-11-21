@@ -123,3 +123,13 @@ def test_value_toggle_is_url_driven() -> None:
     source = (Path(__file__).resolve().parents[1] / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
     assert "useParam('mozzart'" in source
     assert "odds >= item.candidate.fairOdds" in source
+
+
+def test_best_bets_min_fair_odds_control() -> None:
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
+    assert "useParam('min', '1.70')" in source
+    assert "item.candidate.fairOdds < minFair" in source
+    assert 'value="1.40"' in source
+    assert 'value="2.00"' in source
