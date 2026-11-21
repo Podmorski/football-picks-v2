@@ -8,6 +8,7 @@ export type MozzartFixture = {
   kickoff: string | null;
   prices: Record<string, number>;
   match_similarity: number;
+  fetched_at?: string;
 };
 
 export type MozzartSnapshot = {
@@ -37,7 +38,7 @@ export function buildPriceIndex(file: MozzartPricesFile | null, roundDate: strin
     for (const [market, odds] of Object.entries(fixture.prices)) {
       index[priceKey(fixture.div, fixture.home, fixture.away, market)] = {
         odds,
-        fetchedAt: snapshot.fetched_at,
+        fetchedAt: fixture.fetched_at ?? snapshot.fetched_at,
       };
     }
   }

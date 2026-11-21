@@ -6,9 +6,10 @@ import { join } from 'node:path';
 const DATA = join(process.cwd(), 'public', 'data');
 const PRICES_OUT = join(DATA, 'mozzart-prices.json');
 const RECORD_OUT = join(DATA, 'mozzart-record.json');
+const VETTED_OUT = join(DATA, 'mozzart-vetted-record.json');
 
 function clean() {
-  for (const path of [PRICES_OUT, RECORD_OUT]) {
+  for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT]) {
     try {
       if (existsSync(path)) rmSync(path);
     } catch {
@@ -54,6 +55,8 @@ try {
   writeFileSync(PRICES_OUT, JSON.stringify({ rounds }));
   const recordPath = join(cloneDir, 'record.json');
   if (existsSync(recordPath)) writeFileSync(RECORD_OUT, readFileSync(recordPath));
+  const vettedPath = join(cloneDir, 'vetted-record.json');
+  if (existsSync(vettedPath)) writeFileSync(VETTED_OUT, readFileSync(vettedPath));
   console.log('prices: embedded ' + rounds.length + ' round snapshot(s)');
 } catch (error) {
   clean();

@@ -18,7 +18,7 @@ from pathlib import Path
 
 from ..config import ROOT_DIR
 from .. import ranking
-from . import client, record, snapshot
+from . import client, record, snapshot, vetted_record
 
 PICKS_DIR = ROOT_DIR / "picks"
 
@@ -148,6 +148,8 @@ def main(argv=None) -> int:
 
     aggregate = record.aggregate(_all_rounds(), snapshots)
     _write_json(prices_dir / "record.json", aggregate)
+    vetted = vetted_record.aggregate(_all_rounds(), snapshots)
+    _write_json(prices_dir / "vetted-record.json", vetted)
 
     latest = _load_json(snapshot_path, {})
     priced = len(latest.get("fixtures", []))

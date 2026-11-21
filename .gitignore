@@ -7,6 +7,7 @@ data/raw/
 # Mozzart prices are private: never commit them or the private checkout
 web/public/data/mozzart-prices.json
 web/public/data/mozzart-record.json
+web/public/data/mozzart-vetted-record.json
 prices/
 
 # python

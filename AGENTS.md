@@ -81,14 +81,15 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
    settled by `run_model.py`; future rounds carry every market. The already-published 21/22 Nov
    rounds are never edited; their all-market companions are `picks/<date>.full.json`, verified on the
    model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
-6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard: round switch,
-   League (search, grouped by country), Bet (Any / a group / a market, default All combos), odds floor
-   `?min=` (Any/1.30/1.50/2.00/3.00, default 1.50), sortable columns, **top 10** then Show all (N =
-   matches), match view `?match=` (that match's 10 best bets), expanded row = goal ladder + next 5 bets.
-   Target-payout tickets (`?target=` 2/3/5/10/20, `?legs=` 2-5; top 3; per-leg and ticket results once
-   settled), "Suggested tickets — past rounds" (top-1 per target 3/5/10 from each round's own file, with
-   per-target tallies), ticket builder (localStorage only), `/tickets`, `/rounds`, `/record`
-   (per-season picker calibration, target × max-legs combos, Mozzart return).
+6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard = the live
+   **vetted list** (`vetting.DEFAULT_RULE`: C1 0.45, C2-C4, C6; C7 flag): Round, League, Bet (Any / a
+   group / one market, default Any bet). "Best bets this round" = passing picks, one per match, sorted
+   by probability, Strong (>= 55%) / Possible; card shows Mozzart vs fair (red below fair), check ticks,
+   result/score, details (team records n, league usual n, goal ladder). Empty state names the filter and
+   the 3 closest candidates with the failed check. "Only where Mozzart pays at least fair" (`?mozzart=1`).
+   Tickets are built only from passing picks (target 3/5/10). The old odds floor, Show filter and sort
+   are gone; Leagues/Record/Rounds/Tickets are small links. Record: picker calibration, combos, Mozzart
+   return, and "Record at Mozzart prices" (all passing / passing+value / any value, return CI).
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -134,16 +135,19 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   0 started; 20 pages, budget 21/90. Aliases were added for the 29 unmatched names (future fetches
   only; 21 Nov is not re-fetched).
 - Vetting engine: `pipeline/vetting.py` has C1-C12 as pure checks (C7 a flag, never a filter) and a
-  `DEFAULT_RULE` (C1 0.45, C2-C4, C6, C7 flag). 16 tests. **Not yet done**: the Stage A/B rule
-  backtest, the `vetting.json` live-rule selection/holdout, and the vetting dashboard layout.
+  `DEFAULT_RULE` (C1 0.45, C2-C4, C6, C7 flag). The dashboard is now the live vetted list using that
+  rule; the old picker UI is unused. **Cancelled**: the Stage A/B rule backtest and C9 (there is no
+  xG/AxG in the football-data.co.uk CSVs; coverage is 0).
+- Record has "Record at Mozzart prices" (all passing / passing+value / any value; per round and
+  cumulative; return at the Mozzart price with a CI bootstrapped over round dates). It is empty until
+  settled rounds carry frozen prices.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 190 tests passing. `npm run build` green (47 pages).
+- 191 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
-- **Milestone 6 pending**: run the Stage A/B rule backtest (selection 2019-20..2023-24, confirm
-  2024-25..2025-26), save `pipeline/model/vetting.json`, and replace the dashboard with the vetting
-  layout (Best bets, ticks, empty state, target tickets). HxG/AxG coverage is 0 in our CSVs, so C9
-  cannot run.
+- **Record at Mozzart prices** fills after the 21/22 Nov settle (Mon 12:00) and the prices are frozen;
+  21 Nov is 93/122 priced, 22 Nov pending. **Stage A/B backtest and C9 are cancelled** — do not
+  reintroduce them; there is no xG/AxG in the data.
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
   backtest optimises one ticket per round date across all divisions playing that date.

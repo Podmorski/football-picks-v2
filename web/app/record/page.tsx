@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import ComboRecord from '@/components/ComboRecord';
 import MozzartRecord from '@/components/MozzartRecord';
+import MozzartVettedRecord from '@/components/MozzartVettedRecord';
 import PickerRecord from '@/components/PickerRecord';
 import { readModel, readRecord } from '@/lib/data';
 
@@ -110,6 +111,8 @@ export default function RecordPage() {
       <ComboRecord />
 
       <MozzartRecord />
+
+      <MozzartVettedRecord />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Published picks</h2>

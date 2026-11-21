@@ -1,4 +1,4 @@
-import Picker from '@/components/Picker';
+import VettedList from '@/components/VettedList';
 import { Badge } from '@/components/ui/badge';
 import { readIndex, readRoundIndex } from '@/lib/data';
 
@@ -101,7 +101,7 @@ export default function HomePage() {
       ) : null}
 
       {chosen ? (
-        <Picker
+        <VettedList
           date={chosen.date}
           kind={chosen.kind}
           leagueOptions={leagueOptions}
