@@ -199,6 +199,8 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   change:
   `python -c "import json; from pathlib import Path; from pipeline.config import RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras; from pipeline.run import cached_seasons; from pipeline.run_model import load_by_division; from pipeline.model import type_backtest; d=load_divisions(); by=load_by_division(RAW_DIR,d,load_extras(),cached_seasons(RAW_DIR)); f=json.loads((WEB_DATA_DIR/'picker.json').read_text())['season_factors']; type_backtest.write({l.code: by.get(l.code,[]) for l in d}, 365.0, WEB_DATA_DIR/'type_backtest.json', f)`.
   Explore keeps its M4/M5 picker behaviour; only the correct-score removal applies there.
+- Reporting: weekly reporting is automatic via `/report` (rebuilt by every `run_model` pass, including
+  the Monday settle); screenshots via `screens.yml` (artifact only, never committed).
 - Cards/colours (21 Nov): Best bets cards and opened details have no check ticks or condition chips;
   Strong/Possible are neutral badges. Green is used only for Landed, red only for Lost, grey for
   Pending/Void (Best bets and Explore).
