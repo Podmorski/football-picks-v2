@@ -1,0 +1,118 @@
+{
+ "bootstrap": {
+  "resamples": 2000,
+  "seed": 20261025,
+  "unit": "round date"
+ },
+ "groups": [
+  {
+   "group": "Combos",
+   "landed": 0.377,
+   "picks": 8128,
+   "picks_per_round": 9.936,
+   "predicted": 0.3721,
+   "return": 0.0242,
+   "return_ci": [
+    -0.0113,
+    0.0655
+   ],
+   "rounds": 818
+  },
+  {
+   "group": "HT/FT",
+   "landed": 0.2406,
+   "picks": 15109,
+   "picks_per_round": 17.692,
+   "predicted": 0.2417,
+   "return": 0.0065,
+   "return_ci": [
+    -0.0325,
+    0.0461
+   ],
+   "rounds": 854
+  },
+  {
+   "group": "Goals",
+   "landed": 0.2983,
+   "picks": 5075,
+   "picks_per_round": 6.669,
+   "predicted": 0.2935,
+   "return": 0.0113,
+   "return_ci": [
+    -0.0412,
+    0.0656
+   ],
+   "rounds": 761
+  },
+  {
+   "group": "BTTS",
+   "landed": 0.3492,
+   "picks": 1343,
+   "picks_per_round": 2.446,
+   "predicted": 0.3711,
+   "return": -0.0756,
+   "return_ci": [
+    -0.1564,
+    0.0055
+   ],
+   "rounds": 549
+  },
+  {
+   "group": "Half-time",
+   "landed": 0.4733,
+   "picks": 10421,
+   "picks_per_round": 12.678,
+   "predicted": 0.4714,
+   "return": 0.0154,
+   "return_ci": [
+    -0.0137,
+    0.0438
+   ],
+   "rounds": 822
+  },
+  {
+   "group": "Team goals",
+   "landed": 0.4943,
+   "picks": 13060,
+   "picks_per_round": 15.329,
+   "predicted": 0.4968,
+   "return": -0.0103,
+   "return_ci": [
+    -0.0328,
+    0.0128
+   ],
+   "rounds": 852
+  },
+  {
+   "group": "Result & double chance",
+   "landed": 0.4283,
+   "picks": 7694,
+   "picks_per_round": 9.594,
+   "predicted": 0.4293,
+   "return": -0.0119,
+   "return_ci": [
+    -0.0503,
+    0.0289
+   ],
+   "rounds": 802
+  }
+ ],
+ "note": "Walk-forward: goals model and empirical rates use matches before each round; calibration uses picker.json season factors (group x band). One passing bet per match per group (highest lift). Return at fair odds.",
+ "rule": {
+  "agreement_fraction": 0.25,
+  "agreement_min": 0.05,
+  "lift_multiplier": 1.25,
+  "lift_points": 0.03,
+  "max_fair_odds": 15.0,
+  "record_min_n": 8
+ },
+ "seasons": [
+  "2019-20",
+  "2020-21",
+  "2021-22",
+  "2022-23",
+  "2023-24",
+  "2024-25",
+  "2025-26"
+ ]
+}

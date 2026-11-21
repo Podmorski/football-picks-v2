@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { LeagueFile, LeagueIndex, ModelFile, RankRow, RecordFile, RoundDocument, RoundIndexRow } from './types';
+import type { LeagueFile, LeagueIndex, ModelFile, RankRow, RecordFile, RoundDocument, RoundIndexRow, TypeBacktestFile } from './types';
 
 // The pipeline writes here; Next serves the same files statically. Reads happen at build time.
 const DATA_DIR = path.join(process.cwd(), 'public', 'data');
@@ -83,4 +83,9 @@ export function readModel(): ModelFile | null {
 export function readRecord(): RecordFile | null {
   const file = path.join(DATA_DIR, 'record.json');
   return fs.existsSync(file) ? readJson<RecordFile>('record.json') : null;
+}
+
+export function readTypeBacktest(): TypeBacktestFile | null {
+  const file = path.join(DATA_DIR, 'type_backtest.json');
+  return fs.existsSync(file) ? readJson<TypeBacktestFile>('type_backtest.json') : null;
 }

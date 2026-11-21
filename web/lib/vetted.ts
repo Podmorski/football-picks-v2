@@ -4,15 +4,32 @@
 
 import type { PricedRow } from './prices';
 import type { RankRow } from './types';
-import { DEFAULT_RULE, evaluateCandidate, type VettingCandidate, type VettingCheck } from './vetting';
+import {
+  ANY_RULE,
+  evaluateCandidate,
+  evaluateTypeCandidate,
+  liftOf,
+  type VettingCandidate,
+  type VettingCheck,
+} from './vetting';
 
 // Default minimum fair odds on Best bets (`?min=`).
 export const DEFAULT_MIN_FAIR = 1.70;
+
+// Groups kept in the data files but no longer shown in the picker UI.
+export const HIDDEN_GROUP = 'Correct score';
+
+export function isHiddenMarketId(id: string): boolean {
+  return id.startsWith('CORRECT_SCORE:');
+}
+
+export type RuleKind = 'any' | 'type';
 
 export type Evaluated = {
   row: RankRow;
   price?: PricedRow;
   candidate: VettingCandidate;
+  lift: number;
   passed: boolean;
   checks: VettingCheck[];
 };
@@ -28,6 +45,7 @@ export function fairOf(row: RankRow): number {
 export function evaluateRows(
   rows: RankRow[],
   priceFor?: (row: RankRow) => PricedRow | undefined,
+  rule: RuleKind = 'any',
 ): Evaluated[] {
   return rows.map((row) => {
     const probability = pcOf(row);
@@ -46,8 +64,10 @@ export function evaluateRows(
       countsProbability: row.lr,
       mozzartOdds: price?.odds ?? null,
     };
-    const result = evaluateCandidate(candidate, DEFAULT_RULE);
-    return { row, price, candidate, ...result };
+    const result = rule === 'type'
+      ? evaluateTypeCandidate(candidate)
+      : evaluateCandidate(candidate, ANY_RULE);
+    return { row, price, candidate, lift: liftOf(candidate), ...result };
   });
 }
 
@@ -61,6 +81,7 @@ export function selectPassing(
   const mozzartOnly = options.mozzartOnly ?? false;
   const best = new Map<string, Evaluated>();
   for (const item of evaluated) {
+    if (isHiddenMarketId(item.row.m)) continue;
     if (!item.passed) continue;
     if (item.candidate.fairOdds < minFair) continue;
     if (mozzartOnly && !(item.price && item.price.odds >= item.candidate.fairOdds)) continue;
@@ -69,6 +90,27 @@ export function selectPassing(
     if (!current || item.candidate.probability > current.candidate.probability) best.set(key, item);
   }
   return [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
+}
+
+// TYPE_RULE selection. For a group keep one passing bet per match (highest
+// lift); for a single market every passing fixture. Strongest lean first.
+export function selectType(
+  evaluated: Evaluated[],
+  options: { perMatch?: boolean; market?: string } = {},
+): Evaluated[] {
+  const perMatch = options.perMatch ?? false;
+  const best = new Map<string, Evaluated>();
+  for (const item of evaluated) {
+    if (isHiddenMarketId(item.row.m)) continue;
+    if (!item.passed) continue;
+    if (options.market !== undefined && item.row.m !== options.market) continue;
+    const key = perMatch
+      ? `${item.row.d}|${item.row.h}|${item.row.a}`
+      : `${item.row.d}|${item.row.h}|${item.row.a}|${item.row.m}`;
+    const current = best.get(key);
+    if (!current || item.lift > current.lift) best.set(key, item);
+  }
+  return [...best.values()].sort((a, b) => b.lift - a.lift);
 }
 
 export type RoundTally = {

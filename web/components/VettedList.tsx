@@ -15,15 +15,15 @@ import {
 } from '@/lib/prices';
 import { addTicket, combinedFair, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, ticketVsFair, type TicketLeg } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
-import { evaluateRows, pcOf, selectPassing, type Evaluated } from '@/lib/vetted';
+import { evaluateRows, isHiddenMarketId, pcOf, selectPassing, selectType, type Evaluated } from '@/lib/vetted';
 import type { VettingCheck } from '@/lib/vetting';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
-const GROUP_ORDER = ['Combos', 'HT/FT', 'Goals', 'BTTS', 'Half-time', 'Team goals', 'Result & double chance', 'Correct score'];
+const GROUP_ORDER = ['Combos', 'HT/FT', 'Goals', 'BTTS', 'Half-time', 'Team goals', 'Result & double chance'];
 const GROUP_LABEL: Record<string, string> = {
   Combos: 'All combos', 'HT/FT': 'All HT/FT', Goals: 'All goals', BTTS: 'All BTTS',
   'Half-time': 'All half-time', 'Team goals': 'All team goals',
-  'Result & double chance': 'All result & double chance', 'Correct score': 'All correct score',
+  'Result & double chance': 'All result & double chance',
 };
 const LADDER_LABELS: Record<string, string> = {
   'GOAL_RANGE_FT:1+': 'FT 1+ goals', 'GOAL_RANGE_FT:2+': 'FT 2+ goals', 'GOAL_RANGE_FT:3+': 'FT 3+ goals',
@@ -164,27 +164,59 @@ export default function VettedList({
   const priceIndex = useMemo(() => buildPriceIndex(prices, activeDate), [prices, activeDate]);
   const snapshot = useMemo(() => snapshotFor(prices, activeDate), [prices, activeDate]);
 
-  const evaluated = useMemo<EvaluatedRow[]>(() => {
-    return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)]);
+  const isAny = bet === 'any';
+  const evaluatedAny = useMemo<EvaluatedRow[]>(() => {
+    return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)], 'any');
   }, [data, priceIndex]);
+  const evaluatedType = useMemo<EvaluatedRow[]>(() => {
+    return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)], 'type');
+  }, [data, priceIndex]);
+  const activeEvaluated = isAny ? evaluatedAny : evaluatedType;
 
-  const betMatches = (row: RankRow) => {
-    if (bet === 'any') return true;
-    if (bet.startsWith('group:')) return (markets[row.m]?.group ?? '') === bet.slice(6);
-    return row.m === bet.slice(7);
-  };
-  const baseFiltered = evaluated.filter((item) => (league === 'all' || item.row.d === league) && betMatches(item.row));
+  const baseFiltered = useMemo(() => {
+    return activeEvaluated.filter((item) => {
+      if (league !== 'all' && item.row.d !== league) return false;
+      if (isHiddenMarketId(item.row.m)) return false;
+      if (isAny) return true;
+      if (bet.startsWith('group:')) return (markets[item.row.m]?.group ?? '') === bet.slice(6);
+      return item.row.m === bet.slice(7);
+    });
+  }, [activeEvaluated, league, bet, isAny, markets]);
   const minFair = Number(minOdds) || 1.70;
 
   const passing = useMemo(() => {
-    return selectPassing(baseFiltered, { minFair, mozzartOnly: false });
-  }, [baseFiltered, minFair]);
+    if (isAny) return selectPassing(baseFiltered, { minFair, mozzartOnly: false });
+    return selectType(baseFiltered, {
+      perMatch: bet.startsWith('group:'),
+      market: bet.startsWith('group:') ? undefined : bet.slice(7),
+    });
+  }, [baseFiltered, isAny, bet, minFair]);
+
+  // TYPE_RULE match counts for the current round + league, per group and market.
+  const typeCounts = useMemo(() => {
+    const groupMatches = new Map<string, Set<string>>();
+    const marketMatches = new Map<string, Set<string>>();
+    for (const item of evaluatedType) {
+      if (league !== 'all' && item.row.d !== league) continue;
+      if (isHiddenMarketId(item.row.m)) continue;
+      if (!item.passed) continue;
+      const group = markets[item.row.m]?.group;
+      if (!group) continue;
+      const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
+      if (!groupMatches.has(group)) groupMatches.set(group, new Set());
+      groupMatches.get(group)?.add(key);
+      if (!marketMatches.has(item.row.m)) marketMatches.set(item.row.m, new Set());
+      marketMatches.get(item.row.m)?.add(key);
+    }
+    return { groups: groupMatches, markets: marketMatches };
+  }, [evaluatedType, league, markets]);
 
   const closest = useMemo(() => {
     if (passing.length > 0) return [];
     const seen = new Set<string>();
     const rows: { item: EvaluatedRow; failed: VettingCheck[] }[] = [];
-    for (const item of [...baseFiltered].sort((a, b) => b.candidate.probability - a.candidate.probability)) {
+    const ordered = [...baseFiltered].sort((a, b) => (isAny ? b.candidate.probability - a.candidate.probability : b.lift - a.lift));
+    for (const item of ordered) {
       const key = `${item.row.h}|${item.row.a}`;
       if (seen.has(key)) continue;
       const failed = item.checks.filter((check) => !check.flag && !check.passed);
@@ -194,7 +226,7 @@ export default function VettedList({
       if (rows.length >= 3) break;
     }
     return rows;
-  }, [baseFiltered, passing]);
+  }, [baseFiltered, passing, isAny]);
 
   function toLeg(row: RankRow): TicketLeg {
     const meta = markets[row.m];
@@ -228,6 +260,7 @@ export default function VettedList({
   const leagueLabel = league === 'all' ? 'any league' : (leagueNames[league] ?? league);
   const settledPicks = passing.filter((item) => item.row.st === 'landed' || item.row.st === 'lost');
   const landedPicks = settledPicks.filter((item) => item.row.st === 'landed').length;
+  const strongLimit = Math.ceil(passing.length / 3);
   const ticketProbability = combinedProbability(ticket);
   const ticketFair = combinedFair(ticket);
   const ticketMozzart = combinedMozzart(ticket);
@@ -245,7 +278,7 @@ export default function VettedList({
         </div>
       ) : null}
 
-      <div className="grid gap-2 sm:grid-cols-3">
+      <div className={cn('grid gap-2', isAny ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
         <select value={league} onChange={(event) => setLeague(event.target.value)} aria-label="League" className="rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="all">All leagues</option>
           {countries.map(([country, leagues]) => (
@@ -258,20 +291,25 @@ export default function VettedList({
           <option value="any">Any bet</option>
           {GROUP_ORDER.map((group) => (
             <optgroup key={group} label={GROUP_LABEL[group]}>
-              <option value={`group:${group}`}>{GROUP_LABEL[group]}</option>
-              {(marketGroups.get(group) ?? []).map((market) => <option key={market.id} value={`market:${market.id}`}>{market.plain} ({market.mozzart})</option>)}
+              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({typeCounts.groups.get(group)?.size ?? 0})</option>
+              {(marketGroups.get(group) ?? []).map((market) => (
+                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({typeCounts.markets.get(market.id)?.size ?? 0})</option>
+              ))}
             </optgroup>
           ))}
         </select>
-        <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="rounded-md border bg-background px-2 py-1.5 text-sm">
-          <option value="1.40">Min fair odds 1.40</option>
-          <option value="1.70">Min fair odds 1.70</option>
-          <option value="2.00">Min fair odds 2.00</option>
-        </select>
+        {isAny ? (
+          <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="rounded-md border bg-background px-2 py-1.5 text-sm">
+            <option value="1.40">Min fair odds 1.40</option>
+            <option value="1.70">Min fair odds 1.70</option>
+            <option value="2.00">Min fair odds 2.00</option>
+          </select>
+        ) : null}
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel} · fair ≥ {minFair.toFixed(2)}
+        {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel}
+        {isAny ? ` · fair ≥ ${minFair.toFixed(2)}` : ' · strongest lean first'}
         {kind === 'example' ? ' · Example round' : ''}
       </p>
       <p className="text-sm">
@@ -303,13 +341,13 @@ export default function VettedList({
         </div>
       ) : (
         <ul className="space-y-2">
-          {passing.map((item) => {
+          {passing.map((item, index) => {
             const { row, price, candidate, checks } = item;
             const meta = markets[row.m];
             const key = `${row.h}|${row.a}|${row.m}`;
             const open = expanded === key;
             const checked = ticket.some((leg) => legKey(leg) === key);
-            const strong = candidate.probability >= 0.55;
+            const strong = isAny ? candidate.probability >= 0.55 : index < strongLimit;
             const ladderRows = (data?.ladder ?? []).map((id) => (data?.rows ?? []).find((candidateRow) => candidateRow.h === row.h && candidateRow.a === row.a && candidateRow.m === id)).filter(Boolean) as RankRow[];
             return (
               <li key={key} className="rounded-xl border p-3">
@@ -328,6 +366,7 @@ export default function VettedList({
                   <div className="tabular text-right text-sm">
                     <div className="text-base font-semibold">{pct(candidate.probability)}</div>
                     <div className="text-xs text-muted-foreground">fair {candidate.fairOdds.toFixed(2)}</div>
+                    {!isAny ? <div className="text-xs text-muted-foreground">lift {item.lift.toFixed(2)}× usual</div> : null}
                   </div>
                 </div>
 
@@ -448,6 +487,7 @@ export default function VettedList({
       <nav className="flex flex-wrap gap-3 border-t pt-3 text-xs text-muted-foreground">
         <a className="underline underline-offset-2" href="/leagues">Leagues</a>
         <a className="underline underline-offset-2" href="/record">Record</a>
+        <a className="underline underline-offset-2" href="/report">Report</a>
         <a className="underline underline-offset-2" href="/rounds">Rounds</a>
         <a className="underline underline-offset-2" href="/tickets">Tickets</a>
       </nav>

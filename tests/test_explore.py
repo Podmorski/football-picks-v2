@@ -6,10 +6,10 @@ import json
 from pathlib import Path
 
 from pipeline import picker, ranking, vetting
-from pipeline.markets import MARKETS
+from pipeline.markets import MARKET_BY_ID, MARKETS
 
 ROOT = Path(__file__).resolve().parents[1]
-PICKER_HASH = "37ebd7407794e18f0c31510f8f3ea1086cca1973c218050cc64b76119b3f03e8"
+PICKER_HASH = "8cea94d34aea3e78b1988de34d637dc2635d5750af77e911296615ceb73f8216"
 EXPLORE_HASH = "cb4454bd54a9de9df2767b1744d623328b09ef94298f208d524f4024e3ee360b"
 
 
@@ -92,7 +92,7 @@ def test_rounds_tally_shares_the_page_selection() -> None:
     assert "defaultPicks" not in source
     assert "Results pending" in source
     shared = (ROOT / "web" / "lib" / "vetted.ts").read_text(encoding="utf-8")
-    assert "DEFAULT_RULE" in shared
+    assert "ANY_RULE" in shared
     assert "selectPassing" in shared
 
 
@@ -103,3 +103,99 @@ def test_mozzart_labels_are_off_the_main_lists() -> None:
     assert "Mozzart ≥ fair" not in vetted
     assert "Only where Mozzart pays more than fair" not in picker_source
     assert "Mozzart vs fair" not in picker_source
+
+
+TYPE_GROUPS = ("Combos", "HT/FT", "Goals", "BTTS", "Half-time", "Team goals", "Result & double chance")
+
+
+def _type_passes(row: dict) -> bool:
+    pc = row.get("pc", row["p"])
+    fair = 1 / max(pc, 1e-4)
+    candidate = vetting.Candidate(
+        probability=pc, model_probability=row["p"], league_rate=row["lr"], league_n=row["ln"],
+        home_rate=row["hr"], home_n=row["hn"], away_rate=row["ar"], away_n=row["an"],
+        fair_odds=fair,
+    )
+    return vetting.type_evaluate(candidate)[0]
+
+
+def type_rows(iso: str = "2026-11-21") -> tuple[dict, list[dict]]:
+    document = ranking.load(ROOT / "picks" / f"{iso}.full.json")
+    rows = [
+        row for row in document["rows"]
+        if not row["m"].startswith("CORRECT_SCORE:") and _type_passes(row)
+    ]
+    return document, rows
+
+
+def test_htft_rows_pass_type_rule() -> None:
+    _, rows = type_rows()
+    assert any(MARKET_BY_ID[row["m"]].group == "HT/FT" for row in rows)
+
+
+def test_type_group_counts_match_one_per_match_rows() -> None:
+    _, rows = type_rows()
+    counts = {
+        group: len({(row["d"], row["h"], row["a"]) for row in rows if MARKET_BY_ID[row["m"]].group == group})
+        for group in TYPE_GROUPS
+    }
+    assert counts == {
+        "Combos": 32, "HT/FT": 36, "Goals": 18, "BTTS": 9,
+        "Half-time": 44, "Team goals": 43, "Result & double chance": 27,
+    }
+    # A group list shows one row per match, so its length equals the dropdown count.
+    for group in TYPE_GROUPS:
+        selected: dict[tuple[str, str, str], float] = {}
+        for row in rows:
+            if MARKET_BY_ID[row["m"]].group != group:
+                continue
+            key = (row["d"], row["h"], row["a"])
+            lift = row["pc"] / row["lr"] if row["lr"] > 0 else 0.0
+            if key not in selected or lift > selected[key]:
+                selected[key] = lift
+        assert len(selected) == counts[group]
+
+
+def test_zero_count_group_has_closest_candidates() -> None:
+    document, _ = type_rows()
+    rows = [
+        row for row in document["rows"]
+        if row["d"] == "E0" and MARKET_BY_ID[row["m"]].group == "BTTS"
+        and not row["m"].startswith("CORRECT_SCORE:")
+    ]
+    assert rows
+    failing = []
+    for row in rows:
+        pc = row.get("pc", row["p"])
+        candidate = vetting.Candidate(
+            probability=pc, model_probability=row["p"], league_rate=row["lr"], league_n=row["ln"],
+            home_rate=row["hr"], home_n=row["hn"], away_rate=row["ar"], away_n=row["an"],
+            fair_odds=1 / max(pc, 1e-4),
+        )
+        passed, checks = vetting.type_evaluate(candidate)
+        failed = [check for check in checks if not check["passed"]]
+        if not passed and failed:
+            failing.append(((row["h"], row["a"]), failed))
+    # The empty state can name the failed check and value for at least 3 matches.
+    assert len({key for key, _ in failing}) >= 3
+
+
+def test_correct_score_is_hidden_from_the_picker_ui() -> None:
+    vetted = (ROOT / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
+    picker_source = (ROOT / "web" / "components" / "Picker.tsx").read_text(encoding="utf-8")
+    for source in (vetted, picker_source):
+        assert "'Correct score'" not in source
+        assert "isHiddenMarketId" in source
+    shared = (ROOT / "web" / "lib" / "vetted.ts").read_text(encoding="utf-8")
+    assert "CORRECT_SCORE:" in shared
+    markets = json.loads((ROOT / "web" / "public" / "data" / "markets.json").read_text(encoding="utf-8"))
+    assert any(market["group"] == "Correct score" for market in markets["markets"])
+
+
+def test_type_rule_is_wired_into_the_dropdowns_and_list() -> None:
+    vetted = (ROOT / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
+    assert "'type'" in vetted
+    assert "selectType" in vetted
+    assert "typeCounts" in vetted
+    assert ".get(group)?.size" in vetted
+    assert ".get(market.id)?.size" in vetted

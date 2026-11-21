@@ -115,6 +115,25 @@ export type BinRow = { bin: string; shown: number; n: number; hits: number; land
 
 export type CalibrationBlock = { bins: BinRow[] };
 
+export type TypeBacktestRow = {
+  group: string;
+  rounds: number;
+  picks: number;
+  picks_per_round: number | null;
+  landed: number | null;
+  predicted: number | null;
+  return: number | null;
+  return_ci: [number | null, number | null];
+};
+
+export type TypeBacktestFile = {
+  seasons: string[];
+  groups: TypeBacktestRow[];
+  rule: Record<string, number>;
+  bootstrap?: { resamples: number; seed: number; unit: string };
+  note?: string;
+};
+
 export type ModelFile = {
   backtest: { seasons: string[]; fixtures: number };
   hyperparameters: { best: { half_life_days: number; k: number; logloss: number } };

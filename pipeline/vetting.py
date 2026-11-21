@@ -126,6 +126,70 @@ DEFAULT_RULE: dict = {
     "c7": True, "c8": False, "c9": False, "c10": False, "c11": False, "c12": False,
 }
 
+# Bet = "Any bet". Kept as a named alias so the two rules read as one definition.
+ANY_RULE: dict = DEFAULT_RULE
+
+# Bet = a group or a single market. No absolute probability floor and no minimum
+# odds: the bet is judged relative to its own league usual. Fixed thresholds,
+# never tuned on results.
+TYPE_RULE: dict = {
+    "min_lift_multiplier": 1.25,
+    "min_lift_points": 0.03,
+    "min_record_n": 8,
+    "min_agreement": 0.05,
+    "agreement_fraction": 0.25,
+    "max_fair_odds": 15.0,
+}
+
+
+def lift_of(candidate: Candidate) -> float:
+    """Shown probability divided by the league usual for that bet."""
+    return candidate.probability / candidate.league_rate if candidate.league_rate > 0 else 0.0
+
+
+def type_evaluate(candidate: Candidate, rule: dict | None = None) -> tuple[bool, list[dict]]:
+    """TYPE_RULE: lift, team records, agreement and a long-shot cap. No C1/C6 floor."""
+    rule = rule or TYPE_RULE
+    checks: list[dict] = []
+    usual = candidate.league_rate
+    probability = candidate.probability
+
+    lift = lift_of(candidate)
+    lift_passed = (
+        usual > 0
+        and probability >= usual * float(rule["min_lift_multiplier"])
+        and probability >= usual + float(rule["min_lift_points"])
+    )
+    checks.append({
+        "id": "t1", "label": "Lift", "passed": bool(lift_passed),
+        "value": f"{probability*100:.1f}% vs usual {usual*100:.1f}% ({lift:.2f}x)",
+    })
+
+    min_n = int(rule["min_record_n"])
+    records_passed = (
+        candidate.home_n >= min_n and candidate.away_n >= min_n
+        and candidate.home_rate >= usual and candidate.away_rate >= usual
+    )
+    checks.append({
+        "id": "t3", "label": "Team records", "passed": bool(records_passed),
+        "value": f"home {candidate.home_rate*100:.1f}%/{candidate.home_n}, away {candidate.away_rate*100:.1f}%/{candidate.away_n}",
+    })
+
+    gap = abs(candidate.model_probability - usual)
+    allowed = max(float(rule["min_agreement"]), float(rule["agreement_fraction"]) * probability)
+    checks.append({
+        "id": "t4", "label": "Agreement", "passed": bool(gap <= allowed),
+        "value": f"gap {gap*100:.1f} pts <= {allowed*100:.1f} pts",
+    })
+
+    max_fair = float(rule["max_fair_odds"])
+    checks.append({
+        "id": "t6", "label": "Fair", "passed": bool(candidate.fair_odds <= max_fair),
+        "value": f"fair {candidate.fair_odds:.2f} <= {max_fair:.2f}",
+    })
+
+    return all(check["passed"] for check in checks), checks
+
 
 def evaluate(candidate: Candidate, rule: dict | None = None) -> tuple[bool, list[dict]]:
     """All active filters must pass. C7 is appended as a flag, never a filter."""

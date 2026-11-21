@@ -35,7 +35,50 @@ export const DEFAULT_RULE: VettingRule = {
   c8: false, c9: false, c10: false, c11: false, c12: false,
 };
 
+// Bet = "Any bet".
+export const ANY_RULE: VettingRule = DEFAULT_RULE;
+
+// Bet = a group or a single market: judged relative to that bet's league usual.
+// No absolute probability floor and no minimum odds. Fixed thresholds.
+export const TYPE_RULE = {
+  minLiftMultiplier: 1.25,
+  minLiftPoints: 0.03,
+  minRecordN: 8,
+  minAgreement: 0.05,
+  agreementFraction: 0.25,
+  maxFairOdds: 15,
+} as const;
+
 const pct = (value: number) => `${(value * 100).toFixed(1)}%`;
+
+export function liftOf(candidate: VettingCandidate): number {
+  return candidate.leagueRate > 0 ? candidate.probability / candidate.leagueRate : 0;
+}
+
+export function evaluateTypeCandidate(candidate: VettingCandidate): { passed: boolean; checks: VettingCheck[] } {
+  const checks: VettingCheck[] = [];
+  const add = (id: string, label: string, passed: boolean, value: string) => checks.push({ id, label, passed, value });
+  const usual = candidate.leagueRate;
+  const probability = candidate.probability;
+
+  const lift = liftOf(candidate);
+  const liftPassed = usual > 0
+    && probability >= usual * TYPE_RULE.minLiftMultiplier
+    && probability >= usual + TYPE_RULE.minLiftPoints;
+  add('t1', 'Lift', liftPassed, `${pct(probability)} vs usual ${pct(usual)} (${lift.toFixed(2)}x)`);
+
+  const recordsPassed = candidate.homeN >= TYPE_RULE.minRecordN && candidate.awayN >= TYPE_RULE.minRecordN
+    && candidate.homeRate >= usual && candidate.awayRate >= usual;
+  add('t3', 'Team records', recordsPassed, `home ${pct(candidate.homeRate)}/${candidate.homeN}, away ${pct(candidate.awayRate)}/${candidate.awayN}`);
+
+  const gap = Math.abs(candidate.modelProbability - usual);
+  const allowed = Math.max(TYPE_RULE.minAgreement, TYPE_RULE.agreementFraction * probability);
+  add('t4', 'Agreement', gap <= allowed, `gap ${(gap * 100).toFixed(1)} pts <= ${(allowed * 100).toFixed(1)} pts`);
+
+  add('t6', 'Fair', candidate.fairOdds <= TYPE_RULE.maxFairOdds, `fair ${candidate.fairOdds.toFixed(2)} <= ${TYPE_RULE.maxFairOdds.toFixed(2)}`);
+
+  return { passed: checks.every((check) => check.passed), checks };
+}
 
 export function evaluateCandidate(candidate: VettingCandidate, rule: VettingRule = DEFAULT_RULE): { passed: boolean; checks: VettingCheck[] } {
   const checks: VettingCheck[] = [];

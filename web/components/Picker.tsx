@@ -26,6 +26,7 @@ import {
   type TicketLeg,
 } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
+import { isHiddenMarketId } from '@/lib/vetted';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
 const GROUP_ORDER = [
@@ -36,7 +37,6 @@ const GROUP_ORDER = [
   'Half-time',
   'Team goals',
   'Result & double chance',
-  'Correct score',
 ];
 const GROUP_LABEL: Record<string, string> = {
   Combos: 'All combos',
@@ -46,7 +46,6 @@ const GROUP_LABEL: Record<string, string> = {
   'Half-time': 'All half-time',
   'Team goals': 'All team goals',
   'Result & double chance': 'All result & double chance',
-  'Correct score': 'All correct score',
 };
 const FLOORS: [string, string, number][] = [
   ['any', 'Any', 0],
@@ -118,7 +117,8 @@ function decodeRows(payload: Record<string, unknown>): RankRow[] {
 }
 
 function pickPool(rows: RankRow[], bet: string, league: string, markets: Record<string, MarketMeta>, minFair: number): RankRow[] {
-  const filtered = rows.filter((row) => (league === 'all' || row.d === league) && fairOf(row) >= minFair);
+  const visible = rows.filter((row) => !isHiddenMarketId(row.m));
+  const filtered = visible.filter((row) => (league === 'all' || row.d === league) && fairOf(row) >= minFair);
   if (bet === 'any') {
     const best = new Map<string, RankRow>();
     for (const row of filtered) {
@@ -353,7 +353,7 @@ export default function Picker({
   const matchRows = useMemo(() => {
     if (!matchRow) return [];
     return (data?.rows ?? [])
-      .filter((row) => row.d === matchRow.d && row.h === matchRow.h && row.a === matchRow.a && fairOf(row) >= floor)
+      .filter((row) => !isHiddenMarketId(row.m) && row.d === matchRow.d && row.h === matchRow.h && row.a === matchRow.a && fairOf(row) >= floor)
       .sort((a, b) => pcOf(b) - pcOf(a))
       .slice(0, 10);
   }, [data, matchRow, floor]);
@@ -697,7 +697,7 @@ export default function Picker({
                 const open = expanded === key;
                 const checked = ticket.some((leg) => legKey(leg) === key);
                 const siblings = (data?.rows ?? [])
-                  .filter((candidate) => candidate.h === row.h && candidate.a === row.a && candidate.m !== row.m)
+                  .filter((candidate) => !isHiddenMarketId(candidate.m) && candidate.h === row.h && candidate.a === row.a && candidate.m !== row.m)
                   .sort((a, b) => pcOf(b) - pcOf(a))
                   .slice(0, 5);
                 const ladderRows = (data?.ladder ?? []).map((id) => (data?.rows ?? []).find((candidate) => candidate.h === row.h && candidate.a === row.a && candidate.m === id)).filter(Boolean) as RankRow[];

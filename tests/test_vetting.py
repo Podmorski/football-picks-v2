@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 from pipeline.vetting import (
+    ANY_RULE,
     DEFAULT_RULE,
+    TYPE_RULE,
     Candidate,
     c1, c2, c3, c4, c5, c6, c8, c9, c10, c11, c12,
-    evaluate, evaluate_rows,
+    evaluate, evaluate_rows, lift_of, type_evaluate,
 )
 
 
@@ -26,6 +28,72 @@ def test_default_rule_passes_a_good_candidate() -> None:
     passed, checks = evaluate(good(), DEFAULT_RULE)
     assert passed
     assert {check["id"] for check in checks} == {"c1", "c2", "c3", "c4", "c6", "c7"}
+
+
+def type_good(**overrides) -> Candidate:
+    base = dict(
+        probability=0.20, model_probability=0.15, league_rate=0.12, league_n=1000,
+        home_rate=0.13, home_n=12, away_rate=0.12, away_n=10, fair_odds=5.0,
+    )
+    base.update(overrides)
+    return Candidate(**base)
+
+
+def test_any_rule_is_the_default_rule() -> None:
+    assert ANY_RULE == DEFAULT_RULE
+
+
+def test_type_rule_thresholds_are_fixed() -> None:
+    assert TYPE_RULE == {
+        "min_lift_multiplier": 1.25,
+        "min_lift_points": 0.03,
+        "min_record_n": 8,
+        "min_agreement": 0.05,
+        "agreement_fraction": 0.25,
+        "max_fair_odds": 15.0,
+    }
+
+
+def test_type_rule_has_no_probability_or_odds_floor() -> None:
+    # 20% and fair 5.00 would fail the Any-bet rule and a 1.70 floor.
+    candidate = type_good()
+    assert candidate.probability < 0.45 and candidate.fair_odds >= 1.70
+    assert type_evaluate(candidate)[0] is True
+    assert evaluate(candidate, DEFAULT_RULE)[0] is False
+    # A short price passes too: TYPE_RULE has no minimum odds.
+    short = type_good(
+        probability=0.667, league_rate=0.50, model_probability=0.50, fair_odds=1.50,
+        home_rate=0.55, away_rate=0.52,
+    )
+    assert short.fair_odds < 1.70
+    assert type_evaluate(short)[0] is True
+
+
+def test_type_rule_rejects_long_shots() -> None:
+    candidate = type_good(
+        probability=0.065, league_rate=0.03, model_probability=0.03,
+        fair_odds=1 / 0.065, home_rate=0.05, away_rate=0.04,
+    )
+    passed, checks = type_evaluate(candidate)
+    assert passed is False
+    assert next(check for check in checks if check["id"] == "t6")["passed"] is False
+
+
+def test_type_rule_needs_lift_records_and_agreement() -> None:
+    assert type_evaluate(type_good(probability=0.13))[0] is False
+    assert type_evaluate(type_good(home_n=7))[0] is False
+    assert type_evaluate(type_good(probability=0.20, model_probability=0.20))[0] is False
+    # The agreement allowance grows with the probability: 12 points is fine at 60%.
+    big = type_good(
+        probability=0.60, league_rate=0.40, model_probability=0.52,
+        fair_odds=1 / 0.60, home_rate=0.45, away_rate=0.42,
+    )
+    assert type_evaluate(big)[0] is True
+
+
+def test_lift_of_is_probability_over_league_usual() -> None:
+    assert round(lift_of(type_good()), 4) == 1.6667
+    assert lift_of(type_good(league_rate=0.0)) == 0.0
 
 
 def test_c1_threshold() -> None:
