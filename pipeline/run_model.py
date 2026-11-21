@@ -107,9 +107,11 @@ def calibration_overall(selected: dict) -> dict:
     return overall_bins(selected)
 
 
-def historical_fixtures(by_division: dict[str, list], date: dt.date) -> list[Fixture]:
+def historical_fixtures(by_division: dict[str, list], date: dt.date, divisions: set[str] | None = None) -> list[Fixture]:
     fixtures: list[Fixture] = []
     for code, matches in by_division.items():
+        if divisions is not None and code not in divisions:
+            continue
         for match in matches:
             if match.date == date:
                 fixtures.append(
@@ -244,6 +246,11 @@ def main(argv=None) -> int:
             changed = ranking.settle_document(existing, results, today)
             if changed and not args.no_publish:
                 ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
+            full_path = PICKS_DIR / f"{round_date.isoformat()}.full.json"
+            if full_path.exists():
+                full = ranking.load(full_path)
+                if ranking.settle_document(full, results, today) and not args.no_publish:
+                    ranking.publish_full(full, PICKS_DIR, ROUNDS_DIR)
             print(f"round {round_date}: already published, settled only")
         elif action == "settle" and settle_only:
             print(f"round {round_date}: Monday settle-only run, nothing published")
@@ -262,7 +269,7 @@ def main(argv=None) -> int:
 
     example_date = last_saturday(today)
     example_fixtures = fixtures_for_date(fixtures, example_date, divisions_set) or historical_fixtures(
-        by_division, example_date
+        by_division, example_date, divisions_set
     )
     example_predictors = build_predictors(by_division, example_date, half_life, k, decisions)
     example = ranking.build_ranking(example_predictors, example_fixtures, example_date, {**market_calibration, "__bands__": market_bands}, min_fair=0.0, excluded=set(), picker_factors=picker_factors)
@@ -274,11 +281,18 @@ def main(argv=None) -> int:
         ranking.publish(example, PICKS_DIR, ROUNDS_DIR)
 
     for path in sorted(PICKS_DIR.glob("*.json")):
+        if path.name.endswith(".full.json"):
+            continue
         stored = ranking.load(path)
         if stored["date"] in (round_keys | {example_date.isoformat()}):
             continue
         if ranking.settle_document(stored, results, today) and not args.no_publish:
             ranking.publish(stored, PICKS_DIR, ROUNDS_DIR)
+        full_path = PICKS_DIR / f"{stored['date']}.full.json"
+        if full_path.exists():
+            full = ranking.load(full_path)
+            if ranking.settle_document(full, results, today) and not args.no_publish:
+                ranking.publish_full(full, PICKS_DIR, ROUNDS_DIR)
 
     if args.no_publish:
         return 0

@@ -115,13 +115,18 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   (`picks/*.full.json`) add 2,640 / 1,022 market rows and are verified on the model fields.
 - Dashboard UI (5d): top 10 + Show all (N = matches), per-match view (`?match=`), per-leg/ticket
   results on target tickets, and "Suggested tickets — past rounds" with per-target tallies.
+- Settle runs now also settle `picks/<date>.full.json` companions (the dashboard reads them), and
+  `rebuild_index` ignores `*.full.json` (no duplicate rounds). The example round is restricted to the
+  22 main divisions, so the FT-only extra leagues never enter picks, match lists or tickets.
+- Prices (Sat 21 Nov): the scheduled Sat 08:00 `prices.yml` run did not fire (GitHub's scheduler
+  delayed the Fri update runs to 23:26/02:00); the first kickoff was 10:30, under the 2 h guard, so it
+  was not dispatched. The private store is empty, the prebuild embeds 0 snapshots, site 302.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 164 tests passing. `npm run build` green (47 pages).
+- 168 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
-- **Saturday check** after Sat 21 Nov 08:30 UTC and **Sunday check** after Sun 22 Nov 08:30 UTC:
-  prices run, fixture/market match rates, prebuild snapshot count, Mozzart-vs-fair distribution and
-  10 real rows.
+- **Prices**: the 21 Nov round has no prices (scheduler delay + the 2 h guard). Next runs are Sun
+  08:00 and Tue 16:00; the duplicate 21 Nov index entries clear on the next update run.
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
   backtest optimises one ticket per round date across all divisions playing that date.

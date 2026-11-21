@@ -393,6 +393,15 @@ def publish(document: dict, picks_dir: Path, web_dir: Path) -> None:
     (web_dir / f"{document['date']}.json").write_text(text, encoding="utf-8")
 
 
+def publish_full(document: dict, picks_dir: Path, web_dir: Path) -> None:
+    """Write the all-market companion without touching the published main file."""
+    picks_dir.mkdir(parents=True, exist_ok=True)
+    web_dir.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(encode(document), ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+    (picks_dir / f"{document['date']}.full.json").write_text(text, encoding="utf-8")
+    (web_dir / f"{document['date']}.full.json").write_text(text, encoding="utf-8")
+
+
 def load(path: Path) -> dict:
     return decode(json.loads(path.read_text(encoding="utf-8")))
 
@@ -400,6 +409,8 @@ def load(path: Path) -> dict:
 def rebuild_index(picks_dir: Path, web_dir: Path) -> dict:
     rounds = []
     for path in sorted(picks_dir.glob("*.json")):
+        if path.name.endswith(".full.json"):
+            continue
         document = load(path)
         rows = document.get("rows", [])
         if not rows:
