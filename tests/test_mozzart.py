@@ -288,3 +288,16 @@ def test_second_run_makes_no_requests(tmp_path, monkeypatch) -> None:
 
     monkeypatch.setattr(client, "fetch_events", boom)
     assert cli.main(["--date", "2026-11-21", "--prices-dir", str(prices)]) == 0
+
+
+def test_rate_limit_header_is_not_the_monthly_quota() -> None:
+    assert "x-ratelimit-remaining" not in client._REMAINING_HEADERS
+
+    class RateLimited:
+        headers = {"x-ratelimit-remaining": "0"}
+
+    class Quota:
+        headers = {"x-quota-remaining": "300"}
+
+    assert client._remaining(RateLimited(), {}) is None
+    assert client._remaining(Quota(), {}) == 300

@@ -30,8 +30,10 @@ SUNDAY = 6
 TUESDAY = 1
 PRIORITY_ESTIMATE = {"saturday": 16, "sunday": 8, "tuesday": 8}
 
-_REMAINING_HEADERS = ("x-ratelimit-remaining", "x-quota-remaining", "x-requests-remaining")
-_REMAINING_KEYS = ("remaining", "quotaRemaining", "remainingRequests", "remaining_requests")
+# Rate-limit headers are not the provider's monthly quota; the 1.2 s throttle
+# handles them. Only explicit quota signals drive the reserve.
+_REMAINING_HEADERS = ("x-quota-remaining", "x-requests-remaining")
+_REMAINING_KEYS = ("quotaRemaining", "remainingRequests", "remaining_requests")
 
 
 class BudgetExceeded(RuntimeError):

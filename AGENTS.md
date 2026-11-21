@@ -95,12 +95,14 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Schedule (update.yml, UTC)
 
-- Tue 14:00 + 16:00 — Tuesday round.
-- Fri 18:00 + 21:00 — publish BOTH weekend rounds (Saturday and Sunday) when their fixtures exist.
-- Sat 08:00 — retry both weekend rounds; Sun 08:00 — retry Sunday only.
+- Tue 10:00, 14:00, 16:00 — Tuesday round retries.
+- Fri 15:00, 18:00, 21:00 — publish BOTH weekend rounds when their fixtures exist.
+- Sat 05:00, 08:00; Sun 05:00, 08:00 — weekend retries.
 - Mon 12:00 — settle only (settles both weekend rounds), never publish.
 - Round days are Tuesday, Saturday and Sunday; Friday is never a round day.
-- `prices.yml`: Sat 08:00, Sun 08:00, Tue 16:00 — one pass per round, budget priority Sat > Sun > Tue.
+- `prices.yml`: Sat/Sun 05:00, 06:30, 08:00, 09:30; Tue 13:00, 14:30, 16:00, 17:30 — one pass per
+  round. A round that already has a snapshot exits with 0 requests; fixtures kicking off within 20 min
+  of the fetch are marked started and not priced.
 
 ## Current state
 
@@ -121,12 +123,16 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 - Prices (Sat 21 Nov): the scheduled Sat 08:00 `prices.yml` run did not fire (GitHub's scheduler
   delayed the Fri update runs to 23:26/02:00); the first kickoff was 10:30, under the 2 h guard, so it
   was not dispatched. The private store is empty, the prebuild embeds 0 snapshots, site 302.
+- Prices (Sat 21 Nov): dispatched once at 09:51. The fetch stopped after page 1 because the API's
+  rate-limit `remaining: 0` was misread as the monthly quota; the client now uses only explicit quota
+  signals. The snapshot is partial (1 priced, 121 unmatched, 0 started); no second fetch. The priced
+  rebuild embedded 1 snapshot, site 302.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 168 tests passing. `npm run build` green (47 pages).
+- 171 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
-- **Prices**: the 21 Nov round has no prices (scheduler delay + the 2 h guard). Next runs are Sun
-  08:00 and Tue 16:00; the duplicate 21 Nov index entries clear on the next update run.
+- **Prices**: 21 Nov has a partial snapshot (one match). Do not re-fetch 21 Nov; the next late-tolerant
+  slots (Sun 05:00/06:30/08:00/09:30, Tue 13:00/14:30/16:00/17:30) price the next rounds.
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
   backtest optimises one ticket per round date across all divisions playing that date.
