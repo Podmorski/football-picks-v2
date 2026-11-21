@@ -361,3 +361,47 @@ def test_snapshot_merge_keeps_existing_price() -> None:
     assert prices == {("A", "B"): 2.0, ("C", "D"): 1.8}
     assert merged["fixtures"][0]["fetched_at"] == "2026-11-21T09:51:32+00:00"
     assert merged["completion_fetched_at"] == "2026-11-21T10:10:00+00:00"
+
+
+def test_aliases_match_the_21_nov_unmatched_names() -> None:
+    pairs = [
+        ("Borussia Monchengladbach", "M'gladbach"),
+        ("Derby County", "Derby"),
+        ("Stoke City", "Stoke"),
+        ("Birmingham City", "Birmingham"),
+        ("Swansea City", "Swansea"),
+        ("West Bromwich Albion", "West Brom"),
+        ("Wigan Athletic", "Wigan"),
+        ("Luton Town", "Luton"),
+        ("Oxford United", "Oxford"),
+        ("Peterborough United", "Peterboro"),
+        ("Crewe Alexandra", "Crewe"),
+        ("Oldham Athletic", "Oldham"),
+        ("Exeter City", "Exeter"),
+        ("Tranmere Rovers", "Tranmere"),
+        ("Colchester United", "Colchester"),
+        ("York City", "York"),
+        ("Sutton United", "Sutton"),
+        ("Boston United", "Boston Utd"),
+        ("PSG", "Paris SG"),
+        ("Stade Lavallois", "Laval"),
+        ("Sent Etjen", "St Etienne"),
+        ("AEK Athens", "AEK"),
+        ("NEC Nijmegen", "Nijmegen"),
+        ("Dunfermline Athletic", "Dunfermline"),
+        ("Greenock Morton", "Morton"),
+        ("Raith Rovers", "Raith Rvs"),
+        ("Partick Thistle", "Partick"),
+        ("Airdrieonians", "Airdrie Utd"),
+        ("Queen of South", "Queen of Sth"),
+        ("Hamilton Academical", "Hamilton"),
+        ("Alloa Athletic", "Alloa"),
+        ("Forfar Athletic", "Forfar"),
+        ("Stirling Albion", "Stirling"),
+        ("Elgin City", "Elgin"),
+        ("Deportivo La Coruna", "La Coruna"),
+        ("Real Sociedad 2", "Sociedad B"),
+        ("Caykur Rizespor", "Rizespor"),
+    ]
+    for mozzart, v2 in pairs:
+        assert teams.similarity(mozzart, v2) >= teams.MATCH_SIMILARITY, (mozzart, v2)

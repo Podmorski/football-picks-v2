@@ -34,6 +34,10 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   "not found" (currently libnspr4/libnss3/libnssutil3/libasound missing → skip). Screenshots go to
   "/mnt/c/Users/Nikola/Desktop/Zed Backup/screens/", never into the repo.
 
+## Timing guards (no pushes)
+
+- Sat/Sun 04:30-10:00, Tue 12:30-18:00, Fri 14:30-21:30 UTC. The step-0 price dispatches are exempt.
+
 ## Hard rules
 
 - Never commit raw downloaded CSVs (`data/raw/` is gitignored). Commit code and derived JSON only.
@@ -123,16 +127,18 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 - Prices (Sat 21 Nov): the scheduled Sat 08:00 `prices.yml` run did not fire (GitHub's scheduler
   delayed the Fri update runs to 23:26/02:00); the first kickoff was 10:30, under the 2 h guard, so it
   was not dispatched. The private store is empty, the prebuild embeds 0 snapshots, site 302.
-- Prices (Sat 21 Nov): dispatched once at 09:51. The fetch stopped after page 1 because the API's
-  rate-limit `remaining: 0` was misread as the monthly quota; the client now uses only explicit quota
-  signals. The snapshot is partial (1 priced, 121 unmatched, 0 started); no second fetch. The priced
-  rebuild embedded 1 snapshot, site 302.
+- Prices (21 Nov): the 09:51 first pass was cut to 1 page by the rate-limit header
+  (`X-RateLimit-Limit=1, X-RateLimit-Remaining=0, X-RateLimit-Reset=1` — 1 req/s). The client now
+  waits/reset with up to 3 retries and ignores rate-limit signals as quota. A 10:06 completion fetch
+  merged 93 priced fixtures (the first T1 price kept, new fixtures stamped 10:06), 29 unmatched,
+  0 started; 20 pages, budget 21/90. Aliases were added for the 29 unmatched names (future fetches
+  only; 21 Nov is not re-fetched).
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
 - 171 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
-- **Prices**: 21 Nov has a partial snapshot (one match). Do not re-fetch 21 Nov; the next late-tolerant
-  slots (Sun 05:00/06:30/08:00/09:30, Tue 13:00/14:30/16:00/17:30) price the next rounds.
+- **Prices**: 21 Nov is 93/122 priced (29 unmatched remain in that snapshot; the new aliases apply to
+  future rounds). Sunday 22 Nov check pending.
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
   backtest optimises one ticket per round date across all divisions playing that date.
