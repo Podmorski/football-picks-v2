@@ -26,25 +26,31 @@ if (process.env.PRICED !== '1') {
 }
 
 const key = process.env.PRICES_SSH_KEY;
+const localDir = process.env.PRICES_LOCAL_DIR;
 const repo = process.env.PRICES_REPO || 'Podmorski/football-picks-prices';
-if (!key) {
+if (!localDir && !key) {
   clean();
   console.log('prices: PRICES_SSH_KEY missing; serving without Mozzart prices');
   process.exit(0);
 }
 
 let workdir;
+let cloneDir;
 try {
-  workdir = mkdtempSync(join(tmpdir(), 'prices-'));
-  const keyFile = join(workdir, 'deploy_key');
-  writeFileSync(keyFile, key, { mode: 0o600 });
-  const cloneDir = join(workdir, 'repo');
-  const ssh = 'ssh -i ' + keyFile + ' -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes';
-  const url = 'ssh://git@ssh.github.com:443/' + repo + '.git';
-  execFileSync('git', ['clone', '--depth', '1', url, cloneDir], {
-    stdio: ['ignore', 'ignore', 'inherit'],
-    env: { ...process.env, GIT_SSH_COMMAND: ssh },
-  });
+  if (localDir) {
+    cloneDir = localDir;
+  } else {
+    workdir = mkdtempSync(join(tmpdir(), 'prices-'));
+    const keyFile = join(workdir, 'deploy_key');
+    writeFileSync(keyFile, key, { mode: 0o600 });
+    cloneDir = join(workdir, 'repo');
+    const ssh = 'ssh -i ' + keyFile + ' -o StrictHostKeyChecking=accept-new -o IdentitiesOnly=yes';
+    const url = 'ssh://git@ssh.github.com:443/' + repo + '.git';
+    execFileSync('git', ['clone', '--depth', '1', url, cloneDir], {
+      stdio: ['ignore', 'ignore', 'inherit'],
+      env: { ...process.env, GIT_SSH_COMMAND: ssh },
+    });
+  }
   const roundsDir = join(cloneDir, 'rounds');
   const rounds = existsSync(roundsDir)
     ? readdirSync(roundsDir)
