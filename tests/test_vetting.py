@@ -104,3 +104,22 @@ def test_evaluate_rows_splits() -> None:
     passing, failing = evaluate_rows(rows, DEFAULT_RULE)
     assert len(passing) == 1
     assert len(failing) == 1
+
+
+def test_ticks_match_vetting() -> None:
+    passed, checks = evaluate(good(), DEFAULT_RULE)
+    assert passed
+    by_id = {check["id"]: check for check in checks}
+    for check_id in ("c1", "c2", "c3", "c4", "c6"):
+        assert by_id[check_id]["passed"] is True
+    failed_passed, failed_checks = evaluate(good(probability=0.30, model_probability=0.30), DEFAULT_RULE)
+    assert failed_passed is False
+    assert {"c1", "c2"} <= {check["id"] for check in failed_checks if not check["passed"]}
+
+
+def test_value_toggle_is_url_driven() -> None:
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
+    assert "useParam('mozzart'" in source
+    assert "odds >= item.candidate.fairOdds" in source
