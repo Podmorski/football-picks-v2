@@ -146,10 +146,28 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   cumulative; return at the Mozzart price with a CI bootstrapped over round dates). It is empty until
   settled rounds carry frozen prices.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 198 tests passing. `npm run build` green (48 pages).
+- 202 tests passing. `npm run build` green (48 pages).
+- Rounds fixes (21 Nov): `web/lib/vetted.ts` is now the single selection used by Best bets and
+  `/rounds` (`DEFAULT_RULE`, min fair 1.70, one passing pick per match, highest probability).
+  `/rounds` dedupes by date, reads the `*.full.json` companion first (the page does), and shows
+  "Results pending" until a row is landed/lost. `index.json` was regenerated (3 rounds, one per
+  date). Under that rule the 14 Nov example is 8 of 21 landed; 21 Nov is 54 passing picks, all
+  pending; 22 Nov is 15 passing, all pending. The old "13 of 15 landed" was the 14 Nov example
+  under the superseded top-15/pc>0.8 rule.
+- Mozzart surfaces: Best bets and Explore no longer show the Mozzart price, vs-fair label, red
+  flags, "Only where Mozzart pays..." toggle or C7 tick on the main lists. The price appears only
+  in the tap-open details (Best bets card details, Explore row expansion, per-match drill-down).
+  Price fetching and "Record at Mozzart prices" are unchanged. `tests/test_explore.py` pins the new
+  `Picker.tsx` hash; the pin was updated because this task required the Explore label cleanup. The
+  ticket calculator at the bottom of a page is treated as an opened detail surface and still shows
+  combined Mozzart/payout.
+- Screenshots remain skipped: `ldd` on `chrome-headless-shell` reports libnspr4, libnss3,
+  libnssutil3 and libasound missing.
 
 ## Open items
 
+- **Rounds are pending by design**: 21 Nov (54 default passing picks) and 22 Nov (15) have no
+  results until the Mon 12:00 settle; `/rounds` and Best bets show "Results pending" until then.
 - **Record at Mozzart prices** fills after the 21/22 Nov settle (Mon 12:00) and the prices are frozen;
   21 Nov is 93/122 priced, 22 Nov pending. **Stage A/B backtest and C9 are cancelled** — do not
   reintroduce them; there is no xG/AxG in the data.

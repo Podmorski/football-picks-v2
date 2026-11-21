@@ -11,12 +11,12 @@ import {
   signedPct,
   snapshotFor,
   utcTime,
-  vsFairPct,
   type MozzartPricesFile,
 } from '@/lib/prices';
 import { addTicket, combinedFair, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, ticketVsFair, type TicketLeg } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
-import { DEFAULT_RULE, evaluateCandidate, type VettingCandidate, type VettingCheck } from '@/lib/vetting';
+import { evaluateRows, pcOf, selectPassing, type Evaluated } from '@/lib/vetted';
+import type { VettingCheck } from '@/lib/vetting';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
 const GROUP_ORDER = ['Combos', 'HT/FT', 'Goals', 'BTTS', 'Half-time', 'Team goals', 'Result & double chance', 'Correct score'];
@@ -35,9 +35,6 @@ const TARGETS = [3, 5, 10];
 
 function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
-}
-function pcOf(row: RankRow): number {
-  return row.pc ?? row.p;
 }
 function useParam(key: string, initial: string): [string, (next: string) => void] {
   const [value, setValue] = useState(initial);
@@ -80,7 +77,7 @@ function StatusBadge({ status }: { status?: string }) {
   );
 }
 
-type Evaluated = { row: RankRow; price?: { odds: number; fetchedAt: string }; candidate: VettingCandidate; passed: boolean; checks: VettingCheck[] };
+type EvaluatedRow = Evaluated;
 
 export default function VettedList({
   date, kind, leagueOptions, roundOptions = [],
@@ -92,7 +89,6 @@ export default function VettedList({
   const [prices, setPrices] = useState<MozzartPricesFile | null>(null);
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
-  const [mozzartOnly, setMozzartOnly] = useParam('mozzart', '0');
   const [minOdds, setMinOdds] = useParam('min', '1.70');
   const [roundParam, setRound] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -168,19 +164,8 @@ export default function VettedList({
   const priceIndex = useMemo(() => buildPriceIndex(prices, activeDate), [prices, activeDate]);
   const snapshot = useMemo(() => snapshotFor(prices, activeDate), [prices, activeDate]);
 
-  const evaluated = useMemo<Evaluated[]>(() => {
-    return (data?.rows ?? []).map((row) => {
-      const price = priceIndex[priceKey(row.d, row.h, row.a, row.m)];
-      const probability = pcOf(row);
-      const fairOdds = 1 / Math.max(probability, 0.0001);
-      const candidate: VettingCandidate = {
-        probability, modelProbability: row.p, leagueRate: row.lr, leagueN: row.ln,
-        homeRate: row.hr, homeN: row.hn, awayRate: row.ar, awayN: row.an, fairOdds,
-        countsProbability: row.lr, mozzartOdds: price?.odds ?? null,
-      };
-      const result = evaluateCandidate(candidate, DEFAULT_RULE);
-      return { row, price, candidate, ...result };
-    });
+  const evaluated = useMemo<EvaluatedRow[]>(() => {
+    return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)]);
   }, [data, priceIndex]);
 
   const betMatches = (row: RankRow) => {
@@ -192,22 +177,13 @@ export default function VettedList({
   const minFair = Number(minOdds) || 1.70;
 
   const passing = useMemo(() => {
-    const best = new Map<string, Evaluated>();
-    for (const item of baseFiltered) {
-      if (!item.passed) continue;
-      if (item.candidate.fairOdds < minFair) continue;
-      if (mozzartOnly === '1' && !(item.price && item.price.odds >= item.candidate.fairOdds)) continue;
-      const key = `${item.row.h}|${item.row.a}`;
-      const current = best.get(key);
-      if (!current || item.candidate.probability > current.candidate.probability) best.set(key, item);
-    }
-    return [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
-  }, [baseFiltered, mozzartOnly, minFair]);
+    return selectPassing(baseFiltered, { minFair, mozzartOnly: false });
+  }, [baseFiltered, minFair]);
 
   const closest = useMemo(() => {
     if (passing.length > 0) return [];
     const seen = new Set<string>();
-    const rows: { item: Evaluated; failed: VettingCheck[] }[] = [];
+    const rows: { item: EvaluatedRow; failed: VettingCheck[] }[] = [];
     for (const item of [...baseFiltered].sort((a, b) => b.candidate.probability - a.candidate.probability)) {
       const key = `${item.row.h}|${item.row.a}`;
       if (seen.has(key)) continue;
@@ -250,6 +226,8 @@ export default function VettedList({
 
   const betLabel = bet === 'any' ? 'Any bet' : bet.startsWith('group:') ? (GROUP_LABEL[bet.slice(6)] ?? 'group') : (markets[bet.slice(7)]?.plain ?? 'bet');
   const leagueLabel = league === 'all' ? 'any league' : (leagueNames[league] ?? league);
+  const settledPicks = passing.filter((item) => item.row.st === 'landed' || item.row.st === 'lost');
+  const landedPicks = settledPicks.filter((item) => item.row.st === 'landed').length;
   const ticketProbability = combinedProbability(ticket);
   const ticketFair = combinedFair(ticket);
   const ticketMozzart = combinedMozzart(ticket);
@@ -267,7 +245,7 @@ export default function VettedList({
         </div>
       ) : null}
 
-      <div className="grid gap-2 sm:grid-cols-4">
+      <div className="grid gap-2 sm:grid-cols-3">
         <select value={league} onChange={(event) => setLeague(event.target.value)} aria-label="League" className="rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="all">All leagues</option>
           {countries.map(([country, leagues]) => (
@@ -285,9 +263,6 @@ export default function VettedList({
             </optgroup>
           ))}
         </select>
-        <button type="button" onClick={() => setMozzartOnly(mozzartOnly === '1' ? '0' : '1')} className={cn('rounded-md border px-2.5 py-1.5 text-sm', mozzartOnly === '1' ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>
-          Only where Mozzart pays at least fair
-        </button>
         <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="1.40">Min fair odds 1.40</option>
           <option value="1.70">Min fair odds 1.70</option>
@@ -298,6 +273,13 @@ export default function VettedList({
       <p className="text-sm text-muted-foreground">
         {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel} · fair ≥ {minFair.toFixed(2)}
         {kind === 'example' ? ' · Example round' : ''}
+      </p>
+      <p className="text-sm">
+        {settledPicks.length > 0 ? (
+          <>Result: <span className="font-medium">{landedPicks} of {settledPicks.length} landed</span></>
+        ) : (
+          <span className="text-muted-foreground">Results pending</span>
+        )}
       </p>
 
       {passing.length === 0 ? (
@@ -328,7 +310,6 @@ export default function VettedList({
             const open = expanded === key;
             const checked = ticket.some((leg) => legKey(leg) === key);
             const strong = candidate.probability >= 0.55;
-            const priceFlag = checks.find((check) => check.id === 'c7');
             const ladderRows = (data?.ladder ?? []).map((id) => (data?.rows ?? []).find((candidateRow) => candidateRow.h === row.h && candidateRow.a === row.a && candidateRow.m === id)).filter(Boolean) as RankRow[];
             return (
               <li key={key} className="rounded-xl border p-3">
@@ -351,14 +332,6 @@ export default function VettedList({
                 </div>
 
                 <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  {price ? (
-                    <span>
-                      Mozzart {price.odds.toFixed(2)} · {utcTime(price.fetchedAt)}{' '}
-                      <span className={cn('font-medium', price.odds >= candidate.fairOdds ? 'text-emerald-600' : 'text-rose-600')}>
-                        vs fair {signedPct(vsFairPct(price.odds, candidate.fairOdds))}
-                      </span>
-                    </span>
-                  ) : <span>no Mozzart price</span>}
                   <StatusBadge status={row.st} />
                   {row.ht || row.ft ? <span className="tabular">HT {row.ht ?? '–'} · FT {row.ft ?? '–'}</span> : null}
                 </div>
@@ -369,11 +342,6 @@ export default function VettedList({
                       {check.passed ? '✓' : '✗'} {check.label}
                     </span>
                   ))}
-                  {priceFlag ? (
-                    <span title={priceFlag.value} className={cn('rounded-full border px-2 py-0.5 text-[11px]', priceFlag.passed ? 'border-emerald-500 text-emerald-700' : 'border-rose-400 text-rose-600')}>
-                      {priceFlag.passed ? '✓' : '✗'} Mozzart ≥ fair
-                    </span>
-                  ) : null}
                   <button type="button" onClick={() => toggleLeg(row)} className={cn('ml-auto rounded-md border px-2.5 py-1 text-xs', checked ? 'border-primary bg-primary text-primary-foreground' : '')}>
                     {checked ? 'In ticket' : 'Add to ticket'}
                   </button>
@@ -384,10 +352,11 @@ export default function VettedList({
 
                 {open ? (
                   <div className="mt-2 space-y-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                    {price ? <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p> : null}
                     <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)} (n={row.ln})</p>
                     <p>Model {pct(row.p)} · counts/empirical {pct(row.lr)} · agreement gap {pct(Math.abs(row.p - row.lr))}</p>
                     <ul className="space-y-0.5">
-                      {checks.map((check) => (
+                      {checks.filter((check) => !check.flag).map((check) => (
                         <li key={check.id} className={cn(check.passed ? 'text-foreground' : 'text-rose-600')}>
                           {check.passed ? '✓' : '✗'} {check.label}: {check.value}{check.flag ? ' (flag)' : ''}
                         </li>
@@ -425,7 +394,7 @@ export default function VettedList({
                     <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                       {suggestion.legs.map((leg) => <li key={legKey(leg)} className="truncate">{leg.h} v {leg.a} · {leg.label} · {pct(leg.pc)}</li>)}
                     </ul>
-                    <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}{combinedMozzart(suggestion.legs) !== null ? ` · Mozzart ${(combinedMozzart(suggestion.legs) as number).toFixed(2)}` : ' · Mozzart incomplete'}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}</div>
                     <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">Add to my ticket</button>
                   </>
                 ) : <p className="text-xs text-muted-foreground">No passing ticket reaches {target.toFixed(2)}.</p>}

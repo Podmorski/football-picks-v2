@@ -1,35 +1,26 @@
 import Link from 'next/link';
 
-import { readRankRound, readRoundIndex } from '@/lib/data';
-import type { RankRow } from '@/lib/types';
-
-function pcOf(row: RankRow): number {
-  return row.pc ?? row.pl ?? row.p;
-}
-
-function defaultPicks(rows: RankRow[]): RankRow[] {
-  const best = new Map<string, RankRow>();
-  for (const row of rows) {
-    if (row.m === 'RESULT:1' || row.m === 'RESULT:2') continue;
-    if (pcOf(row) > 0.8) continue;
-    const key = `${row.h}|${row.a}`;
-    const current = best.get(key);
-    if (!current || pcOf(row) > pcOf(current)) best.set(key, row);
-  }
-  return [...best.values()].sort((a, b) => pcOf(b) - pcOf(a)).slice(0, 15);
-}
+import { readRankRoundComplete, readRoundIndex } from '@/lib/data';
+import { roundTally } from '@/lib/vetted';
 
 export default function RoundsPage() {
   const index = readRoundIndex();
-  const rounds = [...index.rounds].sort((a, b) => (a.date < b.date ? 1 : -1));
+  const seen = new Set<string>();
+  const rounds = [...index.rounds]
+    .sort((a, b) => (a.date < b.date ? 1 : -1))
+    .filter((round) => {
+      if (seen.has(round.date)) return false;
+      seen.add(round.date);
+      return true;
+    });
 
   return (
     <div className="space-y-5">
       <header className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Rounds</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Every published round, newest first, with the tally for the default filters (Any bet, min odds Any,
-          Strongest lean). Open a round to see the full dashboard for it.
+          Every published round, newest first, with the tally for the default filters (Any bet, any league,
+          minimum fair odds 1.70). Open a round to see the full dashboard for it.
         </p>
       </header>
 
@@ -40,13 +31,13 @@ export default function RoundsPage() {
       ) : (
         <ul className="divide-y rounded-xl border">
           {rounds.map((round) => {
-            const document = readRankRound(round.date);
-            const picks = document ? defaultPicks(document.rows) : [];
-            const settled = picks.filter((row) => row.st === 'landed' || row.st === 'lost');
-            const landed = picks.filter((row) => row.st === 'landed').length;
-            const expected = settled.reduce((total, row) => total + pcOf(row), 0);
+            const document = readRankRoundComplete(round.date);
+            const tally = document ? roundTally(document.rows) : null;
+            const settled = tally?.settled.length ?? 0;
+            const landed = tally?.landed ?? 0;
+            const expected = tally?.expected ?? 0;
             return (
-              <li key={`${round.date}-${round.kind}`}>
+              <li key={round.date}>
                 <Link href={`/?round=${round.date}`} className="flex flex-wrap items-center gap-x-4 gap-y-1 px-3 py-3 hover:bg-muted/40">
                   <span className="w-36 shrink-0 text-sm font-medium">
                     {round.label}
@@ -54,12 +45,12 @@ export default function RoundsPage() {
                   </span>
                   <span className="text-sm text-muted-foreground">{round.fixtures} matches</span>
                   <span className="tabular text-sm">
-                    {settled.length > 0 ? (
+                    {settled > 0 ? (
                       <>
-                        {landed} of {settled.length} landed · expected about {expected.toFixed(1)}
+                        {landed} of {settled} landed · expected about {expected.toFixed(1)}
                       </>
                     ) : (
-                      <span className="text-muted-foreground">pending</span>
+                      <span className="text-muted-foreground">Results pending</span>
                     )}
                   </span>
                   <span className="ml-auto text-sm text-primary">Open →</span>

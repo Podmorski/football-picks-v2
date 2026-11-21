@@ -7,12 +7,10 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
   buildPriceIndex,
-  isOld,
   priceKey,
   signedPct,
   snapshotFor,
   utcTime,
-  vsFairPct,
   type MozzartPricesFile,
 } from '@/lib/prices';
 import {
@@ -73,7 +71,7 @@ const LADDER_LABELS: Record<string, string> = {
   'BTTS:GG': 'Both teams score',
 };
 
-type SortKey = 'pc' | 'fair' | 'mozzart' | 'vsfair' | 'vsusual' | 'kickoff';
+type SortKey = 'pc' | 'fair' | 'vsusual' | 'kickoff';
 
 function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
@@ -148,10 +146,7 @@ function pickPool(rows: RankRow[], bet: string, league: string, markets: Record<
 
 function metric(row: RankRow, key: SortKey, priceIndex: Record<string, { odds: number }>): number | string {
   const fair = fairOf(row);
-  const price = priceIndex[priceKey(row.d, row.h, row.a, row.m)];
   if (key === 'fair') return fair;
-  if (key === 'mozzart') return price ? price.odds : -1;
-  if (key === 'vsfair') return price ? price.odds / fair - 1 : -Infinity;
   if (key === 'vsusual') return row.lr > 0 ? pcOf(row) / row.lr - 1 : -Infinity;
   if (key === 'kickoff') return row.k ?? '';
   return pcOf(row);
@@ -196,14 +191,12 @@ export default function Picker({
   const [data, setData] = useState<{ rows: RankRow[]; ladder: string[] } | null>(null);
   const [markets, setMarkets] = useState<Record<string, MarketMeta>>({});
   const [prices, setPrices] = useState<MozzartPricesFile | null>(null);
-  const [priced, setPriced] = useState(false);
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'group:Combos');
   const [sort, setSort] = useParam('sort', 'pc');
   const [dir, setDir] = useParam('dir', 'desc');
   const [showAll, setShowAll] = useParam('all', '0');
   const [roundParam, setRound] = useParam('round', date);
-  const [mozzartOnly, setMozzartOnly] = useParam('mozzart', '0');
   const [min, setMin] = useParam('min', '1.50');
   const [target, setTarget] = useParam('target', '5');
   const [maxLegs, setMaxLegs] = useParam('legs', '5');
@@ -263,7 +256,6 @@ export default function Picker({
       .then((payload: MozzartPricesFile | null) => {
         if (cancelled) return;
         setPrices(payload);
-        setPriced(payload !== null);
       })
       .catch(() => undefined);
     return () => {
@@ -350,15 +342,7 @@ export default function Picker({
     () => pickPool(data?.rows ?? [], bet, league, markets, floor),
     [data, bet, league, markets, floor],
   );
-  const valuePool = useMemo(() => {
-    if (mozzartOnly !== '1') return pool;
-    return pool.filter((row) => {
-      const price = priceIndex[priceKey(row.d, row.h, row.a, row.m)];
-      return price !== undefined && price.odds >= fairOf(row);
-    });
-  }, [pool, mozzartOnly, priceIndex]);
-
-  const sorted = useMemo(() => sortRows(valuePool, sort as SortKey, dir, priceIndex), [valuePool, sort, dir, priceIndex]);
+  const sorted = useMemo(() => sortRows(pool, sort as SortKey, dir, priceIndex), [pool, sort, dir, priceIndex]);
   const visible = showAll === '1' ? sorted : sorted.slice(0, 10);
 
   const matchRow = useMemo(() => {
@@ -438,9 +422,9 @@ export default function Picker({
   const targetValue = Number(target) || 5;
   const maxLegsValue = Number(maxLegs) || 5;
   const suggestions = useMemo(() => {
-    const legs = valuePool.map(toLeg);
+    const legs = pool.map(toLeg);
     return optimiseTickets(legs, targetValue, maxLegsValue, 3, floor);
-  }, [valuePool, targetValue, maxLegsValue, floor, markets, priceIndex, snapshot]);
+  }, [pool, targetValue, maxLegsValue, floor, markets, priceIndex, snapshot]);
 
   const pastTickets = useMemo(() => {
     return pastRounds.map((round) => {
@@ -549,7 +533,7 @@ export default function Picker({
                       </td>
                       <td className="tabular px-2 py-1.5 text-right font-medium">{pct(pcOf(line))}</td>
                       <td className="tabular px-2 py-1.5 text-right">{fairOf(line).toFixed(2)}</td>
-                      <td className="tabular px-2 py-1.5 text-right">{price ? price.odds.toFixed(2) : priced ? 'no price' : '—'}</td>
+                      <td className="tabular px-2 py-1.5 text-right">{price ? price.odds.toFixed(2) : '—'}</td>
                       <td className="px-2 py-1.5">
                         <StatusBadge status={line.st} />
                         {line.ht || line.ft ? (
@@ -638,7 +622,7 @@ export default function Picker({
         </div>
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="text-xs text-muted-foreground">Sort by</span>
-          {([['pc', 'Probability'], ['fair', 'Fair odds'], ['mozzart', 'Mozzart'], ['vsfair', 'Mozzart vs fair'], ['vsusual', 'vs usual'], ['kickoff', 'Kickoff']] as [SortKey, string][]).map(([key, label]) => (
+          {([['pc', 'Probability'], ['fair', 'Fair odds'], ['vsusual', 'vs usual'], ['kickoff', 'Kickoff']] as [SortKey, string][]).map(([key, label]) => (
             <button
               key={key}
               type="button"
@@ -648,15 +632,6 @@ export default function Picker({
               {label}
             </button>
           ))}
-          {priced ? (
-            <button
-              type="button"
-              onClick={() => setMozzartOnly(mozzartOnly === '1' ? '0' : '1')}
-              className={cn('rounded-full border px-2.5 py-1 text-xs', mozzartOnly === '1' ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}
-            >
-              Only where Mozzart pays more than fair
-            </button>
-          ) : null}
         </div>
         <div className="flex flex-wrap items-center gap-1">
           <span className="text-xs text-muted-foreground">Odds floor</span>
@@ -685,7 +660,7 @@ export default function Picker({
       {settled.length > 0 ? (
         <p className="text-sm">Result: <span className="font-medium">{landed} of {settled.length} landed</span> · expected about {expected.toFixed(1)}</p>
       ) : (
-        <p className="text-sm text-muted-foreground">Results appear after the matches (usually by Monday)</p>
+        <p className="text-sm text-muted-foreground">Results pending</p>
       )}
       {bet.startsWith('market:') && belowFloor > 0 ? (
         <p className="text-xs text-muted-foreground">{belowFloor} matches below {floor > 0 ? floor.toFixed(2) : 'the floor'}</p>
@@ -707,8 +682,6 @@ export default function Picker({
                 <th className="px-2 py-2 text-left font-semibold">Bet</th>
                 <th className="px-2 py-2 text-right font-semibold">{sortHeader('pc', 'Prob')}</th>
                 <th className="px-2 py-2 text-right font-semibold">{sortHeader('fair', 'Fair')}</th>
-                <th className="px-2 py-2 text-right font-semibold">{sortHeader('mozzart', 'Mozzart')}</th>
-                <th className="px-2 py-2 text-right font-semibold">{sortHeader('vsfair', 'vs fair')}</th>
                 <th className="px-2 py-2 text-right font-semibold">{sortHeader('vsusual', 'vs usual')}</th>
                 <th className="px-2 py-2 text-left font-semibold">Conf</th>
                 <th className="px-2 py-2 text-left font-semibold">Result</th>
@@ -720,8 +693,6 @@ export default function Picker({
                 const meta = markets[row.m];
                 const price = priceOf(row);
                 const fair = fairOf(row);
-                const fixture = snapshot?.fixtures.find((item) => item.div === row.d && item.home === row.h && item.away === row.a);
-                const stale = price ? isOld(price.fetchedAt, fixture?.kickoff ?? null) : false;
                 const key = legKey(row);
                 const open = expanded === key;
                 const checked = ticket.some((leg) => legKey(leg) === key);
@@ -752,16 +723,6 @@ export default function Picker({
                       </td>
                       <td className="tabular px-2 py-2 text-right font-semibold">{pct(pcOf(row))}</td>
                       <td className="tabular px-2 py-2 text-right">{fair.toFixed(2)}</td>
-                      <td className="tabular px-2 py-2 text-right">
-                        {price ? (
-                          <span>
-                            {price.odds.toFixed(2)} <span className="text-xs text-muted-foreground">{utcTime(price.fetchedAt)}{stale ? ' · old' : ''}</span>
-                          </span>
-                        ) : priced ? (
-                          <span className="text-xs text-muted-foreground">no price</span>
-                        ) : '—'}
-                      </td>
-                      <td className="tabular px-2 py-2 text-right">{price ? signedPct(vsFairPct(price.odds, fair)) : '—'}</td>
                       <td className="tabular px-2 py-2 text-right">{row.lr > 0 ? signedPct((pcOf(row) / row.lr - 1) * 100) : '—'}</td>
                       <td className="px-2 py-2">{row.c}</td>
                       <td className="px-2 py-2">
@@ -776,8 +737,9 @@ export default function Picker({
                     </tr>
                     {open ? (
                       <tr className="border-t bg-muted/30">
-                        <td colSpan={13} className="px-3 py-2 text-sm text-muted-foreground">
+                        <td colSpan={11} className="px-3 py-2 text-sm text-muted-foreground">
                           <div className="space-y-2">
+                            {price ? <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p> : null}
                             <div>
                               <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Goal ladder</h4>
                               <ul className="grid gap-x-4 gap-y-0.5 sm:grid-cols-2">
@@ -829,7 +791,6 @@ export default function Picker({
         <h2 className="text-lg font-semibold">Target tickets</h2>
         <p className="text-sm text-muted-foreground">
           Highest combined probability whose combined fair odds reach the target, one leg per match, from the current filters.
-          {priced ? (mozzartOnly === '1' ? ' Only legs where Mozzart pays at least fair.' : ' Mozzart odds shown when priced.') : ''}
         </p>
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <label className="flex items-center gap-1">Target
@@ -851,8 +812,6 @@ export default function Picker({
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2">
             {suggestions.map((suggestion, index) => {
-              const mozzart = combinedMozzart(suggestion.legs);
-              const vs = ticketVsFair(suggestion.legs, 0);
               return (
                 <li key={`${index}-${suggestion.fair}`} className="rounded-xl border p-3 text-sm">
                   <div className="flex items-center justify-between">
@@ -873,7 +832,6 @@ export default function Picker({
                   </ul>
                   <div className="mt-1 tabular text-xs text-muted-foreground">
                     Fair {suggestion.fair.toFixed(2)}
-                    {mozzart !== null ? ` · Mozzart ${mozzart.toFixed(2)} · vs fair ${vs === null ? '–' : signedPct(vs * 100)}` : ' · Mozzart incomplete'}
                     {' · '}
                     <span className="font-medium">Ticket: {overallStatus(suggestion.legs)}</span>
                   </div>
@@ -920,8 +878,6 @@ export default function Picker({
                       );
                     }
                     const ticket = entry.ticket;
-                    const mozzart = combinedMozzart(ticket.legs);
-                    const vs = ticketVsFair(ticket.legs, 0);
                     const status = overallStatus(ticket.legs);
                     return (
                       <li key={entry.target} className="rounded-md bg-muted/30 px-2 py-1">
@@ -944,9 +900,6 @@ export default function Picker({
                             </li>
                           ))}
                         </ul>
-                        <div className="mt-1 text-xs text-muted-foreground">
-                          {mozzart !== null ? `Mozzart ${mozzart.toFixed(2)} · vs fair ${vs === null ? '–' : signedPct(vs * 100)}` : 'Mozzart incomplete'}
-                        </div>
                       </li>
                     );
                   })}

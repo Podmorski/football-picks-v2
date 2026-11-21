@@ -117,19 +117,21 @@ def test_ticks_match_vetting() -> None:
     assert {"c1", "c2"} <= {check["id"] for check in failed_checks if not check["passed"]}
 
 
-def test_value_toggle_is_url_driven() -> None:
+def test_mozzart_value_toggle_is_gone_from_best_bets() -> None:
     from pathlib import Path
 
     source = (Path(__file__).resolve().parents[1] / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
-    assert "useParam('mozzart'" in source
-    assert "odds >= item.candidate.fairOdds" in source
+    assert "useParam('mozzart'" not in source
+    assert "Only where Mozzart pays at least fair" not in source
 
 
 def test_best_bets_min_fair_odds_control() -> None:
     from pathlib import Path
 
-    source = (Path(__file__).resolve().parents[1] / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
+    root = Path(__file__).resolve().parents[1]
+    source = (root / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
+    shared = (root / "web" / "lib" / "vetted.ts").read_text(encoding="utf-8")
     assert "useParam('min', '1.70')" in source
-    assert "item.candidate.fairOdds < minFair" in source
+    assert "item.candidate.fairOdds < minFair" in shared
     assert 'value="1.40"' in source
     assert 'value="2.00"' in source
