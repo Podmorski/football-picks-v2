@@ -416,7 +416,7 @@ export default function Dashboard({
         <p className="text-sm text-muted-foreground">Results appear after the matches (usually by Monday)</p>
       )}
 
-      {error ? <p className="text-sm text-destructive">Could not load the round: {error}</p> : null}
+      {error ? <p className="text-sm text-muted-foreground">Could not load the round: {error}</p> : null}
       {!data && !error ? <p className="text-sm text-muted-foreground">Loading the round…</p> : null}
 
       <ul className="divide-y rounded-xl border">

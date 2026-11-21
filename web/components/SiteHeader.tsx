@@ -9,6 +9,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 const PRIMARY = [
   { href: '/', label: 'Best bets' },
   { href: '/explore', label: 'Explore' },
+  { href: '/report', label: 'Report' },
 ];
 
 const LINKS = [

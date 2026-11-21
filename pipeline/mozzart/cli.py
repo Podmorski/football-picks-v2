@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 from ..config import ROOT_DIR
-from .. import ranking
+from .. import alerts, ranking
 from . import client, record, snapshot, vetted_record
 
 PICKS_DIR = ROOT_DIR / "picks"
@@ -85,26 +85,39 @@ def main(argv=None) -> int:
     round_date = dt.date.fromisoformat(args.date) if args.date else dt.date.today()
     prices_dir = Path(args.prices_dir)
     snapshot_path = prices_dir / "rounds" / f"{round_date.isoformat()}.json"
+    budget = client.Budget.load(_load_json(prices_dir / "usage.json", None), client.month_key())
+
+    def finish(ok: bool, note: str) -> None:
+        budget.last_run = {
+            "at": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
+            "ok": bool(ok),
+            "note": note,
+        }
+        _write_json(prices_dir / "usage.json", budget.dump())
 
     document = _load_picks(round_date)
     if document is None:
         print(f"no picks file for {round_date}; nothing to price")
+        finish(True, "no picks file")
         return 0
     fixtures = snapshot.fixtures_from_round(document)
     if not fixtures:
         print(f"round {round_date} has no fixtures yet; nothing to price")
+        finish(True, "no fixtures")
         return 0
 
+    fetched = False
     if snapshot_path.exists() and not args.force and not args.complete:
         print(f"snapshot already frozen for {round_date}; skipping fetch")
+        finish(True, "snapshot already frozen")
         snapshots = _all_snapshots(prices_dir)
     else:
         existing_doc = _load_json(snapshot_path, {})
         key = os.environ.get("PULSESCORE_API_KEY")
         if not key:
             print("PULSESCORE_API_KEY is not set")
+            finish(False, "PULSESCORE_API_KEY is not set")
             return 2
-        budget = client.Budget.load(_load_json(prices_dir / "usage.json", None), client.month_key())
         kind = client.round_kind(round_date)
         allowed, reason = client.may_fetch(
             kind, budget.used, budget.monthly_cap, round_date, client.PRIORITY_ESTIMATE[kind]
@@ -122,6 +135,7 @@ def main(argv=None) -> int:
             )
             _write_json(prices_dir / "usage.json", budget.dump())
             print(f"budget priority: skipping {kind} fetch: {reason}")
+            finish(True, f"budget skip: {reason}")
             return 0
         print(f"budget before: {budget.used}/{budget.monthly_cap} requests this month ({kind})")
         until = _until(round_date, fixtures)
@@ -134,7 +148,9 @@ def main(argv=None) -> int:
             print(f"budget refused: {exc}; using {len(events)} events already fetched")
         except Exception as exc:  # noqa: BLE001 - the price job must never crash publishing
             print(f"fetch failed: {exc}")
+            finish(False, f"fetch failed: {exc}")
             return 1
+        fetched = True
         fetched_at = dt.datetime.now(dt.timezone.utc)
         snap = snapshot.build(round_date, fixtures, events, fetched_at)
         if args.complete and existing_doc:
@@ -155,8 +171,16 @@ def main(argv=None) -> int:
     priced = len(latest.get("fixtures", []))
     unmatched = len(latest.get("unmatched_fixtures", []))
     started = len(latest.get("started_not_priced", []))
+    matched = priced + started
     print(f"priced fixtures: {priced}, unmatched fixtures: {unmatched}, started not priced: {started}")
     print(f"record rows: {len(aggregate.get('summary', []))}, priced picks: {aggregate.get('priced_picks', 0)}")
+    alert = alerts.low_price_coverage(priced, len(fixtures), fetched)
+    if alert:
+        print(f"ALERT: {alert} (matched {matched}, unmatched {unmatched})")
+        finish(False, alert)
+        return 5
+    if fetched:
+        finish(True, f"priced {priced}/{len(fixtures)}")
     return 0
 
 

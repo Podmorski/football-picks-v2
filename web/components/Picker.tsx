@@ -934,7 +934,7 @@ export default function Picker({
                     </li>
                   ))}
                 </ul>
-                {correlated ? <p className="text-sm text-destructive">Same-match legs are correlated; combined % is not reliable.</p> : null}
+                {correlated ? <p className="text-sm text-muted-foreground">Same-match legs are correlated; combined % is not reliable.</p> : null}
                 <div className="grid gap-2 text-sm sm:grid-cols-4">
                   <label className="flex flex-col gap-1">Bonus %
                     <input type="number" value={bonus} onChange={(event) => setBonus(Number(event.target.value) || 0)} className="w-full rounded-md border bg-background px-2 py-1" />

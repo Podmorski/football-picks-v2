@@ -9,7 +9,7 @@ from pipeline import picker, ranking, vetting
 from pipeline.markets import MARKET_BY_ID, MARKETS
 
 ROOT = Path(__file__).resolve().parents[1]
-PICKER_HASH = "8cea94d34aea3e78b1988de34d637dc2635d5750af77e911296615ceb73f8216"
+PICKER_HASH = "f632ac713c7ab898fb4a40abb3c6274ac823f502fae86e999caedc3e1ba3c74a"
 EXPLORE_HASH = "cb4454bd54a9de9df2767b1744d623328b09ef94298f208d524f4024e3ee360b"
 
 
@@ -140,19 +140,20 @@ def test_type_group_counts_match_one_per_match_rows() -> None:
         for group in TYPE_GROUPS
     }
     assert counts == {
-        "Combos": 32, "HT/FT": 36, "Goals": 18, "BTTS": 9,
-        "Half-time": 44, "Team goals": 43, "Result & double chance": 27,
+        "Combos": 27, "HT/FT": 23, "Goals": 11, "BTTS": 9,
+        "Half-time": 37, "Team goals": 41, "Result & double chance": 24,
     }
-    # A group list shows one row per match, so its length equals the dropdown count.
+    # A group list shows one row per match (highest probability), so its length
+    # equals the dropdown count.
     for group in TYPE_GROUPS:
         selected: dict[tuple[str, str, str], float] = {}
         for row in rows:
             if MARKET_BY_ID[row["m"]].group != group:
                 continue
             key = (row["d"], row["h"], row["a"])
-            lift = row["pc"] / row["lr"] if row["lr"] > 0 else 0.0
-            if key not in selected or lift > selected[key]:
-                selected[key] = lift
+            probability = row.get("pc", row["p"])
+            if key not in selected or probability > selected[key]:
+                selected[key] = probability
         assert len(selected) == counts[group]
 
 

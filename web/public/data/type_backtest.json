@@ -7,94 +7,94 @@
  "groups": [
   {
    "group": "Combos",
-   "landed": 0.377,
-   "picks": 8128,
-   "picks_per_round": 9.936,
-   "predicted": 0.3721,
-   "return": 0.0242,
+   "landed": 0.4322,
+   "picks": 7402,
+   "picks_per_round": 9.127,
+   "predicted": 0.4316,
+   "return": -0.0062,
    "return_ci": [
-    -0.0113,
-    0.0655
+    -0.0372,
+    0.0252
    ],
-   "rounds": 818
+   "rounds": 811
   },
   {
    "group": "HT/FT",
-   "landed": 0.2406,
-   "picks": 15109,
-   "picks_per_round": 17.692,
-   "predicted": 0.2417,
-   "return": 0.0065,
+   "landed": 0.4648,
+   "picks": 9525,
+   "picks_per_round": 11.588,
+   "predicted": 0.4652,
+   "return": 0.0004,
    "return_ci": [
-    -0.0325,
-    0.0461
-   ],
-   "rounds": 854
-  },
-  {
-   "group": "Goals",
-   "landed": 0.2983,
-   "picks": 5075,
-   "picks_per_round": 6.669,
-   "predicted": 0.2935,
-   "return": 0.0113,
-   "return_ci": [
-    -0.0412,
-    0.0656
-   ],
-   "rounds": 761
-  },
-  {
-   "group": "BTTS",
-   "landed": 0.3492,
-   "picks": 1343,
-   "picks_per_round": 2.446,
-   "predicted": 0.3711,
-   "return": -0.0756,
-   "return_ci": [
-    -0.1564,
-    0.0055
-   ],
-   "rounds": 549
-  },
-  {
-   "group": "Half-time",
-   "landed": 0.4733,
-   "picks": 10421,
-   "picks_per_round": 12.678,
-   "predicted": 0.4714,
-   "return": 0.0154,
-   "return_ci": [
-    -0.0137,
-    0.0438
+    -0.0272,
+    0.0276
    ],
    "rounds": 822
   },
   {
-   "group": "Team goals",
-   "landed": 0.4943,
-   "picks": 13060,
-   "picks_per_round": 15.329,
-   "predicted": 0.4968,
-   "return": -0.0103,
+   "group": "Goals",
+   "landed": 0.4023,
+   "picks": 3957,
+   "picks_per_round": 5.481,
+   "predicted": 0.3916,
+   "return": 0.0283,
    "return_ci": [
-    -0.0328,
-    0.0128
+    -0.0189,
+    0.0745
    ],
-   "rounds": 852
+   "rounds": 722
+  },
+  {
+   "group": "BTTS",
+   "landed": 0.3578,
+   "picks": 1333,
+   "picks_per_round": 2.432,
+   "predicted": 0.3752,
+   "return": -0.0556,
+   "return_ci": [
+    -0.1357,
+    0.023
+   ],
+   "rounds": 548
+  },
+  {
+   "group": "Half-time",
+   "landed": 0.5605,
+   "picks": 9632,
+   "picks_per_round": 11.833,
+   "predicted": 0.5605,
+   "return": 0.0092,
+   "return_ci": [
+    -0.0137,
+    0.0317
+   ],
+   "rounds": 814
+  },
+  {
+   "group": "Team goals",
+   "landed": 0.562,
+   "picks": 12076,
+   "picks_per_round": 14.291,
+   "predicted": 0.5622,
+   "return": -0.0066,
+   "return_ci": [
+    -0.0256,
+    0.0134
+   ],
+   "rounds": 845
   },
   {
    "group": "Result & double chance",
-   "landed": 0.4283,
-   "picks": 7694,
-   "picks_per_round": 9.594,
-   "predicted": 0.4293,
-   "return": -0.0119,
+   "landed": 0.5697,
+   "picks": 5984,
+   "picks_per_round": 7.731,
+   "predicted": 0.5683,
+   "return": 0.0029,
    "return_ci": [
-    -0.0503,
-    0.0289
+    -0.027,
+    0.0327
    ],
-   "rounds": 802
+   "rounds": 774
   }
  ],
  "note": "Walk-forward: goals model and empirical rates use matches before each round; calibration uses picker.json season factors (group x band). One passing bet per match per group (highest lift). Return at fair odds.",
@@ -103,7 +103,7 @@
   "agreement_min": 0.05,
   "lift_multiplier": 1.25,
   "lift_points": 0.03,
-  "max_fair_odds": 15.0,
+  "max_fair_odds": 6.0,
   "record_min_n": 8
  },
  "seasons": [

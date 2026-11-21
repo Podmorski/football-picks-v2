@@ -13,7 +13,7 @@ from pathlib import Path
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
 from .extras import parse_extra_csv
 from .fixtures import Fixture, fixtures_for_date, last_saturday, parse_fixtures, round_dates_for
-from . import ranking
+from . import alerts, ranking, report
 from .model import backtest, live, ranking_backtest
 from .parse import parse_season_csv
 from .picks import read_results
@@ -229,6 +229,7 @@ def main(argv=None) -> int:
     round_dates = round_dates_for(today)
     round_keys = {date.isoformat() for date in round_dates}
     primary_round = round_dates[0]
+    round_alerts: list[str] = []
 
     for round_date in round_dates:
         round_fixtures = fixtures_for_date(fixtures, round_date, divisions_set)
@@ -242,15 +243,27 @@ def main(argv=None) -> int:
         if settle_only and action == "publish":
             action = "settle"
             existing = None
+        published_now = 0
         if action == "settle" and existing is not None:
+            iso = round_date.isoformat()
+            pending_with_results = sum(
+                1 for row in existing.get("rows", [])
+                if row.get("st") in (None, "pending") and (iso, row["h"], row["a"]) in results
+            )
+            results_count = sum(1 for key in results if key[0] == iso)
             changed = ranking.settle_document(existing, results, today)
-            if changed and not args.no_publish:
-                ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
             full_path = PICKS_DIR / f"{round_date.isoformat()}.full.json"
+            full_changed = False
             if full_path.exists():
                 full = ranking.load(full_path)
-                if ranking.settle_document(full, results, today) and not args.no_publish:
+                full_changed = ranking.settle_document(full, results, today)
+                if full_changed and not args.no_publish:
                     ranking.publish_full(full, PICKS_DIR, ROUNDS_DIR)
+            if changed and not args.no_publish:
+                ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
+            alert = alerts.stale_settle(round_date, results_count, changed or full_changed, pending_with_results)
+            if alert:
+                round_alerts.append(alert)
             print(f"round {round_date}: already published, settled only")
         elif action == "settle" and settle_only:
             print(f"round {round_date}: Monday settle-only run, nothing published")
@@ -262,10 +275,21 @@ def main(argv=None) -> int:
             ranking.settle_document(document, results, today)
             if not args.no_publish:
                 ranking.publish(document, PICKS_DIR, ROUNDS_DIR)
+                published_now = len(document["rows"])
             replaced = " (replaced an empty round file)" if existing is not None else ""
             print(f"round {round_date}: published {len(document['rows'])} rows{replaced}")
         else:
             print(f"round {round_date}: no fixtures published by the source, nothing to publish")
+
+        if not settle_only:
+            alert = alerts.missing_publication(
+                round_date,
+                len(round_fixtures),
+                published_now,
+                bool(existing is not None and existing.get("rows")),
+            )
+            if alert:
+                round_alerts.append(alert)
 
     example_date = last_saturday(today)
     example_fixtures = fixtures_for_date(fixtures, example_date, divisions_set) or historical_fixtures(
@@ -286,19 +310,36 @@ def main(argv=None) -> int:
         stored = ranking.load(path)
         if stored["date"] in (round_keys | {example_date.isoformat()}):
             continue
-        if ranking.settle_document(stored, results, today) and not args.no_publish:
+        iso = stored["date"]
+        pending_with_results = sum(
+            1 for row in stored.get("rows", [])
+            if row.get("st") in (None, "pending") and (iso, row["h"], row["a"]) in results
+        )
+        results_count = sum(1 for key in results if key[0] == iso)
+        changed = ranking.settle_document(stored, results, today)
+        if changed and not args.no_publish:
             ranking.publish(stored, PICKS_DIR, ROUNDS_DIR)
         full_path = PICKS_DIR / f"{stored['date']}.full.json"
+        full_changed = False
         if full_path.exists():
             full = ranking.load(full_path)
-            if ranking.settle_document(full, results, today) and not args.no_publish:
+            full_changed = ranking.settle_document(full, results, today)
+            if full_changed and not args.no_publish:
                 ranking.publish_full(full, PICKS_DIR, ROUNDS_DIR)
+        alert = alerts.stale_settle(iso, results_count, changed or full_changed, pending_with_results)
+        if alert:
+            round_alerts.append(alert)
 
     if args.no_publish:
         return 0
 
     index = ranking.rebuild_index(PICKS_DIR, ROUNDS_DIR)
     write_json(WEB_DATA_DIR / "markets.json", ranking.market_catalogue())
+    best_bets = report.build(PICKS_DIR, WEB_DATA_DIR)
+    print(
+        f"best bets record: {best_bets['cumulative']['landed']} of "
+        f"{best_bets['cumulative']['settled']} landed"
+    )
 
     ranking_bt = None
     if args.skip_backtest and args.skip_picker_backtest and MODEL_JSON.exists():
@@ -371,6 +412,10 @@ def main(argv=None) -> int:
     write_json(RECORD_JSON, payload)
 
     print(f"rounds published: {totals['rounds']}, picks: {totals['picks']}, settled: {totals['settled']}, hits: {totals['hits']}")
+    if round_alerts:
+        for message in round_alerts:
+            print(f"ALERT: {message}")
+        return 3
     return 0
 
 

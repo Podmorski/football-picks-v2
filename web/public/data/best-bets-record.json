@@ -1,0 +1,75 @@
+{
+ "cumulative": {
+  "expected": 11.4497,
+  "landed": 8,
+  "passing": 90,
+  "pending": 69,
+  "possible": {
+   "landed": 6,
+   "settled": 13
+  },
+  "settled": 21,
+  "strong": {
+   "landed": 2,
+   "settled": 8
+  }
+ },
+ "min_fair": 1.7,
+ "rounds": [
+  {
+   "date": "2026-11-14",
+   "expected": 11.4497,
+   "kind": "example",
+   "label": "Saturday 14 Nov",
+   "landed": 8,
+   "passing": 21,
+   "pending": 0,
+   "possible": {
+    "landed": 6,
+    "settled": 13
+   },
+   "settled": 21,
+   "strong": {
+    "landed": 2,
+    "settled": 8
+   }
+  },
+  {
+   "date": "2026-11-21",
+   "expected": 0,
+   "kind": "round",
+   "label": "Saturday 21 Nov",
+   "landed": 0,
+   "passing": 54,
+   "pending": 54,
+   "possible": {
+    "landed": 0,
+    "settled": 0
+   },
+   "settled": 0,
+   "strong": {
+    "landed": 0,
+    "settled": 0
+   }
+  },
+  {
+   "date": "2026-11-22",
+   "expected": 0,
+   "kind": "round",
+   "label": "Sunday 22 Nov",
+   "landed": 0,
+   "passing": 15,
+   "pending": 15,
+   "possible": {
+    "landed": 0,
+    "settled": 0
+   },
+   "settled": 0,
+   "strong": {
+    "landed": 0,
+    "settled": 0
+   }
+  }
+ ],
+ "strong_probability": 0.55
+}

@@ -151,7 +151,7 @@ def run(matches_by_division: dict[str, list], half_life: float, season_factors: 
                                 continue
                             lift = probability / usual if usual > 0 else 0.0
                             current = best.get(group)
-                            if current is None or lift > current["lift"]:
+                            if current is None or probability > current["p"]:
                                 best[group] = {
                                     "position": position,
                                     "p": probability,

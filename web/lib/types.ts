@@ -134,6 +134,55 @@ export type TypeBacktestFile = {
   note?: string;
 };
 
+export type BestBetsSplit = { settled: number; landed: number };
+
+export type BestBetsRound = {
+  date: string;
+  label: string;
+  kind: string;
+  passing: number;
+  settled: number;
+  landed: number;
+  pending: number;
+  expected: number;
+  strong: BestBetsSplit;
+  possible: BestBetsSplit;
+};
+
+export type BestBetsRecordFile = {
+  min_fair: number;
+  strong_probability: number;
+  rounds: BestBetsRound[];
+  cumulative: Omit<BestBetsRound, 'date' | 'label' | 'kind'>;
+};
+
+export type MozzartSummary = {
+  n: number;
+  landed: number | null;
+  return: number | null;
+  ci: [number | null, number | null];
+};
+
+export type MozzartVettedRecordFile = {
+  cumulative: Record<string, MozzartSummary>;
+  rounds: ({ date: string } & Record<string, MozzartSummary>)[];
+};
+
+export type MozzartStatusRound = {
+  round_date: string;
+  last_fetch: string | null;
+  priced: number;
+  started: number;
+  matched: number;
+  unmatched: number;
+};
+
+export type MozzartStatusFile = {
+  rounds: MozzartStatusRound[];
+  usage: { month: string | null; used: number; cap: number } | null;
+  last_run: { at: string; ok: boolean; note: string } | null;
+};
+
 export type ModelFile = {
   backtest: { seasons: string[]; fixtures: number };
   hyperparameters: { best: { half_life_days: number; k: number; logloss: number } };

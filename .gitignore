@@ -8,6 +8,8 @@ data/raw/
 web/public/data/mozzart-prices.json
 web/public/data/mozzart-record.json
 web/public/data/mozzart-vetted-record.json
+web/public/data/mozzart-status.json
+web/screens/
 prices/
 
 # python

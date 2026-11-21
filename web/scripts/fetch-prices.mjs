@@ -7,9 +7,10 @@ const DATA = join(process.cwd(), 'public', 'data');
 const PRICES_OUT = join(DATA, 'mozzart-prices.json');
 const RECORD_OUT = join(DATA, 'mozzart-record.json');
 const VETTED_OUT = join(DATA, 'mozzart-vetted-record.json');
+const STATUS_OUT = join(DATA, 'mozzart-status.json');
 
 function clean() {
-  for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT]) {
+  for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT, STATUS_OUT]) {
     try {
       if (existsSync(path)) rmSync(path);
     } catch {
@@ -57,6 +58,30 @@ try {
   if (existsSync(recordPath)) writeFileSync(RECORD_OUT, readFileSync(recordPath));
   const vettedPath = join(cloneDir, 'vetted-record.json');
   if (existsSync(vettedPath)) writeFileSync(VETTED_OUT, readFileSync(vettedPath));
+  const usagePath = join(cloneDir, 'usage.json');
+  const usage = existsSync(usagePath) ? JSON.parse(readFileSync(usagePath, 'utf8')) : null;
+  const statusRounds = rounds
+    .map((snap) => {
+      const priced = (snap.fixtures ?? []).length;
+      const started = (snap.started_not_priced ?? []).length;
+      return {
+        round_date: snap.round_date,
+        last_fetch: snap.fetched_at ?? null,
+        priced,
+        started,
+        matched: priced + started,
+        unmatched: (snap.unmatched_fixtures ?? []).length,
+      };
+    })
+    .sort((a, b) => String(a.round_date).localeCompare(String(b.round_date)));
+  writeFileSync(
+    STATUS_OUT,
+    JSON.stringify({
+      rounds: statusRounds,
+      usage: usage ? { month: usage.month ?? null, used: Number(usage.used ?? 0), cap: 90 } : null,
+      last_run: usage?.last_run ?? null,
+    }),
+  );
   console.log('prices: embedded ' + rounds.length + ' round snapshot(s)');
 } catch (error) {
   clean();

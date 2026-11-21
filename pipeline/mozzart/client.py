@@ -48,6 +48,7 @@ class Budget:
     used: int = 0
     entries: list[dict] = field(default_factory=list)
     monthly_cap: int = MONTHLY_CAP
+    last_run: dict | None = None
 
     @classmethod
     def load(cls, payload: dict | None, month: str) -> "Budget":
@@ -57,10 +58,11 @@ class Budget:
             month=month,
             used=int(payload.get("used", 0)),
             entries=list(payload.get("entries", [])),
+            last_run=payload.get("last_run"),
         )
 
     def dump(self) -> dict:
-        return {"month": self.month, "used": self.used, "entries": self.entries}
+        return {"month": self.month, "used": self.used, "entries": self.entries, "last_run": self.last_run}
 
     def check(self, provider_remaining: int | None = None) -> None:
         if self.used >= self.monthly_cap:

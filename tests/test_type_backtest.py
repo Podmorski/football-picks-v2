@@ -37,7 +37,7 @@ def test_committed_report_structure() -> None:
     ]
     assert "Correct score" not in [row["group"] for row in report["groups"]]
     assert report["bootstrap"] == {"resamples": 2000, "seed": 20261025, "unit": "round date"}
-    assert report["rule"]["max_fair_odds"] == 15.0
+    assert report["rule"]["max_fair_odds"] == 6.0
     for row in report["groups"]:
         assert row["picks"] > 0 and row["rounds"] > 0
         assert 0 <= row["landed"] <= 1

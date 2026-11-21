@@ -46,7 +46,7 @@ export const TYPE_RULE = {
   minRecordN: 8,
   minAgreement: 0.05,
   agreementFraction: 0.25,
-  maxFairOdds: 15,
+  maxFairOdds: 6,
 } as const;
 
 const pct = (value: number) => `${(value * 100).toFixed(1)}%`;

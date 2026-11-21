@@ -1,0 +1,63 @@
+name: Screens
+
+# Captures the public pages after CI succeeds on main (the push that Vercel
+# deploys). Manual dispatch is available too. Screenshots are artifact-only and
+# never committed.
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  screenshots:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: web
+
+      - name: Install Playwright (no-save)
+        run: npm install --no-save playwright
+        working-directory: web
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+        working-directory: web
+
+      - name: Build without the price file
+        run: npm run build
+        working-directory: web
+
+      - name: Serve and capture
+        run: |
+          python3 -m http.server 4173 --directory out &
+          SERVER_PID=$!
+          trap "kill $SERVER_PID" EXIT
+          for attempt in $(seq 1 20); do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && break
+            sleep 1
+          done
+          node scripts/screens.mjs
+        working-directory: web
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screens
+          path: web/screens
+          retention-days: 3

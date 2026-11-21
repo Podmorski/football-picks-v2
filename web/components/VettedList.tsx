@@ -309,7 +309,7 @@ export default function VettedList({
 
       <p className="text-sm text-muted-foreground">
         {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel}
-        {isAny ? ` · fair ≥ ${minFair.toFixed(2)}` : ' · strongest lean first'}
+        {isAny ? ` · fair ≥ ${minFair.toFixed(2)}` : ' · sorted by probability'}
         {kind === 'example' ? ' · Example round' : ''}
       </p>
       <p className="text-sm">
@@ -342,7 +342,7 @@ export default function VettedList({
       ) : (
         <ul className="space-y-2">
           {passing.map((item, index) => {
-            const { row, price, candidate, checks } = item;
+            const { row, price, candidate } = item;
             const meta = markets[row.m];
             const key = `${row.h}|${row.a}|${row.m}`;
             const open = expanded === key;
@@ -357,7 +357,7 @@ export default function VettedList({
                       <span className="text-muted-foreground">{row.k ?? ''}</span>
                       <span className="font-semibold">{row.h} <span className="text-muted-foreground">v</span> {row.a}</span>
                       <span className="text-xs text-muted-foreground">{leagueNames[row.d] ?? row.d}</span>
-                      <Badge variant={strong ? 'success' : 'secondary'}>{strong ? 'Strong' : 'Possible'}</Badge>
+                      <Badge variant="secondary">{strong ? 'Strong' : 'Possible'}</Badge>
                     </div>
                     <div className="mt-1 text-sm">
                       {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
@@ -376,11 +376,6 @@ export default function VettedList({
                 </div>
 
                 <div className="mt-2 flex flex-wrap items-center gap-1">
-                  {checks.filter((check) => !check.flag).map((check) => (
-                    <span key={check.id} title={check.value} className={cn('rounded-full border px-2 py-0.5 text-[11px]', check.passed ? 'border-emerald-500 text-emerald-700' : 'border-rose-400 text-rose-600')}>
-                      {check.passed ? '✓' : '✗'} {check.label}
-                    </span>
-                  ))}
                   <button type="button" onClick={() => toggleLeg(row)} className={cn('ml-auto rounded-md border px-2.5 py-1 text-xs', checked ? 'border-primary bg-primary text-primary-foreground' : '')}>
                     {checked ? 'In ticket' : 'Add to ticket'}
                   </button>
@@ -394,13 +389,6 @@ export default function VettedList({
                     {price ? <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p> : null}
                     <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)} (n={row.ln})</p>
                     <p>Model {pct(row.p)} · counts/empirical {pct(row.lr)} · agreement gap {pct(Math.abs(row.p - row.lr))}</p>
-                    <ul className="space-y-0.5">
-                      {checks.filter((check) => !check.flag).map((check) => (
-                        <li key={check.id} className={cn(check.passed ? 'text-foreground' : 'text-rose-600')}>
-                          {check.passed ? '✓' : '✗'} {check.label}: {check.value}{check.flag ? ' (flag)' : ''}
-                        </li>
-                      ))}
-                    </ul>
                     <div>
                       <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Goal ladder</h4>
                       <ul className="grid gap-x-4 gap-y-0.5 sm:grid-cols-2">
@@ -463,7 +451,7 @@ export default function VettedList({
                     </li>
                   ))}
                 </ul>
-                {correlated ? <p className="text-sm text-destructive">Same-match legs are correlated; combined % is not reliable.</p> : null}
+                {correlated ? <p className="text-sm text-muted-foreground">Same-match legs are correlated; combined % is not reliable.</p> : null}
                 <div className="grid gap-2 text-sm sm:grid-cols-4">
                   <label className="flex flex-col gap-1">Bonus %
                     <input type="number" value={bonus} onChange={(event) => setBonus(Number(event.target.value) || 0)} className="w-full rounded-md border bg-background px-2 py-1" />

@@ -138,7 +138,7 @@ TYPE_RULE: dict = {
     "min_record_n": 8,
     "min_agreement": 0.05,
     "agreement_fraction": 0.25,
-    "max_fair_odds": 15.0,
+    "max_fair_odds": 6.0,
 }
 
 

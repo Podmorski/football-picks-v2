@@ -50,7 +50,7 @@ def test_type_rule_thresholds_are_fixed() -> None:
         "min_record_n": 8,
         "min_agreement": 0.05,
         "agreement_fraction": 0.25,
-        "max_fair_odds": 15.0,
+        "max_fair_odds": 6.0,
     }
 
 
@@ -71,8 +71,8 @@ def test_type_rule_has_no_probability_or_odds_floor() -> None:
 
 def test_type_rule_rejects_long_shots() -> None:
     candidate = type_good(
-        probability=0.065, league_rate=0.03, model_probability=0.03,
-        fair_odds=1 / 0.065, home_rate=0.05, away_rate=0.04,
+        probability=1 / 6.5, league_rate=0.08, model_probability=0.08,
+        fair_odds=6.5, home_rate=0.10, away_rate=0.09,
     )
     passed, checks = type_evaluate(candidate)
     assert passed is False

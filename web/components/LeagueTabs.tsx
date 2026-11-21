@@ -208,7 +208,7 @@ export default function LeagueTabs({ league }: { league: LeagueFile }) {
       </TabsContent>
 
       <TabsContent value="teams">
-        {error ? <p className="text-sm text-destructive">Could not load team data: {error}</p> : null}
+        {error ? <p className="text-sm text-muted-foreground">Could not load team data: {error}</p> : null}
         {!teams && !error ? <p className="text-sm text-muted-foreground">Loading team data…</p> : null}
         {teams ? (
           <div className="space-y-4">

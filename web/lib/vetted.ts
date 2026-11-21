@@ -93,7 +93,8 @@ export function selectPassing(
 }
 
 // TYPE_RULE selection. For a group keep one passing bet per match (highest
-// lift); for a single market every passing fixture. Strongest lean first.
+// probability); for a single market every passing fixture. Highest probability
+// first; lift is shown only.
 export function selectType(
   evaluated: Evaluated[],
   options: { perMatch?: boolean; market?: string } = {},
@@ -108,9 +109,9 @@ export function selectType(
       ? `${item.row.d}|${item.row.h}|${item.row.a}`
       : `${item.row.d}|${item.row.h}|${item.row.a}|${item.row.m}`;
     const current = best.get(key);
-    if (!current || item.lift > current.lift) best.set(key, item);
+    if (!current || item.candidate.probability > current.candidate.probability) best.set(key, item);
   }
-  return [...best.values()].sort((a, b) => b.lift - a.lift);
+  return [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
 }
 
 export type RoundTally = {
