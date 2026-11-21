@@ -60,6 +60,15 @@ try {
   if (existsSync(vettedPath)) writeFileSync(VETTED_OUT, readFileSync(vettedPath));
   const usagePath = join(cloneDir, 'usage.json');
   const usage = existsSync(usagePath) ? JSON.parse(readFileSync(usagePath, 'utf8')) : null;
+  const entries = Array.isArray(usage?.entries) ? usage.entries : [];
+  const lastEntry = entries.length ? entries[entries.length - 1] : null;
+  const inferredRun = lastEntry
+    ? {
+        at: lastEntry.timestamp ?? null,
+        ok: true,
+        note: lastEntry.note ?? `last usage entry (status ${lastEntry.status ?? 'n/a'})`,
+      }
+    : null;
   const statusRounds = rounds
     .map((snap) => {
       const priced = (snap.fixtures ?? []).length;
@@ -79,7 +88,7 @@ try {
     JSON.stringify({
       rounds: statusRounds,
       usage: usage ? { month: usage.month ?? null, used: Number(usage.used ?? 0), cap: 90 } : null,
-      last_run: usage?.last_run ?? null,
+      last_run: usage?.last_run ?? inferredRun,
     }),
   );
   console.log('prices: embedded ' + rounds.length + ' round snapshot(s)');
