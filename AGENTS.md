@@ -145,9 +145,11 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   matches at 1.40/1.70/2.00.
 - Record has "Record at Mozzart prices" (all passing / passing+value / any value; per round and
   cumulative; return at the Mozzart price with a CI bootstrapped over round dates). It is empty until
-  settled rounds carry frozen prices.
+  settled rounds carry frozen prices. Both `vetted_record.py` and `value_record.py` key prices by
+  `(round_date, div, home, away, market)`, so a repeated fixture uses only its own round's snapshot;
+  historical snapshots are used as-is (no migration or refetch).
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 241 tests passing. `npm run build` green (50 pages).
+- 249 tests passing. `npm run build` green (50 pages).
 - Rounds fixes (21 Nov): `web/lib/vetted.ts` is now the single selection used by Best bets and
   `/rounds` (`DEFAULT_RULE`, min fair 1.70, one passing pick per match, highest probability).
   `/rounds` dedupes by date, reads the `*.full.json` companion first (the page does), and shows
@@ -230,7 +232,18 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   workflow checks out the private store as `prices-private`). It writes
   `web/public/data/value-record.json` (aggregates only): bets, landed, needed (sum 1/price), profit
   units, return, 95% CI over round dates (2000, seed 20261025), split by group and odds band, cumulative
-  profit series. `/report` renders it. It is empty until the 21/22 Nov settle.
+  profit series. `/report` renders it. It is empty until the 21/22 Nov settle. The settled cohort matches
+  the web `selectValue` exactly: t3 team records, t4 agreement and t6 fair <= 6; t1 lift is not required
+  and the UI min-fair dropdown is not applied; min_play and fair <= 6 apply, one per match by highest
+  edge, sorted by edge.
+- Task 11 (21 Nov): fixed two reporting defects. (a) `value_record.py` selected the complete TYPE_RULE
+  (including t1 lift) while the web Value selection used only t3/t4/t6; the pipeline now matches the web
+  contract (t1 not required, no min-fair dropdown, min_play + fair <= 6, one per match highest edge,
+  sorted edge). (b) both `value_record.py` and `vetted_record.py` keyed prices by fixture/market without
+  the round date; both now key by `(round_date, div, home, away, market)`. Tests in
+  `tests/test_value_record.py` and `tests/test_vetted_record.py` include the web contract source check,
+  t1=false inclusion, each required-check exclusion, min-play/fair-cap exclusions, one-per-match/edge
+  ordering, pending/void/unpriced semantics and two-date price isolation.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`

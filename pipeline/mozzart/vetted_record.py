@@ -4,6 +4,9 @@ Three scopes, cumulative and per round date:
   all            every passing vetting pick with a price
   passing_value  passing picks where Mozzart >= fair
   any_value      every priced bet where Mozzart >= fair (any rule)
+
+Prices are keyed by (round_date, div, home, away, market), so a repeated
+fixture uses only its own round's snapshot. Historical snapshots are used as-is.
 """
 from __future__ import annotations
 
@@ -14,9 +17,12 @@ from ..model.ranking_backtest import mean_return_ci
 def _price_map(snapshots: list[dict]) -> dict[tuple, float]:
     out: dict[tuple, float] = {}
     for snapshot in snapshots:
+        round_date = snapshot.get("round_date")
+        if not round_date:
+            continue
         for fixture in snapshot.get("fixtures", []):
             for market, odds in (fixture.get("prices") or {}).items():
-                out[(fixture["div"], fixture["home"], fixture["away"], market)] = float(odds)
+                out[(round_date, fixture["div"], fixture["home"], fixture["away"], market)] = float(odds)
     return out
 
 
@@ -71,7 +77,7 @@ def aggregate(rounds: list[dict], snapshots: list[dict], rule: dict | None = Non
         for row in document.get("rows", []):
             if row.get("st") not in ("landed", "lost"):
                 continue
-            odds = prices.get((row.get("d"), row.get("h"), row.get("a"), row.get("m")))
+            odds = prices.get((date, row.get("d"), row.get("h"), row.get("a"), row.get("m")))
             if odds is None:
                 continue
             candidate = _candidate(row, odds)

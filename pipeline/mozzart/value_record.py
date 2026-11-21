@@ -1,8 +1,10 @@
 """Value-bet tracking at the Mozzart snapshot price, flat 1 unit.
 
 Settled rounds only. Value = Mozzart price >= ceil_2dp(1.05 / p), team records
-and agreement pass, fair <= 6, one per match by highest edge. The output is an
-aggregate only: no prices are written to the public repository.
+and agreement pass, fair <= 6, one per match by highest edge. Lift (t1) is not
+required: the web Value selection uses only t3/t4/t6. Prices are keyed by the
+snapshot's round_date, so a repeated fixture uses its own round's price. The
+output is an aggregate only: no prices are written to the public repository.
 
 Run from update.yml after the settle pass (the workflow checks out the private
 price store separately):
@@ -41,9 +43,12 @@ def band_of(price: float) -> str:
 def _price_map(snapshots: list[dict]) -> dict[tuple, float]:
     out: dict[tuple, float] = {}
     for snapshot in snapshots:
+        round_date = snapshot.get("round_date")
+        if not round_date:
+            continue
         for fixture in snapshot.get("fixtures", []):
             for market, odds in (fixture.get("prices") or {}).items():
-                out[(fixture["div"], fixture["home"], fixture["away"], market)] = float(odds)
+                out[(round_date, fixture["div"], fixture["home"], fixture["away"], market)] = float(odds)
     return out
 
 
@@ -85,15 +90,13 @@ def _value_bets(rounds: list[dict], snapshots: list[dict]) -> dict[str, list[dic
                 continue
             if row.get("st") not in ("landed", "lost"):
                 continue
-            odds = prices.get((row.get("d"), row.get("h"), row.get("a"), row.get("m")))
+            odds = prices.get((date, row.get("d"), row.get("h"), row.get("a"), row.get("m")))
             if odds is None:
                 continue
             probability = float(row.get("pc", row.get("p", 0.0)))
             if odds < min_play(probability) or 1.0 / max(probability, 1e-4) > MAX_FAIR:
                 continue
-            passed, checks = vetting.type_evaluate(_candidate(row, odds))
-            if not passed:
-                continue
+            _, checks = vetting.type_evaluate(_candidate(row, odds))
             by_id = {check["id"]: check["passed"] for check in checks}
             if not (by_id.get("t3") and by_id.get("t4") and by_id.get("t6")):
                 continue
@@ -114,7 +117,7 @@ def _value_bets(rounds: list[dict], snapshots: list[dict]) -> dict[str, list[dic
                     "needed": 1.0 / odds,
                 }
         if best:
-            out[date] = list(best.values())
+            out[date] = sorted(best.values(), key=lambda bet: bet["edge"], reverse=True)
     return out
 
 
