@@ -148,7 +148,8 @@ def main(argv=None) -> int:
     latest = _load_json(snapshot_path, {})
     priced = len(latest.get("fixtures", []))
     unmatched = len(latest.get("unmatched_fixtures", []))
-    print(f"priced fixtures: {priced}, unmatched fixtures: {unmatched}")
+    started = len(latest.get("started_not_priced", []))
+    print(f"priced fixtures: {priced}, unmatched fixtures: {unmatched}, started not priced: {started}")
     print(f"record rows: {len(aggregate.get('summary', []))}, priced picks: {aggregate.get('priced_picks', 0)}")
     return 0
 

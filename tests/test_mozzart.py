@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import json
 import subprocess
 from pathlib import Path
 
@@ -235,3 +236,55 @@ def test_cli_without_fixtures_is_a_noop(tmp_path, monkeypatch, capsys) -> None:
     )
     assert cli.main(["--date", "2026-11-21", "--prices-dir", str(tmp_path / "prices")]) == 0
     assert "no fixtures" in capsys.readouterr().out
+
+
+def test_started_fixtures_are_skipped() -> None:
+    fetched = dt.datetime(2026, 11, 21, 10, 0, tzinfo=dt.timezone.utc)
+    fixtures = [
+        {"d": "T1", "k": "10:10", "h": "Genclerbirligi", "a": "Gaziantep"},
+        {"d": "E0", "k": "12:30", "h": "Man City", "a": "Fulham"},
+    ]
+
+    def event(league, home, away, kickoff):
+        return {
+            "league": league, "home": home, "away": away, "startTime": kickoff,
+            "markets": [{
+                "rawName": "Konačan ishod", "period": "FULL_TIME",
+                "selections": [{"rawName": "1", "odds": 2.1, "isActive": True}],
+            }],
+        }
+
+    events = [
+        event("Turska 1", "Genclerbirligi", "Gaziantep", "2026-11-21T10:10:00Z"),
+        event("Engleska 1", "Man City", "Fulham", "2026-11-21T12:30:00Z"),
+    ]
+    snap = snapshot.build(dt.date(2026, 11, 21), fixtures, events, fetched, min_lead_minutes=20)
+    assert [row["home"] for row in snap["fixtures"]] == ["Man City"]
+    assert [row["home"] for row in snap["started_not_priced"]] == ["Genclerbirligi"]
+    assert snap["unmatched_fixtures"] == []
+
+
+def test_second_run_makes_no_requests(tmp_path, monkeypatch) -> None:
+    from pipeline.mozzart import cli
+
+    monkeypatch.setattr(cli, "PICKS_DIR", tmp_path)
+    (tmp_path / "2026-11-21.json").write_text(
+        json.dumps({
+            "date": "2026-11-21", "kind": "round",
+            "fixture_list": [{"d": "E0", "k": "15:00", "h": "A", "a": "B"}],
+            "rows": [],
+        }),
+        encoding="utf-8",
+    )
+    prices = tmp_path / "prices"
+    (prices / "rounds").mkdir(parents=True)
+    (prices / "rounds" / "2026-11-21.json").write_text(
+        json.dumps({"round_date": "2026-11-21", "fetched_at": "2026-11-21T10:00:00+00:00", "fixtures": []}),
+        encoding="utf-8",
+    )
+
+    def boom(*_args, **_kwargs):
+        raise AssertionError("must not fetch when a snapshot exists")
+
+    monkeypatch.setattr(client, "fetch_events", boom)
+    assert cli.main(["--date", "2026-11-21", "--prices-dir", str(prices)]) == 0

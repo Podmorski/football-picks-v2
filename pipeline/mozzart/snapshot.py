@@ -7,6 +7,7 @@ from . import mapping, teams
 from .client import parse_kickoff
 
 MAX_KICKOFF_HOURS = teams.MAX_KICKOFF_HOURS
+MIN_LEAD_MINUTES = 20.0
 
 
 def fixtures_from_round(document: dict) -> list[dict]:
@@ -75,11 +76,46 @@ def event_prices(event: dict) -> dict[str, float]:
     return prices
 
 
-def build(round_date: dt.date, fixtures: list[dict], events: list[dict], fetched_at: dt.datetime) -> dict:
-    """Join the feed to the round's fixtures and emit the snapshot document."""
-    by_division: dict[str, list[dict]] = {}
+def best_event(fixture: dict, events: list[dict]) -> dict | None:
+    """Nearest Mozzart event by team-name similarity, for the unmatched report."""
+    best, score = None, -1.0
+    for event in events:
+        value = teams.similarity(event.get("home", ""), fixture["h"]) + teams.similarity(event.get("away", ""), fixture["a"])
+        if value > score:
+            best, score = event, value
+    return best
+
+
+def build(
+    round_date: dt.date, fixtures: list[dict], events: list[dict], fetched_at: dt.datetime,
+    min_lead_minutes: float = MIN_LEAD_MINUTES,
+) -> dict:
+    """Join the feed to the round's fixtures and emit the snapshot document.
+
+    Fixtures kicking off within ``min_lead_minutes`` of the fetch are marked
+    started and not priced, so a late run never shows stale pre-match prices.
+    """
+    start_cutoff = fetched_at + dt.timedelta(minutes=min_lead_minutes)
+    eligible: list[dict] = []
+    started: list[dict] = []
     for fixture in fixtures:
+        kickoff = _fixture_kickoff(round_date, fixture.get("k"))
+        if kickoff is not None and kickoff <= start_cutoff:
+            started.append(
+                {"div": fixture["d"], "home": fixture["h"], "away": fixture["a"], "kickoff": kickoff.isoformat()}
+            )
+        else:
+            eligible.append(fixture)
+
+    by_division: dict[str, list[dict]] = {}
+    for fixture in eligible:
         by_division.setdefault(fixture["d"], []).append(fixture)
+
+    events_by_division: dict[str, list[dict]] = {}
+    for event in events:
+        division = teams.LEAGUE_LABELS.get(event.get("league", ""))
+        if division is not None:
+            events_by_division.setdefault(division, []).append(event)
 
     priced: dict[tuple, dict] = {}
     for event in events:
@@ -103,14 +139,22 @@ def build(round_date: dt.date, fixtures: list[dict], events: list[dict], fetched
             "match_similarity": round(score, 3),
         }
 
-    unmatched = [
-        {"div": fixture["d"], "home": fixture["h"], "away": fixture["a"], "kickoff": fixture.get("k")}
-        for fixture in fixtures
-        if (fixture["d"], fixture["h"], fixture["a"]) not in priced
-    ]
+    unmatched = []
+    for fixture in eligible:
+        key = (fixture["d"], fixture["h"], fixture["a"])
+        if key in priced:
+            continue
+        row = {"div": fixture["d"], "home": fixture["h"], "away": fixture["a"], "kickoff": fixture.get("k")}
+        candidate = best_event(fixture, events_by_division.get(fixture["d"], []))
+        if candidate is not None:
+            row["mozzart_home"] = candidate.get("home")
+            row["mozzart_away"] = candidate.get("away")
+        unmatched.append(row)
+
     return {
         "round_date": round_date.isoformat(),
         "fetched_at": fetched_at.astimezone(dt.timezone.utc).isoformat(timespec="seconds"),
         "fixtures": sorted(priced.values(), key=lambda row: (row["div"], row["home"], row["away"])),
         "unmatched_fixtures": unmatched,
+        "started_not_priced": sorted(started, key=lambda row: (row["kickoff"], row["div"], row["home"])),
     }
