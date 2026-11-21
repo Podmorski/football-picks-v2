@@ -133,12 +133,17 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   merged 93 priced fixtures (the first T1 price kept, new fixtures stamped 10:06), 29 unmatched,
   0 started; 20 pages, budget 21/90. Aliases were added for the 29 unmatched names (future fetches
   only; 21 Nov is not re-fetched).
+- Vetting engine: `pipeline/vetting.py` has C1-C12 as pure checks (C7 a flag, never a filter) and a
+  `DEFAULT_RULE` (C1 0.45, C2-C4, C6, C7 flag). 16 tests. **Not yet done**: the Stage A/B rule
+  backtest, the `vetting.json` live-rule selection/holdout, and the vetting dashboard layout.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 171 tests passing. `npm run build` green (47 pages).
+- 190 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 
-- **Prices**: 21 Nov is 93/122 priced (29 unmatched remain in that snapshot; the new aliases apply to
-  future rounds). Sunday 22 Nov check pending.
+- **Milestone 6 pending**: run the Stage A/B rule backtest (selection 2019-20..2023-24, confirm
+  2024-25..2025-26), save `pipeline/model/vetting.json`, and replace the dashboard with the vetting
+  layout (Best bets, ticks, empty state, target tickets). HxG/AxG coverage is 0 in our CSVs, so C9
+  cannot run.
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
   backtest optimises one ticket per round date across all divisions playing that date.
