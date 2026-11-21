@@ -1,5 +1,4 @@
 import ValueList from '@/components/ValueList';
-import { Badge } from '@/components/ui/badge';
 import { readIndex, readRoundIndex } from '@/lib/data';
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -48,20 +47,27 @@ export default function ValuePage() {
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .slice(-6)
     .map((row) => [row.date, row.label]);
+  const roundMeta: Record<string, { label: string; kind: string }> = {};
+  for (const row of index.rounds) roundMeta[row.date] = { label: row.label, kind: row.kind };
 
   return (
     <div className="space-y-4">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">{chosen ? `${chosen.label} — value bets` : 'Value bets'}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Value bets</h1>
         <p className="text-sm text-muted-foreground">
           Mozzart price at or above the minimum play odds, plus the team-record and agreement checks.
-          One per match, strongest edge first.
+          One per match, strongest edge first. Value is unproven: it is a price signal, not a guarantee.
         </p>
-        {chosen?.kind === 'example' ? <Badge variant="secondary">Example — {chosen.label}</Badge> : null}
       </header>
 
       {chosen ? (
-        <ValueList date={chosen.date} kind={chosen.kind} leagueOptions={leagueOptions} roundOptions={roundOptions} />
+        <ValueList
+          date={chosen.date}
+          kind={chosen.kind}
+          leagueOptions={leagueOptions}
+          roundOptions={roundOptions}
+          roundMeta={roundMeta}
+        />
       ) : (
         <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
           No round published yet. {roundLabel(next)} is the next round.

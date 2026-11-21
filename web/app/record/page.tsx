@@ -55,9 +55,8 @@ export default function RecordPage() {
             <tbody>
               {bins.map((bin) => {
                 const diff = bin.landed === null ? null : bin.landed - bin.shown;
-                const inRange = Number(bin.bin.split('-')[0]) >= 40 && Number(bin.bin.split('-')[1]) <= 65;
                 return (
-                  <tr key={bin.bin} className={inRange ? 'border-t bg-accent/30' : 'border-t'}>
+                  <tr key={bin.bin} className="border-t">
                     <td className="tabular px-3 py-1.5">{bin.bin}%</td>
                     <td className="tabular px-3 py-1.5 text-right">{pct(bin.shown)}</td>
                     <td className="tabular px-3 py-1.5 text-right font-medium">{pct(bin.landed)}</td>
@@ -72,7 +71,7 @@ export default function RecordPage() {
           </table>
         </div>
         <p className="text-xs text-muted-foreground">
-          Highlighted rows are the 40–65% band the picker actually publishes.
+          Every probability band is shown; no band is treated as a publishing filter.
         </p>
       </section>
 

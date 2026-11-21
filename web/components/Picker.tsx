@@ -183,11 +183,13 @@ export default function Picker({
   kind,
   leagueOptions,
   roundOptions = [],
+  roundMeta = {},
 }: {
   date: string;
   kind: string;
   leagueOptions: [string, string, string][];
   roundOptions?: [string, string][];
+  roundMeta?: Record<string, { label: string; kind: string }>;
 }) {
   const [data, setData] = useState<{ rows: RankRow[]; ladder: string[] } | null>(null);
   const [markets, setMarkets] = useState<Record<string, MarketMeta>>({});
@@ -212,6 +214,8 @@ export default function Picker({
   const [ticketOpen, setTicketOpen] = useState(false);
 
   const activeDate = /^\d{4}-\d{2}-\d{2}$/.test(roundParam) ? roundParam : date;
+  const activeMeta = roundMeta[activeDate] ?? { label: activeDate, kind };
+  const activeKind = activeMeta.kind;
 
   useEffect(() => {
     let cancelled = false;
@@ -487,6 +491,11 @@ export default function Picker({
 
   return (
     <div className="space-y-4 pb-40">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="text-lg font-semibold">{activeMeta.label}</h2>
+        {activeKind === 'example' ? <Badge variant="secondary">Example</Badge> : null}
+      </div>
+
       {roundOptions.length > 1 ? (
         <div className="flex flex-wrap gap-1.5">
           {roundOptions.map(([value, label]) => (
@@ -658,7 +667,7 @@ export default function Picker({
           : bet.startsWith('group:')
             ? `best matches for ${GROUP_LABEL[bet.slice(6)] ?? 'this group'}`
             : `best matches for ${markets[bet.slice(7)]?.plain ?? 'this bet'}`}
-        {' · '}{league === 'all' ? 'all leagues' : (leagueNames[league] ?? league)} · {kind === 'example' ? 'Example round' : activeDate}
+        {' · '}{league === 'all' ? 'all leagues' : (leagueNames[league] ?? league)} · {activeKind === 'example' ? 'Example round' : activeDate}
       </p>
       {settled.length > 0 ? (
         <p className="text-sm">Result: <span className="font-medium">{landed} of {settled.length} landed</span> · expected about {expected.toFixed(1)}</p>

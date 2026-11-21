@@ -81,15 +81,18 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
    settled by `run_model.py`; future rounds carry every market. The already-published 21/22 Nov
    rounds are never edited; their all-market companions are `picks/<date>.full.json`, verified on the
    model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
-6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard = the live
-   **vetted list** (`vetting.DEFAULT_RULE`: C1 0.45, C2-C4, C6; C7 flag): Round, League, Bet (Any / a
-   group / one market, default Any bet). "Best bets this round" = passing picks, one per match, sorted
-   by probability, Strong (>= 55%) / Possible; card shows Mozzart vs fair (red below fair), check ticks,
-   result/score, details (team records n, league usual n, goal ladder). Empty state names the filter and
-   the 3 closest candidates with the failed check. "Only where Mozzart pays at least fair" (`?mozzart=1`).
-   Tickets are built only from passing picks (target 3/5/10). The old odds floor, Show filter and sort
-   are gone; Leagues/Record/Rounds/Tickets are small links. Record: picker calibration, combos, Mozzart
-   return, and "Record at Mozzart prices" (all passing / passing+value / any value, return CI).
+6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Best bets = the live
+   vetted list (`ANY_RULE` for Any bet, `TYPE_RULE` for a group/market; C7 is internal and not shown):
+   Round, League, Bet (Any / group / market), minimum fair odds (1.40/1.70/2.00/2.50, default 1.70).
+   One pick per match, sorted by probability; Strong means probability >= 55% for Any bet and the top
+   third of displayed passing rows for a group/market; Possible otherwise. Cards show probability, fair,
+   min play (`ceil_2dp(1.05/p)`), Strong/Possible and a Value badge; the Mozzart price appears only in
+   the opened details. Empty states distinguish loading, fetch failure, no candidates, none at the
+   minimum fair odds and `0 of N candidates passed` with the highest-probability failed candidates.
+   Tickets are built only from passing picks (target 3/5/10), with `Value legs only` default ON and a
+   combined min play. Top nav is Best bets | Value bets | Explore | Report; Value bets lists snapshot
+   prices at or above min play that also pass team-record/agreement checks, one per match by edge.
+   Record/Report cover calibration, combos, Mozzart returns and value tracking.
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -149,7 +152,7 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `(round_date, div, home, away, market)`, so a repeated fixture uses only its own round's snapshot;
   historical snapshots are used as-is (no migration or refetch).
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 249 tests passing. `npm run build` green (50 pages).
+- 256 tests passing. `npm run build` green (50 pages).
 - Rounds fixes (21 Nov): `web/lib/vetted.ts` is now the single selection used by Best bets and
   `/rounds` (`DEFAULT_RULE`, min fair 1.70, one passing pick per match, highest probability).
   `/rounds` dedupes by date, reads the `*.full.json` companion first (the page does), and shows
@@ -244,6 +247,20 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `tests/test_value_record.py` and `tests/test_vetted_record.py` include the web contract source check,
   t1=false inclusion, each required-check exclusion, min-play/fair-cap exclusions, one-per-match/edge
   ordering, pending/void/unpriced semantics and two-date price isolation.
+- Task 12 (21 Nov): Best bets and Value distinguish loading, fetch failure, unpriced build, no snapshot
+  for the active round, snapshot-but-no-qualifying bets, and available bets. Best bets stays usable
+  without prices; the price state is a separate note, and league/group counts depend only on round +
+  markets, not prices. Round headings/labels/kind come from the active client round via `roundMeta`
+  (including a directly linked example not in the buttons); page h1s are generic (`Best bets`,
+  `Value bets`, `Explore`). Empty states are factual (no candidates / none at the minimum fair odds /
+  `0 of N candidates passed` with `Highest-probability candidates that failed`). Strong/Possible
+  definitions sit beside the Best bets list. How-it-works, Record and Report copy is current
+  (Tuesday/Saturday/Sunday, division coverage, minimum playable odds, Mozzart snapshots, unproven
+  Value); Report's single TYPE_RULE research table is labelled before the UI minimum-fair filter,
+  highest probability and fair-odds returns. ComboRecord's Mozzart footnote is conditional.
+- Validation limits (21 Nov): local Playwright remains blocked by the four missing system libraries.
+  The state/round-identity/label contracts are source- and build-tested and captured in the private
+  priced screenshots; delayed-fetch, keyboard and mobile interactions were not exercised locally.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`

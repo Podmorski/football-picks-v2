@@ -43,7 +43,7 @@ def test_a2_min_fair_dropdown_is_in_every_view() -> None:
     assert "aria-label=\"Minimum fair odds\"" in source
     assert "value=\"2.50\"" in source
     assert "minFair," in source
-    assert "selectType(baseFiltered, {" in source
+    assert "selectType(eligible, {" in source
 
 
 def test_a3_dropdowns_are_full_width_on_mobile() -> None:

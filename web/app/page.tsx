@@ -1,5 +1,4 @@
 import VettedList from '@/components/VettedList';
-import { Badge } from '@/components/ui/badge';
 import { readIndex, readRoundIndex } from '@/lib/data';
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -67,27 +66,21 @@ export default function HomePage() {
     .sort((a, b) => (a.date < b.date ? -1 : 1))
     .slice(-6)
     .map((row) => [row.date, row.label]);
+  const roundMeta: Record<string, { label: string; kind: string }> = {};
+  for (const row of index.rounds) roundMeta[row.date] = { label: row.label, kind: row.kind };
 
   const updated = utcStamp(index.generated_at) ?? utcStamp(new Date().toISOString());
   const weekend = next.getUTCDay() === 0 || next.getUTCDay() === 6;
   const checkTimes = weekend ? 'Fri 18:00, Fri 21:00, Sat 08:00, Sun 08:00' : 'Tue 14:00, Tue 16:00';
-  const below = chosen
-    ? `${chosen.kind === 'example' ? 'example round' : 'latest finished round'}, ${chosen.label}`
-    : 'no round yet';
 
   return (
     <div className="space-y-4">
       <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">
-          {chosen ? `${chosen.label} — best plays` : 'Best plays'}
-        </h1>
+        <h1 className="text-2xl font-bold tracking-tight">Best bets</h1>
         {updated ? <p className="text-xs text-muted-foreground">Last updated: {updated}</p> : null}
-        <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-          {chosen?.kind === 'example' ? <Badge variant="secondary">Example — {chosen.label}</Badge> : null}
-          <span>
-            Every play is a calibrated probability with fair odds shown. Nothing here is a certainty.
-          </span>
-        </div>
+        <p className="text-sm text-muted-foreground">
+          Every play is a calibrated probability with fair odds shown. Nothing here is a certainty.
+        </p>
       </header>
 
       {!nextHasPicks ? (
@@ -95,7 +88,7 @@ export default function HomePage() {
           <p className="font-medium">No picks yet for {roundLabel(next)}.</p>
           <p className="text-muted-foreground">
             They appear once football-data.co.uk posts the fixtures (usually Friday afternoon UK for weekend
-            rounds, Tuesday for midweek; we check at {checkTimes} UTC). Below: {below}.
+            rounds, Tuesday for midweek; we check at {checkTimes} UTC).
           </p>
         </div>
       ) : null}
@@ -106,11 +99,12 @@ export default function HomePage() {
           kind={chosen.kind}
           leagueOptions={leagueOptions}
           roundOptions={roundOptions}
+          roundMeta={roundMeta}
         />
       ) : (
         <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
-          No round published yet. Saturday and Sunday picks appear Friday around 18:00 UK; Tuesday picks Tuesday
-          around 14:00 UK.
+          No round published yet. Tuesday, Saturday and Sunday rounds appear when the fixtures and
+          pre-match odds are available.
         </p>
       )}
     </div>

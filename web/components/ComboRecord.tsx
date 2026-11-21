@@ -45,6 +45,7 @@ export default function ComboRecord() {
 
   const strategies = data?.strategies ?? [];
   if (strategies.length === 0) return null;
+  const hasMozzart = strategies.some((row) => (row.mozzart?.n ?? 0) > 0);
 
   return (
     <section className="space-y-3">
@@ -98,7 +99,9 @@ export default function ComboRecord() {
         </table>
       </div>
       <p className="text-xs text-muted-foreground">
-        Mozzart returns appear once settled live rounds carry frozen prices; there are none yet.
+        {hasMozzart
+          ? 'Mozzart returns are included where settled rounds carry frozen prices.'
+          : 'Mozzart returns appear once settled live rounds carry frozen prices; there are none yet.'}
       </p>
     </section>
   );

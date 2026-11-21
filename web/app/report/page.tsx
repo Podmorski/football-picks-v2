@@ -169,11 +169,12 @@ export default function ReportPage() {
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">TYPE_RULE backtest · per group</h2>
+        <h2 className="text-lg font-semibold">TYPE_RULE research backtest · per group</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Used when Bet is a group or a single market. One passing bet per match per group (highest
-          probability), sorted by probability. Returns are at fair odds; the interval is a 95% CI
-          bootstrapped over round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
+          Used when Bet is a group or a single market. Research cohort: TYPE_RULE before the UI
+          minimum-fair filter. One pick per match by highest probability, sorted by probability;
+          selection is by probability, not lift. Returns are at fair odds, not realised Mozzart
+          profit. The interval is a 95% CI bootstrapped over round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -185,8 +186,8 @@ export default function ReportPage() {
                 <th className="px-3 py-2 text-right font-semibold">Picks/round</th>
                 <th className="px-3 py-2 text-right font-semibold">Landed</th>
                 <th className="px-3 py-2 text-right font-semibold">Predicted</th>
-                <th className="px-3 py-2 text-right font-semibold">Return</th>
-                <th className="px-3 py-2 text-right font-semibold">Return 95% CI</th>
+                <th className="px-3 py-2 text-right font-semibold">Return (fair)</th>
+                <th className="px-3 py-2 text-right font-semibold">95% CI</th>
               </tr>
             </thead>
             <tbody>
@@ -209,7 +210,6 @@ export default function ReportPage() {
           Rule: lift ≥ usual × {report.rule.lift_multiplier} and ≥ usual + {(report.rule.lift_points * 100).toFixed(0)} pts · home/away
           records ≥ usual with n ≥ {report.rule.record_min_n} · |model − empirical| ≤ max({(report.rule.agreement_min * 100).toFixed(0)} pts,
           {' '}{(report.rule.agreement_fraction * 100).toFixed(0)}% of p) · fair ≤ {report.rule.max_fair_odds}.
-          {report.note ? ` ${report.note}` : ''}
         </p>
         <p className="text-xs text-muted-foreground">
           Footnote: one pick per match, highest probability. Weekly reporting is automatic: the pipeline

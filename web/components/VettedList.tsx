@@ -81,13 +81,17 @@ function StatusBadge({ status }: { status?: string }) {
 type EvaluatedRow = Evaluated;
 
 export default function VettedList({
-  date, kind, leagueOptions, roundOptions = [],
+  date, kind, leagueOptions, roundOptions = [], roundMeta = {},
 }: {
   date: string; kind: string; leagueOptions: [string, string, string][]; roundOptions?: [string, string][];
+  roundMeta?: Record<string, { label: string; kind: string }>;
 }) {
   const [data, setData] = useState<{ rows: RankRow[]; ladder: string[] } | null>(null);
   const [markets, setMarkets] = useState<Record<string, MarketMeta>>({});
   const [prices, setPrices] = useState<MozzartPricesFile | null>(null);
+  const [roundState, setRoundState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [marketsState, setMarketsState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [pricesState, setPricesState] = useState<'loading' | 'ready' | 'unpriced' | 'error'>('loading');
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
   const [minOdds, setMinOdds] = useParam('min', '1.70');
@@ -100,43 +104,65 @@ export default function VettedList({
   const [valueOnly, setValueOnly] = useState(true);
 
   const activeDate = /^\d{4}-\d{2}-\d{2}$/.test(roundParam) ? roundParam : date;
+  const activeMeta = roundMeta[activeDate] ?? { label: activeDate, kind };
+  const activeKind = activeMeta.kind;
 
   useEffect(() => {
     let cancelled = false;
     setData(null);
+    setRoundState('loading');
     (async () => {
       for (const url of [`/data/rounds/${activeDate}.full.json`, `/data/rounds/${activeDate}.json`]) {
         const response = await fetch(url);
         if (!response.ok) continue;
         const payload = (await response.json()) as Record<string, unknown>;
-        if (!cancelled) setData({ rows: decodeRows(payload), ladder: (payload.ladder as string[]) ?? [] });
+        if (!cancelled) {
+          setData({ rows: decodeRows(payload), ladder: (payload.ladder as string[]) ?? [] });
+          setRoundState('ready');
+        }
         return;
       }
-      if (!cancelled) setData({ rows: [], ladder: [] });
-    })().catch(() => { if (!cancelled) setData({ rows: [], ladder: [] }); });
+      if (!cancelled) setRoundState('error');
+    })().catch(() => { if (!cancelled) setRoundState('error'); });
     return () => { cancelled = true; };
   }, [activeDate]);
 
   useEffect(() => {
     let cancelled = false;
+    setMarketsState('loading');
     fetch('/data/markets.json')
-      .then((response) => (response.ok ? response.json() : { markets: [] }))
-      .then((payload: { markets: MarketMeta[] }) => {
+      .then((response) => {
+        if (!response.ok) throw new Error('markets');
+        return response.json() as Promise<{ markets: MarketMeta[] }>;
+      })
+      .then((payload) => {
         if (cancelled) return;
         const map: Record<string, MarketMeta> = {};
         for (const market of payload.markets ?? []) map[market.id] = market;
         setMarkets(map);
+        setMarketsState('ready');
       })
-      .catch(() => undefined);
+      .catch(() => { if (!cancelled) setMarketsState('error'); });
     return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
     let cancelled = false;
+    setPricesState('loading');
     fetch('/data/mozzart-prices.json')
-      .then((response) => (response.ok ? response.json() : null))
-      .then((payload: MozzartPricesFile | null) => { if (!cancelled) setPrices(payload); })
-      .catch(() => undefined);
+      .then(async (response) => {
+        if (response.status === 404) {
+          if (!cancelled) { setPrices(null); setPricesState('unpriced'); }
+          return;
+        }
+        if (!response.ok) {
+          if (!cancelled) setPricesState('error');
+          return;
+        }
+        const payload = (await response.json()) as MozzartPricesFile;
+        if (!cancelled) { setPrices(payload); setPricesState('ready'); }
+      })
+      .catch(() => { if (!cancelled) setPricesState('error'); });
     return () => { cancelled = true; };
   }, []);
 
@@ -185,15 +211,22 @@ export default function VettedList({
     });
   }, [activeEvaluated, league, bet, isAny, markets]);
   const minFair = Number(minOdds) || 1.70;
+  const dataReady = roundState === 'ready' && marketsState === 'ready';
+  const countsReady = dataReady;
+
+  const eligible = useMemo(
+    () => baseFiltered.filter((item) => item.candidate.fairOdds >= minFair),
+    [baseFiltered, minFair],
+  );
 
   const passing = useMemo(() => {
-    if (isAny) return selectPassing(baseFiltered, { minFair, mozzartOnly: false });
-    return selectType(baseFiltered, {
+    if (isAny) return selectPassing(eligible, { minFair, mozzartOnly: false });
+    return selectType(eligible, {
       perMatch: bet.startsWith('group:'),
       market: bet.startsWith('group:') ? undefined : bet.slice(7),
       minFair,
     });
-  }, [baseFiltered, isAny, bet, minFair]);
+  }, [eligible, isAny, bet, minFair]);
 
   // TYPE_RULE match counts for the current round + league, per group and market.
   const typeCounts = useMemo(() => {
@@ -215,25 +248,40 @@ export default function VettedList({
     return { groups: groupMatches, markets: marketMatches };
   }, [evaluatedType, league, markets, minFair]);
 
-  const closest = useMemo(() => {
+  const failedCandidates = useMemo(() => {
     if (passing.length > 0) return [];
     const seen = new Set<string>();
     const rows: { item: EvaluatedRow; failed: VettingCheck[] }[] = [];
-    const ordered = [...baseFiltered].sort((a, b) => b.candidate.probability - a.candidate.probability);
+    const ordered = [...eligible].sort((a, b) => b.candidate.probability - a.candidate.probability);
     for (const item of ordered) {
-      const key = `${item.row.h}|${item.row.a}`;
+      const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
       if (seen.has(key)) continue;
       const failed = item.checks.filter((check) => !check.flag && !check.passed);
-      if (failed.length === 0 && item.candidate.fairOdds < minFair) {
-        failed.push({ id: 'min', label: 'Min fair', passed: false, value: `fair ${item.candidate.fairOdds.toFixed(2)} < ${minFair.toFixed(2)}` });
-      }
       if (failed.length === 0) continue;
       seen.add(key);
       rows.push({ item, failed });
       if (rows.length >= 3) break;
     }
     return rows;
-  }, [baseFiltered, passing, minFair]);
+  }, [eligible, passing.length]);
+
+  const priceNote = pricesState === 'loading'
+    ? 'Loading Mozzart prices…'
+    : pricesState === 'error'
+      ? 'Mozzart prices could not be loaded.'
+      : pricesState === 'unpriced'
+        ? 'Mozzart prices are not embedded in this build.'
+        : snapshot
+          ? null
+          : 'No Mozzart snapshot for this round.';
+
+  function priceUnavailableText(): string {
+    if (pricesState === 'loading') return 'Loading Mozzart price…';
+    if (pricesState === 'error') return 'Mozzart price unavailable (prices could not be loaded).';
+    if (pricesState === 'unpriced') return 'Mozzart price unavailable (not embedded in this build).';
+    if (!snapshot) return 'No Mozzart snapshot for this round.';
+    return 'No Mozzart price for this bet.';
+  }
 
   function toLeg(row: RankRow): TicketLeg {
     const meta = markets[row.m];
@@ -279,6 +327,11 @@ export default function VettedList({
 
   return (
     <div className="space-y-4 pb-40">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="text-lg font-semibold">{activeMeta.label} — best bets</h2>
+        {activeKind === 'example' ? <Badge variant="secondary">Example</Badge> : null}
+      </div>
+
       {roundOptions.length > 1 ? (
         <div className="flex flex-wrap gap-1.5">
           {roundOptions.map(([value, label]) => (
@@ -300,9 +353,9 @@ export default function VettedList({
           <option value="any">Any bet</option>
           {GROUP_ORDER.map((group) => (
             <optgroup key={group} label={GROUP_LABEL[group]}>
-              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({typeCounts.groups.get(group)?.size ?? 0})</option>
+              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({countsReady ? (typeCounts.groups.get(group)?.size ?? 0) : '…'})</option>
               {(marketGroups.get(group) ?? []).map((market) => (
-                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({typeCounts.markets.get(market.id)?.size ?? 0})</option>
+                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({countsReady ? (typeCounts.markets.get(market.id)?.size ?? 0) : '…'})</option>
               ))}
             </optgroup>
           ))}
@@ -315,109 +368,131 @@ export default function VettedList({
         </select>
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel}
-        {` · fair ≥ ${minFair.toFixed(2)}`}
-        {isAny ? '' : ' · sorted by probability'}
-        {kind === 'example' ? ' · Example round' : ''}
-      </p>
-      <p className="text-sm">
-        {settledPicks.length > 0 ? (
-          <>Result: <span className="font-medium">{landedPicks} of {settledPicks.length} landed</span></>
-        ) : (
-          <span className="text-muted-foreground">Results pending</span>
-        )}
-      </p>
-
-      {passing.length === 0 ? (
-        <div className="space-y-2">
-          <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
-            No {leagueLabel} match fits {betLabel} this round.
-          </p>
-          {closest.length > 0 ? (
-            <div className="space-y-1">
-              <h3 className="text-sm font-semibold">Closest candidates</h3>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                {closest.map(({ item, failed }) => (
-                  <li key={`${item.row.h}|${item.row.a}|${item.row.m}`} className="rounded-md border px-2 py-1">
-                    <span className="font-medium text-foreground">{item.row.h} v {item.row.a}</span> · {markets[item.row.m]?.plain ?? item.row.m} · {pct(item.candidate.probability)}
-                    {' — '}{failed.map((check) => `${check.label}: ${check.value}`).join('; ')}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </div>
+      {!dataReady ? (
+        <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+          {roundState === 'error'
+            ? 'Could not load the round data. Choose another round or try again.'
+            : marketsState === 'error'
+              ? 'Could not load the market data. The list needs league and bet metadata.'
+              : 'Loading the round and market data…'}
+        </p>
       ) : (
-        <ul className="space-y-2">
-          {passing.map((item, index) => {
-            const { row, price, candidate } = item;
-            const meta = markets[row.m];
-            const key = `${row.h}|${row.a}|${row.m}`;
-            const open = expanded === key;
-            const checked = ticket.some((leg) => legKey(leg) === key);
-            const strong = isAny ? candidate.probability >= 0.55 : index < strongLimit;
-            const ladderRows = (data?.ladder ?? []).map((id) => (data?.rows ?? []).find((candidateRow) => candidateRow.h === row.h && candidateRow.a === row.a && candidateRow.m === id)).filter(Boolean) as RankRow[];
-            return (
-              <li key={key} className="rounded-xl border p-3">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 text-sm">
-                      <span className="text-muted-foreground">{row.k ?? ''}</span>
-                      <span className="font-semibold">{row.h} <span className="text-muted-foreground">v</span> {row.a}</span>
-                      <span className="text-xs text-muted-foreground">{leagueNames[row.d] ?? row.d}</span>
-                      <Badge variant="secondary">{strong ? 'Strong' : 'Possible'}</Badge>
-                      {isValue(item) ? <Badge variant="value">Value</Badge> : null}
-                    </div>
-                    <div className="mt-1 text-sm">
-                      {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
-                    </div>
-                  </div>
-                  <div className="tabular text-right text-sm">
-                    <div className="text-base font-semibold">{pct(candidate.probability)}</div>
-                    <div className="text-xs text-muted-foreground">fair {candidate.fairOdds.toFixed(2)}</div>
-                    {!isAny ? <div className="text-xs text-muted-foreground">lift {item.lift.toFixed(2)}× usual</div> : null}
-                    <div className="text-xs text-muted-foreground">Play only at odds ≥ {item.minPlay.toFixed(2)}</div>
-                  </div>
-                </div>
+        <>
+          <p className="text-sm text-muted-foreground">
+            {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel}
+            {` · fair ≥ ${minFair.toFixed(2)}`}
+            {isAny ? '' : ' · sorted by probability'}
+            {activeKind === 'example' ? ' · Example round' : ''}
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {isAny
+              ? 'Strong = probability ≥ 55%; Possible otherwise.'
+              : 'Strong = top third of the displayed passing rows by probability; Possible otherwise.'}
+          </p>
+          <p className="text-sm">
+            {settledPicks.length > 0 ? (
+              <>Result: <span className="font-medium">{landedPicks} of {settledPicks.length} landed</span></>
+            ) : (
+              <span className="text-muted-foreground">Results pending</span>
+            )}
+          </p>
+          {priceNote ? <p className="text-xs text-muted-foreground">{priceNote}</p> : null}
 
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <StatusBadge status={row.st} />
-                  {row.ht || row.ft ? <span className="tabular">HT {row.ht ?? '–'} · FT {row.ft ?? '–'}</span> : null}
+          {passing.length === 0 ? (
+            <div className="space-y-2">
+              <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                {baseFiltered.length === 0
+                  ? `No ${betLabel} candidates for ${leagueLabel} in this round.`
+                  : eligible.length === 0
+                    ? `No ${betLabel} candidates for ${leagueLabel} reach fair odds ≥ ${minFair.toFixed(2)}.`
+                    : `0 of ${eligible.length} candidates passed the ${isAny ? 'Any-bet' : 'selected'} rule.`}
+              </p>
+              {failedCandidates.length > 0 ? (
+                <div className="space-y-1">
+                  <h3 className="text-sm font-semibold">Highest-probability candidates that failed</h3>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    {failedCandidates.map(({ item, failed }) => (
+                      <li key={`${item.row.d}|${item.row.h}|${item.row.a}|${item.row.m}`} className="rounded-md border px-2 py-1">
+                        <span className="font-medium text-foreground">{item.row.h} v {item.row.a}</span> · {markets[item.row.m]?.plain ?? item.row.m} · {pct(item.candidate.probability)}
+                        {' — '}{failed.map((check) => `${check.label}: ${check.value}`).join('; ')}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                <div className="mt-2 flex flex-wrap items-center gap-1">
-                  <button type="button" onClick={() => toggleLeg(row)} className={cn('ml-auto rounded-md border px-2.5 py-1 text-xs', checked ? 'border-primary bg-primary text-primary-foreground' : '')}>
-                    {checked ? 'In ticket' : 'Add to ticket'}
-                  </button>
-                  <button type="button" onClick={() => setExpanded(open ? null : key)} aria-label="Details">
-                    <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform', open && 'rotate-180')} />
-                  </button>
-                </div>
-
-                {open ? (
-                  <div className="mt-2 space-y-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                    {price ? <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p> : null}
-                    <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)} (n={row.ln})</p>
-                    <p>Model {pct(row.p)} · team empirical {pct(candidate.countsProbability ?? 0)} · agreement gap {pct(Math.abs(row.p - (candidate.countsProbability ?? 0)))}</p>
-                    <p>Play only at odds ≥ {item.minPlay.toFixed(2)} · needs {(10 / item.minPlay).toFixed(1)} in 10 at that price; our chance {pct(candidate.probability)}</p>
-                    <div>
-                      <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Goal ladder</h4>
-                      <ul className="grid gap-x-4 gap-y-0.5 sm:grid-cols-2">
-                        {ladderRows.map((line) => (
-                          <li key={line.m} className={cn('flex justify-between gap-2', line.m === row.m && 'font-medium text-foreground')}>
-                            <span>{LADDER_LABELS[line.m] ?? line.m}</span>
-                            <span className="tabular">{pct(pcOf(line))} · {(1 / Math.max(pcOf(line), 1e-4)).toFixed(2)}</span>
-                          </li>
-                        ))}
-                      </ul>
+              ) : null}
+            </div>
+          ) : (
+            <ul className="space-y-2">
+              {passing.map((item, index) => {
+                const { row, price, candidate } = item;
+                const meta = markets[row.m];
+                const key = `${row.h}|${row.a}|${row.m}`;
+                const open = expanded === key;
+                const checked = ticket.some((leg) => legKey(leg) === key);
+                const strong = isAny ? candidate.probability >= 0.55 : index < strongLimit;
+                const ladderRows = (data?.ladder ?? []).map((id) => (data?.rows ?? []).find((candidateRow) => candidateRow.h === row.h && candidateRow.a === row.a && candidateRow.m === id)).filter(Boolean) as RankRow[];
+                return (
+                  <li key={key} className="rounded-xl border p-3">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 text-sm">
+                          <span className="text-muted-foreground">{row.k ?? ''}</span>
+                          <span className="font-semibold">{row.h} <span className="text-muted-foreground">v</span> {row.a}</span>
+                          <span className="text-xs text-muted-foreground">{leagueNames[row.d] ?? row.d}</span>
+                          <Badge variant="secondary">{strong ? 'Strong' : 'Possible'}</Badge>
+                          {isValue(item) ? <Badge variant="value">Value</Badge> : null}
+                        </div>
+                        <div className="mt-1 text-sm">
+                          {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
+                        </div>
+                      </div>
+                      <div className="tabular text-right text-sm">
+                        <div className="text-base font-semibold">{pct(candidate.probability)}</div>
+                        <div className="text-xs text-muted-foreground">fair {candidate.fairOdds.toFixed(2)}</div>
+                        {!isAny ? <div className="text-xs text-muted-foreground">lift {item.lift.toFixed(2)}× usual</div> : null}
+                        <div className="text-xs text-muted-foreground">Play only at odds ≥ {item.minPlay.toFixed(2)}</div>
+                      </div>
                     </div>
-                  </div>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                      <StatusBadge status={row.st} />
+                      {row.ht || row.ft ? <span className="tabular">HT {row.ht ?? '–'} · FT {row.ft ?? '–'}</span> : null}
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-1">
+                      <button type="button" onClick={() => toggleLeg(row)} className={cn('ml-auto rounded-md border px-2.5 py-1 text-xs', checked ? 'border-primary bg-primary text-primary-foreground' : '')}>
+                        {checked ? 'In ticket' : 'Add to ticket'}
+                      </button>
+                      <button type="button" onClick={() => setExpanded(open ? null : key)} aria-label="Details">
+                        <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform', open && 'rotate-180')} />
+                      </button>
+                    </div>
+
+                    {open ? (
+                      <div className="mt-2 space-y-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                        {price ? <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p> : <p>{priceUnavailableText()}</p>}
+                        <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)} (n={row.ln})</p>
+                        <p>Model {pct(row.p)} · team empirical {pct(candidate.countsProbability ?? 0)} · agreement gap {pct(Math.abs(row.p - (candidate.countsProbability ?? 0)))}</p>
+                        <p>Play only at odds ≥ {item.minPlay.toFixed(2)} · needs {(10 / item.minPlay).toFixed(1)} in 10 at that price; our chance {pct(candidate.probability)}</p>
+                        <div>
+                          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Goal ladder</h4>
+                          <ul className="grid gap-x-4 gap-y-0.5 sm:grid-cols-2">
+                            {ladderRows.map((line) => (
+                              <li key={line.m} className={cn('flex justify-between gap-2', line.m === row.m && 'font-medium text-foreground')}>
+                                <span>{LADDER_LABELS[line.m] ?? line.m}</span>
+                                <span className="tabular">{pct(pcOf(line))} · {(1 / Math.max(pcOf(line), 1e-4)).toFixed(2)}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </>
       )}
 
       <section className="space-y-2">

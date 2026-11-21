@@ -2,27 +2,31 @@ export default function HowItWorksPage() {
   const points = [
     {
       title: 'What we count',
-      body: 'Every result since 2015-16 in twelve divisions: full-time and half-time goals, both teams scoring, totals, combos. Each number is a hit rate with a sample size and a 95% confidence interval.',
+      body: 'Twenty-two main divisions with full-time and half-time goals and pre-match odds, plus extra full-time-only leagues for statistics. Each number is a historical hit rate with its sample size and a 95% confidence interval.',
     },
     {
       title: 'How a probability is built',
       body: 'Two engines run in parallel. One counts league and team history with recency weighting and shrinkage. The other builds a half-by-half goal grid from team strength and anchors it on de-margined pre-match odds. A per-group stack then picks the better source on held-out seasons.',
     },
     {
-      title: 'Why nothing under fair odds 1.54 is shown',
-      body: 'Plays above about 65% are dropped, which is where fair odds reach roughly 1.54. A 75% “sure thing” at short odds is where the counting gets thin and the market is already efficient — publishing it would be bravado, not analysis.',
+      title: 'Fair odds and minimum playable odds',
+      body: 'Fair odds are 1 divided by the calibrated probability. Every card also shows a minimum playable price: 1.05 divided by that probability, rounded up to two decimals. Below it the price does not cover the estimated chance. The minimum-fair-odds dropdown hides shorter prices; there is no fixed short-price cutoff.',
     },
     {
       title: 'How to read a card',
-      body: 'The percentage is the calibrated chance the play lands, fair odds are 1 divided by that, and the “Why” panel shows the two engines, the home/away counts and the league rate behind the pick.',
+      body: 'The percentage is the calibrated chance, fair odds are 1 divided by it, and the minimum playable price is the lowest price worth taking. Open the details for the team records, league usual, model/empirical gap, goal ladder and, when available, the Mozzart snapshot price and fetch time.',
     },
     {
-      title: 'The confidence badge',
-      body: 'High needs at least 20 matches of team history, the two engines within 0.05 of each other and a backtest bin that landed close to what it showed. Low means one of those is weak — treat the number as a starting point, not a verdict.',
+      title: 'Strong and Possible',
+      body: 'Under Any bet, Strong means probability at or above 55%; under a group or single market, Strong is the top third of the displayed passing rows by probability. Possible is everything else. The badge describes the displayed lean; it does not change the pick or the price.',
     },
     {
-      title: 'When picks appear',
-      body: 'Saturday rounds publish Friday around 18:00 UK, Tuesday rounds Tuesday around 14:00 UK. Only Tuesday and Saturday fixtures are considered, and a published round is never edited — only settled.',
+      title: 'When rounds appear',
+      body: 'Rounds are Tuesday, Saturday and Sunday. Weekend fixtures and odds usually appear Friday; midweek fixtures appear Tuesday. A published round is never edited, only settled.',
+    },
+    {
+      title: 'Mozzart snapshots and Value',
+      body: 'Mozzart prices come from a private snapshot and appear only in the tap-open details. A Value row means the snapshot price is at or above the minimum playable price and the team-record and agreement checks pass with fair odds at most 6.00. Value is unproven: it is a price signal, not a tip or a guarantee; the record is reported once results settle.',
     },
     {
       title: 'Statistics, not certainty',
