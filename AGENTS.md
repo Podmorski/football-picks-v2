@@ -79,10 +79,12 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
    model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
 6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Dashboard: round switch,
    League (search, grouped by country), Bet (Any / a group / a market, default All combos), odds floor
-   `?min=` (Any/1.30/1.50/2.00/3.00, default 1.50), sortable columns, 15 then Show all, expanded row =
-   goal ladder + next 5 bets. Target-payout tickets (`?target=` 2/3/5/10/20, `?legs=` 2-5; top 3),
-   ticket builder (localStorage only), `/tickets`, `/rounds`, `/record` (per-season picker
-   calibration, target × max-legs combos, Mozzart return).
+   `?min=` (Any/1.30/1.50/2.00/3.00, default 1.50), sortable columns, **top 10** then Show all (N =
+   matches), match view `?match=` (that match's 10 best bets), expanded row = goal ladder + next 5 bets.
+   Target-payout tickets (`?target=` 2/3/5/10/20, `?legs=` 2-5; top 3; per-leg and ticket results once
+   settled), "Suggested tickets — past rounds" (top-1 per target 3/5/10 from each round's own file, with
+   per-target tallies), ticket builder (localStorage only), `/tickets`, `/rounds`, `/record`
+   (per-season picker calibration, target × max-legs combos, Mozzart return).
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -111,8 +113,10 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   divisions playing that date (walk-forward, floor 1.50), with a return 95% CI bootstrapped over dates.
 - 21 Nov (122 fixtures, 19,076 rows) and 22 Nov (44 fixtures, 6,810 rows) are published; companions
   (`picks/*.full.json`) add 2,640 / 1,022 market rows and are verified on the model fields.
+- Dashboard UI (5d): top 10 + Show all (N = matches), per-match view (`?match=`), per-leg/ticket
+  results on target tickets, and "Suggested tickets — past rounds" with per-target tallies.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 160 tests passing. `npm run build` green (47 pages).
+- 164 tests passing. `npm run build` green (47 pages).
 
 ## Open items
 

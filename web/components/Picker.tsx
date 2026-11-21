@@ -21,6 +21,7 @@ import {
   combinedMozzart,
   combinedProbability,
   legKey,
+  overallStatus,
   payout,
   sameMatchWarning,
   ticketVsFair,
@@ -206,6 +207,8 @@ export default function Picker({
   const [min, setMin] = useParam('min', '1.50');
   const [target, setTarget] = useParam('target', '5');
   const [maxLegs, setMaxLegs] = useParam('legs', '5');
+  const [matchParam, setMatch] = useParam('match', '');
+  const [pastRounds, setPastRounds] = useState<{ date: string; label: string; rows: RankRow[] }[]>([]);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [leagueQuery, setLeagueQuery] = useState('');
   const [betQuery, setBetQuery] = useState('');
@@ -269,6 +272,39 @@ export default function Picker({
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    fetch('/data/rounds/index.json')
+      .then((response) => (response.ok ? response.json() : { rounds: [] }))
+      .then(async (payload: { rounds: { date: string; label: string; picks: number }[] }) => {
+        const seen = new Set<string>();
+        const dates = (payload.rounds ?? [])
+          .filter((round) => {
+            if (round.picks <= 0 || seen.has(round.date)) return false;
+            seen.add(round.date);
+            return true;
+          })
+          .sort((a, b) => (a.date < b.date ? 1 : -1))
+          .slice(0, 12);
+        const loaded = await Promise.all(
+          dates.map(async (round) => {
+            for (const url of [`/data/rounds/${round.date}.full.json`, `/data/rounds/${round.date}.json`]) {
+              const response = await fetch(url);
+              if (!response.ok) continue;
+              const data = (await response.json()) as Record<string, unknown>;
+              return { date: round.date, label: round.label, rows: decodeRows(data) };
+            }
+            return { date: round.date, label: round.label, rows: [] as RankRow[] };
+          }),
+        );
+        if (!cancelled) setPastRounds(loaded);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
     const savedBonus = window.localStorage.getItem('fpv2-bonus');
     const savedStake = window.localStorage.getItem('fpv2-stake');
     if (savedBonus) setBonus(Number(savedBonus) || 0);
@@ -323,7 +359,20 @@ export default function Picker({
   }, [pool, mozzartOnly, priceIndex]);
 
   const sorted = useMemo(() => sortRows(valuePool, sort as SortKey, dir, priceIndex), [valuePool, sort, dir, priceIndex]);
-  const visible = showAll === '1' ? sorted : sorted.slice(0, 15);
+  const visible = showAll === '1' ? sorted : sorted.slice(0, 10);
+
+  const matchRow = useMemo(() => {
+    const parts = matchParam.split('|');
+    if (parts.length !== 3 || !parts[0] || !parts[1] || !parts[2]) return null;
+    return { d: parts[0], h: parts[1], a: parts[2] };
+  }, [matchParam]);
+  const matchRows = useMemo(() => {
+    if (!matchRow) return [];
+    return (data?.rows ?? [])
+      .filter((row) => row.d === matchRow.d && row.h === matchRow.h && row.a === matchRow.a && fairOf(row) >= floor)
+      .sort((a, b) => pcOf(b) - pcOf(a))
+      .slice(0, 10);
+  }, [data, matchRow, floor]);
 
   const settled = sorted.filter((row) => row.st === 'landed' || row.st === 'lost');
   const landed = settled.filter((row) => row.st === 'landed').length;
@@ -346,10 +395,10 @@ export default function Picker({
     return priceIndex[priceKey(row.d, row.h, row.a, row.m)];
   }
 
-  function toLeg(row: RankRow): TicketLeg {
+  function legFrom(row: RankRow, pIndex = priceIndex, snap = snapshot): TicketLeg {
     const meta = markets[row.m];
-    const price = priceOf(row);
-    const fixture = snapshot?.fixtures.find((item) => item.div === row.d && item.home === row.h && item.away === row.a);
+    const price = pIndex[priceKey(row.d, row.h, row.a, row.m)];
+    const fixture = snap?.fixtures.find((item) => item.div === row.d && item.home === row.h && item.away === row.a);
     return {
       d: row.d,
       h: row.h,
@@ -366,6 +415,10 @@ export default function Picker({
       ht: row.ht,
       ft: row.ft,
     };
+  }
+
+  function toLeg(row: RankRow): TicketLeg {
+    return legFrom(row);
   }
 
   function toggleLeg(row: RankRow) {
@@ -388,6 +441,34 @@ export default function Picker({
     const legs = valuePool.map(toLeg);
     return optimiseTickets(legs, targetValue, maxLegsValue, 3, floor);
   }, [valuePool, targetValue, maxLegsValue, floor, markets, priceIndex, snapshot]);
+
+  const pastTickets = useMemo(() => {
+    return pastRounds.map((round) => {
+      const roundPriceIndex = buildPriceIndex(prices, round.date);
+      const roundSnapshot = snapshotFor(prices, round.date);
+      const roundPool = pickPool(round.rows, bet, league, markets, floor);
+      const entries = [3, 5, 10].map((target) => {
+        const legs = roundPool.map((row) => legFrom(row, roundPriceIndex, roundSnapshot));
+        const tickets = optimiseTickets(legs, target, maxLegsValue, 1, floor);
+        return { target, ticket: tickets[0] ?? null };
+      });
+      return { date: round.date, label: round.label, entries };
+    });
+  }, [pastRounds, bet, league, markets, floor, maxLegsValue, prices]);
+
+  const pastTally = [3, 5, 10].map((target) => {
+    const tickets = pastTickets.flatMap((round) => {
+      const entry = round.entries.find((item) => item.target === target);
+      return entry?.ticket ? [entry.ticket] : [];
+    });
+    const settled = tickets.filter((ticket) => {
+      const status = overallStatus(ticket.legs);
+      return status === 'landed' || status === 'lost';
+    });
+    const landed = settled.filter((ticket) => overallStatus(ticket.legs) === 'landed').length;
+    const expected = settled.reduce((total, ticket) => total + ticket.probability, 0);
+    return { target, landed, total: settled.length, expected };
+  });
 
   const ticketProbability = combinedProbability(ticket);
   const ticketFair = combinedFair(ticket);
@@ -436,6 +517,55 @@ export default function Picker({
             </button>
           ))}
         </div>
+      ) : null}
+
+      {matchRow ? (
+        <section className="space-y-2 rounded-xl border p-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-lg font-semibold">Best bets for {matchRow.h} v {matchRow.a}</h2>
+            <button type="button" onClick={() => setMatch('')} className="rounded-md border px-2.5 py-1 text-xs">
+              Back to list
+            </button>
+          </div>
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-2 py-2 text-left font-semibold">Bet</th>
+                  <th className="px-2 py-2 text-right font-semibold">Prob</th>
+                  <th className="px-2 py-2 text-right font-semibold">Fair</th>
+                  <th className="px-2 py-2 text-right font-semibold">Mozzart</th>
+                  <th className="px-2 py-2 text-left font-semibold">Result</th>
+                </tr>
+              </thead>
+              <tbody>
+                {matchRows.map((line) => {
+                  const meta = markets[line.m];
+                  const price = priceOf(line);
+                  return (
+                    <tr key={line.m} className="border-t">
+                      <td className="px-2 py-1.5">
+                        {meta?.plain ?? line.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
+                      </td>
+                      <td className="tabular px-2 py-1.5 text-right font-medium">{pct(pcOf(line))}</td>
+                      <td className="tabular px-2 py-1.5 text-right">{fairOf(line).toFixed(2)}</td>
+                      <td className="tabular px-2 py-1.5 text-right">{price ? price.odds.toFixed(2) : priced ? 'no price' : '—'}</td>
+                      <td className="px-2 py-1.5">
+                        <StatusBadge status={line.st} />
+                        {line.ht || line.ft ? (
+                          <span className="tabular block text-xs text-muted-foreground">HT {line.ht ?? '–'} · FT {line.ft ?? '–'}</span>
+                        ) : null}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {matchRows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No bets clear the floor for this match.</p>
+          ) : null}
+        </section>
       ) : null}
 
       <div className="space-y-2 rounded-xl border p-3">
@@ -544,7 +674,13 @@ export default function Picker({
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {sorted.length} {bet === 'any' ? 'best plays' : bet.startsWith('group:') ? (GROUP_LABEL[bet.slice(6)] ?? 'plays') : (markets[bet.slice(7)]?.plain ?? 'plays')} · {league === 'all' ? 'all leagues' : (leagueNames[league] ?? league)} · {kind === 'example' ? 'Example round' : activeDate}
+        {visible.length}{visible.length < sorted.length ? ` of ${sorted.length}` : ''}{' '}
+        {bet === 'any'
+          ? 'best matches'
+          : bet.startsWith('group:')
+            ? `best matches for ${GROUP_LABEL[bet.slice(6)] ?? 'this group'}`
+            : `best matches for ${markets[bet.slice(7)]?.plain ?? 'this bet'}`}
+        {' · '}{league === 'all' ? 'all leagues' : (leagueNames[league] ?? league)} · {kind === 'example' ? 'Example round' : activeDate}
       </p>
       {settled.length > 0 ? (
         <p className="text-sm">Result: <span className="font-medium">{landed} of {settled.length} landed</span> · expected about {expected.toFixed(1)}</p>
@@ -601,7 +737,15 @@ export default function Picker({
                         <input type="checkbox" checked={checked} onChange={() => toggleLeg(row)} aria-label="Add to ticket" />
                       </td>
                       <td className="tabular px-2 py-2 text-muted-foreground">{row.k ?? ''}</td>
-                      <td className="px-2 py-2 font-medium">{row.h} <span className="text-muted-foreground">v</span> {row.a}</td>
+                      <td className="px-2 py-2 font-medium">
+                        <button
+                          type="button"
+                          onClick={() => setMatch(`${row.d}|${row.h}|${row.a}`)}
+                          className="text-left underline-offset-2 hover:underline"
+                        >
+                          {row.h} <span className="text-muted-foreground">v</span> {row.a}
+                        </button>
+                      </td>
                       <td className="px-2 py-2 text-muted-foreground">{leagueNames[row.d] ?? row.d}</td>
                       <td className="px-2 py-2">
                         {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
@@ -670,14 +814,14 @@ export default function Picker({
         </div>
       )}
 
-      {sorted.length > 15 && showAll !== '1' ? (
+      {sorted.length > 10 && showAll !== '1' ? (
         <button type="button" onClick={() => setShowAll('1')} className="rounded-md border px-3 py-1.5 text-sm">
           Show all ({sorted.length})
         </button>
       ) : null}
-      {showAll === '1' && sorted.length > 15 ? (
+      {showAll === '1' && sorted.length > 10 ? (
         <button type="button" onClick={() => setShowAll('0')} className="rounded-md border px-3 py-1.5 text-sm">
-          Show top 15
+          Show top 10
         </button>
       ) : null}
 
@@ -717,15 +861,21 @@ export default function Picker({
                   </div>
                   <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                     {suggestion.legs.map((leg) => (
-                      <li key={legKey(leg)} className="flex justify-between gap-2">
+                      <li key={legKey(leg)} className="flex flex-wrap justify-between gap-2">
                         <span className="truncate">{leg.h} v {leg.a} · {leg.label}</span>
-                        <span className="tabular">{pct(leg.pc)} · {leg.fair.toFixed(2)}</span>
+                        <span className="tabular">
+                          {pct(leg.pc)} · {leg.fair.toFixed(2)} ·{' '}
+                          {leg.st === 'landed' ? 'Landed ✓' : leg.st === 'lost' ? 'Lost ✗' : 'Pending'}
+                          {leg.ht || leg.ft ? ` (${leg.ht ?? '–'} / ${leg.ft ?? '–'})` : ''}
+                        </span>
                       </li>
                     ))}
                   </ul>
                   <div className="mt-1 tabular text-xs text-muted-foreground">
                     Fair {suggestion.fair.toFixed(2)}
                     {mozzart !== null ? ` · Mozzart ${mozzart.toFixed(2)} · vs fair ${vs === null ? '–' : signedPct(vs * 100)}` : ' · Mozzart incomplete'}
+                    {' · '}
+                    <span className="font-medium">Ticket: {overallStatus(suggestion.legs)}</span>
                   </div>
                   <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">
                     Add to my ticket
@@ -733,6 +883,76 @@ export default function Picker({
                 </li>
               );
             })}
+          </ul>
+        )}
+      </section>
+
+      <section className="space-y-2">
+        <h2 className="text-lg font-semibold">Suggested tickets — past rounds</h2>
+        <p className="text-sm text-muted-foreground">
+          The #1 ticket for targets 3.00 / 5.00 / 10.00 in every published round, using the current League/Bet/floor filters and only that round&apos;s file.
+        </p>
+        {pastTally.some((row) => row.total > 0) ? (
+          <ul className="flex flex-wrap gap-2 text-sm">
+            {pastTally.map((row) => (
+              <li key={row.target} className="rounded-full border px-3 py-1">
+                {row.target.toFixed(2)}: {row.landed} of {row.total} landed · expected about {row.expected.toFixed(1)}
+              </li>
+            ))}
+          </ul>
+        ) : null}
+        {pastTickets.length === 0 ? (
+          <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No published rounds yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {pastTickets.map((round) => (
+              <li key={round.date} className="rounded-xl border p-3 text-sm">
+                <div className="font-medium">
+                  {round.label} <span className="text-xs text-muted-foreground">({round.date})</span>
+                </div>
+                <ul className="mt-1 space-y-1">
+                  {round.entries.map((entry) => {
+                    if (!entry.ticket) {
+                      return (
+                        <li key={entry.target} className="text-xs text-muted-foreground">
+                          {entry.target.toFixed(2)}: no ticket
+                        </li>
+                      );
+                    }
+                    const ticket = entry.ticket;
+                    const mozzart = combinedMozzart(ticket.legs);
+                    const vs = ticketVsFair(ticket.legs, 0);
+                    const status = overallStatus(ticket.legs);
+                    return (
+                      <li key={entry.target} className="rounded-md bg-muted/30 px-2 py-1">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="font-medium">
+                            {entry.target.toFixed(2)} · {pct(ticket.probability)} · fair {ticket.fair.toFixed(2)}
+                          </span>
+                          <span className={status === 'landed' ? 'text-xs text-emerald-600' : status === 'lost' ? 'text-xs text-rose-600' : 'text-xs text-muted-foreground'}>
+                            {status === 'landed' ? 'Landed' : status === 'lost' ? 'Lost' : 'Pending'}
+                          </span>
+                        </div>
+                        <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                          {ticket.legs.map((leg) => (
+                            <li key={legKey(leg)} className="flex flex-wrap justify-between gap-2">
+                              <span className="truncate">{leg.h} v {leg.a} · {leg.label} · {pct(leg.pc)} · {leg.fair.toFixed(2)}</span>
+                              <span>
+                                {leg.st === 'landed' ? 'Landed ✓' : leg.st === 'lost' ? 'Lost ✗' : 'Pending'}
+                                {leg.ht || leg.ft ? ` (${leg.ht ?? '–'} / ${leg.ft ?? '–'})` : ''}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="mt-1 text-xs text-muted-foreground">
+                          {mozzart !== null ? `Mozzart ${mozzart.toFixed(2)} · vs fair ${vs === null ? '–' : signedPct(vs * 100)}` : 'Mozzart incomplete'}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
           </ul>
         )}
       </section>

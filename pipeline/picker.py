@@ -60,6 +60,27 @@ def below_floor_count(rows: list[dict], bet: str, league: str = "all", min_fair:
     return sum(1 for value in by_match.values() if value < min_fair)
 
 
+def top_n(rows: list[dict], n: int = 10) -> list[dict]:
+    return sorted(rows, key=lambda row: -pc(row))[:n]
+
+
+def match_best(rows: list[dict], home: str, away: str, min_fair: float = DEFAULT_FLOOR, n: int = 10) -> list[dict]:
+    candidates = [
+        row for row in rows
+        if row.get("h") == home and row.get("a") == away and fair(row) >= min_fair
+    ]
+    return sorted(candidates, key=lambda row: -pc(row))[:n]
+
+
+def ticket_status(statuses: list[str | None]) -> str:
+    """Any leg lost => lost; otherwise any pending => pending; else landed."""
+    if any(status == "lost" for status in statuses):
+        return "lost"
+    if any(status is None or status == "pending" for status in statuses):
+        return "pending"
+    return "landed"
+
+
 def _metric(row: dict, key: str, price_index: dict | None) -> float | str:
     price = (price_index or {}).get(f"{row.get('d')}|{row.get('h')}|{row.get('a')}|{row.get('m')}")
     if key == "fair":

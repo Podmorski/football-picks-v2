@@ -84,6 +84,32 @@ def test_picker_calibration_is_walk_forward() -> None:
     assert "if earlier >= target" in inspect.getsource(picker_backtest)
 
 
+def test_top_n_cut() -> None:
+    rows = [row("A", "B", "BTTS:GG", 0.50 + index * 0.01) for index in range(12)]
+    assert len(picker.top_n(rows, 10)) == 10
+
+
+def test_match_best_returns_ten_highest_for_that_match() -> None:
+    rows = [row("A", "B", f"M{index}", 0.50 + index * 0.01) for index in range(12)]
+    rows.append(row("C", "D", "BTTS:GG", 0.90))
+    best = picker.match_best(rows, "A", "B", min_fair=0.0, n=10)
+    assert len(best) == 10
+    assert all(item["h"] == "A" and item["a"] == "B" for item in best)
+    assert best[0]["pc"] > best[-1]["pc"]
+
+
+def test_ticket_status_logic() -> None:
+    assert picker.ticket_status(["landed", "lost"]) == "lost"
+    assert picker.ticket_status(["landed", "pending"]) == "pending"
+    assert picker.ticket_status(["landed", "void"]) == "landed"
+
+
+def test_picker_has_past_round_tickets_from_round_files() -> None:
+    source = (Path(__file__).resolve().parents[1] / "web" / "components" / "Picker.tsx").read_text(encoding="utf-8")
+    assert "Suggested tickets — past rounds" in source
+    assert "/data/rounds/index.json" in source
+
+
 def test_no_empty_list_when_fixtures_exist() -> None:
     rows = [row("A", "B", "BTTS:GG", 0.5)]
     assert picker.pick_rows(rows, "group:BTTS", "all", GROUPS)

@@ -46,7 +46,14 @@ export default function HomePage() {
   const nextRound = index.rounds.find((row) => row.kind === 'round' && row.date === nextIso);
   const nextHasPicks = Boolean(nextRound && nextRound.picks > 0);
 
-  const withPicks = index.rounds.filter((row) => row.kind === 'round' && row.picks > 0);
+  const seenDates = new Set<string>();
+  const withPicks = index.rounds
+    .filter((row) => row.kind === 'round' && row.picks > 0)
+    .filter((row) => {
+      if (seenDates.has(row.date)) return false;
+      seenDates.add(row.date);
+      return true;
+    });
   const upcoming = withPicks
     .filter((row) => row.date >= nextIso)
     .sort((a, b) => (a.date < b.date ? -1 : 1));
