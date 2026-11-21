@@ -3149,37 +3149,11 @@
    "kind": "round",
    "label": "Saturday 21 Nov",
    "leagues": 21,
-   "picks": 21716,
-   "rows": 21716,
-   "settled": false,
-   "settled_count": 0,
-   "weekday": "Saturday"
-  },
-  {
-   "date": "2026-11-21",
-   "fixtures": 122,
-   "hits": 0,
-   "kind": "round",
-   "label": "Saturday 21 Nov",
-   "leagues": 21,
    "picks": 19076,
    "rows": 19076,
    "settled": false,
    "settled_count": 0,
    "weekday": "Saturday"
-  },
-  {
-   "date": "2026-11-22",
-   "fixtures": 44,
-   "hits": 0,
-   "kind": "round",
-   "label": "Sunday 22 Nov",
-   "leagues": 13,
-   "picks": 7832,
-   "rows": 7832,
-   "settled": false,
-   "settled_count": 0,
-   "weekday": "Sunday"
   },
   {
    "date": "2026-11-22",
@@ -3198,8 +3172,8 @@
  "totals": {
   "hit_rate": 0.3381,
   "hits": 2793,
-  "picks": 63978,
-  "rounds": 5,
+  "picks": 34430,
+  "rounds": 3,
   "settled": 8262
  }
 }
