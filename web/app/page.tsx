@@ -80,6 +80,8 @@ export default function HomePage() {
         {updated ? <p className="text-xs text-muted-foreground">Last updated: {updated}</p> : null}
         <p className="text-sm text-muted-foreground">
           Every play is a calibrated probability with fair odds shown. Nothing here is a certainty.
+          Group and single-market views rank all candidates; strict checks are optional. Any bet defaults
+          to minimum fair 1.70; group and single-market views default to any odds.
         </p>
       </header>
 

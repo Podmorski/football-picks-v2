@@ -104,6 +104,19 @@ export function selectPassing(
   return [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
 }
 
+// Ranked group selection: one row per match by highest displayed probability.
+// This is intentionally not TYPE_RULE-gated; callers apply league/odds filters.
+export function selectByMatch(evaluated: Evaluated[]): Evaluated[] {
+  const best = new Map<string, Evaluated>();
+  for (const item of evaluated) {
+    if (isHiddenMarketId(item.row.m)) continue;
+    const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
+    const current = best.get(key);
+    if (!current || item.candidate.probability > current.candidate.probability) best.set(key, item);
+  }
+  return [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
+}
+
 // TYPE_RULE selection. For a group keep one passing bet per match (highest
 // probability); for a single market every passing fixture. Highest probability
 // first; lift is shown only.

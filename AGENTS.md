@@ -82,17 +82,21 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
    rounds are never edited; their all-market companions are `picks/<date>.full.json`, verified on the
    model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
 6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Best bets = the live
-   vetted list (`ANY_RULE` for Any bet, `TYPE_RULE` for a group/market; C7 is internal and not shown):
-   Round, League, Bet (Any / group / market), minimum fair odds (1.40/1.70/2.00/2.50, default 1.70).
-   One pick per match, sorted by probability; Strong means probability >= 55% for Any bet and the top
-   third of displayed passing rows for a group/market; Possible otherwise. Cards show probability, fair,
-   min play (`ceil_2dp(1.05/p)`), Strong/Possible and a Value badge; the Mozzart price appears only in
-   the opened details. Empty states distinguish loading, fetch failure, no candidates, none at the
-   minimum fair odds and `0 of N candidates passed` with the highest-probability failed candidates.
-   Tickets are built only from passing picks (target 3/5/10), with `Value legs only` default ON and a
-   combined min play. Top nav is Best bets | Value bets | Explore | Report; Value bets lists snapshot
-   prices at or above min play that also pass team-record/agreement checks, one per match by edge.
-   Record/Report cover calibration, combos, Mozzart returns and value tracking.
+   list: Any bet uses ANY_RULE; a group or single market uses Ranked — all candidates by default, or
+   optional Strict checks only (TYPE_RULE exactly). Round, League, Bet (Any / group / market), minimum
+   fair odds: Any bet defaults to 1.70; group and single-market views default to Any odds when the URL
+   has no explicit min; 1.40/1.70/2.00/2.50 remain available. Ranked group = one candidate per match
+   by highest displayed probability; a single market = every eligible fixture; both sorted by
+   probability. Strict = TYPE_RULE one pick per match. Strong = probability >= 55% in every Best bets
+   view; Possible otherwise. Cards show probability, fair, min play (`ceil_2dp(1.05/p)`),
+   Strong/Possible and a Value badge; the Mozzart price appears only in the opened details. Counts
+   follow the current league, mode and minimum odds; zero states distinguish no candidates, min-odds
+   filtering (with Show all odds) and strict zero (with Show ranked candidates and the
+   highest-probability failed checks). Opened group details list all Ranked (or strict-passing) group
+   options for the match, with neutral diagnostics and Pass / Does not pass. Correct score is hidden.
+   Tickets and Value are unchanged. Top nav is Best bets | Value bets | Explore | Report; Record/Report
+   cover calibration, combos, Mozzart returns and value tracking; Report's TYPE_RULE table is the
+   STRICT_checks cohort, not Ranked.
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -152,7 +156,7 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `(round_date, div, home, away, market)`, so a repeated fixture uses only its own round's snapshot;
   historical snapshots are used as-is (no migration or refetch).
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 256 tests passing. `npm run build` green (50 pages).
+- 262 tests passing. `npm run build` green (50 pages).
 - Rounds fixes (21 Nov): `web/lib/vetted.ts` is now the single selection used by Best bets and
   `/rounds` (`DEFAULT_RULE`, min fair 1.70, one passing pick per match, highest probability).
   `/rounds` dedupes by date, reads the `*.full.json` companion first (the page does), and shows
@@ -260,7 +264,20 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   highest probability and fair-odds returns. ComboRecord's Mozzart footnote is conditional.
 - Validation limits (21 Nov): local Playwright remains blocked by the four missing system libraries.
   The state/round-identity/label contracts are source- and build-tested and captured in the private
-  priced screenshots; delayed-fetch, keyboard and mobile interactions were not exercised locally.
+  priced screenshots; delayed-fetch, keyboard, mobile interactions, the Ranked/Strict toggles, the
+  all-options match details and the odds reset were not exercised locally.
+- Task 13 (21 Nov): Best-bets group/single-market views are market-first. Ranked — all candidates is
+  the default; Strict checks only is optional and is the existing TYPE_RULE exactly. Ranked applies
+  only league + visible minimum odds, then group one-per-match by highest displayed probability /
+  single market every eligible fixture, sorted by probability; no TYPE_RULE gate. Correct score stays
+  hidden. Strong is probability >= 55% in every Best-bets view (top-third removed). The min control has
+  Any odds; group/market default any odds when the URL has no min, Any bet defaults 1.70, explicit
+  numeric minima are preserved. Counts follow league + mode + min odds; min-odds zero shows the
+  available count and Show all odds; strict zero shows Show ranked candidates and the
+  highest-probability failed checks. Opened group details list all Ranked (or strict-passing) options
+  per match, plus neutral diagnostics (league usual/lift, team records, team empirical/agreement, fair,
+  Pass / Does not pass). Report's TYPE_RULE table is the STRICT_checks cohort, not Ranked; Ranked
+  profitability is not established.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`
@@ -268,6 +285,10 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   runs only on success.
 
 ## Open items
+
+- **Ranked group/market mode is not backtested**: no profitability, return or confidence-interval
+  claim. The existing TYPE_RULE research table is the Strict cohort only; a separate walk-forward
+  audit will follow. Do not present the TYPE_RULE returns as Ranked performance.
 
 - **Rounds are pending by design**: 21 Nov (70 default passing picks) and 22 Nov (19) have no
   results until the Mon 12:00 settle; `/rounds` and Best bets show "Results pending" until then.

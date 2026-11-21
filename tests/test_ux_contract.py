@@ -1,4 +1,4 @@
-"""Task 12 UX contracts: truthful states, active-round identity and current labels."""
+"""Task 12/13 UX contracts: states, active-round identity, Ranked/Strict and labels."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -24,12 +24,93 @@ def test_best_bets_distinguishes_loading_failure_and_empty_verdicts() -> None:
         "0 of ${eligible.length} candidates passed",
         "Highest-probability candidates that failed",
         "Strong = probability ≥ 55%",
-        "Strong = top third of the displayed passing rows",
         "activeMeta", "activeKind", "roundMeta",
+        "Any odds", "Ranked — all candidates", "Strict checks only",
+        "Show all odds", "Show ranked candidates",
+        "selectByMatch(eligible)",
+        "mode === 'strict' && !item.passed",
+        "Highest-probability {groupKey} option for this match",
+        "Lower-probability alternatives",
+        "Does not pass",
     ):
         assert needle in source, needle
     assert "Closest candidates" not in source
+    assert "top third" not in source
+    assert "strongLimit" not in source
     assert "kind === 'example'" not in source
+
+
+def test_ranked_group_and_single_market_selection() -> None:
+    source = read("web/components/VettedList.tsx")
+    assert "const rankedDisplayed = useMemo" in source
+    assert "selectByMatch(eligible)" in source
+    assert "return [...eligible].sort((a, b) => b.candidate.probability - a.candidate.probability);" in source
+    assert "const displayed = isAny || isStrict ? strictPassing : rankedDisplayed;" in source
+    vetted = read("web/lib/vetted.ts")
+    assert "export function selectByMatch" in vetted
+    assert "item.candidate.probability > current.candidate.probability" in vetted
+
+
+def test_ranked_includes_failing_htft_while_strict_still_excludes() -> None:
+    source = read("web/components/VettedList.tsx")
+    # Ranked group options are not gated by TYPE_RULE; strict options still are.
+    assert "!isStrict || option.passed" in source
+    assert "selectByMatch(eligible)" in source
+    strict = read("web/lib/vetted.ts")
+    assert "if (!item.passed) continue;" in strict
+
+    from pipeline.vetting import Candidate, type_evaluate
+
+    candidate = Candidate(
+        probability=0.10, model_probability=0.90, league_rate=0.40, league_n=5000,
+        home_rate=0.30, home_n=4, away_rate=0.30, away_n=4, fair_odds=10.0,
+    )
+    passed, checks = type_evaluate(candidate)
+    assert passed is False
+    by_id = {check["id"]: check["passed"] for check in checks}
+    assert by_id["t1"] is False
+    assert by_id["t3"] is False
+    assert by_id["t4"] is False
+    assert by_id["t6"] is False
+
+
+def test_match_details_expose_all_options() -> None:
+    source = read("web/components/VettedList.tsx")
+    assert "const matchOptions = groupKey" in source
+    assert "option.row.d === row.d && option.row.h === row.h && option.row.a === row.a" in source
+    assert "Highest-probability {groupKey} option for this match" in source
+    assert "Lower-probability alternatives" in source
+    assert "option.candidate.probability >= 0.55 ? 'Strong' : 'Possible'" in source
+
+
+def test_any_odds_and_counts_follow_mode() -> None:
+    source = read("web/components/VettedList.tsx")
+    assert '<option value="any">Any odds</option>' in source
+    assert "minOdds === 'any' ? 0" in source
+    assert "minParamRef" in source
+    assert "Show all odds" in source
+    assert "Counts follow the current league, mode and minimum odds." in source
+    assert "mode === 'strict' && !item.passed" in source
+    assert "Show ranked candidates" in source
+
+
+def test_strong_is_absolute_in_every_view() -> None:
+    source = read("web/components/VettedList.tsx")
+    assert "candidate.probability >= 0.55" in source
+    assert "top third" not in source
+    assert "strongLimit" not in source
+    how = read("web/app/how-it-works/page.tsx")
+    assert "at or above 55% in every Best bets view" in how
+    assert "top third" not in how
+
+
+def test_any_rule_and_correct_score_unchanged() -> None:
+    rule = read("web/lib/vetting.ts")
+    assert "export const ANY_RULE: VettingRule = DEFAULT_RULE;" in rule
+    vetted = read("web/lib/vetted.ts")
+    assert "isHiddenMarketId" in vetted
+    source = read("web/components/VettedList.tsx")
+    assert "isHiddenMarketId" in source
 
 
 def test_value_distinguishes_loading_failure_unpriced_and_empty() -> None:
@@ -81,6 +162,10 @@ def test_report_research_table_labels() -> None:
     source = read("web/app/report/page.tsx")
     normalized = " ".join(source.split())
     for needle in (
+        "STRICT_checks cohort",
+        "not the default Ranked group/market list",
+        "Ranked mode has no established profitability record",
+        "This is the Any-bet record only",
         "TYPE_RULE research backtest",
         "TYPE_RULE before the UI minimum-fair filter",
         "One pick per match by highest probability",
@@ -105,8 +190,10 @@ def test_user_facing_copy_is_current() -> None:
     for needle in (
         "Twenty-two main divisions",
         "Tuesday, Saturday and Sunday",
+        "Ranked and strict",
         "Strong and Possible",
         "minimum playable price",
+        "any odds",
         "Mozzart snapshots and Value",
         "Value is unproven",
     ):

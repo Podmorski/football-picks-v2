@@ -10,15 +10,19 @@ export default function HowItWorksPage() {
     },
     {
       title: 'Fair odds and minimum playable odds',
-      body: 'Fair odds are 1 divided by the calibrated probability. Every card also shows a minimum playable price: 1.05 divided by that probability, rounded up to two decimals. Below it the price does not cover the estimated chance. The minimum-fair-odds dropdown hides shorter prices; there is no fixed short-price cutoff.',
+      body: 'Fair odds are 1 divided by the calibrated probability. Every card also shows a minimum playable price: 1.05 divided by that probability, rounded up to two decimals. Below it the price does not cover the estimated chance. Any bet defaults to minimum fair 1.70; group and single-market views default to any odds, with 1.40, 1.70, 2.00 and 2.50 available. There is no hidden odds floor or favourites switch.',
+    },
+    {
+      title: 'Ranked and strict',
+      body: 'Group and single-market views default to Ranked — all candidates. After the league and minimum-odds filters, a group shows one candidate per match by highest probability, while a single market shows every eligible fixture. Strict checks only is an optional filter that applies the existing lift, team-record, agreement and fair-odds conditions. Ranked mode has no established profitability record yet; it is a statistical ranking, not a value signal.',
     },
     {
       title: 'How to read a card',
-      body: 'The percentage is the calibrated chance, fair odds are 1 divided by it, and the minimum playable price is the lowest price worth taking. Open the details for the team records, league usual, model/empirical gap, goal ladder and, when available, the Mozzart snapshot price and fetch time.',
+      body: 'The percentage is the calibrated chance, fair odds are 1 divided by it, and the minimum playable price is the lowest price worth taking. Open the details for the league usual and lift, home/away records, team empirical estimate, model agreement difference, fair odds, strict-check results and, when available, the Mozzart snapshot price and fetch time.',
     },
     {
       title: 'Strong and Possible',
-      body: 'Under Any bet, Strong means probability at or above 55%; under a group or single market, Strong is the top third of the displayed passing rows by probability. Possible is everything else. The badge describes the displayed lean; it does not change the pick or the price.',
+      body: 'Strong means displayed probability at or above 55% in every Best bets view; Possible is everything else. The badge is a probability label, not a value or profit label; it does not change the pick or the price.',
     },
     {
       title: 'When rounds appear',

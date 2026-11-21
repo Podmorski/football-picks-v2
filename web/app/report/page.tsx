@@ -169,12 +169,13 @@ export default function ReportPage() {
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">TYPE_RULE research backtest · per group</h2>
+        <h2 className="text-lg font-semibold">STRICT_checks cohort · TYPE_RULE research backtest · per group</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Used when Bet is a group or a single market. Research cohort: TYPE_RULE before the UI
-          minimum-fair filter. One pick per match by highest probability, sorted by probability;
-          selection is by probability, not lift. Returns are at fair odds, not realised Mozzart
-          profit. The interval is a 95% CI bootstrapped over round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
+          This is the existing TYPE_RULE research cohort, not the default Ranked group/market list. It
+          applies TYPE_RULE before the UI minimum-fair filter. One pick per match by highest probability,
+          sorted by probability; selection is by probability, not lift. Returns are at fair odds, not
+          realised Mozzart profit. Ranked mode has no established profitability record; this table does
+          not measure it. The interval is a 95% CI bootstrapped over round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -220,8 +221,9 @@ export default function ReportPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Best bets results · Any bet</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Passing picks under {bestBets ? `fair ≥ ${bestBets.min_fair.toFixed(2)}` : 'the Any-bet rule'}, one per
-          match. Expected is the sum of the shown probabilities. Strong is ≥{' '}
+          This is the Any-bet record only. It does not measure the Ranked group/market mode. Passing picks
+          under {bestBets ? `fair ≥ ${bestBets.min_fair.toFixed(2)}` : 'the Any-bet rule'}, one per match.
+          Expected is the sum of the shown probabilities. Strong is ≥{' '}
           {bestBets ? pct(bestBets.strong_probability) : '55.0%'}.
         </p>
         {settled.length === 0 ? (
