@@ -162,13 +162,16 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `Picker.tsx` hash; the pin was updated because this task required the Explore label cleanup. The
   ticket calculator at the bottom of a page is treated as an opened detail surface and still shows
   combined Mozzart/payout.
-- Screenshots run in GitHub Actions via `screens.yml` (workflow_dispatch plus workflow_run after CI on
-  main, i.e. after a deploy): ubuntu runner, `npx playwright install --with-deps chromium`, build
-  `web/` with the private price snapshot (artifact only; prices never committed), serve `web/out`,
-  capture 1280x800 and 390x844 PNGs of Best bets (latest round), Best bets with Bet=HT/FT and min 1.70,
-  one card opened, Value bets, Explore, /rounds, /report and /tickets, upload the `screens` artifact
-  with 3-day retention. Screenshots are never committed. Local Playwright is still blocked by the four
-  missing system libraries.
+- Screenshots: the PUBLIC `screens.yml` builds WITHOUT prices and never checks out the private repo;
+  its `screens` artifact is unpriced (the Value page shows its unpriced empty state). Priced
+  screenshots run in the PRIVATE repo `Podmorski/football-picks-prices` workflow `screens.yml`: it
+  checks out the public repo read-only, builds with `PRICED=1` and `PRICES_LOCAL_DIR` (the private
+  checkout), captures the same pages including /value at 1280x800 and 390x844, and uploads the
+  `screens-priced` artifact with 3-day retention. Screenshots are never committed. Local Playwright is
+  still blocked by the four missing system libraries.
+- Privacy (21 Nov): all public `screens` artifacts were deleted (6, priced). The public workflow is
+  unpriced; the 34 public runs in the previous 24h and the full public git history contain no price
+  values or committed Mozzart price files. Priced screenshots are artifact-only in the private repo.
 - Task 8 (21 Nov): Correct score is hidden from the Best bets and Explore UI (dropdowns, lists,
   match views, tickets) but stays in `markets.py` / `markets.json` and Record history.
   `web/lib/vetted.ts` exposes `isHiddenMarketId` (prefix `CORRECT_SCORE:`) and both pickers filter it.
@@ -245,5 +248,6 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
   backtest optimises one ticket per round date across all divisions playing that date. `type_backtest.json`
   is static too: regenerate it after recalibration so `/report` matches the live factors.
-- **Screenshots**: artifact-only via `screens.yml`; locally Playwright remains blocked by the four
-  missing system libraries.
+- **Screenshots**: public `screens` artifacts are unpriced; priced screenshots are artifact-only in
+  the private repo's `screens.yml`. Locally Playwright remains blocked by the four missing system
+  libraries.

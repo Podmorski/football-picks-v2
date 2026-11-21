@@ -39,17 +39,7 @@ jobs:
         run: npx playwright install --with-deps chromium
         working-directory: web
 
-      - name: Checkout private prices repo
-        uses: actions/checkout@v4
-        with:
-          repository: Podmorski/football-picks-prices
-          ssh-key: ${{ secrets.PRICES_DEPLOY_KEY }}
-          path: prices-private
-
-      - name: Build with the private price snapshot
-        env:
-          PRICED: '1'
-          PRICES_LOCAL_DIR: ${{ github.workspace }}/prices-private
+      - name: Build without prices
         run: npm run build
         working-directory: web
 
