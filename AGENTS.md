@@ -138,10 +138,11 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `DEFAULT_RULE` (C1 0.45, C2-C4, C6, C7 flag). The dashboard is now the live vetted list using that
   rule; the old picker UI is unused. **Cancelled**: the Stage A/B rule backtest and C9 (there is no
   xG/AxG in the football-data.co.uk CSVs; coverage is 0).
-- `/explore` restores the pre-M6 M4/M5 picker unchanged (filters, sorting, Show all, odds floor, match
-  view, tickets, past-ticket results). Top nav is "Best bets | Explore". The Best bets page has a
-  "Minimum fair odds" dropdown (1.40/1.70/2.00, URL `?min=`, default 1.70) applied before the per-match
-  best; on 21 Nov that gives 71/54/19 passing matches at 1.40/1.70/2.00.
+- `/explore` keeps the pre-M6 M4/M5 picker (filters, sorting, Show all, odds floor, match
+  view, tickets, past-ticket results); the FIX TASK removed its main-list Mozzart labels. Top nav is
+  "Best bets | Explore". The Best bets page has a "Minimum fair odds" dropdown (1.40/1.70/2.00, URL
+  `?min=`, default 1.70) applied before the per-match best; on 21 Nov that gives 71/54/19 passing
+  matches at 1.40/1.70/2.00.
 - Record has "Record at Mozzart prices" (all passing / passing+value / any value; per round and
   cumulative; return at the Mozzart price with a CI bootstrapped over round dates). It is empty until
   settled rounds carry frozen prices.
