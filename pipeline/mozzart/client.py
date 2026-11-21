@@ -24,6 +24,8 @@ THROTTLE_SECONDS = 1.2
 TIMEOUT = 30
 MONTHLY_CAP = 90
 PROVIDER_RESERVE = 60  # refuse when the provider says fewer than this remain
+MAX_RETRIES = 3
+BACKOFF_SECONDS = 60.0
 
 SATURDAY = 5
 SUNDAY = 6
@@ -148,23 +150,77 @@ def _remaining(response, body) -> int | None:
     return None
 
 
-def _get(key: str, path: str, params: dict, budget: Budget, provider_remaining: int | None):
-    budget.check(provider_remaining)
-    query = urllib.parse.urlencode(params)
-    request = urllib.request.Request(
-        f"{BASE}{path}?{query}",
-        headers={"X-Secret": key, "Accept": "application/json"},
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-            body = json.loads(response.read().decode("utf-8"))
-            status = response.status
-            remaining = _remaining(response, body)
-    except urllib.error.HTTPError as exc:
-        budget.record(path, int(params.get("page", 0)), exc.code, provider_remaining)
-        raise
-    budget.record(path, int(params.get("page", 0)), status, remaining)
-    return body, remaining
+_RATE_HEADERS_LOGGED = False
+
+
+def _log_rate_headers(response) -> None:
+    global _RATE_HEADERS_LOGGED
+    if _RATE_HEADERS_LOGGED:
+        return
+    headers = getattr(response, "headers", None)
+    if headers is None:
+        return
+    found = {}
+    for name, value in headers.items():
+        lowered = name.lower()
+        if "ratelimit" in lowered or "rate-limit" in lowered or "retry-after" in lowered:
+            found[name] = value
+    if found:
+        print("rate-limit headers: " + ", ".join(f"{name}={value}" for name, value in sorted(found.items())))
+        _RATE_HEADERS_LOGGED = True
+
+
+def _retry_after(error) -> float:
+    headers = getattr(error, "headers", None)
+    if headers is not None:
+        retry = headers.get("Retry-After")
+        if retry:
+            try:
+                return max(0.0, float(retry))
+            except (TypeError, ValueError):
+                pass
+        for name in ("X-RateLimit-Reset", "RateLimit-Reset"):
+            reset = headers.get(name)
+            if reset:
+                try:
+                    value = float(reset)
+                except (TypeError, ValueError):
+                    continue
+                if value > 1e9:
+                    return max(0.0, value - time.time())
+                return max(0.0, value)
+    return BACKOFF_SECONDS
+
+
+def _get(key: str, path: str, params: dict, budget: Budget, provider_remaining: int | None, sleep=time.sleep):
+    attempt = 0
+    while True:
+        budget.check(provider_remaining)
+        query = urllib.parse.urlencode(params)
+        request = urllib.request.Request(
+            f"{BASE}{path}?{query}",
+            headers={"X-Secret": key, "Accept": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+                _log_rate_headers(response)
+                body = json.loads(response.read().decode("utf-8"))
+                status = response.status
+                remaining = _remaining(response, body)
+        except urllib.error.HTTPError as exc:
+            budget.record(path, int(params.get("page", 0)), exc.code, provider_remaining)
+            if exc.code == 429 and attempt < MAX_RETRIES:
+                delay = _retry_after(exc)
+                print(
+                    f"rate limited on {path} page {params.get('page', 0)}; "
+                    f"waiting {delay:.0f}s (retry {attempt + 1}/{MAX_RETRIES})"
+                )
+                sleep(delay)
+                attempt += 1
+                continue
+            raise
+        budget.record(path, int(params.get("page", 0)), status, remaining)
+        return body, remaining
 
 
 def fetch_events(key: str, until: datetime, budget: Budget, sleep=time.sleep):
@@ -185,7 +241,7 @@ def fetch_events(key: str, until: datetime, budget: Budget, sleep=time.sleep):
             sleep(wait)
         try:
             body, reported = _get(
-                key, "/soccer/events", {"page": page, "limit": PAGE_SIZE}, budget, provider_remaining
+                key, "/soccer/events", {"page": page, "limit": PAGE_SIZE}, budget, provider_remaining, sleep=sleep
             )
         except BudgetExceeded as exc:
             exc.partial = events  # type: ignore[attr-defined]

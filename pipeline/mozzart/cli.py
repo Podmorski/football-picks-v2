@@ -79,6 +79,7 @@ def main(argv=None) -> int:
     parser.add_argument("--date", help="round date YYYY-MM-DD (default: today)")
     parser.add_argument("--prices-dir", required=True, help="private prices repo checkout")
     parser.add_argument("--force", action="store_true", help="refetch even if a snapshot exists")
+    parser.add_argument("--complete", action="store_true", help="merge a completion fetch into an existing snapshot")
     args = parser.parse_args(argv)
 
     round_date = dt.date.fromisoformat(args.date) if args.date else dt.date.today()
@@ -94,10 +95,11 @@ def main(argv=None) -> int:
         print(f"round {round_date} has no fixtures yet; nothing to price")
         return 0
 
-    if snapshot_path.exists() and not args.force:
+    if snapshot_path.exists() and not args.force and not args.complete:
         print(f"snapshot already frozen for {round_date}; skipping fetch")
         snapshots = _all_snapshots(prices_dir)
     else:
+        existing_doc = _load_json(snapshot_path, {})
         key = os.environ.get("PULSESCORE_API_KEY")
         if not key:
             print("PULSESCORE_API_KEY is not set")
@@ -135,6 +137,8 @@ def main(argv=None) -> int:
             return 1
         fetched_at = dt.datetime.now(dt.timezone.utc)
         snap = snapshot.build(round_date, fixtures, events, fetched_at)
+        if args.complete and existing_doc:
+            snap = snapshot.merge(existing_doc, snap, fixtures)
         _write_json(snapshot_path, snap)
         frozen = record.freeze(snap, document)
         _write_json(prices_dir / "frozen" / f"{round_date.isoformat()}.json", frozen)

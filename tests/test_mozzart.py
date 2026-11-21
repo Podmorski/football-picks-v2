@@ -111,7 +111,7 @@ def test_paging_stops_at_window_end(monkeypatch) -> None:
     base = dt.datetime(2026, 11, 21, tzinfo=dt.timezone.utc)
     pages = []
 
-    def fake_get(key, path, params, budget, remaining):
+    def fake_get(key, path, params, budget, remaining, sleep=None):
         page = params["page"]
         pages.append(page)
         events = [
@@ -301,3 +301,63 @@ def test_rate_limit_header_is_not_the_monthly_quota() -> None:
 
     assert client._remaining(RateLimited(), {}) is None
     assert client._remaining(Quota(), {}) == 300
+
+
+def test_rate_limit_backoff(monkeypatch) -> None:
+    calls = {"n": 0}
+
+    class FakeResponse:
+        status = 200
+        headers = {"x-ratelimit-remaining": "0"}
+
+        def read(self):
+            return b'{"events": [], "totalPages": 1}'
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def fake_urlopen(request, timeout=30):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            raise client.urllib.error.HTTPError(
+                request.full_url, 429, "rate", {"Retry-After": "2"}, None
+            )
+        return FakeResponse()
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    sleeps: list[float] = []
+    budget = client.Budget("2026-11")
+    body, _remaining_value = client._get(
+        "k", "/soccer/events", {"page": 1}, budget, None, sleep=lambda seconds: sleeps.append(seconds)
+    )
+    assert sleeps == [2.0]
+    assert body["totalPages"] == 1
+    assert len(budget.entries) == 2
+
+
+def test_snapshot_merge_keeps_existing_price() -> None:
+    existing = {
+        "round_date": "2026-11-21", "fetched_at": "2026-11-21T09:51:32+00:00",
+        "fixtures": [{"div": "E0", "home": "A", "away": "B", "prices": {"BTTS:GG": 2.0}}],
+        "unmatched_fixtures": [{"div": "E0", "home": "C", "away": "D", "kickoff": "15:00"}],
+    }
+    new = {
+        "round_date": "2026-11-21", "fetched_at": "2026-11-21T10:10:00+00:00",
+        "fixtures": [
+            {"div": "E0", "home": "A", "away": "B", "prices": {"BTTS:GG": 9.9}},
+            {"div": "E0", "home": "C", "away": "D", "prices": {"BTTS:GG": 1.8}},
+        ],
+        "unmatched_fixtures": [], "started_not_priced": [],
+    }
+    fixtures = [
+        {"d": "E0", "k": "15:00", "h": "A", "a": "B"},
+        {"d": "E0", "k": "15:00", "h": "C", "a": "D"},
+    ]
+    merged = snapshot.merge(existing, new, fixtures)
+    prices = {(row["home"], row["away"]): row["prices"]["BTTS:GG"] for row in merged["fixtures"]}
+    assert prices == {("A", "B"): 2.0, ("C", "D"): 1.8}
+    assert merged["fixtures"][0]["fetched_at"] == "2026-11-21T09:51:32+00:00"
+    assert merged["completion_fetched_at"] == "2026-11-21T10:10:00+00:00"

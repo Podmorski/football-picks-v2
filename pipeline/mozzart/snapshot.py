@@ -137,6 +137,7 @@ def build(
             "kickoff": kickoff.isoformat() if kickoff else fixture.get("k"),
             "prices": prices,
             "match_similarity": round(score, 3),
+            "fetched_at": fetched_at.astimezone(dt.timezone.utc).isoformat(timespec="seconds"),
         }
 
     unmatched = []
@@ -157,4 +158,44 @@ def build(
         "fixtures": sorted(priced.values(), key=lambda row: (row["div"], row["home"], row["away"])),
         "unmatched_fixtures": unmatched,
         "started_not_priced": sorted(started, key=lambda row: (row["kickoff"], row["div"], row["home"])),
+    }
+
+
+def merge(existing: dict, new: dict, fixtures: list[dict]) -> dict:
+    """Merge a completion fetch into an existing snapshot without overwriting prices."""
+    def key_of(row: dict) -> tuple:
+        return (row.get("div"), row.get("home"), row.get("away"))
+
+    existing_stamp = existing.get("fetched_at")
+    priced: dict[tuple, dict] = {}
+    for row in existing.get("fixtures", []):
+        row = dict(row)
+        row.setdefault("fetched_at", existing_stamp)
+        priced[key_of(row)] = row
+    for row in new.get("fixtures", []):
+        row = dict(row)
+        row.setdefault("fetched_at", new.get("fetched_at"))
+        priced.setdefault(key_of(row), row)
+
+    started = list(new.get("started_not_priced", []))
+    started_keys = {key_of(row) for row in started}
+    new_unmatched = {key_of(row): row for row in new.get("unmatched_fixtures", [])}
+    existing_unmatched = {key_of(row): row for row in existing.get("unmatched_fixtures", [])}
+    unmatched = []
+    for fixture in fixtures:
+        key = (fixture["d"], fixture["h"], fixture["a"])
+        if key in priced or key in started_keys:
+            continue
+        row = new_unmatched.get(key) or existing_unmatched.get(key)
+        if row is None:
+            row = {"div": fixture["d"], "home": fixture["h"], "away": fixture["a"], "kickoff": fixture.get("k")}
+        unmatched.append(row)
+
+    return {
+        "round_date": new.get("round_date") or existing.get("round_date"),
+        "fetched_at": max(existing.get("fetched_at") or "", new.get("fetched_at") or ""),
+        "fixtures": sorted(priced.values(), key=lambda row: (row.get("div", ""), row.get("home", ""), row.get("away", ""))),
+        "unmatched_fixtures": unmatched,
+        "started_not_priced": sorted(started, key=lambda row: (row.get("kickoff") or "", row.get("div", ""), row.get("home", ""))),
+        "completion_fetched_at": new.get("fetched_at"),
     }

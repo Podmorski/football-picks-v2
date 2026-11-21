@@ -1,8 +1,9 @@
 name: Prices
 
 # A separate workflow so a price failure can never block publishing or settling.
-# One pass per round, after the round file exists: Saturday 08:00 and Tuesday
-# 16:00 UTC. The global feed is paged only to the round's last kick-off.
+# Late-tolerant slots; each run fetches only if the round has no snapshot yet.
+# Fixtures kicking off within 20 minutes of the fetch are marked started and not
+# priced. A `complete` dispatch merges a completion fetch into the existing snapshot.
 on:
   schedule:
     # Late-tolerant slots. Each run fetches only if the round has no snapshot
@@ -25,6 +26,10 @@ on:
       date:
         description: Round date (YYYY-MM-DD); blank = today
         required: false
+      complete:
+        description: "Completion fetch: merge into an existing snapshot"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -61,7 +66,11 @@ jobs:
           PULSESCORE_API_KEY: ${{ secrets.PULSESCORE_API_KEY }}
         run: |
           if [ -n "${{ github.event.inputs.date }}" ]; then
-            python -m pipeline.mozzart.cli --date "${{ github.event.inputs.date }}" --prices-dir prices
+            if [ "${{ github.event.inputs.complete }}" = "true" ]; then
+              python -m pipeline.mozzart.cli --date "${{ github.event.inputs.date }}" --prices-dir prices --complete
+            else
+              python -m pipeline.mozzart.cli --date "${{ github.event.inputs.date }}" --prices-dir prices
+            fi
           else
             python -m pipeline.mozzart.cli --prices-dir prices
           fi
