@@ -52905,34 +52905,6 @@
  },
  "upcoming": [
   {
-   "away": "Ayr",
-   "best": {
-    "a": "Ayr",
-    "an": 159,
-    "ar": 0.1607,
-    "c": "Medium",
-    "d": "SC1",
-    "ft": null,
-    "h": "Inverness C",
-    "hn": 123,
-    "hr": 0.0509,
-    "ht": null,
-    "k": "19:30",
-    "ln": 1965,
-    "lr": 0.1505,
-    "m": "HTFT_AND_GOALS:1-1&3+",
-    "p": 0.2638,
-    "pc": 0.2638,
-    "pl": 0.2638,
-    "pp": 0.2638,
-    "s": 0.7025,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Inverness C",
-   "time": "19:30"
-  },
-  {
    "away": "Stenhousemuir",
    "best": {
     "a": "Stenhousemuir",

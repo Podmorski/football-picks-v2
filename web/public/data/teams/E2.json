@@ -104716,34 +104716,6 @@
  },
  "upcoming": [
   {
-   "away": "Sheffield Weds",
-   "best": {
-    "a": "Sheffield Weds",
-    "an": 52,
-    "ar": 0.0378,
-    "c": "Medium",
-    "d": "E2",
-    "ft": null,
-    "h": "Barnsley",
-    "hn": 144,
-    "hr": 0.1677,
-    "ht": null,
-    "k": "20:00",
-    "ln": 6083,
-    "lr": 0.1189,
-    "m": "TEAM_GOALS:I2 3+",
-    "p": 0.2884,
-    "pc": 0.2884,
-    "pl": 0.2884,
-    "pp": 0.2884,
-    "s": 1.0996,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Barnsley",
-   "time": "20:00"
-  },
-  {
    "away": "Wigan",
    "best": {
     "a": "Wigan",

@@ -66021,34 +66021,6 @@
  },
  "upcoming": [
   {
-   "away": "FC Koln",
-   "best": {
-    "a": "FC Koln",
-    "an": 157,
-    "ar": 0.1357,
-    "c": "Medium",
-    "d": "D1",
-    "ft": null,
-    "h": "Bayern Munich",
-    "hn": 191,
-    "hr": 0.5312,
-    "ht": null,
-    "k": "19:30",
-    "ln": 3447,
-    "lr": 0.1328,
-    "m": "MARGIN:HH 1 3+",
-    "p": 0.6567,
-    "pc": 0.6567,
-    "pl": 0.6567,
-    "pp": 0.6567,
-    "s": 2.5271,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Bayern Munich",
-   "time": "19:30"
-  },
-  {
    "away": "Hoffenheim",
    "best": {
     "a": "Hoffenheim",

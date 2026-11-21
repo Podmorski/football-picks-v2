@@ -64204,34 +64204,6 @@
  },
  "upcoming": [
   {
-   "away": "Westerlo",
-   "best": {
-    "a": "Westerlo",
-    "an": 111,
-    "ar": 0.4609,
-    "c": "Medium",
-    "d": "B1",
-    "ft": null,
-    "h": "Cercle Brugge",
-    "hn": 141,
-    "hr": 0.6605,
-    "ht": null,
-    "k": "19:45",
-    "ln": 3144,
-    "lr": 0.5294,
-    "m": "BTTS:GG",
-    "p": 0.6145,
-    "pc": 0.6145,
-    "pl": 0.6145,
-    "pp": 0.6145,
-    "s": 0.3484,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Cercle Brugge",
-   "time": "19:45"
-  },
-  {
    "away": "St Truiden",
    "best": {
     "a": "St Truiden",

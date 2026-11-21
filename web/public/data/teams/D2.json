@@ -75990,62 +75990,6 @@
  },
  "upcoming": [
   {
-   "away": "Magdeburg",
-   "best": {
-    "a": "Magdeburg",
-    "an": 90,
-    "ar": 0.4108,
-    "c": "Medium",
-    "d": "D2",
-    "ft": null,
-    "h": "Bielefeld",
-    "hn": 124,
-    "hr": 0.2399,
-    "ht": null,
-    "k": "17:30",
-    "ln": 3465,
-    "lr": 0.3136,
-    "m": "SECOND_HALF_RESULT:IIX",
-    "p": 0.3648,
-    "pc": 0.3648,
-    "pl": 0.3648,
-    "pp": 0.3648,
-    "s": 0.228,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Bielefeld",
-   "time": "17:30"
-  },
-  {
-   "away": "Heidenheim",
-   "best": {
-    "a": "Heidenheim",
-    "an": 141,
-    "ar": 0.0506,
-    "c": "Medium",
-    "d": "D2",
-    "ft": null,
-    "h": "Darmstadt",
-    "hn": 142,
-    "hr": 0.1142,
-    "ht": null,
-    "k": "17:30",
-    "ln": 3465,
-    "lr": 0.1183,
-    "m": "MARGIN:HP 2",
-    "p": 0.2727,
-    "pc": 0.2727,
-    "pl": 0.2727,
-    "pp": 0.2727,
-    "s": 1.0272,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Darmstadt",
-   "time": "17:30"
-  },
-  {
    "away": "Greuther Furth",
    "best": {
     "a": "Greuther Furth",

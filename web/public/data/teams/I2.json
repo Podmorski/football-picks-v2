@@ -91127,34 +91127,6 @@
  },
  "upcoming": [
   {
-   "away": "Cesena",
-   "best": {
-    "a": "Cesena",
-    "an": 106,
-    "ar": 0.2135,
-    "c": "Medium",
-    "d": "I2",
-    "ft": null,
-    "h": "Verona",
-    "hn": 45,
-    "hr": 0.3328,
-    "ht": null,
-    "k": "19:30",
-    "ln": 4498,
-    "lr": 0.161,
-    "m": "TEAM_GOALS:I1 3+",
-    "p": 0.2881,
-    "pc": 0.2881,
-    "pl": 0.2881,
-    "pp": 0.2881,
-    "s": 0.7447,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Verona",
-   "time": "19:30"
-  },
-  {
    "away": "Vicenza",
    "best": {
     "a": "Vicenza",

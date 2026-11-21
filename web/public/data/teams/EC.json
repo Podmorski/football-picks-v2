@@ -101866,34 +101866,6 @@
  },
  "upcoming": [
   {
-   "away": "Boreham Wood",
-   "best": {
-    "a": "Boreham Wood",
-    "an": 233,
-    "ar": 0.3037,
-    "c": "Medium",
-    "d": "EC",
-    "ft": null,
-    "h": "Southend",
-    "hn": 122,
-    "hr": 0.0894,
-    "ht": null,
-    "k": "19:45",
-    "ln": 6050,
-    "lr": 0.1477,
-    "m": "TEAM_GOALS:I2 3+",
-    "p": 0.3426,
-    "pc": 0.3426,
-    "pl": 0.3426,
-    "pp": 0.3426,
-    "s": 1.1013,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Southend",
-   "time": "19:45"
-  },
-  {
    "away": "Scunthorpe",
    "best": {
     "a": "Scunthorpe",

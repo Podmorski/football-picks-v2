@@ -96436,34 +96436,6 @@
  },
  "upcoming": [
   {
-   "away": "Leganes",
-   "best": {
-    "a": "Leganes",
-    "an": 133,
-    "ar": 0.216,
-    "c": "Medium",
-    "d": "SP2",
-    "ft": null,
-    "h": "Andorra",
-    "hn": 69,
-    "hr": 0.1461,
-    "ht": null,
-    "k": "19:30",
-    "ln": 5233,
-    "lr": 0.2065,
-    "m": "MARGIN:HP 1",
-    "p": 0.286,
-    "pc": 0.286,
-    "pl": 0.286,
-    "pp": 0.286,
-    "s": 0.4307,
-    "st": "pending"
-   },
-   "date": "2026-11-20",
-   "home": "Andorra",
-   "time": "19:30"
-  },
-  {
    "away": "Eldense",
    "best": {
     "a": "Eldense",
