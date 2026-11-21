@@ -51,6 +51,19 @@ export const TYPE_RULE = {
 
 const pct = (value: number) => `${(value * 100).toFixed(1)}%`;
 
+export const SHRINK_N = 20;
+
+export function teamEmpirical(candidate: VettingCandidate, k: number = SHRINK_N): number {
+  const usual = candidate.leagueRate;
+  const home = (candidate.homeN * candidate.homeRate + k * usual) / (candidate.homeN + k);
+  const away = (candidate.awayN * candidate.awayRate + k * usual) / (candidate.awayN + k);
+  return (home + away) / 2;
+}
+
+export function minPlay(probability: number): number {
+  return Math.ceil((1.05 / Math.max(probability, 1e-4)) * 100 - 1e-9) / 100;
+}
+
 export function liftOf(candidate: VettingCandidate): number {
   return candidate.leagueRate > 0 ? candidate.probability / candidate.leagueRate : 0;
 }
@@ -71,9 +84,10 @@ export function evaluateTypeCandidate(candidate: VettingCandidate): { passed: bo
     && candidate.homeRate >= usual && candidate.awayRate >= usual;
   add('t3', 'Team records', recordsPassed, `home ${pct(candidate.homeRate)}/${candidate.homeN}, away ${pct(candidate.awayRate)}/${candidate.awayN}`);
 
-  const gap = Math.abs(candidate.modelProbability - usual);
+  const empirical = teamEmpirical(candidate);
+  const gap = Math.abs(candidate.modelProbability - empirical);
   const allowed = Math.max(TYPE_RULE.minAgreement, TYPE_RULE.agreementFraction * probability);
-  add('t4', 'Agreement', gap <= allowed, `gap ${(gap * 100).toFixed(1)} pts <= ${(allowed * 100).toFixed(1)} pts`);
+  add('t4', 'Agreement', gap <= allowed, `gap ${(gap * 100).toFixed(1)} pts <= ${(allowed * 100).toFixed(1)} pts (empirical ${pct(empirical)})`);
 
   add('t6', 'Fair', candidate.fairOdds <= TYPE_RULE.maxFairOdds, `fair ${candidate.fairOdds.toFixed(2)} <= ${TYPE_RULE.maxFairOdds.toFixed(2)}`);
 
@@ -96,8 +110,9 @@ export function evaluateCandidate(candidate: VettingCandidate, rule: VettingRule
     add('c3', 'Team records', passed, `home ${pct(candidate.homeRate)}/${candidate.homeN}, away ${pct(candidate.awayRate)}/${candidate.awayN}`);
   }
   if (rule.c4) {
-    const gap = candidate.countsProbability == null ? null : Math.abs(candidate.modelProbability - candidate.countsProbability);
-    add('c4', 'Agreement', gap !== null && gap <= 0.10, gap === null ? 'no counts' : `gap ${(gap * 100).toFixed(1)} pts`);
+    const empirical = teamEmpirical(candidate);
+    const gap = Math.abs(candidate.modelProbability - empirical);
+    add('c4', 'Agreement', gap <= 0.10, `gap ${(gap * 100).toFixed(1)} pts (empirical ${pct(empirical)})`);
   }
   if (rule.c5) {
     const passed = candidate.homeForm != null && candidate.awayForm != null

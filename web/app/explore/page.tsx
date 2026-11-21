@@ -64,8 +64,8 @@ export default function HomePage() {
   const chosen = upcoming[0] ?? latest ?? example;
 
   const roundOptions: [string, string][] = [...withPicks]
-    .sort((a, b) => (a.date < b.date ? 1 : -1))
-    .slice(0, 6)
+    .sort((a, b) => (a.date < b.date ? -1 : 1))
+    .slice(-6)
     .map((row) => [row.date, row.label]);
 
   const updated = utcStamp(index.generated_at) ?? utcStamp(new Date().toISOString());

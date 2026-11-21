@@ -13,10 +13,11 @@ import {
   utcTime,
   type MozzartPricesFile,
 } from '@/lib/prices';
-import { addTicket, combinedFair, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, ticketVsFair, type TicketLeg } from '@/lib/ticket';
+import { addTicket, combinedFair, combinedMinPlay, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, ticketVsFair, type TicketLeg } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
-import { evaluateRows, isHiddenMarketId, pcOf, selectPassing, selectType, type Evaluated } from '@/lib/vetted';
+import { evaluateRows, isHiddenMarketId, isValue, pcOf, selectPassing, selectType, type Evaluated } from '@/lib/vetted';
 import type { VettingCheck } from '@/lib/vetting';
+import { minPlay } from '@/lib/vetting';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
 const GROUP_ORDER = ['Combos', 'HT/FT', 'Goals', 'BTTS', 'Half-time', 'Team goals', 'Result & double chance'];
@@ -96,6 +97,7 @@ export default function VettedList({
   const [bonus, setBonus] = useState(0);
   const [stake, setStake] = useState(10);
   const [ticketOpen, setTicketOpen] = useState(false);
+  const [valueOnly, setValueOnly] = useState(true);
 
   const activeDate = /^\d{4}-\d{2}-\d{2}$/.test(roundParam) ? roundParam : date;
 
@@ -189,6 +191,7 @@ export default function VettedList({
     return selectType(baseFiltered, {
       perMatch: bet.startsWith('group:'),
       market: bet.startsWith('group:') ? undefined : bet.slice(7),
+      minFair,
     });
   }, [baseFiltered, isAny, bet, minFair]);
 
@@ -200,6 +203,7 @@ export default function VettedList({
       if (league !== 'all' && item.row.d !== league) continue;
       if (isHiddenMarketId(item.row.m)) continue;
       if (!item.passed) continue;
+      if (item.candidate.fairOdds < minFair) continue;
       const group = markets[item.row.m]?.group;
       if (!group) continue;
       const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
@@ -209,24 +213,27 @@ export default function VettedList({
       marketMatches.get(item.row.m)?.add(key);
     }
     return { groups: groupMatches, markets: marketMatches };
-  }, [evaluatedType, league, markets]);
+  }, [evaluatedType, league, markets, minFair]);
 
   const closest = useMemo(() => {
     if (passing.length > 0) return [];
     const seen = new Set<string>();
     const rows: { item: EvaluatedRow; failed: VettingCheck[] }[] = [];
-    const ordered = [...baseFiltered].sort((a, b) => (isAny ? b.candidate.probability - a.candidate.probability : b.lift - a.lift));
+    const ordered = [...baseFiltered].sort((a, b) => b.candidate.probability - a.candidate.probability);
     for (const item of ordered) {
       const key = `${item.row.h}|${item.row.a}`;
       if (seen.has(key)) continue;
       const failed = item.checks.filter((check) => !check.flag && !check.passed);
+      if (failed.length === 0 && item.candidate.fairOdds < minFair) {
+        failed.push({ id: 'min', label: 'Min fair', passed: false, value: `fair ${item.candidate.fairOdds.toFixed(2)} < ${minFair.toFixed(2)}` });
+      }
       if (failed.length === 0) continue;
       seen.add(key);
       rows.push({ item, failed });
       if (rows.length >= 3) break;
     }
     return rows;
-  }, [baseFiltered, passing, isAny]);
+  }, [baseFiltered, passing, minFair]);
 
   function toLeg(row: RankRow): TicketLeg {
     const meta = markets[row.m];
@@ -235,7 +242,7 @@ export default function VettedList({
     const probability = pcOf(row);
     return {
       d: row.d, h: row.h, a: row.a, m: row.m, label: meta?.plain ?? row.m, mozzart: meta?.mozzart ?? '',
-      pc: probability, fair: 1 / Math.max(probability, 0.0001), odds: price?.odds ?? null,
+      pc: probability, fair: 1 / Math.max(probability, 0.0001), minPlay: minPlay(probability), odds: price?.odds ?? null,
       fetchedAt: price?.fetchedAt, kickoff: fixture?.kickoff ?? null, st: row.st, ht: row.ht, ft: row.ft,
     };
   }
@@ -251,10 +258,11 @@ export default function VettedList({
   }
 
   const targetTickets = useMemo(() => {
-    const legs = passing.map((item) => toLeg(item.row));
+    const candidates = valueOnly ? passing.filter(isValue) : passing;
+    const legs = candidates.map((item) => toLeg(item.row));
     if (legs.length === 0) return [];
     return TARGETS.map((target) => ({ target, ticket: optimiseTickets(legs, target, 5, 1, 1.0)[0] ?? null }));
-  }, [passing, markets, priceIndex, snapshot]);
+  }, [passing, markets, priceIndex, snapshot, valueOnly]);
 
   const betLabel = bet === 'any' ? 'Any bet' : bet.startsWith('group:') ? (GROUP_LABEL[bet.slice(6)] ?? 'group') : (markets[bet.slice(7)]?.plain ?? 'bet');
   const leagueLabel = league === 'all' ? 'any league' : (leagueNames[league] ?? league);
@@ -264,6 +272,7 @@ export default function VettedList({
   const ticketProbability = combinedProbability(ticket);
   const ticketFair = combinedFair(ticket);
   const ticketMozzart = combinedMozzart(ticket);
+  const ticketMinPlay = combinedMinPlay(ticket);
   const ticketValue = ticketVsFair(ticket, bonus);
   const ticketPayout = payout(stake, ticket, bonus);
   const correlated = sameMatchWarning(ticket);
@@ -278,8 +287,8 @@ export default function VettedList({
         </div>
       ) : null}
 
-      <div className={cn('grid gap-2', isAny ? 'sm:grid-cols-3' : 'sm:grid-cols-2')}>
-        <select value={league} onChange={(event) => setLeague(event.target.value)} aria-label="League" className="rounded-md border bg-background px-2 py-1.5 text-sm">
+      <div className="grid gap-2 sm:grid-cols-3">
+        <select value={league} onChange={(event) => setLeague(event.target.value)} aria-label="League" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="all">All leagues</option>
           {countries.map(([country, leagues]) => (
             <optgroup key={country} label={country}>
@@ -287,7 +296,7 @@ export default function VettedList({
             </optgroup>
           ))}
         </select>
-        <select value={bet} onChange={(event) => setBet(event.target.value)} aria-label="Bet" className="rounded-md border bg-background px-2 py-1.5 text-sm">
+        <select value={bet} onChange={(event) => setBet(event.target.value)} aria-label="Bet" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="any">Any bet</option>
           {GROUP_ORDER.map((group) => (
             <optgroup key={group} label={GROUP_LABEL[group]}>
@@ -298,18 +307,18 @@ export default function VettedList({
             </optgroup>
           ))}
         </select>
-        {isAny ? (
-          <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="rounded-md border bg-background px-2 py-1.5 text-sm">
-            <option value="1.40">Min fair odds 1.40</option>
-            <option value="1.70">Min fair odds 1.70</option>
-            <option value="2.00">Min fair odds 2.00</option>
-          </select>
-        ) : null}
+        <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
+          <option value="1.40">Min fair odds 1.40</option>
+          <option value="1.70">Min fair odds 1.70</option>
+          <option value="2.00">Min fair odds 2.00</option>
+          <option value="2.50">Min fair odds 2.50</option>
+        </select>
       </div>
 
       <p className="text-sm text-muted-foreground">
         {passing.length} best {passing.length === 1 ? 'bet' : 'bets'} this round · {betLabel} · {leagueLabel}
-        {isAny ? ` · fair ≥ ${minFair.toFixed(2)}` : ' · sorted by probability'}
+        {` · fair ≥ ${minFair.toFixed(2)}`}
+        {isAny ? '' : ' · sorted by probability'}
         {kind === 'example' ? ' · Example round' : ''}
       </p>
       <p className="text-sm">
@@ -358,6 +367,7 @@ export default function VettedList({
                       <span className="font-semibold">{row.h} <span className="text-muted-foreground">v</span> {row.a}</span>
                       <span className="text-xs text-muted-foreground">{leagueNames[row.d] ?? row.d}</span>
                       <Badge variant="secondary">{strong ? 'Strong' : 'Possible'}</Badge>
+                      {isValue(item) ? <Badge variant="value">Value</Badge> : null}
                     </div>
                     <div className="mt-1 text-sm">
                       {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
@@ -367,6 +377,7 @@ export default function VettedList({
                     <div className="text-base font-semibold">{pct(candidate.probability)}</div>
                     <div className="text-xs text-muted-foreground">fair {candidate.fairOdds.toFixed(2)}</div>
                     {!isAny ? <div className="text-xs text-muted-foreground">lift {item.lift.toFixed(2)}× usual</div> : null}
+                    <div className="text-xs text-muted-foreground">Play only at odds ≥ {item.minPlay.toFixed(2)}</div>
                   </div>
                 </div>
 
@@ -388,7 +399,8 @@ export default function VettedList({
                   <div className="mt-2 space-y-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
                     {price ? <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p> : null}
                     <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)} (n={row.ln})</p>
-                    <p>Model {pct(row.p)} · counts/empirical {pct(row.lr)} · agreement gap {pct(Math.abs(row.p - row.lr))}</p>
+                    <p>Model {pct(row.p)} · team empirical {pct(candidate.countsProbability ?? 0)} · agreement gap {pct(Math.abs(row.p - (candidate.countsProbability ?? 0)))}</p>
+                    <p>Play only at odds ≥ {item.minPlay.toFixed(2)} · needs {(10 / item.minPlay).toFixed(1)} in 10 at that price; our chance {pct(candidate.probability)}</p>
                     <div>
                       <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Goal ladder</h4>
                       <ul className="grid gap-x-4 gap-y-0.5 sm:grid-cols-2">
@@ -408,10 +420,17 @@ export default function VettedList({
         </ul>
       )}
 
-      {targetTickets.some((entry) => entry.ticket) ? (
-        <section className="space-y-2">
+      <section className="space-y-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-semibold">Target tickets</h2>
-          <p className="text-sm text-muted-foreground">Built only from passing picks, one leg per match.</p>
+          <button type="button" onClick={() => setValueOnly(!valueOnly)} className={cn('rounded-full border px-2.5 py-1 text-xs', valueOnly ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>
+            Value legs only
+          </button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Built only from passing picks, one leg per match{valueOnly ? ' that is a Value bet' : ''}.
+        </p>
+        {targetTickets.some((entry) => entry.ticket) ? (
           <ul className="grid gap-2 sm:grid-cols-3">
             {targetTickets.map(({ target, ticket: suggestion }) => (
               <li key={target} className="rounded-xl border p-3 text-sm">
@@ -421,15 +440,19 @@ export default function VettedList({
                     <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                       {suggestion.legs.map((leg) => <li key={legKey(leg)} className="truncate">{leg.h} v {leg.a} · {leg.label} · {pct(leg.pc)}</li>)}
                     </ul>
-                    <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)} · min play {(combinedMinPlay(suggestion.legs) ?? 0).toFixed(2)}</div>
                     <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">Add to my ticket</button>
                   </>
                 ) : <p className="text-xs text-muted-foreground">No passing ticket reaches {target.toFixed(2)}.</p>}
               </li>
             ))}
           </ul>
-        </section>
-      ) : null}
+        ) : (
+          <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">
+            {valueOnly ? 'No target ticket from Value legs this round.' : 'No target ticket reaches these targets.'}
+          </p>
+        )}
+      </section>
 
       {ticket.length > 0 ? (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur">
@@ -461,6 +484,7 @@ export default function VettedList({
                   </label>
                   <div>Combined %<div className="tabular font-medium">{pct(ticketProbability)}</div></div>
                   <div>Fair odds<div className="tabular font-medium">{ticketFair.toFixed(2)}</div></div>
+                  <div>Min play<div className="tabular font-medium">{ticketMinPlay === null ? '–' : ticketMinPlay.toFixed(2)}</div></div>
                   <div>Mozzart<div className="tabular font-medium">{ticketMozzart === null ? 'incomplete' : ticketMozzart.toFixed(2)}</div></div>
                   <div>Ticket vs fair<div className="tabular font-medium">{ticketValue === null ? '–' : signedPct(ticketValue * 100)}</div></div>
                   <div>Payout<div className="tabular font-medium">{ticketPayout === null ? '–' : ticketPayout.toFixed(2)}</div></div>

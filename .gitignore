@@ -11,6 +11,7 @@ web/public/data/mozzart-vetted-record.json
 web/public/data/mozzart-status.json
 web/screens/
 prices/
+prices-private/
 
 # python
 .venv/

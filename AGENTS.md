@@ -147,13 +147,13 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   cumulative; return at the Mozzart price with a CI bootstrapped over round dates). It is empty until
   settled rounds carry frozen prices.
 - Production is private (Vercel Authentication; 302), priced (`PRICED=1` + read-only `vercel-read`).
-- 231 tests passing. `npm run build` green (49 pages).
+- 241 tests passing. `npm run build` green (50 pages).
 - Rounds fixes (21 Nov): `web/lib/vetted.ts` is now the single selection used by Best bets and
   `/rounds` (`DEFAULT_RULE`, min fair 1.70, one passing pick per match, highest probability).
   `/rounds` dedupes by date, reads the `*.full.json` companion first (the page does), and shows
   "Results pending" until a row is landed/lost. `index.json` was regenerated (3 rounds, one per
-  date). Under that rule the 14 Nov example is 8 of 21 landed; 21 Nov is 54 passing picks, all
-  pending; 22 Nov is 15 passing, all pending. The old "13 of 15 landed" was the 14 Nov example
+  date). Under that rule the 14 Nov example is 10 of 26 landed; 21 Nov is 70 passing picks, all
+  pending; 22 Nov is 19 passing, all pending. The old "13 of 15 landed" was the 14 Nov example
   under the superseded top-15/pc>0.8 rule.
 - Mozzart surfaces: Best bets and Explore no longer show the Mozzart price, vs-fair label, red
   flags, "Only where Mozzart pays..." toggle or C7 tick on the main lists. The price appears only
@@ -164,17 +164,20 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   combined Mozzart/payout.
 - Screenshots run in GitHub Actions via `screens.yml` (workflow_dispatch plus workflow_run after CI on
   main, i.e. after a deploy): ubuntu runner, `npx playwright install --with-deps chromium`, build
-  `web/` without the price file, serve `web/out`, capture 1280x800 and 390x844 PNGs of Best bets (latest
-  round), Best bets with Bet=HT/FT, one card opened, Explore, /rounds, /report and /tickets, upload the
-  `screens` artifact with 3-day retention. Screenshots are never committed. Local Playwright is still
-  blocked by the four missing system libraries.
+  `web/` with the private price snapshot (artifact only; prices never committed), serve `web/out`,
+  capture 1280x800 and 390x844 PNGs of Best bets (latest round), Best bets with Bet=HT/FT and min 1.70,
+  one card opened, Value bets, Explore, /rounds, /report and /tickets, upload the `screens` artifact
+  with 3-day retention. Screenshots are never committed. Local Playwright is still blocked by the four
+  missing system libraries.
 - Task 8 (21 Nov): Correct score is hidden from the Best bets and Explore UI (dropdowns, lists,
   match views, tickets) but stays in `markets.py` / `markets.json` and Record history.
   `web/lib/vetted.ts` exposes `isHiddenMarketId` (prefix `CORRECT_SCORE:`) and both pickers filter it.
 - Two rules: `ANY_RULE` (alias of `DEFAULT_RULE`, used when Bet = Any bet) and `TYPE_RULE` (used when
   a group or one market is chosen). TYPE_RULE has no probability floor and no minimum odds: lift
   `p >= usual x 1.25` and `p >= usual + 3 pts`; home-at-home and away-at-away records each >= usual
-  with n >= 8; `|model - empirical| <= max(5 pts, 0.25 x p)`; `fair <= 6.00`. The two definitions live in
+  with n >= 8; `|model - empirical| <= max(5 pts, 0.25 x p)` where empirical is the team-based count
+  estimate (home-at-home and away-at-away, each shrunk to the league usual by n/(n+20), then
+  averaged), not the league usual; `fair <= 6.00`. The two definitions live in
   `pipeline/vetting.py` (`type_evaluate`) and `web/lib/vetting.ts` (`evaluateTypeCandidate`).
   `lift = pc / league usual` and is displayed only. A group shows one passing bet per match with the
   highest probability, a single market every passing fixture; both sort by probability. Strong under
@@ -183,8 +186,8 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 - Bet dropdown counts (Best bets): each group and single-market option shows the number of matches
   passing TYPE_RULE for the current round + league, e.g. `HT/FT (36)`. Zero-count options stay
   selectable and show the empty state plus up to 3 closest candidates with the failed check and value.
-  On 21 Nov (all leagues) the group counts are Combos 27, HT/FT 23, Goals 11, BTTS 9, Half-time 37,
-  Team goals 41, Result & double chance 24.
+  Counts reflect the min-fair dropdown (default 1.70). On 21 Nov (all leagues) the group counts are
+  Combos 45, HT/FT 46, Goals 18, BTTS 14, Half-time 45, Team goals 54, Result & double chance 31.
 - `/report` (49th page) shows: (a) the TYPE_RULE group backtest from
   `web/public/data/type_backtest.json` (walk-forward goals model and empirical rates before every round,
   calibration from `picker.json` season factors, seasons 2019-20..2025-26, one pick per match per group
@@ -194,8 +197,8 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   (including the Monday settle): passing, settled, landed, expected and the Strong/Possible split;
   (c) Record at Mozzart prices (cumulative aggregates from `mozzart-vetted-record.json`) and price
   status (per-round priced/matched/unmatched, monthly requests vs 90, last price run) from
-  `mozzart-status.json`, both embedded only in the priced build; (d) a Last updated time. Top nav is
-  Best bets | Explore | Report. Regenerate the TYPE_RULE table with half-life 365 after picker factors
+  `mozzart-status.json`, both embedded only in the priced build; (d) a Last updated time; (e) Value
+  tracking from `value-record.json`. Top nav is Best bets | Value bets | Explore | Report. Regenerate the TYPE_RULE table with half-life 365 after picker factors
   change:
   `python -c "import json; from pathlib import Path; from pipeline.config import RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras; from pipeline.run import cached_seasons; from pipeline.run_model import load_by_division; from pipeline.model import type_backtest; d=load_divisions(); by=load_by_division(RAW_DIR,d,load_extras(),cached_seasons(RAW_DIR)); f=json.loads((WEB_DATA_DIR/'picker.json').read_text())['season_factors']; type_backtest.write({l.code: by.get(l.code,[]) for l in d}, 365.0, WEB_DATA_DIR/'type_backtest.json', f)`.
   Explore keeps its M4/M5 picker behaviour; only the correct-score removal applies there.
@@ -203,7 +206,28 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   the Monday settle); screenshots via `screens.yml` (artifact only, never committed).
 - Cards/colours (21 Nov): Best bets cards and opened details have no check ticks or condition chips;
   Strong/Possible are neutral badges. Green is used only for Landed, red only for Lost, grey for
-  Pending/Void (Best bets and Explore).
+  Pending/Void (Best bets and Explore). The Value badge is amber; min play text is neutral.
+- Task 9 (21 Nov): agreement "empirical" is the team-based count estimate (`team_empirical` in
+  `pipeline/vetting.py`, `teamEmpirical` in `web/lib/vetting.ts`): home-at-home and away-at-away, each
+  shrunk to the league usual by n/(n+20), then averaged. C4 and T4 use it; card details label it
+  "team empirical". Before/after group counts on 21 Nov (league usual -> team empirical, no min fair):
+  Combos 27->51, HT/FT 23->55, Goals 11->20, BTTS 9->14, Half-time 37->53, Team goals 41->64,
+  Result & DC 24->51. With the default min fair 1.70 the dropdown counts are 45/46/18/14/45/54/31.
+- Min fair odds is shown in every Bet view (Any, group, single market): 1.40/1.70/2.00/2.50, URL
+  `?min=`, default 1.70, applied before the per-match best; dropdown counts reflect it. Dropdowns are
+  full width on mobile; round buttons are oldest-left; /report says "Walk-forward over
+  2019-20..2025-26" and footnotes "highest probability".
+- Min play: `min_play = ceil_2dp(1.05 / p)` (floating-point-safe epsilon). Every Best bets card and
+  Explore row shows "Play only at odds >= X.XX"; the opened card adds "needs N in 10 at that price;
+  our chance P%". Neutral colour. Value rows are those with Mozzart >= min_play.
+- Value bets (`/value`, top nav "Value bets"): Mozzart snapshot price >= min_play, team records and
+  agreement pass, fair <= 6; one per match by highest edge `price x p - 1`, sorted edge. Amber Value
+  badge. The Best bets ticket builder has "Value legs only" (default ON) and shows combined min play.
+- Value tracking: `pipeline/mozzart/value_record.py` runs in `update.yml` after `run_model` (the
+  workflow checks out the private store as `prices-private`). It writes
+  `web/public/data/value-record.json` (aggregates only): bets, landed, needed (sum 1/price), profit
+  units, return, 95% CI over round dates (2000, seed 20261025), split by group and odds band, cumulative
+  profit series. `/report` renders it. It is empty until the 21/22 Nov settle.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`
@@ -212,11 +236,12 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Open items
 
-- **Rounds are pending by design**: 21 Nov (54 default passing picks) and 22 Nov (15) have no
+- **Rounds are pending by design**: 21 Nov (70 default passing picks) and 22 Nov (19) have no
   results until the Mon 12:00 settle; `/rounds` and Best bets show "Results pending" until then.
-- **Record at Mozzart prices** fills after the 21/22 Nov settle (Mon 12:00) and the prices are frozen;
-  21 Nov is 93/122 priced, 22 Nov pending. **Stage A/B backtest and C9 are cancelled** — do not
-  reintroduce them; there is no xG/AxG in the data.
+- **Record at Mozzart prices / Value tracking** fill after the 21/22 Nov settle (Mon 12:00) and the
+  prices are frozen; 21 Nov is 93/122 priced, 22 Nov pending. The Value record is rebuilt by the next
+  `update.yml` pass. **Stage A/B backtest and C9 are cancelled** — do not reintroduce them; there is
+  no xG/AxG in the data.
 - **Recalibration**: `picker.json` and `combo.json` are recomputed once and committed. The combo
   backtest optimises one ticket per round date across all divisions playing that date. `type_backtest.json`
   is static too: regenerate it after recalibration so `/report` matches the live factors.

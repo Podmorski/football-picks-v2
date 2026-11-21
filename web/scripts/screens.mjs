@@ -9,8 +9,9 @@ mkdirSync(out, { recursive: true });
 
 const pages = [
   ['best-bets', '/'],
-  ['best-bets-htft', '/?bet=group:HT%2FFT'],
-  ['best-bets-card', '/?bet=group:HT%2FFT', true],
+  ['best-bets-htft', '/?bet=group:HT%2FFT&min=1.70'],
+  ['best-bets-card', '/?bet=group:HT%2FFT&min=1.70', true],
+  ['value', '/value/'],
   ['explore', '/explore/'],
   ['rounds', '/rounds/'],
   ['report', '/report/'],

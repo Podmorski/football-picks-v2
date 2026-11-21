@@ -13,7 +13,7 @@ from pipeline.vetting import (
 
 def good(**overrides) -> Candidate:
     base = dict(
-        probability=0.60, model_probability=0.60, league_rate=0.40, league_n=5000,
+        probability=0.60, model_probability=0.48, league_rate=0.40, league_n=5000,
         home_rate=0.50, home_n=20, away_rate=0.45, away_n=20, fair_odds=1.60,
         counts_probability=0.55, home_form=0.50, away_form=0.45, mozzart_odds=1.80,
         bookmaker_disagreement=0.05, bookmaker_p80=0.10, xg_for=1.6, xg_against=1.4,
@@ -112,10 +112,14 @@ def test_c3_team_records() -> None:
     assert c3(good())[0] is True
 
 
-def test_c4_agreement() -> None:
-    assert c4(good(model_probability=0.70, counts_probability=0.50))[0] is False
-    assert c4(good(counts_probability=None))[0] is False
-    assert c4(good())[0] is True
+def test_c4_agreement_uses_team_empirical() -> None:
+    # For good(): ((20*0.50 + 20*0.40)/40 + (20*0.45 + 20*0.40)/40)/2 = 0.4375.
+    assert c4(good(model_probability=0.70))[0] is False
+    assert c4(good(model_probability=0.48))[0] is True
+    assert "empirical 43.8%" in c4(good())[1]
+    # A model far from the league usual but close to the team estimate passes.
+    strong = good(model_probability=0.60, home_rate=0.80, away_rate=0.80)
+    assert c4(strong)[0] is True
 
 
 def test_c5_recent_form() -> None:

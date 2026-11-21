@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 
 from ..markets import MARKETS, market_mask, settle
-from ..vetting import TYPE_RULE
+from ..vetting import TYPE_RULE, team_empirical_values
 from .data import EPOCH, build_arrays, subset
 from .empirical import build as build_empirical
 from .goals_engine import fit as fit_goals
@@ -51,7 +51,8 @@ def passes(
     min_n = int(TYPE_RULE["min_record_n"])
     if home_n < min_n or away_n < min_n or home_rate < usual or away_rate < usual:
         return False
-    if abs(model - usual) > max(float(TYPE_RULE["min_agreement"]), float(TYPE_RULE["agreement_fraction"]) * probability):
+    empirical = team_empirical_values(usual, home_rate, home_n, away_rate, away_n)
+    if abs(model - empirical) > max(float(TYPE_RULE["min_agreement"]), float(TYPE_RULE["agreement_fraction"]) * probability):
         return False
     if fair > float(TYPE_RULE["max_fair_odds"]):
         return False

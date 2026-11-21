@@ -54,6 +54,16 @@ jobs:
       - name: Build model and publish rounds
         run: python -m pipeline.run_model
 
+      - name: Checkout private prices repo
+        uses: actions/checkout@v4
+        with:
+          repository: Podmorski/football-picks-prices
+          ssh-key: ${{ secrets.PRICES_DEPLOY_KEY }}
+          path: prices-private
+
+      - name: Build value record
+        run: python -m pipeline.mozzart.value_record --prices-dir prices-private --web-dir web/public/data
+
       - name: Commit changed data
         id: commit
         run: |

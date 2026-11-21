@@ -31,7 +31,10 @@ def _candidate(row: dict) -> vetting.Candidate:
         away_rate=float(row.get("ar", 0.0)),
         away_n=int(row.get("an", 0)),
         fair_odds=1.0 / max(probability, 1e-4),
-        counts_probability=float(row.get("lr", 0.0)),
+        counts_probability=vetting.team_empirical_values(
+            float(row.get("lr", 0.0)), float(row.get("hr", 0.0)), int(row.get("hn", 0)),
+            float(row.get("ar", 0.0)), int(row.get("an", 0)),
+        ),
     )
 
 

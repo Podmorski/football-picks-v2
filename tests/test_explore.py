@@ -9,8 +9,8 @@ from pipeline import picker, ranking, vetting
 from pipeline.markets import MARKET_BY_ID, MARKETS
 
 ROOT = Path(__file__).resolve().parents[1]
-PICKER_HASH = "f632ac713c7ab898fb4a40abb3c6274ac823f502fae86e999caedc3e1ba3c74a"
-EXPLORE_HASH = "cb4454bd54a9de9df2767b1744d623328b09ef94298f208d524f4024e3ee360b"
+PICKER_HASH = "32baebd7c364fcd5f068cea7f6e59adedd0b41287e2fc3ec4f967b8f706074af"
+EXPLORE_HASH = "788976a2bffcf1138553436813fcd9798c584b69c0af7701df8cb415c6464749"
 
 
 def sha(path: Path) -> str:
@@ -73,9 +73,9 @@ def default_vetted_tally(iso: str) -> tuple[int, int, int]:
 
 def test_rounds_tally_matches_the_best_bets_default_rows() -> None:
     # 21 Nov has no results yet: every row is pending, so no landed/lost tally.
-    assert default_vetted_tally("2026-11-21") == (54, 0, 0)
-    # The 14 Nov example is settled under the same rule: 8 of 21 landed.
-    assert default_vetted_tally("2026-11-14") == (21, 21, 8)
+    assert default_vetted_tally("2026-11-21") == (70, 0, 0)
+    # The 14 Nov example is settled under the same rule: 10 of 26 landed.
+    assert default_vetted_tally("2026-11-14") == (26, 26, 10)
 
 
 def test_rounds_index_has_one_entry_per_date() -> None:
@@ -140,8 +140,8 @@ def test_type_group_counts_match_one_per_match_rows() -> None:
         for group in TYPE_GROUPS
     }
     assert counts == {
-        "Combos": 27, "HT/FT": 23, "Goals": 11, "BTTS": 9,
-        "Half-time": 37, "Team goals": 41, "Result & double chance": 24,
+        "Combos": 51, "HT/FT": 55, "Goals": 20, "BTTS": 14,
+        "Half-time": 53, "Team goals": 64, "Result & double chance": 51,
     }
     # A group list shows one row per match (highest probability), so its length
     # equals the dropdown count.

@@ -27,6 +27,7 @@ import {
 } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
 import { isHiddenMarketId } from '@/lib/vetted';
+import { minPlay } from '@/lib/vetting';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
 const GROUP_ORDER = [
@@ -392,6 +393,7 @@ export default function Picker({
       mozzart: meta?.mozzart ?? '',
       pc: pcOf(row),
       fair: fairOf(row),
+      minPlay: minPlay(pcOf(row)),
       odds: price?.odds ?? null,
       fetchedAt: price?.fetchedAt,
       kickoff: fixture?.kickoff ?? null,
@@ -530,6 +532,7 @@ export default function Picker({
                     <tr key={line.m} className="border-t">
                       <td className="px-2 py-1.5">
                         {meta?.plain ?? line.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
+                        <div className="text-[11px] text-muted-foreground">Play only at odds ≥ {minPlay(pcOf(line)).toFixed(2)}</div>
                       </td>
                       <td className="tabular px-2 py-1.5 text-right font-medium">{pct(pcOf(line))}</td>
                       <td className="tabular px-2 py-1.5 text-right">{fairOf(line).toFixed(2)}</td>
@@ -720,6 +723,7 @@ export default function Picker({
                       <td className="px-2 py-2 text-muted-foreground">{leagueNames[row.d] ?? row.d}</td>
                       <td className="px-2 py-2">
                         {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
+                        <div className="text-[11px] text-muted-foreground">Play only at odds ≥ {minPlay(pcOf(row)).toFixed(2)}</div>
                       </td>
                       <td className="tabular px-2 py-2 text-right font-semibold">{pct(pcOf(row))}</td>
                       <td className="tabular px-2 py-2 text-right">{fair.toFixed(2)}</td>

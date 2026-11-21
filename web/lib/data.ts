@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { BestBetsRecordFile, LeagueFile, LeagueIndex, ModelFile, MozzartStatusFile, MozzartVettedRecordFile, RankRow, RecordFile, RoundDocument, RoundIndexRow, TypeBacktestFile } from './types';
+import type { BestBetsRecordFile, LeagueFile, LeagueIndex, ModelFile, MozzartStatusFile, MozzartVettedRecordFile, RankRow, RecordFile, RoundDocument, RoundIndexRow, TypeBacktestFile, ValueRecordFile } from './types';
 
 // The pipeline writes here; Next serves the same files statically. Reads happen at build time.
 const DATA_DIR = path.join(process.cwd(), 'public', 'data');
@@ -103,4 +103,9 @@ export function readMozzartVettedRecord(): MozzartVettedRecordFile | null {
 export function readMozzartStatus(): MozzartStatusFile | null {
   const file = path.join(DATA_DIR, 'mozzart-status.json');
   return fs.existsSync(file) ? readJson<MozzartStatusFile>('mozzart-status.json') : null;
+}
+
+export function readValueRecord(): ValueRecordFile | null {
+  const file = path.join(DATA_DIR, 'value-record.json');
+  return fs.existsSync(file) ? readJson<ValueRecordFile>('value-record.json') : null;
 }

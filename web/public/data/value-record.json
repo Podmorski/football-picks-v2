@@ -1,0 +1,23 @@
+{
+ "bands": {},
+ "bootstrap": {
+  "resamples": 2000,
+  "seed": 20261025,
+  "unit": "round date"
+ },
+ "cumulative": {
+  "bets": 0,
+  "ci": [
+   null,
+   null
+  ],
+  "landed": 0,
+  "needed": 0,
+  "profit": 0,
+  "return": null
+ },
+ "groups": {},
+ "note": "Settled rounds only. Value = Mozzart >= min play, team records and agreement pass, fair <= 6, one per match by highest edge; flat 1 unit at the Mozzart price.",
+ "profit_series": [],
+ "rounds": []
+}

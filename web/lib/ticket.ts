@@ -9,6 +9,7 @@ export type TicketLeg = {
   mozzart: string;
   pc: number;
   fair: number;
+  minPlay: number;
   odds: number | null;
   fetchedAt?: string;
   kickoff?: string | null;
@@ -38,6 +39,11 @@ export function combinedProbability(legs: TicketLeg[]): number {
 
 export function combinedFair(legs: TicketLeg[]): number {
   return legs.reduce((total, leg) => total * leg.fair, 1);
+}
+
+export function combinedMinPlay(legs: TicketLeg[]): number | null {
+  if (legs.length === 0) return null;
+  return legs.reduce((total, leg) => total * (leg.minPlay || 1), 1);
 }
 
 export function combinedMozzart(legs: TicketLeg[]): number | null {

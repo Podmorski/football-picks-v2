@@ -9,6 +9,8 @@ import {
   evaluateCandidate,
   evaluateTypeCandidate,
   liftOf,
+  minPlay,
+  teamEmpirical,
   type VettingCandidate,
   type VettingCheck,
 } from './vetting';
@@ -30,6 +32,8 @@ export type Evaluated = {
   price?: PricedRow;
   candidate: VettingCandidate;
   lift: number;
+  minPlay: number;
+  edge: number;
   passed: boolean;
   checks: VettingCheck[];
 };
@@ -61,13 +65,21 @@ export function evaluateRows(
       awayRate: row.ar,
       awayN: row.an,
       fairOdds,
-      countsProbability: row.lr,
+      countsProbability: teamEmpirical({ probability, modelProbability: row.p, leagueRate: row.lr, leagueN: row.ln, homeRate: row.hr, homeN: row.hn, awayRate: row.ar, awayN: row.an, fairOdds }),
       mozzartOdds: price?.odds ?? null,
     };
     const result = rule === 'type'
       ? evaluateTypeCandidate(candidate)
       : evaluateCandidate(candidate, ANY_RULE);
-    return { row, price, candidate, lift: liftOf(candidate), ...result };
+    return {
+      row,
+      price,
+      candidate,
+      lift: liftOf(candidate),
+      minPlay: minPlay(probability),
+      edge: price ? price.odds * probability - 1 : -Infinity,
+      ...result,
+    };
   });
 }
 
@@ -97,13 +109,15 @@ export function selectPassing(
 // first; lift is shown only.
 export function selectType(
   evaluated: Evaluated[],
-  options: { perMatch?: boolean; market?: string } = {},
+  options: { perMatch?: boolean; market?: string; minFair?: number } = {},
 ): Evaluated[] {
   const perMatch = options.perMatch ?? false;
+  const minFair = options.minFair ?? DEFAULT_MIN_FAIR;
   const best = new Map<string, Evaluated>();
   for (const item of evaluated) {
     if (isHiddenMarketId(item.row.m)) continue;
     if (!item.passed) continue;
+    if (item.candidate.fairOdds < minFair) continue;
     if (options.market !== undefined && item.row.m !== options.market) continue;
     const key = perMatch
       ? `${item.row.d}|${item.row.h}|${item.row.a}`
@@ -112,6 +126,27 @@ export function selectType(
     if (!current || item.candidate.probability > current.candidate.probability) best.set(key, item);
   }
   return [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
+}
+
+export function isValue(item: Evaluated): boolean {
+  return item.price != null && item.price.odds >= item.minPlay;
+}
+
+// Value rows: Mozzart >= min play, team records + agreement + fair <= 6, one per
+// match by highest edge, strongest edge first. Lift is not required.
+const VALUE_CHECKS = ['t3', 't4', 't6'] as const;
+
+export function selectValue(evaluated: Evaluated[]): Evaluated[] {
+  const best = new Map<string, Evaluated>();
+  for (const item of evaluated) {
+    if (isHiddenMarketId(item.row.m)) continue;
+    if (!isValue(item)) continue;
+    if (!VALUE_CHECKS.every((id) => item.checks.find((check) => check.id === id)?.passed)) continue;
+    const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
+    const current = best.get(key);
+    if (!current || item.edge > current.edge) best.set(key, item);
+  }
+  return [...best.values()].sort((a, b) => b.edge - a.edge);
 }
 
 export type RoundTally = {

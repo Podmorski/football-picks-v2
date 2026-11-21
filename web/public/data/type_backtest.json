@@ -7,94 +7,94 @@
  "groups": [
   {
    "group": "Combos",
-   "landed": 0.4322,
-   "picks": 7402,
-   "picks_per_round": 9.127,
-   "predicted": 0.4316,
-   "return": -0.0062,
+   "landed": 0.5011,
+   "picks": 16308,
+   "picks_per_round": 19.029,
+   "predicted": 0.4922,
+   "return": 0.0185,
    "return_ci": [
-    -0.0372,
-    0.0252
+    0.0008,
+    0.0358
    ],
-   "rounds": 811
+   "rounds": 857
   },
   {
    "group": "HT/FT",
-   "landed": 0.4648,
-   "picks": 9525,
-   "picks_per_round": 11.588,
-   "predicted": 0.4652,
-   "return": 0.0004,
+   "landed": 0.5366,
+   "picks": 18149,
+   "picks_per_round": 21.302,
+   "predicted": 0.5373,
+   "return": -0.0046,
    "return_ci": [
-    -0.0272,
-    0.0276
+    -0.0217,
+    0.0119
    ],
-   "rounds": 822
+   "rounds": 852
   },
   {
    "group": "Goals",
-   "landed": 0.4023,
-   "picks": 3957,
-   "picks_per_round": 5.481,
-   "predicted": 0.3916,
-   "return": 0.0283,
+   "landed": 0.4043,
+   "picks": 5996,
+   "picks_per_round": 7.797,
+   "predicted": 0.3987,
+   "return": 0.0047,
    "return_ci": [
-    -0.0189,
-    0.0745
+    -0.0289,
+    0.038
    ],
-   "rounds": 722
+   "rounds": 769
   },
   {
    "group": "BTTS",
-   "landed": 0.3578,
-   "picks": 1333,
-   "picks_per_round": 2.432,
-   "predicted": 0.3752,
-   "return": -0.0556,
+   "landed": 0.3601,
+   "picks": 1877,
+   "picks_per_round": 3.032,
+   "predicted": 0.3739,
+   "return": -0.0333,
    "return_ci": [
-    -0.1357,
-    0.023
+    -0.0961,
+    0.0331
    ],
-   "rounds": 548
+   "rounds": 619
   },
   {
    "group": "Half-time",
-   "landed": 0.5605,
-   "picks": 9632,
-   "picks_per_round": 11.833,
-   "predicted": 0.5605,
-   "return": 0.0092,
+   "landed": 0.551,
+   "picks": 14841,
+   "picks_per_round": 17.481,
+   "predicted": 0.5483,
+   "return": 0.0134,
    "return_ci": [
-    -0.0137,
-    0.0317
+    -0.0053,
+    0.0321
    ],
-   "rounds": 814
+   "rounds": 849
   },
   {
    "group": "Team goals",
-   "landed": 0.562,
-   "picks": 12076,
-   "picks_per_round": 14.291,
-   "predicted": 0.5622,
-   "return": -0.0066,
+   "landed": 0.5487,
+   "picks": 18566,
+   "picks_per_round": 21.614,
+   "predicted": 0.5489,
+   "return": -0.0017,
    "return_ci": [
-    -0.0256,
-    0.0134
+    -0.017,
+    0.0137
    ],
-   "rounds": 845
+   "rounds": 859
   },
   {
    "group": "Result & double chance",
-   "landed": 0.5697,
-   "picks": 5984,
-   "picks_per_round": 7.731,
-   "predicted": 0.5683,
+   "landed": 0.6094,
+   "picks": 15531,
+   "picks_per_round": 18.38,
+   "predicted": 0.6027,
    "return": 0.0029,
    "return_ci": [
-    -0.027,
-    0.0327
+    -0.0144,
+    0.0195
    ],
-   "rounds": 774
+   "rounds": 845
   }
  ],
  "note": "Walk-forward: goals model and empirical rates use matches before each round; calibration uses picker.json season factors (group x band). One passing bet per match per group (highest lift). Return at fair odds.",

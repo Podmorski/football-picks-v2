@@ -183,6 +183,25 @@ export type MozzartStatusFile = {
   last_run: { at: string; ok: boolean; note: string } | null;
 };
 
+export type ValueSummaryRow = {
+  bets: number;
+  landed: number;
+  needed: number;
+  profit: number;
+  return: number | null;
+  ci: [number | null, number | null];
+};
+
+export type ValueRecordFile = {
+  rounds: { date: string; label: string; summary: ValueSummaryRow }[];
+  cumulative: ValueSummaryRow;
+  groups: Record<string, ValueSummaryRow>;
+  bands: Record<string, ValueSummaryRow>;
+  profit_series: { date: string; profit: number }[];
+  bootstrap?: { resamples: number; seed: number; unit: string };
+  note?: string;
+};
+
 export type ModelFile = {
   backtest: { seasons: string[]; fixtures: number };
   hyperparameters: { best: { half_life_days: number; k: number; logloss: number } };

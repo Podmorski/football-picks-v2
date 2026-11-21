@@ -57,10 +57,9 @@ def c3(candidate: Candidate) -> tuple[bool, str]:
 
 
 def c4(candidate: Candidate) -> tuple[bool, str]:
-    if candidate.counts_probability is None:
-        return False, "no counts estimate"
-    gap = abs(candidate.model_probability - candidate.counts_probability)
-    return gap <= 0.10, f"gap {gap*100:.1f} points"
+    empirical = team_empirical(candidate)
+    gap = abs(candidate.model_probability - empirical)
+    return gap <= 0.10, f"gap {gap*100:.1f} pts (empirical {empirical*100:.1f}%)"
 
 
 def c5(candidate: Candidate) -> tuple[bool, str]:
@@ -147,6 +146,28 @@ def lift_of(candidate: Candidate) -> float:
     return candidate.probability / candidate.league_rate if candidate.league_rate > 0 else 0.0
 
 
+SHRINK_N = 20.0
+
+
+def _shrunk(rate: float, n: int, usual: float, k: float = SHRINK_N) -> float:
+    return (n * rate + k * usual) / (n + k)
+
+
+def team_empirical_values(
+    usual: float, home_rate: float, home_n: int, away_rate: float, away_n: int, k: float = SHRINK_N,
+) -> float:
+    """Team-based count estimate: home-at-home and away-at-away, each shrunk to the
+    league usual by n/(n+20), then averaged."""
+    return (_shrunk(home_rate, home_n, usual, k) + _shrunk(away_rate, away_n, usual, k)) / 2.0
+
+
+def team_empirical(candidate: Candidate, k: float = SHRINK_N) -> float:
+    return team_empirical_values(
+        candidate.league_rate, candidate.home_rate, candidate.home_n,
+        candidate.away_rate, candidate.away_n, k,
+    )
+
+
 def type_evaluate(candidate: Candidate, rule: dict | None = None) -> tuple[bool, list[dict]]:
     """TYPE_RULE: lift, team records, agreement and a long-shot cap. No C1/C6 floor."""
     rule = rule or TYPE_RULE
@@ -175,11 +196,12 @@ def type_evaluate(candidate: Candidate, rule: dict | None = None) -> tuple[bool,
         "value": f"home {candidate.home_rate*100:.1f}%/{candidate.home_n}, away {candidate.away_rate*100:.1f}%/{candidate.away_n}",
     })
 
-    gap = abs(candidate.model_probability - usual)
+    empirical = team_empirical(candidate)
+    gap = abs(candidate.model_probability - empirical)
     allowed = max(float(rule["min_agreement"]), float(rule["agreement_fraction"]) * probability)
     checks.append({
         "id": "t4", "label": "Agreement", "passed": bool(gap <= allowed),
-        "value": f"gap {gap*100:.1f} pts <= {allowed*100:.1f} pts",
+        "value": f"gap {gap*100:.1f} pts <= {allowed*100:.1f} pts (empirical {empirical*100:.1f}%)",
     })
 
     max_fair = float(rule["max_fair_odds"])

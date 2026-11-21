@@ -8,6 +8,7 @@ const VARIANTS: Record<string, string> = {
   outline: 'border-border text-foreground',
   success: 'border-transparent bg-success/15 text-success',
   warning: 'border-transparent bg-warning/20 text-foreground',
+  value: 'border-transparent bg-amber-500/15 text-amber-700',
   destructive: 'border-transparent bg-destructive/15 text-destructive',
 };
 

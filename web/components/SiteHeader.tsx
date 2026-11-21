@@ -8,6 +8,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 
 const PRIMARY = [
   { href: '/', label: 'Best bets' },
+  { href: '/value', label: 'Value bets' },
   { href: '/explore', label: 'Explore' },
   { href: '/report', label: 'Report' },
 ];

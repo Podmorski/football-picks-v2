@@ -39,7 +39,10 @@ jobs:
         run: npx playwright install --with-deps chromium
         working-directory: web
 
-      - name: Build without the price file
+      - name: Build with the private price snapshot
+        env:
+          PRICED: '1'
+          PRICES_SSH_KEY: ${{ secrets.PRICES_DEPLOY_KEY }}
         run: npm run build
         working-directory: web
 
