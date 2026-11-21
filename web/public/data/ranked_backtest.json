@@ -1,0 +1,3747 @@
+{
+ "actual_odds_methodology": {
+  "bookmaker": "Bet365",
+  "coverage": "Reported per cohort as mapped, priced and priced-of-mapped selection shares.",
+  "mappings": [
+   {
+    "column": "B365H",
+    "market": "RESULT:1"
+   },
+   {
+    "column": "B365D",
+    "market": "RESULT:X"
+   },
+   {
+    "column": "B365A",
+    "market": "RESULT:2"
+   },
+   {
+    "column": "B365>2.5",
+    "market": "GOAL_RANGE_FT:3+"
+   },
+   {
+    "column": "B365<2.5",
+    "market": "GOAL_RANGE_FT:0-2"
+   }
+  ],
+  "price_type": "pre-match only",
+  "unmapped_markets": "realised historical return not measurable from current data"
+ },
+ "divisions": [
+  "B1",
+  "D1",
+  "D2",
+  "E0",
+  "E1",
+  "E2",
+  "E3",
+  "EC",
+  "F1",
+  "F2",
+  "G1",
+  "I1",
+  "I2",
+  "N1",
+  "P1",
+  "SC0",
+  "SC1",
+  "SC2",
+  "SC3",
+  "SP1",
+  "SP2",
+  "T1"
+ ],
+ "groups": [
+  {
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42939,
+     "eligible_candidates": 858500,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0011,
+     "fair_return_ci": [
+      -0.0073,
+      0.0091
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 25305,
+     "landed_pct": 0.5893,
+     "mean_predicted": 0.5883,
+     "median_fair_odds": 1.752,
+     "predicted_minus_landed": -0.0011,
+     "round_dates": 891,
+     "selections": 42939,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 16308,
+     "eligible_candidates": 858500,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0185,
+     "fair_return_ci": [
+      0.0008,
+      0.0358
+     ],
+     "fixture_coverage": 0.3798,
+     "landed": 8172,
+     "landed_pct": 0.5011,
+     "mean_predicted": 0.4922,
+     "median_fair_odds": 2.178,
+     "predicted_minus_landed": -0.0089,
+     "round_dates": 857,
+     "selections": 16308,
+     "small_sample": false
+    },
+    "strict_rejected": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "candidate_coverage": 0.9623,
+     "covered_fixtures": 42939,
+     "diagnostic_only": true,
+     "eligible_candidates": 858500,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0199,
+     "fair_return_ci": [
+      0.0132,
+      0.0266
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 252515,
+     "landed_pct": 0.3057,
+     "mean_predicted": 0.2969,
+     "median_fair_odds": 3.486,
+     "predicted_minus_landed": -0.0088,
+     "round_dates": 891,
+     "selections": 826120,
+     "small_sample": false
+    }
+   },
+   "failure_reasons_non_exclusive": {
+    "t1": {
+     "candidates": 748317,
+     "fixtures": 42939,
+     "landed": 221959,
+     "landed_pct": 0.2966,
+     "mean_predicted": 0.2878,
+     "predicted_minus_landed": -0.0088,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.8717,
+     "share_of_rejected_candidates": 0.9058,
+     "small_sample": false
+    },
+    "t3": {
+     "candidates": 677678,
+     "fixtures": 42939,
+     "landed": 199349,
+     "landed_pct": 0.2942,
+     "mean_predicted": 0.2864,
+     "predicted_minus_landed": -0.0078,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.7894,
+     "share_of_rejected_candidates": 0.8203,
+     "small_sample": false
+    },
+    "t4": {
+     "candidates": 197207,
+     "fixtures": 37452,
+     "landed": 51144,
+     "landed_pct": 0.2593,
+     "mean_predicted": 0.2556,
+     "predicted_minus_landed": -0.0038,
+     "round_dates": 886,
+     "share_of_eligible_candidates": 0.2297,
+     "share_of_rejected_candidates": 0.2387,
+     "small_sample": false
+    },
+    "t6": {
+     "candidates": 190804,
+     "fixtures": 42936,
+     "landed": 20496,
+     "landed_pct": 0.1074,
+     "mean_predicted": 0.1085,
+     "predicted_minus_landed": 0.0011,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.2223,
+     "share_of_rejected_candidates": 0.231,
+     "small_sample": false
+    }
+   },
+   "group": "Combos"
+  },
+  {
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 1330024,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0011,
+     "fair_return_ci": [
+      -0.008,
+      0.0063
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 29233,
+     "landed_pct": 0.6814,
+     "mean_predicted": 0.6821,
+     "median_fair_odds": 1.497,
+     "predicted_minus_landed": 0.0007,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 18149,
+     "eligible_candidates": 1330024,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0046,
+     "fair_return_ci": [
+      -0.0217,
+      0.0119
+     ],
+     "fixture_coverage": 0.423,
+     "landed": 9738,
+     "landed_pct": 0.5366,
+     "mean_predicted": 0.5373,
+     "median_fair_odds": 1.621,
+     "predicted_minus_landed": 0.0007,
+     "round_dates": 852,
+     "selections": 18149,
+     "small_sample": false
+    },
+    "strict_rejected": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "candidate_coverage": 0.9653,
+     "covered_fixtures": 42904,
+     "diagnostic_only": true,
+     "eligible_candidates": 1330024,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0077,
+     "fair_return_ci": [
+      0.0022,
+      0.0134
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 254847,
+     "landed_pct": 0.1985,
+     "mean_predicted": 0.2,
+     "median_fair_odds": 7.761,
+     "predicted_minus_landed": 0.0015,
+     "round_dates": 891,
+     "selections": 1283893,
+     "small_sample": false
+    }
+   },
+   "failure_reasons_non_exclusive": {
+    "t1": {
+     "candidates": 1122992,
+     "fixtures": 42904,
+     "landed": 210083,
+     "landed_pct": 0.1871,
+     "mean_predicted": 0.1887,
+     "predicted_minus_landed": 0.0016,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.8443,
+     "share_of_rejected_candidates": 0.8747,
+     "small_sample": false
+    },
+    "t3": {
+     "candidates": 1069366,
+     "fixtures": 42904,
+     "landed": 203579,
+     "landed_pct": 0.1904,
+     "mean_predicted": 0.1925,
+     "predicted_minus_landed": 0.0021,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.804,
+     "share_of_rejected_candidates": 0.8329,
+     "small_sample": false
+    },
+    "t4": {
+     "candidates": 258838,
+     "fixtures": 37537,
+     "landed": 54913,
+     "landed_pct": 0.2122,
+     "mean_predicted": 0.2138,
+     "predicted_minus_landed": 0.0017,
+     "round_dates": 885,
+     "share_of_eligible_candidates": 0.1946,
+     "share_of_rejected_candidates": 0.2016,
+     "small_sample": false
+    },
+    "t6": {
+     "candidates": 761793,
+     "fixtures": 42904,
+     "landed": 57972,
+     "landed_pct": 0.0761,
+     "mean_predicted": 0.0774,
+     "predicted_minus_landed": 0.0013,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.5728,
+     "share_of_rejected_candidates": 0.5933,
+     "small_sample": false
+    }
+   },
+   "group": "HT/FT"
+  },
+  {
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42939,
+     "eligible_candidates": 1288065,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0031,
+     "fair_return_ci": [
+      0.0006,
+      0.0056
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 40159,
+     "landed_pct": 0.9353,
+     "mean_predicted": 0.9324,
+     "median_fair_odds": 1.075,
+     "predicted_minus_landed": -0.0029,
+     "round_dates": 891,
+     "selections": 42939,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.2493,
+      "market_mapped_selections": 1495,
+      "measurement": "exact Bet365 pre-match return on the priced subset only",
+      "priced_coverage": 0.248,
+      "priced_of_mapped": 0.9946,
+      "priced_selections": 1487,
+      "return": 0.0068,
+      "return_ci": [
+       -0.0296,
+       0.0449
+      ],
+      "round_dates": 561,
+      "scope_warning": "Subset accounting only; this is not a realised return for the whole cohort."
+     },
+     "covered_fixtures": 5996,
+     "eligible_candidates": 1288065,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0047,
+     "fair_return_ci": [
+      -0.0289,
+      0.038
+     ],
+     "fixture_coverage": 0.1396,
+     "landed": 2424,
+     "landed_pct": 0.4043,
+     "mean_predicted": 0.3987,
+     "median_fair_odds": 2.845,
+     "predicted_minus_landed": -0.0056,
+     "round_dates": 769,
+     "selections": 5996,
+     "small_sample": false
+    },
+    "strict_rejected": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0659,
+      "market_mapped_selections": 84331,
+      "measurement": "exact Bet365 pre-match return on the priced subset only",
+      "priced_coverage": 0.0658,
+      "priced_of_mapped": 0.9979,
+      "priced_selections": 84155,
+      "return": -0.0565,
+      "return_ci": [
+       -0.0582,
+       -0.0548
+      ],
+      "round_dates": 891,
+      "scope_warning": "Subset accounting only; this is not a realised return for the whole cohort."
+     },
+     "candidate_coverage": 0.9928,
+     "covered_fixtures": 42939,
+     "diagnostic_only": true,
+     "eligible_candidates": 1288065,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0037,
+     "fair_return_ci": [
+      0.0015,
+      0.006
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 630066,
+     "landed_pct": 0.4927,
+     "mean_predicted": 0.4895,
+     "median_fair_odds": 2.126,
+     "predicted_minus_landed": -0.0033,
+     "round_dates": 891,
+     "selections": 1278748,
+     "small_sample": false
+    }
+   },
+   "failure_reasons_non_exclusive": {
+    "t1": {
+     "candidates": 1252106,
+     "fixtures": 42939,
+     "landed": 623018,
+     "landed_pct": 0.4976,
+     "mean_predicted": 0.4941,
+     "predicted_minus_landed": -0.0034,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.9721,
+     "share_of_rejected_candidates": 0.9792,
+     "small_sample": false
+    },
+    "t3": {
+     "candidates": 989966,
+     "fixtures": 42939,
+     "landed": 475468,
+     "landed_pct": 0.4803,
+     "mean_predicted": 0.4775,
+     "predicted_minus_landed": -0.0028,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.7686,
+     "share_of_rejected_candidates": 0.7742,
+     "small_sample": false
+    },
+    "t4": {
+     "candidates": 87696,
+     "fixtures": 28644,
+     "landed": 22670,
+     "landed_pct": 0.2585,
+     "mean_predicted": 0.2586,
+     "predicted_minus_landed": 0.0001,
+     "round_dates": 882,
+     "share_of_eligible_candidates": 0.0681,
+     "share_of_rejected_candidates": 0.0686,
+     "small_sample": false
+    },
+    "t6": {
+     "candidates": 127678,
+     "fixtures": 42939,
+     "landed": 14108,
+     "landed_pct": 0.1105,
+     "mean_predicted": 0.1136,
+     "predicted_minus_landed": 0.0031,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.0991,
+     "share_of_rejected_candidates": 0.0998,
+     "small_sample": false
+    }
+   },
+   "group": "Goals"
+  },
+  {
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 257494,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0045,
+     "fair_return_ci": [
+      -0.0089,
+      -0.0001
+     ],
+     "fixture_coverage": 0.9992,
+     "landed": 34652,
+     "landed_pct": 0.8077,
+     "mean_predicted": 0.8115,
+     "median_fair_odds": 1.233,
+     "predicted_minus_landed": 0.0039,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 1877,
+     "eligible_candidates": 257494,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0333,
+     "fair_return_ci": [
+      -0.0961,
+      0.0331
+     ],
+     "fixture_coverage": 0.0437,
+     "landed": 676,
+     "landed_pct": 0.3601,
+     "mean_predicted": 0.3739,
+     "median_fair_odds": 3.126,
+     "predicted_minus_landed": 0.0138,
+     "round_dates": 619,
+     "selections": 1877,
+     "small_sample": false
+    },
+    "strict_rejected": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "candidate_coverage": 0.9918,
+     "covered_fixtures": 42939,
+     "diagnostic_only": true,
+     "eligible_candidates": 257494,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0012,
+     "fair_return_ci": [
+      -0.0044,
+      0.0022
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 128014,
+     "landed_pct": 0.5013,
+     "mean_predicted": 0.5025,
+     "median_fair_odds": 1.996,
+     "predicted_minus_landed": 0.0012,
+     "round_dates": 891,
+     "selections": 255375,
+     "small_sample": false
+    }
+   },
+   "failure_reasons_non_exclusive": {
+    "t1": {
+     "candidates": 251113,
+     "fixtures": 42939,
+     "landed": 126664,
+     "landed_pct": 0.5044,
+     "mean_predicted": 0.5054,
+     "predicted_minus_landed": 0.001,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.9752,
+     "share_of_rejected_candidates": 0.9833,
+     "small_sample": false
+    },
+    "t3": {
+     "candidates": 198333,
+     "fixtures": 42939,
+     "landed": 97856,
+     "landed_pct": 0.4934,
+     "mean_predicted": 0.4942,
+     "predicted_minus_landed": 0.0008,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.7702,
+     "share_of_rejected_candidates": 0.7766,
+     "small_sample": false
+    },
+    "t4": {
+     "candidates": 18304,
+     "fixtures": 13484,
+     "landed": 4980,
+     "landed_pct": 0.2721,
+     "mean_predicted": 0.2726,
+     "predicted_minus_landed": 0.0005,
+     "round_dates": 848,
+     "share_of_eligible_candidates": 0.0711,
+     "share_of_rejected_candidates": 0.0717,
+     "small_sample": false
+    },
+    "t6": {
+     "candidates": 9749,
+     "fixtures": 9503,
+     "landed": 1562,
+     "landed_pct": 0.1602,
+     "mean_predicted": 0.1473,
+     "predicted_minus_landed": -0.013,
+     "round_dates": 787,
+     "share_of_eligible_candidates": 0.0379,
+     "share_of_rejected_candidates": 0.0382,
+     "small_sample": false
+    }
+   },
+   "group": "BTTS"
+  },
+  {
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 1458736,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0007,
+     "fair_return_ci": [
+      -0.0042,
+      0.0026
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 38036,
+     "landed_pct": 0.8865,
+     "mean_predicted": 0.8872,
+     "median_fair_odds": 1.127,
+     "predicted_minus_landed": 0.0006,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 14841,
+     "eligible_candidates": 1458736,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0134,
+     "fair_return_ci": [
+      -0.0053,
+      0.0321
+     ],
+     "fixture_coverage": 0.3459,
+     "landed": 8178,
+     "landed_pct": 0.551,
+     "mean_predicted": 0.5483,
+     "median_fair_odds": 2.108,
+     "predicted_minus_landed": -0.0027,
+     "round_dates": 849,
+     "selections": 14841,
+     "small_sample": false
+    },
+    "strict_rejected": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "candidate_coverage": 0.9814,
+     "covered_fixtures": 42904,
+     "diagnostic_only": true,
+     "eligible_candidates": 1458736,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0047,
+     "fair_return_ci": [
+      0.0024,
+      0.0073
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 640957,
+     "landed_pct": 0.4477,
+     "mean_predicted": 0.4452,
+     "median_fair_odds": 2.53,
+     "predicted_minus_landed": -0.0025,
+     "round_dates": 891,
+     "selections": 1431633,
+     "small_sample": false
+    }
+   },
+   "failure_reasons_non_exclusive": {
+    "t1": {
+     "candidates": 1381378,
+     "fixtures": 42904,
+     "landed": 621558,
+     "landed_pct": 0.45,
+     "mean_predicted": 0.4475,
+     "predicted_minus_landed": -0.0025,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.947,
+     "share_of_rejected_candidates": 0.9649,
+     "small_sample": false
+    },
+    "t3": {
+     "candidates": 1129845,
+     "fixtures": 42904,
+     "landed": 491877,
+     "landed_pct": 0.4353,
+     "mean_predicted": 0.4331,
+     "predicted_minus_landed": -0.0023,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.7745,
+     "share_of_rejected_candidates": 0.7892,
+     "small_sample": false
+    },
+    "t4": {
+     "candidates": 152048,
+     "fixtures": 37411,
+     "landed": 42735,
+     "landed_pct": 0.2811,
+     "mean_predicted": 0.2784,
+     "predicted_minus_landed": -0.0026,
+     "round_dates": 888,
+     "share_of_eligible_candidates": 0.1042,
+     "share_of_rejected_candidates": 0.1062,
+     "small_sample": false
+    },
+    "t6": {
+     "candidates": 158151,
+     "fixtures": 42904,
+     "landed": 18117,
+     "landed_pct": 0.1146,
+     "mean_predicted": 0.1134,
+     "predicted_minus_landed": -0.0012,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.1084,
+     "share_of_rejected_candidates": 0.1105,
+     "small_sample": false
+    }
+   },
+   "group": "Half-time"
+  },
+  {
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42939,
+     "eligible_candidates": 858360,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0048,
+     "fair_return_ci": [
+      0.0,
+      0.0094
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 34502,
+     "landed_pct": 0.8035,
+     "mean_predicted": 0.7994,
+     "median_fair_odds": 1.257,
+     "predicted_minus_landed": -0.0041,
+     "round_dates": 891,
+     "selections": 42939,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 18566,
+     "eligible_candidates": 858360,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0017,
+     "fair_return_ci": [
+      -0.017,
+      0.0137
+     ],
+     "fixture_coverage": 0.4324,
+     "landed": 10188,
+     "landed_pct": 0.5487,
+     "mean_predicted": 0.5489,
+     "median_fair_odds": 1.749,
+     "predicted_minus_landed": 0.0002,
+     "round_dates": 859,
+     "selections": 18566,
+     "small_sample": false
+    },
+    "strict_rejected": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "candidate_coverage": 0.9475,
+     "covered_fixtures": 42939,
+     "diagnostic_only": true,
+     "eligible_candidates": 858360,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0057,
+     "fair_return_ci": [
+      -0.0108,
+      -0.0008
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 306739,
+     "landed_pct": 0.3772,
+     "mean_predicted": 0.3789,
+     "median_fair_odds": 2.608,
+     "predicted_minus_landed": 0.0017,
+     "round_dates": 891,
+     "selections": 813274,
+     "small_sample": false
+    }
+   },
+   "failure_reasons_non_exclusive": {
+    "t1": {
+     "candidates": 718814,
+     "fixtures": 42939,
+     "landed": 270671,
+     "landed_pct": 0.3766,
+     "mean_predicted": 0.378,
+     "predicted_minus_landed": 0.0014,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.8374,
+     "share_of_rejected_candidates": 0.8839,
+     "small_sample": false
+    },
+    "t3": {
+     "candidates": 674634,
+     "fixtures": 42939,
+     "landed": 242618,
+     "landed_pct": 0.3596,
+     "mean_predicted": 0.3615,
+     "predicted_minus_landed": 0.0018,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.786,
+     "share_of_rejected_candidates": 0.8295,
+     "small_sample": false
+    },
+    "t4": {
+     "candidates": 182816,
+     "fixtures": 36100,
+     "landed": 48949,
+     "landed_pct": 0.2678,
+     "mean_predicted": 0.2705,
+     "predicted_minus_landed": 0.0027,
+     "round_dates": 882,
+     "share_of_eligible_candidates": 0.213,
+     "share_of_rejected_candidates": 0.2248,
+     "small_sample": false
+    },
+    "t6": {
+     "candidates": 182656,
+     "fixtures": 42884,
+     "landed": 18925,
+     "landed_pct": 0.1036,
+     "mean_predicted": 0.1057,
+     "predicted_minus_landed": 0.0021,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.2128,
+     "share_of_rejected_candidates": 0.2246,
+     "small_sample": false
+    }
+   },
+   "group": "Team goals"
+  },
+  {
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42939,
+     "eligible_candidates": 601076,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0004,
+     "fair_return_ci": [
+      -0.0053,
+      0.0053
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 33166,
+     "landed_pct": 0.7724,
+     "mean_predicted": 0.7717,
+     "median_fair_odds": 1.337,
+     "predicted_minus_landed": -0.0007,
+     "round_dates": 891,
+     "selections": 42939,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.2993,
+      "market_mapped_selections": 4649,
+      "measurement": "exact Bet365 pre-match return on the priced subset only",
+      "priced_coverage": 0.2987,
+      "priced_of_mapped": 0.9978,
+      "priced_selections": 4639,
+      "return": -0.0305,
+      "return_ci": [
+       -0.0569,
+       -0.0018
+      ],
+      "round_dates": 753,
+      "scope_warning": "Subset accounting only; this is not a realised return for the whole cohort."
+     },
+     "covered_fixtures": 15531,
+     "eligible_candidates": 601076,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0029,
+     "fair_return_ci": [
+      -0.0144,
+      0.0195
+     ],
+     "fixture_coverage": 0.3617,
+     "landed": 9464,
+     "landed_pct": 0.6094,
+     "mean_predicted": 0.6027,
+     "median_fair_odds": 1.675,
+     "predicted_minus_landed": -0.0067,
+     "round_dates": 845,
+     "selections": 15531,
+     "small_sample": false
+    },
+    "strict_rejected": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.2124,
+      "market_mapped_selections": 121956,
+      "measurement": "exact Bet365 pre-match return on the priced subset only",
+      "priced_coverage": 0.212,
+      "priced_of_mapped": 0.998,
+      "priced_selections": 121709,
+      "return": -0.077,
+      "return_ci": [
+       -0.0814,
+       -0.0721
+      ],
+      "round_dates": 891,
+      "scope_warning": "Subset accounting only; this is not a realised return for the whole cohort."
+     },
+     "candidate_coverage": 0.9552,
+     "covered_fixtures": 42939,
+     "diagnostic_only": true,
+     "eligible_candidates": 601076,
+     "eligible_fixtures": 42939,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0219,
+     "fair_return_ci": [
+      -0.0333,
+      -0.0102
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 162896,
+     "landed_pct": 0.2837,
+     "mean_predicted": 0.2851,
+     "median_fair_odds": 4.642,
+     "predicted_minus_landed": 0.0014,
+     "round_dates": 891,
+     "selections": 574149,
+     "small_sample": false
+    }
+   },
+   "failure_reasons_non_exclusive": {
+    "t1": {
+     "candidates": 474294,
+     "fixtures": 42939,
+     "landed": 130351,
+     "landed_pct": 0.2748,
+     "mean_predicted": 0.2754,
+     "predicted_minus_landed": 0.0005,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.7891,
+     "share_of_rejected_candidates": 0.8261,
+     "small_sample": false
+    },
+    "t3": {
+     "candidates": 482853,
+     "fixtures": 42939,
+     "landed": 127123,
+     "landed_pct": 0.2633,
+     "mean_predicted": 0.2653,
+     "predicted_minus_landed": 0.0021,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.8033,
+     "share_of_rejected_candidates": 0.841,
+     "small_sample": false
+    },
+    "t4": {
+     "candidates": 177373,
+     "fixtures": 35204,
+     "landed": 41043,
+     "landed_pct": 0.2314,
+     "mean_predicted": 0.2364,
+     "predicted_minus_landed": 0.005,
+     "round_dates": 884,
+     "share_of_eligible_candidates": 0.2951,
+     "share_of_rejected_candidates": 0.3089,
+     "small_sample": false
+    },
+    "t6": {
+     "candidates": 237657,
+     "fixtures": 42939,
+     "landed": 18195,
+     "landed_pct": 0.0766,
+     "mean_predicted": 0.0808,
+     "predicted_minus_landed": 0.0042,
+     "round_dates": 891,
+     "share_of_eligible_candidates": 0.3954,
+     "share_of_rejected_candidates": 0.4139,
+     "small_sample": false
+    }
+   },
+   "group": "Result & double chance"
+  }
+ ],
+ "half_life_days": 365.0,
+ "htft_markets_exploratory": [
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0444,
+     "fair_return_ci": [
+      -0.0625,
+      -0.0256
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 11046,
+     "landed_pct": 0.2575,
+     "mean_predicted": 0.2673,
+     "median_fair_odds": 3.974,
+     "predicted_minus_landed": 0.0098,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2996,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.042,
+     "fair_return_ci": [
+      -0.0883,
+      0.0042
+     ],
+     "fixture_coverage": 0.0698,
+     "landed": 1118,
+     "landed_pct": 0.3732,
+     "mean_predicted": 0.3909,
+     "median_fair_odds": 2.663,
+     "predicted_minus_landed": 0.0177,
+     "round_dates": 700,
+     "selections": 2996,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Home team ahead at half-time, home win at full-time",
+   "market": "HTFT:1-1"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.2176,
+     "fair_return_ci": [
+      0.1692,
+      0.2695
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 2272,
+     "landed_pct": 0.053,
+     "mean_predicted": 0.0439,
+     "median_fair_odds": 21.791,
+     "predicted_minus_landed": -0.009,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": null,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": null,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 0,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": null,
+     "fair_return_ci": [
+      null,
+      null
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 0,
+     "landed_pct": null,
+     "mean_predicted": null,
+     "median_fair_odds": null,
+     "predicted_minus_landed": null,
+     "round_dates": 0,
+     "selections": 0,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Home team ahead at half-time, draw at full-time",
+   "market": "HTFT:1-X"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.285,
+     "fair_return_ci": [
+      0.1933,
+      0.3765
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 978,
+     "landed_pct": 0.0228,
+     "mean_predicted": 0.0177,
+     "median_fair_odds": 57.535,
+     "predicted_minus_landed": -0.0051,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": null,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": null,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 0,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": null,
+     "fair_return_ci": [
+      null,
+      null
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 0,
+     "landed_pct": null,
+     "mean_predicted": null,
+     "median_fair_odds": null,
+     "predicted_minus_landed": null,
+     "round_dates": 0,
+     "selections": 0,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Home team ahead at half-time, away win at full-time",
+   "market": "HTFT:1-2"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0378,
+     "fair_return_ci": [
+      -0.0606,
+      -0.0147
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 6208,
+     "landed_pct": 0.1447,
+     "mean_predicted": 0.1494,
+     "median_fair_odds": 6.527,
+     "predicted_minus_landed": 0.0047,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2950,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0341,
+     "fair_return_ci": [
+      -0.0359,
+      0.1077
+     ],
+     "fixture_coverage": 0.0688,
+     "landed": 612,
+     "landed_pct": 0.2075,
+     "mean_predicted": 0.2003,
+     "median_fair_odds": 4.988,
+     "predicted_minus_landed": -0.0071,
+     "round_dates": 689,
+     "selections": 2950,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, home win at full-time",
+   "market": "HTFT:X-1"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0215,
+     "fair_return_ci": [
+      -0.0444,
+      0.0014
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 6671,
+     "landed_pct": 0.1555,
+     "mean_predicted": 0.1572,
+     "median_fair_odds": 6.255,
+     "predicted_minus_landed": 0.0017,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 1013,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0643,
+     "fair_return_ci": [
+      -0.1837,
+      0.0622
+     ],
+     "fixture_coverage": 0.0236,
+     "landed": 184,
+     "landed_pct": 0.1816,
+     "mean_predicted": 0.1931,
+     "median_fair_odds": 5.249,
+     "predicted_minus_landed": 0.0114,
+     "round_dates": 491,
+     "selections": 1013,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, draw at full-time",
+   "market": "HTFT:X-X"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.048,
+     "fair_return_ci": [
+      -0.0759,
+      -0.0207
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 4734,
+     "landed_pct": 0.1103,
+     "mean_predicted": 0.1155,
+     "median_fair_odds": 8.65,
+     "predicted_minus_landed": 0.0051,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 1673,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0194,
+     "fair_return_ci": [
+      -0.081,
+      0.1283
+     ],
+     "fixture_coverage": 0.039,
+     "landed": 322,
+     "landed_pct": 0.1925,
+     "mean_predicted": 0.1871,
+     "median_fair_odds": 5.415,
+     "predicted_minus_landed": -0.0053,
+     "round_dates": 624,
+     "selections": 1673,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, away win at full-time",
+   "market": "HTFT:X-2"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.2368,
+     "fair_return_ci": [
+      0.1659,
+      0.3126
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 1150,
+     "landed_pct": 0.0268,
+     "mean_predicted": 0.0218,
+     "median_fair_odds": 46.069,
+     "predicted_minus_landed": -0.005,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": null,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": null,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 0,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": null,
+     "fair_return_ci": [
+      null,
+      null
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 0,
+     "landed_pct": null,
+     "mean_predicted": null,
+     "median_fair_odds": null,
+     "predicted_minus_landed": null,
+     "round_dates": 0,
+     "selections": 0,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Away team ahead at half-time, home win at full-time",
+   "market": "HTFT:2-1"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.1962,
+     "fair_return_ci": [
+      0.1501,
+      0.2428
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 2231,
+     "landed_pct": 0.052,
+     "mean_predicted": 0.0434,
+     "median_fair_odds": 22.169,
+     "predicted_minus_landed": -0.0086,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": null,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": null,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 0,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": null,
+     "fair_return_ci": [
+      null,
+      null
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 0,
+     "landed_pct": null,
+     "mean_predicted": null,
+     "median_fair_odds": null,
+     "predicted_minus_landed": null,
+     "round_dates": 0,
+     "selections": 0,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Away team ahead at half-time, draw at full-time",
+   "market": "HTFT:2-X"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0511,
+     "fair_return_ci": [
+      -0.0754,
+      -0.0268
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 7614,
+     "landed_pct": 0.1775,
+     "mean_predicted": 0.1839,
+     "median_fair_odds": 5.929,
+     "predicted_minus_landed": 0.0065,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2748,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0147,
+     "fair_return_ci": [
+      -0.0739,
+      0.0482
+     ],
+     "fixture_coverage": 0.064,
+     "landed": 737,
+     "landed_pct": 0.2682,
+     "mean_predicted": 0.273,
+     "median_fair_odds": 3.794,
+     "predicted_minus_landed": 0.0048,
+     "round_dates": 704,
+     "selections": 2748,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Away team ahead at half-time, away win at full-time",
+   "market": "HTFT:2-2"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0509,
+     "fair_return_ci": [
+      -0.0722,
+      -0.0288
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 9180,
+     "landed_pct": 0.214,
+     "mean_predicted": 0.2226,
+     "median_fair_odds": 4.925,
+     "predicted_minus_landed": 0.0086,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2832,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0408,
+     "fair_return_ci": [
+      -0.0892,
+      0.0084
+     ],
+     "fixture_coverage": 0.066,
+     "landed": 895,
+     "landed_pct": 0.316,
+     "mean_predicted": 0.3311,
+     "median_fair_odds": 3.16,
+     "predicted_minus_landed": 0.0151,
+     "round_dates": 718,
+     "selections": 2832,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Home ahead at HT and FT with 2+ goals",
+   "market": "HTFT_AND_GOALS:1-1&2+"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0609,
+     "fair_return_ci": [
+      -0.0855,
+      -0.0356
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 7012,
+     "landed_pct": 0.1634,
+     "mean_predicted": 0.1714,
+     "median_fair_odds": 6.614,
+     "predicted_minus_landed": 0.008,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2521,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.005,
+     "fair_return_ci": [
+      -0.0694,
+      0.0641
+     ],
+     "fixture_coverage": 0.0588,
+     "landed": 633,
+     "landed_pct": 0.2511,
+     "mean_predicted": 0.256,
+     "median_fair_odds": 4.135,
+     "predicted_minus_landed": 0.0049,
+     "round_dates": 678,
+     "selections": 2521,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Home ahead at HT and FT with 3+ goals",
+   "market": "HTFT_AND_GOALS:1-1&3+"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0342,
+     "fair_return_ci": [
+      -0.0644,
+      -0.0053
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 6202,
+     "landed_pct": 0.1446,
+     "mean_predicted": 0.1475,
+     "median_fair_odds": 7.743,
+     "predicted_minus_landed": 0.0029,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2186,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0043,
+     "fair_return_ci": [
+      -0.0793,
+      0.0735
+     ],
+     "fixture_coverage": 0.051,
+     "landed": 509,
+     "landed_pct": 0.2328,
+     "mean_predicted": 0.2361,
+     "median_fair_odds": 4.468,
+     "predicted_minus_landed": 0.0033,
+     "round_dates": 669,
+     "selections": 2186,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Away ahead at HT and FT with 2+ goals",
+   "market": "HTFT_AND_GOALS:2-2&2+"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0279,
+     "fair_return_ci": [
+      -0.062,
+      0.0074
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 4752,
+     "landed_pct": 0.1108,
+     "mean_predicted": 0.1126,
+     "median_fair_odds": 10.438,
+     "predicted_minus_landed": 0.0018,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 1249,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0622,
+     "fair_return_ci": [
+      -0.1707,
+      0.0432
+     ],
+     "fixture_coverage": 0.0291,
+     "landed": 252,
+     "landed_pct": 0.2018,
+     "mean_predicted": 0.2113,
+     "median_fair_odds": 5.036,
+     "predicted_minus_landed": 0.0096,
+     "round_dates": 540,
+     "selections": 1249,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Away ahead at HT and FT with 3+ goals",
+   "market": "HTFT_AND_GOALS:2-2&3+"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0641,
+     "fair_return_ci": [
+      -0.0914,
+      -0.0352
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 4508,
+     "landed_pct": 0.1051,
+     "mean_predicted": 0.1109,
+     "median_fair_odds": 9.49,
+     "predicted_minus_landed": 0.0058,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 1312,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.03,
+     "fair_return_ci": [
+      -0.076,
+      0.1413
+     ],
+     "fixture_coverage": 0.0306,
+     "landed": 263,
+     "landed_pct": 0.2005,
+     "mean_predicted": 0.1941,
+     "median_fair_odds": 5.315,
+     "predicted_minus_landed": -0.0064,
+     "round_dates": 536,
+     "selections": 1312,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Home team ahead at half-time, home win at full-time and both teams score",
+   "market": "HTFT_COMBO:1-1&gg"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0297,
+     "fair_return_ci": [
+      -0.0547,
+      -0.0043
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 6538,
+     "landed_pct": 0.1524,
+     "mean_predicted": 0.1563,
+     "median_fair_odds": 6.913,
+     "predicted_minus_landed": 0.0039,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2719,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0029,
+     "fair_return_ci": [
+      -0.0719,
+      0.0685
+     ],
+     "fixture_coverage": 0.0634,
+     "landed": 648,
+     "landed_pct": 0.2383,
+     "mean_predicted": 0.2403,
+     "median_fair_odds": 4.369,
+     "predicted_minus_landed": 0.002,
+     "round_dates": 686,
+     "selections": 2719,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Home team ahead at half-time, home win at full-time and not both teams score",
+   "market": "HTFT_COMBO:1-1&ng"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0285,
+     "fair_return_ci": [
+      -0.0654,
+      0.0087
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 2567,
+     "landed_pct": 0.0598,
+     "mean_predicted": 0.0611,
+     "median_fair_odds": 16.359,
+     "predicted_minus_landed": 0.0013,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": null,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": null,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 0,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": null,
+     "fair_return_ci": [
+      null,
+      null
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 0,
+     "landed_pct": null,
+     "mean_predicted": null,
+     "median_fair_odds": null,
+     "predicted_minus_landed": null,
+     "round_dates": 0,
+     "selections": 0,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, home win at full-time and both teams score",
+   "market": "HTFT_COMBO:X-1&gg"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0407,
+     "fair_return_ci": [
+      -0.0727,
+      -0.0077
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 3641,
+     "landed_pct": 0.0849,
+     "mean_predicted": 0.0883,
+     "median_fair_odds": 11.191,
+     "predicted_minus_landed": 0.0034,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 44,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.1638,
+     "fair_return_ci": [
+      -0.473,
+      0.8753
+     ],
+     "fixture_coverage": 0.001,
+     "landed": 9,
+     "landed_pct": 0.2045,
+     "mean_predicted": 0.1777,
+     "median_fair_odds": 5.739,
+     "predicted_minus_landed": -0.0268,
+     "round_dates": 42,
+     "selections": 44,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, home win at full-time and not both teams score",
+   "market": "HTFT_COMBO:X-1&ng"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0075,
+     "fair_return_ci": [
+      -0.0409,
+      0.0247
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 3562,
+     "landed_pct": 0.083,
+     "mean_predicted": 0.0834,
+     "median_fair_odds": 11.321,
+     "predicted_minus_landed": 0.0003,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": null,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": null,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 0,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": null,
+     "fair_return_ci": [
+      null,
+      null
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 0,
+     "landed_pct": null,
+     "mean_predicted": null,
+     "median_fair_odds": null,
+     "predicted_minus_landed": null,
+     "round_dates": 0,
+     "selections": 0,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, draw at full-time and both teams score",
+   "market": "HTFT_COMBO:X-X&gg"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0755,
+     "fair_return_ci": [
+      -0.1216,
+      -0.03
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 1888,
+     "landed_pct": 0.044,
+     "mean_predicted": 0.048,
+     "median_fair_odds": 21.412,
+     "predicted_minus_landed": 0.004,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": null,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": null,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 0,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": null,
+     "fair_return_ci": [
+      null,
+      null
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 0,
+     "landed_pct": null,
+     "mean_predicted": null,
+     "median_fair_odds": null,
+     "predicted_minus_landed": null,
+     "round_dates": 0,
+     "selections": 0,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, away win at full-time and both teams score",
+   "market": "HTFT_COMBO:X-2&gg"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0281,
+     "fair_return_ci": [
+      -0.0664,
+      0.0136
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 2846,
+     "landed_pct": 0.0663,
+     "mean_predicted": 0.0674,
+     "median_fair_odds": 14.954,
+     "predicted_minus_landed": 0.0011,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 1.8548,
+     "fair_return_ci": [
+      -1.0,
+      4.7097
+     ],
+     "fixture_coverage": 0.0,
+     "landed": 1,
+     "landed_pct": 0.5,
+     "mean_predicted": 0.1744,
+     "median_fair_odds": 5.733,
+     "predicted_minus_landed": -0.3256,
+     "round_dates": 2,
+     "selections": 2,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "Level at half-time, away win at full-time and not both teams score",
+   "market": "HTFT_COMBO:X-2&ng"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0433,
+     "fair_return_ci": [
+      -0.0819,
+      -0.0061
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 3367,
+     "landed_pct": 0.0785,
+     "mean_predicted": 0.081,
+     "median_fair_odds": 13.536,
+     "predicted_minus_landed": 0.0025,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 364,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0007,
+     "fair_return_ci": [
+      -0.2073,
+      0.1975
+     ],
+     "fixture_coverage": 0.0085,
+     "landed": 70,
+     "landed_pct": 0.1923,
+     "mean_predicted": 0.1916,
+     "median_fair_odds": 5.423,
+     "predicted_minus_landed": -0.0007,
+     "round_dates": 277,
+     "selections": 364,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Away team ahead at half-time, away win at full-time and both teams score",
+   "market": "HTFT_COMBO:2-2&gg"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0521,
+     "fair_return_ci": [
+      -0.0844,
+      -0.0178
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 4247,
+     "landed_pct": 0.099,
+     "mean_predicted": 0.1029,
+     "median_fair_odds": 10.699,
+     "predicted_minus_landed": 0.0039,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 864,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.056,
+     "fair_return_ci": [
+      -0.1811,
+      0.0765
+     ],
+     "fixture_coverage": 0.0201,
+     "landed": 161,
+     "landed_pct": 0.1863,
+     "mean_predicted": 0.1986,
+     "median_fair_odds": 5.282,
+     "predicted_minus_landed": 0.0122,
+     "round_dates": 470,
+     "selections": 864,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "Away team ahead at half-time, away win at full-time and not both teams score",
+   "market": "HTFT_COMBO:2-2&ng"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0114,
+     "fair_return_ci": [
+      -0.0196,
+      -0.0027
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 26197,
+     "landed_pct": 0.6106,
+     "mean_predicted": 0.6157,
+     "median_fair_odds": 1.59,
+     "predicted_minus_landed": 0.0051,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 3532,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0128,
+     "fair_return_ci": [
+      -0.0283,
+      0.0021
+     ],
+     "fixture_coverage": 0.0823,
+     "landed": 2922,
+     "landed_pct": 0.8273,
+     "mean_predicted": 0.8377,
+     "median_fair_odds": 1.198,
+     "predicted_minus_landed": 0.0104,
+     "round_dates": 710,
+     "selections": 3532,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "1X at half-time, 1X at full-time",
+   "market": "HTFT_DC:1X-1X"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0268,
+     "fair_return_ci": [
+      -0.0354,
+      -0.0183
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 22966,
+     "landed_pct": 0.5353,
+     "mean_predicted": 0.5497,
+     "median_fair_odds": 1.849,
+     "predicted_minus_landed": 0.0144,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2691,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0142,
+     "fair_return_ci": [
+      -0.0073,
+      0.0354
+     ],
+     "fixture_coverage": 0.0627,
+     "landed": 2024,
+     "landed_pct": 0.7521,
+     "mean_predicted": 0.7413,
+     "median_fair_odds": 1.379,
+     "predicted_minus_landed": -0.0108,
+     "round_dates": 668,
+     "selections": 2691,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "1X at half-time, 12 at full-time",
+   "market": "HTFT_DC:1X-12"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0199,
+     "fair_return_ci": [
+      0.0053,
+      0.0345
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 14655,
+     "landed_pct": 0.3416,
+     "mean_predicted": 0.3343,
+     "median_fair_odds": 2.847,
+     "predicted_minus_landed": -0.0073,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 850,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0159,
+     "fair_return_ci": [
+      -0.0715,
+      0.1024
+     ],
+     "fixture_coverage": 0.0198,
+     "landed": 352,
+     "landed_pct": 0.4141,
+     "mean_predicted": 0.4074,
+     "median_fair_odds": 2.456,
+     "predicted_minus_landed": -0.0067,
+     "round_dates": 470,
+     "selections": 850,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "1X at half-time, X2 at full-time",
+   "market": "HTFT_DC:1X-X2"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.032,
+     "fair_return_ci": [
+      0.019,
+      0.0455
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 16699,
+     "landed_pct": 0.3892,
+     "mean_predicted": 0.3764,
+     "median_fair_odds": 2.707,
+     "predicted_minus_landed": -0.0128,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 3080,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0331,
+     "fair_return_ci": [
+      0.0022,
+      0.0648
+     ],
+     "fixture_coverage": 0.0718,
+     "landed": 1798,
+     "landed_pct": 0.5838,
+     "mean_predicted": 0.5641,
+     "median_fair_odds": 1.808,
+     "predicted_minus_landed": -0.0196,
+     "round_dates": 687,
+     "selections": 3080,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "12 at half-time, 1X at full-time",
+   "market": "HTFT_DC:12-1X"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0148,
+     "fair_return_ci": [
+      -0.025,
+      -0.0047
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 20788,
+     "landed_pct": 0.4845,
+     "mean_predicted": 0.491,
+     "median_fair_odds": 2.084,
+     "predicted_minus_landed": 0.0065,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 593,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0079,
+     "fair_return_ci": [
+      -0.0641,
+      0.0502
+     ],
+     "fixture_coverage": 0.0138,
+     "landed": 384,
+     "landed_pct": 0.6476,
+     "mean_predicted": 0.6515,
+     "median_fair_odds": 1.538,
+     "predicted_minus_landed": 0.0039,
+     "round_dates": 365,
+     "selections": 593,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "12 at half-time, 12 at full-time",
+   "market": "HTFT_DC:12-12"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0648,
+     "fair_return_ci": [
+      0.048,
+      0.0826
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 13095,
+     "landed_pct": 0.3052,
+     "mean_predicted": 0.289,
+     "median_fair_odds": 3.56,
+     "predicted_minus_landed": -0.0162,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 3015,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0445,
+     "fair_return_ci": [
+      0.0032,
+      0.0841
+     ],
+     "fixture_coverage": 0.0703,
+     "landed": 1416,
+     "landed_pct": 0.4697,
+     "mean_predicted": 0.4501,
+     "median_fair_odds": 2.277,
+     "predicted_minus_landed": -0.0195,
+     "round_dates": 715,
+     "selections": 3015,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "12 at half-time, X2 at full-time",
+   "market": "HTFT_DC:12-X2"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0167,
+     "fair_return_ci": [
+      0.0048,
+      0.0292
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 16260,
+     "landed_pct": 0.379,
+     "mean_predicted": 0.3717,
+     "median_fair_odds": 2.595,
+     "predicted_minus_landed": -0.0072,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 30,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.2179,
+     "fair_return_ci": [
+      -0.6083,
+      0.1968
+     ],
+     "fixture_coverage": 0.0007,
+     "landed": 10,
+     "landed_pct": 0.3333,
+     "mean_predicted": 0.4284,
+     "median_fair_odds": 2.344,
+     "predicted_minus_landed": 0.095,
+     "round_dates": 27,
+     "selections": 30,
+     "small_sample": true
+    }
+   },
+   "exploratory": true,
+   "label": "X2 at half-time, 1X at full-time",
+   "market": "HTFT_DC:X2-1X"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0237,
+     "fair_return_ci": [
+      -0.0341,
+      -0.013
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 19706,
+     "landed_pct": 0.4593,
+     "mean_predicted": 0.4706,
+     "median_fair_odds": 2.17,
+     "predicted_minus_landed": 0.0113,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 2428,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.0154,
+     "fair_return_ci": [
+      -0.0447,
+      0.0139
+     ],
+     "fixture_coverage": 0.0566,
+     "landed": 1530,
+     "landed_pct": 0.6301,
+     "mean_predicted": 0.6393,
+     "median_fair_odds": 1.586,
+     "predicted_minus_landed": 0.0092,
+     "round_dates": 679,
+     "selections": 2428,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "X2 at half-time, 12 at full-time",
+   "market": "HTFT_DC:X2-12"
+  },
+  {
+   "actual_price_mapping": null,
+   "actual_return_note": "realised historical return not measurable from current data",
+   "cohorts": {
+    "ranked": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 42904,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": -0.016,
+     "fair_return_ci": [
+      -0.027,
+      -0.0044
+     ],
+     "fixture_coverage": 1.0,
+     "landed": 21250,
+     "landed_pct": 0.4953,
+     "mean_predicted": 0.4997,
+     "median_fair_odds": 1.97,
+     "predicted_minus_landed": 0.0044,
+     "round_dates": 891,
+     "selections": 42904,
+     "small_sample": false
+    },
+    "strict": {
+     "actual_bookmaker_return": {
+      "mapped_coverage": 0.0,
+      "market_mapped_selections": 0,
+      "measurement": "realised historical return not measurable from current data",
+      "priced_coverage": 0.0,
+      "priced_of_mapped": null,
+      "priced_selections": 0,
+      "return": null,
+      "return_ci": [
+       null,
+       null
+      ],
+      "round_dates": 0,
+      "scope_warning": "No exact mapped pre-match price supports an actual-return estimate."
+     },
+     "covered_fixtures": 4439,
+     "eligible_candidates": 42904,
+     "eligible_fixtures": 42904,
+     "eligible_round_dates": 891,
+     "fair_return": 0.0123,
+     "fair_return_ci": [
+      -0.0072,
+      0.0311
+     ],
+     "fixture_coverage": 0.1035,
+     "landed": 3133,
+     "landed_pct": 0.7058,
+     "mean_predicted": 0.6967,
+     "median_fair_odds": 1.462,
+     "predicted_minus_landed": -0.0091,
+     "round_dates": 742,
+     "selections": 4439,
+     "small_sample": false
+    }
+   },
+   "exploratory": true,
+   "label": "X2 at half-time, X2 at full-time",
+   "market": "HTFT_DC:X2-X2"
+  }
+ ],
+ "limitations": [
+  "Fair-odds returns do not establish realised profitability.",
+  "Only the five explicit Bet365 mappings can support historical actual-bookmaker subset returns.",
+  "HT/FT realised historical return is not measurable from current data.",
+  "Failure reasons overlap and are non-exclusive; rejected candidates are not a one-per-match strategy.",
+  "All intervals are unadjusted despite multiple group, check and exploratory-market comparisons.",
+  "No optimal group, rule or filter is selected from observed returns."
+ ],
+ "methodology": {
+  "actual_odds": "Optional exact Bet365 pre-match priced-subset returns only. No average, closing, similar-market, synthetic-margin or Mozzart substitution. Missing mappings/prices produce no actual-return claim.",
+  "bootstrap": {
+   "interval": "95% percentile CI; dates resampled with replacement; ratio of summed returns to summed selections",
+   "multiple_comparisons": "Intervals are unadjusted across all groups, checks and exploratory markets.",
+   "resamples": 2000,
+   "seed": 20261025,
+   "unit": "round date"
+  },
+  "calibration": "picker.json season_factors fitted on seasons before each target season by picker_backtest; the target season's mapping only is applied. 2019-20 has no fitted factors and uses 1.0.",
+  "coverage": "Covered/eligible settleable fixtures. Rejected diagnostics also report rejected/eligible candidates.",
+  "htft_exploratory": "Every visible HT/FT-group market is reported separately, including combination/double-chance members. These are secondary exploratory multiple comparisons, not confirmed strategies.",
+  "interpretation": "Fair-odds return is model-price accounting, not realised profit. Landed approximately equal to predicted supports calibration only. Ranked, Strict and rejected cohorts differ in composition; their contrast is descriptive and not a causal paired comparison. No cohort is selected as best.",
+  "minimum_fair_odds": "Any odds (no floor)",
+  "numeric_precision": "Unrounded internal probabilities, matching the existing TYPE_RULE backtest. The live round JSON rounds pc to four decimals; fair-return calculations here do not use the two-decimal fair-odds display string.",
+  "probability": "Displayed pc = raw goals-model p x target-season group/band calibration factor, clipped to [0.001, 0.999]; fair odds = 1/pc. Raw p is used only for t4 agreement.",
+  "ranked": "One highest-pc visible candidate per match per group; single market keeps every eligible fixture; pc descending.",
+  "research_only": true,
+  "settlement": "Flat one-unit stake; fair profit = fair - 1 when landed and -1 when lost. Unsettleable selected rows are excluded.",
+  "small_sample_rule": "Flagged when selections < 200 or contributing round dates < 30; descriptive caution, not a significance test.",
+  "strict": "TYPE_RULE exactly; one highest-pc passing candidate per match per group; single market keeps every passing fixture.",
+  "strict_rejected": "Every settleable visible group candidate failing at least one TYPE_RULE check before one-per-match selection. Candidate-level diagnostic only; not a selected-pick cohort.",
+  "walk_forward": "For every division and Tuesday/Saturday/Sunday round, goals and empirical rates use only matches strictly before that date; at least 200 prior division matches are required."
+ },
+ "round_weekdays": [
+  "Tuesday",
+  "Saturday",
+  "Sunday"
+ ],
+ "rule": {
+  "agreement_fraction": 0.25,
+  "max_fair_odds": 6.0,
+  "min_agreement": 0.05,
+  "min_lift_multiplier": 1.25,
+  "min_lift_points": 0.03,
+  "min_record_n": 8
+ },
+ "schema_version": 1,
+ "seasons": [
+  "2019-20",
+  "2020-21",
+  "2021-22",
+  "2022-23",
+  "2023-24",
+  "2024-25",
+  "2025-26"
+ ],
+ "strict_parity": {
+  "compared_fields": [
+   "picks",
+   "rounds",
+   "picks_per_round",
+   "landed",
+   "predicted",
+   "return",
+   "return_ci"
+  ],
+  "groups": [
+   {
+    "differences": {},
+    "group": "Combos",
+    "matches": true
+   },
+   {
+    "differences": {},
+    "group": "HT/FT",
+    "matches": true
+   },
+   {
+    "differences": {},
+    "group": "Goals",
+    "matches": true
+   },
+   {
+    "differences": {},
+    "group": "BTTS",
+    "matches": true
+   },
+   {
+    "differences": {},
+    "group": "Half-time",
+    "matches": true
+   },
+   {
+    "differences": {},
+    "group": "Team goals",
+    "matches": true
+   },
+   {
+    "differences": {},
+    "group": "Result & double chance",
+    "matches": true
+   }
+  ],
+  "reference": "web/public/data/type_backtest.json",
+  "status": "exact"
+ }
+}

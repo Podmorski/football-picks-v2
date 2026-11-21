@@ -278,6 +278,42 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   per match, plus neutral diagnostics (league usual/lift, team records, team empirical/agreement, fair,
   Pass / Does not pass). Report's TYPE_RULE table is the STRICT_checks cohort, not Ranked; Ranked
   profitability is not established.
+- Task 14 (21 Nov): the complete Ranked/Strict walk-forward audit is
+  `pipeline/model/ranked_backtest.py`, with synthetic contracts in `tests/test_ranked_backtest.py` and
+  aggregate-only output in `web/public/data/ranked_backtest.json`. It uses the same 22 divisions,
+  2019-20..2025-26, Tuesday/Saturday/Sunday rounds, half-life 365, pre-round goals/empirical fitting and
+  `picker.json` target-season factors as the TYPE_RULE backtest. Displayed probability is calibrated `pc`
+  (raw p × group/band factor, clipped to .001-.999), fair is `1/pc`, and raw p is used only by t4. Any odds
+  means no floor. Strict reproduced every compared field in `type_backtest.json` exactly before the file
+  was written. Ranked is one highest-pc candidate per match; Strict is one highest-pc passing candidate;
+  the separate rejected diagnostic is EVERY settleable visible candidate failing Strict before selection,
+  not a strategy or paired causal cohort. Return CIs use 2000 date-cluster bootstrap draws, seed 20261025.
+  Full run: 9m03s, Strict parity exact; 42,904/42,939 eligible fixtures per group depending on HT coverage.
+  Strict fixture coverage is Combos 37.98%, HT/FT 42.30%, Goals 13.96%, BTTS 4.37%, Half-time 34.59%,
+  Team goals 43.24%, Result & DC 36.17%. Ranked landed/predicted is respectively
+  .5893/.5883, .6814/.6821, .9353/.9324, .8077/.8115, .8865/.8872, .8035/.7994, .7724/.7717;
+  Strict is .5011/.4922, .5366/.5373, .4043/.3987, .3601/.3739, .5510/.5483, .5487/.5489,
+  .6094/.6027. The rejected candidate cohorts are 94.75%-99.28% of eligible candidates by group and
+  their predicted-minus-landed differences range from -0.88 to +0.17 percentage points. Strict therefore
+  removes substantial coverage without a consistent calibration improvement; this is descriptive, not a
+  causal or profitability conclusion. Non-exclusive t1/t3/t4/t6 counts, fixture counts, sample sizes,
+  outcomes and all fair-return CIs are in the JSON; t1 and t3 are the broadest checks, and overlaps matter.
+  All 31 visible HT/FT-group markets are reported separately as secondary exploratory cohorts, including
+  zero-selection Strict markets and small-sample warnings. Seven have zero Strict selections; the Strict
+  HTFT_COMBO:X-1&ng, X-2&ng and HTFT_DC:X2-1X cohorts have only 44, 2 and 30 selections. Do not cherry-pick
+  the positive fair-return tails across these multiple comparisons. HT/FT realised historical return is
+  not measurable from current data.
+  Exact historical actual-bookmaker mappings are only RESULT:1/X/2 -> Bet365 PRE-MATCH B365H/D/A,
+  GOAL_RANGE_FT:3+ -> B365>2.5 and GOAL_RANGE_FT:0-2 -> B365<2.5. No average/closing/similar-market or
+  Mozzart substitution. No primary Ranked cohort has a mapped selected row, so its realised return is
+  unknown. Strict Goals has 1,487 priced of 5,996 selections (24.80%), actual-subset return +0.68%,
+  95% CI -2.96%..+4.49%; Strict Result & DC has 4,639 of 15,531 (29.87%), -3.05%, CI -5.69%..-0.18%.
+  These are priced subsets, not whole-group realised returns. Other markets lack exact historical prices.
+  Fair-odds return is model-price accounting, never evidence of positive expected value by itself.
+  Regenerate the complete audit (no season/division shortening) with
+  `/home/nikola/.venvs/picks-v2/bin/python -m pipeline.model.ranked_backtest` from the repo root. It refuses
+  to write if Strict parity differs. The site does not read `ranked_backtest.json`; no selection, rule,
+  threshold, UI, workflow, price or existing generated-data behaviour was changed.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`
@@ -286,9 +322,12 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Open items
 
-- **Ranked group/market mode is not backtested**: no profitability, return or confidence-interval
-  claim. The existing TYPE_RULE research table is the Strict cohort only; a separate walk-forward
-  audit will follow. Do not present the TYPE_RULE returns as Ranked performance.
+- **Ranked audit complete; realised profitability remains mostly unmeasured**: Task 14's aggregate
+  `ranked_backtest.json` covers Ranked, Strict, rejected-candidate diagnostics and exploratory HT/FT
+  markets with fair-return CIs. It is research output only, not presented by the site as a strategy.
+  Fair-odds returns are not realised profit; no primary Ranked cohort has exact historical bookmaker
+  coverage, and HT/FT actual returns are not measurable from current data. Do not select an optimal
+  group/check from observed returns or make causal claims from the different cohorts.
 
 - **Rounds are pending by design**: 21 Nov (70 default passing picks) and 22 Nov (19) have no
   results until the Mon 12:00 settle; `/rounds` and Best bets show "Results pending" until then.
