@@ -59004,34 +59004,6 @@
  },
  "upcoming": [
   {
-   "away": "AEK",
-   "best": {
-    "a": "AEK",
-    "an": 186,
-    "ar": 0.1034,
-    "c": "Low",
-    "d": "G1",
-    "ft": null,
-    "h": "Kalamata",
-    "hn": 5,
-    "hr": 0.0,
-    "ht": null,
-    "k": "17:30",
-    "ln": 2697,
-    "lr": 0.0497,
-    "m": "MARGIN:HH 2 3+",
-    "p": 0.2775,
-    "pc": 0.2775,
-    "pl": 0.2775,
-    "pp": 0.2775,
-    "s": 1.9934,
-    "st": "pending"
-   },
-   "date": "2026-11-21",
-   "home": "Kalamata",
-   "time": "17:30"
-  },
-  {
    "away": "Atromitos",
    "best": {
     "a": "Atromitos",

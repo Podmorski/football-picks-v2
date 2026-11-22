@@ -83149,62 +83149,6 @@
  },
  "upcoming": [
   {
-   "away": "Montpellier",
-   "best": {
-    "a": "Montpellier",
-    "an": 23,
-    "ar": 0.2858,
-    "c": "Medium",
-    "d": "F2",
-    "ft": null,
-    "h": "Laval",
-    "hn": 116,
-    "hr": 0.2373,
-    "ht": null,
-    "k": "13:00",
-    "ln": 4038,
-    "lr": 0.2215,
-    "m": "RESULT_AND_GOALS:2&2+",
-    "p": 0.3742,
-    "pc": 0.3742,
-    "pl": 0.3742,
-    "pp": 0.3742,
-    "s": 0.7423,
-    "st": "pending"
-   },
-   "date": "2026-11-21",
-   "home": "Laval",
-   "time": "13:00"
-  },
-  {
-   "away": "St Etienne",
-   "best": {
-    "a": "St Etienne",
-    "an": 61,
-    "ar": 0.2858,
-    "c": "Medium",
-    "d": "F2",
-    "ft": null,
-    "h": "Reims",
-    "hn": 61,
-    "hr": 0.1065,
-    "ht": null,
-    "k": "19:00",
-    "ln": 4038,
-    "lr": 0.2215,
-    "m": "RESULT_AND_GOALS:2&2+",
-    "p": 0.3564,
-    "pc": 0.3564,
-    "pl": 0.3564,
-    "pp": 0.3564,
-    "s": 0.6659,
-    "st": "pending"
-   },
-   "date": "2026-11-21",
-   "home": "Reims",
-   "time": "19:00"
-  },
-  {
    "away": "Grenoble",
    "best": {
     "a": "Grenoble",
