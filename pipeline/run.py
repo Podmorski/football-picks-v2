@@ -61,6 +61,17 @@ def write_json(path: Path, payload: dict) -> int:
     return path.stat().st_size
 
 
+def existing_upcoming(path: Path) -> list:
+    """Keep predictions across a data-only refresh; run_model may replace them later."""
+    if not path.exists():
+        return []
+    try:
+        upcoming = json.loads(path.read_text(encoding="utf-8")).get("upcoming", [])
+    except (OSError, ValueError):
+        return []
+    return upcoming if isinstance(upcoming, list) else []
+
+
 def table_cell(stat: list) -> str:
     n, _hits, rate, lo, hi = stat
     if not n or rate is None:
@@ -254,7 +265,7 @@ def main(argv: list[str] | None = None) -> int:
             "focus_season": focus,
             "teams": compact_teams(document.pop("teams")),
             "top10": document.pop("top10"),
-            "upcoming": [],
+            "upcoming": existing_upcoming(out_dir / "teams" / f"{league.code}.json"),
         }
         size = write_json(out_dir / f"{league.code}.json", document)
         teams_size = write_json(out_dir / "teams" / f"{league.code}.json", teams_document)
@@ -316,11 +327,11 @@ def main(argv: list[str] | None = None) -> int:
         teams_document = {
             "schema": SCHEMA,
             "code": league.code,
-            "name": league_name,
+            "name": league.name or parsed_extra.league_name,
             "focus_season": focus,
             "teams": compact_teams(document.pop("teams")),
             "top10": document.pop("top10"),
-            "upcoming": [],
+            "upcoming": existing_upcoming(out_dir / "teams" / f"{league.code}.json"),
         }
         size = write_json(out_dir / f"{league.code}.json", document)
         teams_size = write_json(out_dir / "teams" / f"{league.code}.json", teams_document)

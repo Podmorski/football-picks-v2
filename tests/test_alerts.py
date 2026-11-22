@@ -24,9 +24,10 @@ def test_low_price_coverage_needs_a_fetch_below_half() -> None:
 
 def test_stale_settle_needs_results_and_pending_rows() -> None:
     assert alerts.stale_settle("2026-11-21", 10, False, 10)
-    assert alerts.stale_settle("2026-11-21", 10, True, 10) is None
+    assert "still pending" in alerts.stale_settle("2026-11-21", 10, True, 10)
     assert alerts.stale_settle("2026-11-21", 0, False, 10) is None
     assert alerts.stale_settle("2026-11-21", 10, False, 0) is None
+    assert alerts.stale_settle("2026-11-21", 10, True, 0) is None
 
 
 def test_price_cli_wires_the_coverage_alert() -> None:

@@ -1,6 +1,6 @@
 """Build the model, publish rounds in both views, settle them, refresh site data.
 
-Usage: python -m pipeline.run_model [--today DATE] [--skip-backtest] [--no-publish]
+Usage: python -m pipeline.run_model [--today DATE] [--skip-backtest] [--no-publish] [--settle-only]
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from pathlib import Path
 
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
 from .extras import parse_extra_csv
-from .fixtures import Fixture, fixtures_for_date, last_saturday, parse_fixtures, round_dates_for
+from .fixtures import ROUND_WEEKDAYS, Fixture, fixtures_for_date, last_saturday, parse_fixtures, round_dates_for
 from . import alerts, ranking, report
 from .model import backtest, live, ranking_backtest
 from .parse import parse_season_csv
@@ -134,6 +134,133 @@ def is_settle_only(day: dt.date) -> bool:
     return day.weekday() == 0
 
 
+def settlement_due_date(round_date: dt.date) -> dt.date:
+    """Tuesday, Saturday and Sunday rounds become eligible the next day."""
+    if round_date.weekday() not in ROUND_WEEKDAYS:
+        raise ValueError(f"not a round day: {round_date}")
+    return round_date + dt.timedelta(days=1)
+
+
+def settlement_eligible(round_date: dt.date, today: dt.date) -> bool:
+    """Eligible past round days only; same-day/future fixtures are never settled."""
+    if round_date.weekday() not in ROUND_WEEKDAYS:
+        return False
+    return settlement_due_date(round_date) <= today
+
+
+def _pending(document: dict, results: dict) -> dict:
+    iso = document["date"]
+    rows = [row for row in document.get("rows", []) if row.get("st") in (None, "pending")]
+    with_results = [row for row in rows if (iso, row["h"], row["a"]) in results]
+    without_results = [row for row in rows if (iso, row["h"], row["a"]) not in results]
+    return {
+        "rows": len(rows),
+        "with_results": len(with_results),
+        "without_results": len(without_results),
+        "missing_fixtures": {(row["h"], row["a"]) for row in without_results},
+    }
+
+
+def _transitions(before: list, after: list) -> dict:
+    counts = {"landed": 0, "lost": 0, "void": 0}
+    for old, new in zip(before, after):
+        if old in (None, "pending") and new in counts:
+            counts[new] += 1
+    return counts
+
+
+def settle_documents(document: dict, full: dict | None, results: dict, today: dt.date) -> dict:
+    """Settle a main round and its companion without inventing missing results.
+
+    ``ranking.settle_document`` is deliberately called without ``today``: its
+    optional past-date mode marks absent results void. Next-day settlement must
+    instead leave those rows pending for a later retry. An available FT result
+    with no HT score can still void only the markets that require HT.
+    """
+    round_date = dt.date.fromisoformat(document["date"])
+    if not settlement_eligible(round_date, today):
+        return {"eligible": False, "changed": False}
+
+    before_main = [row.get("st") for row in document.get("rows", [])]
+    before_full = [row.get("st") for row in (full or {}).get("rows", [])]
+    main_changed = ranking.settle_document(document, results)
+    full_changed = ranking.settle_document(full, results) if full is not None else False
+
+    main_pending = _pending(document, results)
+    full_pending = _pending(full, results) if full is not None else {"rows": 0, "with_results": 0, "without_results": 0, "missing_fixtures": set()}
+    main = {
+        "present": True,
+        **_transitions(before_main, [row.get("st") for row in document.get("rows", [])]),
+        "pending": main_pending["rows"],
+    }
+    companion = {
+        "present": full is not None,
+        **_transitions(before_full, [row.get("st") for row in (full or {}).get("rows", [])]),
+        "pending": full_pending["rows"],
+    }
+    return {
+        "eligible": True,
+        "changed": main_changed or full_changed,
+        "main_changed": main_changed,
+        "full_changed": full_changed,
+        "main": main,
+        "full": companion,
+        "landed": main["landed"] + companion["landed"],
+        "lost": main["lost"] + companion["lost"],
+        "void": main["void"] + companion["void"],
+        "pending": main_pending["rows"] + full_pending["rows"],
+        "pending_with_results": main_pending["with_results"] + full_pending["with_results"],
+        "pending_without_results": main_pending["without_results"] + full_pending["without_results"],
+        "missing_fixtures": len(main_pending["missing_fixtures"] | full_pending["missing_fixtures"]),
+    }
+
+
+def settle_round_files(
+    round_date: dt.date, results: dict, today: dt.date, picks_dir: Path, web_dir: Path, *, write: bool = True,
+) -> dict | None:
+    """Load, settle and conditionally republish one round and its full companion."""
+    path = picks_dir / f"{round_date.isoformat()}.json"
+    if not path.exists():
+        return None
+    document = ranking.load(path)
+    full_path = picks_dir / f"{round_date.isoformat()}.full.json"
+    full = ranking.load(full_path) if full_path.exists() else None
+    outcome = settle_documents(document, full, results, today)
+    if not outcome["eligible"]:
+        return outcome
+    if write and outcome["main_changed"]:
+        ranking.publish(document, picks_dir, web_dir)
+    if write and outcome["full_changed"] and full is not None:
+        ranking.publish_full(full, picks_dir, web_dir)
+    return outcome
+
+
+def log_settlement(round_date: dt.date, outcome: dict | None) -> None:
+    if not outcome or not outcome["eligible"]:
+        return
+    if outcome["changed"]:
+        print(
+            f"round {round_date}: main landed {outcome['main']['landed']}, lost {outcome['main']['lost']}, "
+            f"void {outcome['main']['void']}; full landed {outcome['full']['landed']}, "
+            f"lost {outcome['full']['lost']}, void {outcome['full']['void']}"
+        )
+    if outcome["pending_without_results"]:
+        print(
+            f"round {round_date}: SOURCE PENDING — {outcome['missing_fixtures']} fixtures have no "
+            f"football-data result; {outcome['pending_without_results']} rows remain pending"
+        )
+    if outcome["pending_with_results"]:
+        print(f"round {round_date}: {outcome['pending_with_results']} source-backed rows remain pending")
+
+
+def rebuild_round_reports(picks_dir: Path, web_dir: Path) -> tuple[dict, dict]:
+    """Rebuild the round index and Best bets Report in their established paths."""
+    (web_dir / "rounds").mkdir(parents=True, exist_ok=True)
+    index = ranking.rebuild_index(picks_dir, web_dir / "rounds")
+    best_bets = report.build(picks_dir, web_dir)
+    return index, best_bets
+
+
 def market_band_map(ranking_bt: dict) -> dict:
     """Group|band -> the row confidence_badge expects (landed, shown, n)."""
     return {
@@ -152,6 +279,7 @@ def parse_args(argv=None):
     parser.add_argument("--skip-backtest", action="store_true", help="reuse decisions.json / model.json")
     parser.add_argument("--no-publish", action="store_true", help="compute but do not write round files")
     parser.add_argument("--skip-picker-backtest", action="store_true")
+    parser.add_argument("--settle-only", action="store_true", help="settle every eligible past round; never publish predictions")
     return parser.parse_args(argv)
 
 
@@ -220,7 +348,7 @@ def main(argv=None) -> int:
     picker_factors = {}
     if PICKER_JSON.exists():
         picker_factors = json.loads(PICKER_JSON.read_text(encoding="utf-8")).get("factors", {})
-    settle_only = is_settle_only(today)
+    settle_only = args.settle_only or is_settle_only(today)
 
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
     divisions_set = {league.code for league in divisions}
@@ -246,24 +374,17 @@ def main(argv=None) -> int:
         published_now = 0
         if action == "settle" and existing is not None:
             iso = round_date.isoformat()
-            pending_with_results = sum(
-                1 for row in existing.get("rows", [])
-                if row.get("st") in (None, "pending") and (iso, row["h"], row["a"]) in results
-            )
             results_count = sum(1 for key in results if key[0] == iso)
-            changed = ranking.settle_document(existing, results, today)
-            full_path = PICKS_DIR / f"{round_date.isoformat()}.full.json"
-            full_changed = False
-            if full_path.exists():
-                full = ranking.load(full_path)
-                full_changed = ranking.settle_document(full, results, today)
-                if full_changed and not args.no_publish:
-                    ranking.publish_full(full, PICKS_DIR, ROUNDS_DIR)
-            if changed and not args.no_publish:
-                ranking.publish(existing, PICKS_DIR, ROUNDS_DIR)
-            alert = alerts.stale_settle(round_date, results_count, changed or full_changed, pending_with_results)
+            outcome = settle_round_files(
+                round_date, results, today, PICKS_DIR, ROUNDS_DIR, write=not args.no_publish,
+            )
+            alert = alerts.stale_settle(
+                round_date, results_count, bool(outcome and outcome["changed"]),
+                outcome["pending_with_results"] if outcome and outcome["eligible"] else 0,
+            )
             if alert:
                 round_alerts.append(alert)
+            log_settlement(round_date, outcome)
             print(f"round {round_date}: already published, settled only")
         elif action == "settle" and settle_only:
             print(f"round {round_date}: Monday settle-only run, nothing published")
@@ -291,51 +412,53 @@ def main(argv=None) -> int:
             if alert:
                 round_alerts.append(alert)
 
-    example_date = last_saturday(today)
-    example_fixtures = fixtures_for_date(fixtures, example_date, divisions_set) or historical_fixtures(
-        by_division, example_date, divisions_set
-    )
-    example_predictors = build_predictors(by_division, example_date, half_life, k, decisions)
-    example = ranking.build_ranking(example_predictors, example_fixtures, example_date, {**market_calibration, "__bands__": market_bands}, min_fair=0.0, excluded=set(), picker_factors=picker_factors)
-    example["kind"] = "example"
-    example["market_bands"] = market_bands
-    ranking.settle_document(example, results, today)
-    print(f"example round {example_date}: {len(example['rows'])} rows")
-    if not args.no_publish and example["rows"]:
-        ranking.publish(example, PICKS_DIR, ROUNDS_DIR)
+    if not settle_only:
+        example_date = last_saturday(today)
+        example_path = PICKS_DIR / f"{example_date.isoformat()}.json"
+        published_example = ranking.load(example_path) if example_path.exists() else None
+        if published_example and published_example.get("kind", "round") == "round" and published_example.get("rows"):
+            # A real round is never regenerated as an example: only its settlement
+            # fields may change. This also protects Saturday on Sunday retries.
+            print(f"example round {example_date}: using the already published round without rebuilding")
+        else:
+            example_fixtures = fixtures_for_date(fixtures, example_date, divisions_set) or historical_fixtures(
+                by_division, example_date, divisions_set
+            )
+            example_predictors = build_predictors(by_division, example_date, half_life, k, decisions)
+            example = ranking.build_ranking(example_predictors, example_fixtures, example_date, {**market_calibration, "__bands__": market_bands}, min_fair=0.0, excluded=set(), picker_factors=picker_factors)
+            example["kind"] = "example"
+            example["market_bands"] = market_bands
+            ranking.settle_document(example, results, today)
+            print(f"example round {example_date}: {len(example['rows'])} rows")
+            if not args.no_publish and example["rows"]:
+                ranking.publish(example, PICKS_DIR, ROUNDS_DIR)
 
+    # Every eligible past round is settled on every run. In particular, Sunday's
+    # example date (Saturday) must not be excluded from next-day settlement.
     for path in sorted(PICKS_DIR.glob("*.json")):
         if path.name.endswith(".full.json"):
             continue
-        stored = ranking.load(path)
-        if stored["date"] in (round_keys | {example_date.isoformat()}):
+        iso = path.name[:-5]
+        if iso in round_keys:
             continue
-        iso = stored["date"]
-        pending_with_results = sum(
-            1 for row in stored.get("rows", [])
-            if row.get("st") in (None, "pending") and (iso, row["h"], row["a"]) in results
-        )
+        round_date = dt.date.fromisoformat(iso)
         results_count = sum(1 for key in results if key[0] == iso)
-        changed = ranking.settle_document(stored, results, today)
-        if changed and not args.no_publish:
-            ranking.publish(stored, PICKS_DIR, ROUNDS_DIR)
-        full_path = PICKS_DIR / f"{stored['date']}.full.json"
-        full_changed = False
-        if full_path.exists():
-            full = ranking.load(full_path)
-            full_changed = ranking.settle_document(full, results, today)
-            if full_changed and not args.no_publish:
-                ranking.publish_full(full, PICKS_DIR, ROUNDS_DIR)
-        alert = alerts.stale_settle(iso, results_count, changed or full_changed, pending_with_results)
+        outcome = settle_round_files(
+            round_date, results, today, PICKS_DIR, ROUNDS_DIR, write=not args.no_publish,
+        )
+        alert = alerts.stale_settle(
+            round_date, results_count, bool(outcome and outcome["changed"]),
+            outcome["pending_with_results"] if outcome and outcome["eligible"] else 0,
+        )
         if alert:
             round_alerts.append(alert)
+        log_settlement(round_date, outcome)
 
     if args.no_publish:
         return 0
 
-    index = ranking.rebuild_index(PICKS_DIR, ROUNDS_DIR)
+    index, best_bets = rebuild_round_reports(PICKS_DIR, WEB_DATA_DIR)
     write_json(WEB_DATA_DIR / "markets.json", ranking.market_catalogue())
-    best_bets = report.build(PICKS_DIR, WEB_DATA_DIR)
     print(
         f"best bets record: {best_bets['cumulative']['landed']} of "
         f"{best_bets['cumulative']['settled']} landed"
@@ -368,36 +491,37 @@ def main(argv=None) -> int:
                 f"pred={row['mean_probability'] * 100:5.1f}% hit={row['hit_rate'] * 100:5.1f}%"
             )
 
-    upcoming = [
-        fixture
-        for fixture in fixtures
-        if fixture.div in divisions_set and today <= fixture.date <= today + dt.timedelta(days=UPCOMING_DAYS)
-    ]
-    by_div: dict[str, list] = defaultdict(list)
-    for fixture in upcoming:
-        by_div[fixture.div].append(fixture)
-
-    predictors = build_predictors(by_division, primary_round, half_life, k, decisions)
-    for code, items in by_div.items():
-        teams_path = TEAMS_DIR / f"{code}.json"
-        if not teams_path.exists():
-            continue
-        teams_document = json.loads(teams_path.read_text(encoding="utf-8"))
-        built = ranking.build_ranking(predictors, items, primary_round, {**market_calibration, "__bands__": market_bands})
-        best: dict[tuple[str, str], dict] = {}
-        for row in ranking.rank_rows(built["rows"]):
-            best.setdefault((row["h"], row["a"]), row)
-        teams_document["upcoming"] = [
-            {
-                "date": fixture.date.isoformat(),
-                "time": fixture.time,
-                "home": fixture.home,
-                "away": fixture.away,
-                "best": best.get((fixture.home, fixture.away)),
-            }
-            for fixture in sorted(items, key=lambda item: (item.date, item.home))
+    if not settle_only:
+        upcoming = [
+            fixture
+            for fixture in fixtures
+            if fixture.div in divisions_set and today <= fixture.date <= today + dt.timedelta(days=UPCOMING_DAYS)
         ]
-        write_json(teams_path, teams_document)
+        by_div: dict[str, list] = defaultdict(list)
+        for fixture in upcoming:
+            by_div[fixture.div].append(fixture)
+
+        predictors = build_predictors(by_division, primary_round, half_life, k, decisions)
+        for code, items in by_div.items():
+            teams_path = TEAMS_DIR / f"{code}.json"
+            if not teams_path.exists():
+                continue
+            teams_document = json.loads(teams_path.read_text(encoding="utf-8"))
+            built = ranking.build_ranking(predictors, items, primary_round, {**market_calibration, "__bands__": market_bands})
+            best: dict[tuple[str, str], dict] = {}
+            for row in ranking.rank_rows(built["rows"]):
+                best.setdefault((row["h"], row["a"]), row)
+            teams_document["upcoming"] = [
+                {
+                    "date": fixture.date.isoformat(),
+                    "time": fixture.time,
+                    "home": fixture.home,
+                    "away": fixture.away,
+                    "best": best.get((fixture.home, fixture.away)),
+                }
+                for fixture in sorted(items, key=lambda item: (item.date, item.home))
+            ]
+            write_json(teams_path, teams_document)
 
     totals = {
         "rounds": len(index["rounds"]),

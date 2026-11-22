@@ -107,11 +107,13 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 ## Schedule (update.yml, UTC)
 
-- Tue 10:00, 14:00, 16:00 — Tuesday round retries.
+- Tue 10:00, 14:00, 16:00 — Tuesday round retries; Wed 06:00, 12:00 — Tuesday settlement retries.
 - Fri 15:00, 18:00, 21:00 — publish BOTH weekend rounds when their fixtures exist.
 - Sat 05:00, 08:00; Sun 05:00, 08:00 — weekend retries.
-- Mon 12:00 — settle only (settles both weekend rounds), never publish.
-- Round days are Tuesday, Saturday and Sunday; Friday is never a round day.
+- Sun 12:00, 18:00 — settle-only retries for Saturday and every earlier eligible round.
+- Mon 06:00, 12:00 — settle only (Sunday, Saturday and every earlier eligible round), never publish.
+- Round days are Tuesday, Saturday and Sunday; Friday is never a round day. Every run also attempts every
+  eligible past round; missing football-data results stay Pending for the next retry rather than becoming void.
 - `prices.yml`: Sat/Sun 05:00, 06:30, 08:00, 09:30; Tue 13:00, 14:30, 16:00, 17:30 — one pass per
   round. A round that already has a snapshot exits with 0 requests; fixtures kicking off within 20 min
   of the fetch are marked started and not priced.
@@ -314,6 +316,22 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `/home/nikola/.venvs/picks-v2/bin/python -m pipeline.model.ranked_backtest` from the repo root. It refuses
   to write if Strict parity differs. The site does not read `ranked_backtest.json`; no selection, rule,
   threshold, UI, workflow, price or existing generated-data behaviour was changed.
+- Task 15 (22 Nov): automatic next-day settlement uses `run_model --settle-only` and the shared
+  `settle_round_files` path for every eligible past round and its `.full.json` companion. Only `st`, `ht`
+  and `ft` may change; same-day/future rounds are never settled, real rounds are never regenerated as
+  examples, and `pipeline.run` preserves existing team `upcoming` predictions until a normal publish run
+  replaces them. Missing football-data results stay Pending (`SOURCE PENDING`) for the next retry; an
+  available FT result can still void only HT-dependent rows. Source-backed rows still Pending after a
+  pass alert/fail, including partial settlement. Index, public Record/Report and the workflow's Value
+  record use the existing rebuild/commit/deploy-hook path. New settle-only cron retries are Sun 12:00
+  and 18:00, Mon 06:00 and Wed 06:00/12:00 UTC; Mon 12:00 remains settle-only and every other update
+  also attempts every earlier eligible round. Focused schedule/settlement/alert tests: 15 passing.
+  Full validation: 281 pytest tests passing; `npm run build` green (50 pages).
+  Live verification after the Sunday guard: the normal download made 39 requests and refreshed all 22
+  current-season main files, but the latest main-division result date was still 16 Nov with no 21 Nov
+  results. Saturday therefore changed 0 landed / 0 lost / 0 void and left all 40,792 main+companion
+  rows Pending across 122 fixtures. No timestamp-only data commit was made; Sun 12:00/18:00 remain
+  the next trusted retries.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`
@@ -329,8 +347,10 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   coverage, and HT/FT actual returns are not measurable from current data. Do not select an optimal
   group/check from observed returns or make causal claims from the different cohorts.
 
-- **Rounds are pending by design**: 21 Nov (70 default passing picks) and 22 Nov (19) have no
-  results until the Mon 12:00 settle; `/rounds` and Best bets show "Results pending" until then.
+- **Rounds await source results**: football-data had no 21 Nov results after the Sun 10:00 refresh;
+  all 40,792 Saturday main+companion rows remain Pending across 122 fixtures (0 landed/lost/void).
+  Sunday's round is not eligible until Monday. Sun 12:00/18:00, Mon 06:00/12:00 and later runs retry
+  automatically; `/rounds` and Best bets show "Results pending" until trusted results arrive.
 - **Record at Mozzart prices / Value tracking** fill after the 21/22 Nov settle (Mon 12:00) and the
   prices are frozen; 21 Nov is 93/122 priced, 22 Nov pending. The Value record is rebuilt by the next
   `update.yml` pass. **Stage A/B backtest and C9 are cancelled** — do not reintroduce them; there is

@@ -21,6 +21,13 @@ def low_price_coverage(priced: int, total: int, fetched: bool) -> str | None:
 
 
 def stale_settle(round_date, results: int, changed: bool, pending_with_results: int) -> str | None:
-    if results <= 0 or changed or pending_with_results <= 0:
+    """Source-backed rows still pending after settlement are a pipeline defect.
+
+    ``changed=False`` preserves the original unused-results alert. ``changed=True``
+    also fails when only part of the available results were applied.
+    """
+    if results <= 0 or pending_with_results <= 0:
         return None
-    return f"{round_date}: {results} results but settling changed nothing ({pending_with_results} pending)"
+    if not changed:
+        return f"{round_date}: {results} results but settling changed nothing ({pending_with_results} pending)"
+    return f"{round_date}: {pending_with_results} source-backed rows still pending after settlement"
