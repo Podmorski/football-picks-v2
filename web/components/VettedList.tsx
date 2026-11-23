@@ -512,7 +512,7 @@ export default function VettedList({
               type="button"
               onClick={() => setRound(value)}
               className={cn(
-                'min-h-9 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors',
+                'min-h-11 sm:min-h-9 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors',
                 activeDate === value
                   ? 'border-primary bg-primary text-primary-foreground'
                   : 'border-border bg-card text-muted-foreground hover:text-foreground',
@@ -650,9 +650,9 @@ export default function VettedList({
               ) : null}
               {league !== 'all' && daily.rows.length > DAILY_LIMIT ? (
                 showAll ? (
-                  <button type="button" onClick={clearShow} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show top {DAILY_LIMIT}</button>
+                  <button type="button" onClick={clearShow} className="min-h-11 sm:min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show top {DAILY_LIMIT}</button>
                 ) : (
-                  <button type="button" onClick={() => setShowParam('all')} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show all eligible games ({daily.rows.length})</button>
+                  <button type="button" onClick={() => setShowParam('all')} className="min-h-11 sm:min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show all eligible games ({daily.rows.length})</button>
                 )
               ) : null}
             </div>
@@ -694,7 +694,7 @@ export default function VettedList({
                 </p>
               )}
               {refinement !== 'all' && marketBase.length > 0 ? (
-                <button type="button" onClick={() => setRefineParam('all')} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">
+                <button type="button" onClick={() => setRefineParam('all')} className="min-h-11 sm:min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">
                   Show all {marketBase.length}
                 </button>
               ) : null}
@@ -704,7 +704,7 @@ export default function VettedList({
           {!isAny && displayed.length > 0 && refined.hidden > 0 ? (
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="text-muted-foreground">The optional refinement hides {refined.hidden} of {marketBase.length} rows.</span>
-              <button type="button" onClick={() => setRefineParam('all')} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show all</button>
+              <button type="button" onClick={() => setRefineParam('all')} className="min-h-11 sm:min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show all</button>
             </div>
           ) : null}
 
@@ -771,10 +771,10 @@ export default function VettedList({
                     </div>
 
                     <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
-                      <button type="button" onClick={() => toggleLeg(row, item.odds, item.pc)} className={cn('min-h-9 rounded-lg border px-3 text-xs font-medium transition-colors', checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
+                      <button type="button" onClick={() => toggleLeg(row, item.odds, item.pc)} className={cn('min-h-11 sm:min-h-9 rounded-lg border px-3 text-xs font-medium transition-colors', checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
                         {checked ? 'In ticket' : 'Add to ticket'}
                       </button>
-                      <button type="button" onClick={() => setExpanded(open ? null : key)} aria-label="Details" aria-expanded={open} className="ml-auto inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                      <button type="button" onClick={() => setExpanded(open ? null : key)} aria-label="Details" aria-expanded={open} className="ml-auto inline-flex min-h-11 sm:min-h-9 items-center gap-1 rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
                         <span className="hidden sm:inline">{open ? 'Hide details' : 'Details'}</span>
                         <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} aria-hidden />
                       </button>
@@ -861,7 +861,7 @@ export default function VettedList({
                       {suggestion.legs.map((leg) => <li key={legKey(leg)} className="truncate">{leg.h} v {leg.a} · {leg.label} · {pct(leg.pc)}</li>)}
                     </ul>
                     <div className="mt-2 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}</div>
-                    <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-auto min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium transition-colors hover:bg-accent">Add to my ticket</button>
+                    <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-auto min-h-11 sm:min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium transition-colors hover:bg-accent">Add to my ticket</button>
                   </>
                 ) : <p className="text-xs text-muted-foreground">No displayed ticket reaches {target.toFixed(2)}.</p>}
               </li>
@@ -878,10 +878,10 @@ export default function VettedList({
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 backdrop-blur">
           <div className="mx-auto max-w-6xl px-4 py-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="min-h-9 text-sm font-medium">My ticket · {ticket.length} legs · <span className="tabular">{pct(ticketProbability)}</span></button>
+              <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="min-h-11 sm:min-h-9 text-sm font-medium">My ticket · {ticket.length} legs · <span className="tabular">{pct(ticketProbability)}</span></button>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="min-h-9 rounded-lg border border-border px-3 text-xs font-medium hover:bg-accent">{ticketOpen ? 'Hide' : 'View'}</button>
-                <button type="button" onClick={() => setTicket([])} className="min-h-9 rounded-lg border border-border px-3 text-xs font-medium hover:bg-accent">Clear</button>
+                <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="min-h-11 sm:min-h-9 rounded-lg border border-border px-3 text-xs font-medium hover:bg-accent">{ticketOpen ? 'Hide' : 'View'}</button>
+                <button type="button" onClick={() => setTicket([])} className="min-h-11 sm:min-h-9 rounded-lg border border-border px-3 text-xs font-medium hover:bg-accent">Clear</button>
               </div>
             </div>
             {ticketOpen ? (

@@ -32,7 +32,7 @@ export default function SiteFooter() {
         </div>
         <nav aria-label="Secondary" className="flex max-w-md flex-wrap gap-x-4 gap-y-1 text-xs">
           {SECONDARY.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-foreground">
+            <Link key={link.href} href={link.href} className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">
               {link.label}
             </Link>
           ))}

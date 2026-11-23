@@ -484,7 +484,7 @@ export default function TicketsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <span className={`rounded-full border px-2 py-0.5 text-xs ${statusClass(overall)}`}>{overall}</span>
-                      <button type="button" onClick={() => remove(ticket.id)} className="text-xs text-muted-foreground">Delete</button>
+                      <button type="button" onClick={() => remove(ticket.id)} className="inline-flex min-h-11 items-center text-xs text-muted-foreground hover:text-foreground sm:min-h-0">Delete</button>
                     </div>
                   </div>
                   <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
