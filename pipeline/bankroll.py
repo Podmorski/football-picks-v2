@@ -63,10 +63,12 @@ def _market_group(market: str) -> str | None:
     return item.group if item is not None else None
 
 
-def _prior_documents(prices_dir: Path, before_date: str) -> list[dict]:
+def _prior_documents(prices_dir: Path, before_date: str, schema_version: int | None = None) -> list[dict]:
     documents = []
     for path in sorted((prices_dir / "proposals").glob("*.json")):
         document = json.loads(path.read_text(encoding="utf-8"))
+        if schema_version is not None and document.get("schema_version") != schema_version:
+            continue
         if document.get("round_date", "") < before_date:
             documents.append(document)
     return documents
@@ -283,16 +285,21 @@ def no_forced_kelly(proposals: list[dict], state: dict, outcomes: list[dict]) ->
         return 0.0, [0.0] * count, {"status": "zero", "message": "no positive robust edge"}
     multiplier = max(0.0, 1.0 - float(state["drawdown"]) / MEL_DRAWDOWN_SCALE)
     total_cap = NO_FORCED_TOTAL_CAP * A * multiplier
+    # A single available ticket cannot carry the whole 2% total cap: the 1%
+    # per-ticket cap is binding. This preserves both caps without changing MEL.
+    total_cap = min(total_cap, NO_FORCED_TICKET_CAP * A)
     stakes, solver = _log_allocation(A, total_cap, outcomes, NO_FORCED_TICKET_CAP * A)
     stakes = [NO_FORCED_KELLY_FRACTION * value for value in stakes]
     total = sum(stakes)
     return total, stakes, {"status": "ok" if total > 0 else "zero", "method": "SLSQP", "iterations": solver.get("iterations")}
 
 
-def martingale_multiplier(prices_dir: Path, picks_dir: Path, before_date: str) -> tuple[float, dict]:
+def martingale_multiplier(
+    prices_dir: Path, picks_dir: Path, before_date: str, schema_version: int | None = None,
+) -> tuple[float, dict]:
     multiplier = 1.0
     rounds = 0
-    for document in _prior_documents(prices_dir, before_date):
+    for document in _prior_documents(prices_dir, before_date, schema_version):
         accounting = settlement.round_accounting(
             document.get("proposals", []), _status_map(picks_dir, document["round_date"]),
             lambda proposal: float(proposal.get("flat_stake", 0.0)),
@@ -314,8 +321,10 @@ def _status_map(picks_dir: Path, date: str) -> dict[tuple, str]:
     }
 
 
-def policy_state(prices_dir: Path, picks_dir: Path, before_date: str) -> dict:
-    documents = _prior_documents(prices_dir, before_date)
+def policy_state(
+    prices_dir: Path, picks_dir: Path, before_date: str, schema_version: int | None = None,
+) -> dict:
+    documents = _prior_documents(prices_dir, before_date, schema_version)
     mel_stake = lambda proposal: float(((proposal.get("policies") or {}).get("mel") or {}).get("stake", 0.0))
     replay = settlement.replay_bankroll(
         documents, lambda date: _status_map(picks_dir, date), mel_stake, INITIAL_BANKROLL,
@@ -325,7 +334,7 @@ def policy_state(prices_dir: Path, picks_dir: Path, before_date: str) -> dict:
     current = drawdown(bankroll, peak)
     available = replay["available"]
     total = mel_total_stake(available, current)
-    multiplier, martingale = martingale_multiplier(prices_dir, picks_dir, before_date)
+    multiplier, martingale = martingale_multiplier(prices_dir, picks_dir, before_date, schema_version)
     return {
         "bankroll": bankroll, "peak": peak, "drawdown": current,
         "unresolved_exposure": replay["unresolved_exposure"], "available": available,

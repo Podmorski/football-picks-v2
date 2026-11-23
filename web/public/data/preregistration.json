@@ -27,7 +27,16 @@
   },
   "probability_weighted": "S allocated in proportion to combined ticket probability"
  },
- "construction_version": "ticket-construction-v2",
+ "construction_version": "ticket-construction-v3",
+ "evaluation": {
+  "construction_version": "ticket-construction-v3",
+  "id": "ticket-construction-v3+mel-v1",
+  "policy_version": "mel-v1",
+  "pooling_rule": "v2 and v3 performance records are never pooled",
+  "start_rule": "first eligible round with a frozen schema-3 proposal; pre-existing schema-1/2 proposals stay frozen and are not pooled",
+  "unsupported_same_fixture_rule": "flat proposals are retained; new MEL exposure is zero with reason unsupported same-fixture dependence"
+ },
+ "evaluation_id": "ticket-construction-v3+mel-v1",
  "exploratory": [
   "fixed_fractional",
   "no_forced_kelly",
@@ -57,7 +66,7 @@
   "flat",
   "mel"
  ],
- "proposal_schema_version": 2,
+ "proposal_schema_version": 3,
  "protocol": {
   "alpha_one_sided": 0.05,
   "bootstrap": {
@@ -93,38 +102,65 @@
   "fallback_labels": [
    "in preferred band",
    "outside preferred band",
-   "below meaningful payout floor; highest available payout"
+   "below meaningful payout floor; highest available payout",
+   "no combined-odds target"
   ],
-  "overlap": "soft non-overlap across best2/around3/around5; relaxation is recorded",
-  "preferred_min_individual_odds": 1.1,
-  "ranking": "combined pc, model_EV, fewer legs, log-distance to target, deterministic identity",
+  "individual_price_tiers": [
+   {
+    "message": "preferred individual odds (every leg at least 1.20)",
+    "minimum_odds": 1.2,
+    "tier": "preferred"
+   },
+   {
+    "message": "preferred individual-odds floor relaxed to 1.10",
+    "minimum_odds": 1.1,
+    "tier": "relaxed_1_10"
+   },
+   {
+    "message": "individual-odds preference relaxed below 1.10; lowest available prices used",
+    "minimum_odds": 1.0,
+    "tier": "relaxed_below_1_10"
+   }
+  ],
+  "overlap": "soft no-fixture-reuse, then exact shared legs only, then recorded relaxation; no fixture in all three when avoidable",
+  "preferred_min_individual_odds": 1.2,
+  "ranking": "combined pc, model_EV, fewer legs; Around 3.00 then log-distance to 3.00; deterministic identity",
   "specs": {
    "around3": {
     "floor": 2.0,
     "high": 3.3,
     "label": "Around 3.00",
     "low": 2.7,
-    "max_legs": 5,
-    "min_legs": 2,
-    "target": 3.0
+    "max_legs": 3,
+    "min_legs": 1,
+    "rank_distance": true,
+    "required_fixtures": 1,
+    "target": 3.0,
+    "unavailable": "unavailable — no eligible priced fixture"
    },
    "around5": {
     "floor": 3.0,
-    "high": 5.5,
-    "label": "Around 5.00",
-    "low": 4.5,
+    "high": 10.0,
+    "label": "5–10 combo",
+    "low": 5.0,
     "max_legs": 5,
-    "min_legs": 2,
-    "target": 5.0
+    "min_legs": 3,
+    "rank_distance": false,
+    "required_fixtures": 3,
+    "target": 7.0,
+    "unavailable": "unavailable — fewer than three distinct eligible priced fixtures"
    },
    "best2": {
-    "floor": 1.2,
-    "high": 1.65,
-    "label": "2 best games",
-    "low": 1.35,
-    "max_legs": 2,
+    "floor": null,
+    "high": null,
+    "label": "High-probability",
+    "low": null,
+    "max_legs": 3,
     "min_legs": 2,
-    "target": 1.5
+    "rank_distance": false,
+    "required_fixtures": 2,
+    "target": null,
+    "unavailable": "unavailable — fewer than two distinct eligible priced fixtures"
    }
   }
  },

@@ -206,10 +206,15 @@ def _ruin(rounds: list[dict], policy: str, rng: random.Random) -> dict:
 
 def build(prices_dir: Path, picks_dir: Path) -> dict:
     documents = []
+    legacy_rounds = 0
     for path in sorted((prices_dir / "proposals").glob("*.json")):
         payload = _load(path)
-        if payload.get("proposals"):
-            documents.append(payload)
+        if not payload.get("proposals"):
+            continue
+        if payload.get("schema_version") != proposed_tickets.SCHEMA_VERSION:
+            legacy_rounds += 1
+            continue
+        documents.append(payload)
     rounds = [_round_record(document, picks_dir) for document in documents]
     rng = random.Random(preregistration.BOOTSTRAP_SEED)
     primary = {}
@@ -290,8 +295,11 @@ def build(prices_dir: Path, picks_dir: Path) -> dict:
     )
     return {
         "schema_version": SCHEMA_VERSION,
+        "construction_version": proposed_tickets.CONSTRUCTION_VERSION,
+        "policy_version": proposed_tickets.POLICY_VERSION,
+        "evaluation_id": proposed_tickets.EVALUATION_ID,
         "state": state,
-        "counts": counts,
+        "counts": {**counts, "legacy_rounds": legacy_rounds},
         "primary": primary,
         "exploratory": exploratory,
         "exposure": exposure,
@@ -309,6 +317,8 @@ def build(prices_dir: Path, picks_dir: Path) -> dict:
             "Actual pre-match prices only; no retrospective fair-odds substitution.",
             "Flat and MEL-v1 are the primary pre-registered comparison; other policies are exploratory diagnostics.",
             "Every policy consumes the same frozen proposals and round-atomic settlement.",
+            "ticket-construction-v3 records only; schema-1/2 rounds are excluded and are never pooled with v3.",
+            "Same-fixture dependence is unsupported: those rounds keep flat proposals but carry zero MEL exposure.",
             "Do not select a policy because it has the best observed test return.",
             "Small samples and multiple comparisons: treat every exploratory return as descriptive.",
         ],

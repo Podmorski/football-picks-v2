@@ -4,7 +4,9 @@
   "seed": 20261025,
   "unit": "whole round date"
  },
+ "construction_version": "ticket-construction-v3",
  "counts": {
+  "legacy_rounds": 0,
   "pending": 0,
   "pending_frequency": null,
   "rounds": 0,
@@ -13,6 +15,7 @@
   "void": 0,
   "void_frequency": null
  },
+ "evaluation_id": "ticket-construction-v3+mel-v1",
  "evidence": {
   "inconclusive": false,
   "lower_95_log_growth": null,
@@ -79,9 +82,12 @@
   "Actual pre-match prices only; no retrospective fair-odds substitution.",
   "Flat and MEL-v1 are the primary pre-registered comparison; other policies are exploratory diagnostics.",
   "Every policy consumes the same frozen proposals and round-atomic settlement.",
+  "ticket-construction-v3 records only; schema-1/2 rounds are excluded and are never pooled with v3.",
+  "Same-fixture dependence is unsupported: those rounds keep flat proposals but carry zero MEL exposure.",
   "Do not select a policy because it has the best observed test return.",
   "Small samples and multiple comparisons: treat every exploratory return as descriptive."
  ],
+ "policy_version": "mel-v1",
  "power": {
   "n_star": null,
   "reason": "fewer than two settled playable rounds; N* is not estimated"

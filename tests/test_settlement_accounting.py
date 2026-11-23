@@ -91,6 +91,7 @@ def test_aggregate_flat_and_adaptive_agree_on_mixed_void(tmp_path: Path) -> None
     (prices / "proposals").mkdir(parents=True)
     picks.mkdir()
     document = {
+        "schema_version": 3,
         "round_date": "2026-11-24",
         "proposals": [{
             "type": "best2", "status": "available", "flat_stake": 50.0,

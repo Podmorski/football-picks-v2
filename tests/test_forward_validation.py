@@ -40,17 +40,19 @@ def test_whole_round_metrics_and_no_prices_in_output(tmp_path) -> None:
     write_picks(picks, "2026-11-21", {("A", "B", "BTTS:GG"): "landed", ("C", "D", "BTTS:GG"): "landed"})
     write_picks(picks, "2026-11-22", {("E", "F", "BTTS:GG"): "lost", ("G", "H", "BTTS:GG"): "lost"})
     (prices / "proposals" / "2026-11-21.json").write_text(json.dumps({
-        "round_date": "2026-11-21", "proposals": [proposal("best2", first, 50.0, 20.0)],
+        "schema_version": 3, "round_date": "2026-11-21", "proposals": [proposal("best2", first, 50.0, 20.0)],
     }), encoding="utf-8")
     (prices / "proposals" / "2026-11-22.json").write_text(json.dumps({
-        "round_date": "2026-11-22", "proposals": [proposal("best2", second, 50.0, 20.0)],
+        "schema_version": 3, "round_date": "2026-11-22", "proposals": [proposal("best2", second, 50.0, 20.0)],
     }), encoding="utf-8")
 
     payload = forward_validation.build(prices, picks)
     assert payload["counts"] == {
         "rounds": 2, "terminal_rounds": 2, "tickets": 2, "void": 0, "pending": 0,
-        "void_frequency": 0.0, "pending_frequency": 0.0,
+        "void_frequency": 0.0, "pending_frequency": 0.0, "legacy_rounds": 0,
     }
+    assert payload["construction_version"] == "ticket-construction-v3"
+    assert payload["evaluation_id"] == "ticket-construction-v3+mel-v1"
     assert payload["primary"]["flat"]["staked"] == 100.0
     assert payload["primary"]["flat"]["net"] == 100.0
     assert payload["primary"]["flat"]["roi"] == 1.0
@@ -70,3 +72,19 @@ def test_empty_store_is_honest(tmp_path) -> None:
     assert payload["power"]["n_star"] is None
     assert "fewer than two" in payload["power"]["reason"]
     assert payload["safety"]["identity_failure"] is False
+    assert payload["construction_version"] == "ticket-construction-v3"
+
+
+def test_v2_rounds_are_excluded_from_the_v3_validation(tmp_path) -> None:
+    picks = tmp_path / "picks"; picks.mkdir()
+    prices = tmp_path / "prices"; (prices / "proposals").mkdir(parents=True)
+    write_picks(picks, "2026-11-21", {("A", "B", "BTTS:GG"): "landed", ("C", "D", "BTTS:GG"): "landed"})
+    (prices / "proposals" / "2026-11-21.json").write_text(json.dumps({
+        "schema_version": 2, "round_date": "2026-11-21",
+        "proposals": [proposal("best2", [leg("A", "B"), leg("C", "D")], 50.0, 20.0)],
+    }), encoding="utf-8")
+    payload = forward_validation.build(prices, picks)
+    assert payload["counts"]["rounds"] == 0
+    assert payload["counts"]["legacy_rounds"] == 1
+    assert payload["primary"]["flat"]["staked"] == 0.0
+    assert payload["state"] == "no settled playable rounds"

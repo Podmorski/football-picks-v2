@@ -109,7 +109,9 @@
    "unresolved_exposure": 0.0
   }
  },
+ "construction_version": "ticket-construction-v3",
  "counts": {
+  "legacy_rounds": 0,
   "pending": 0,
   "rounds": 0,
   "settled": 0,
@@ -118,6 +120,7 @@
   "unpriced": 0,
   "void": 0
  },
+ "evaluation_id": "ticket-construction-v3+mel-v1",
  "flat": {
   "ci_rounds": 0,
   "net": 0.0,
@@ -147,10 +150,10 @@
   "staked": 0.0,
   "unresolved_exposure": 0.0
  },
- "note": "Paper ledger. Flat is 50/30/20; MEL-v1 is mandatory-exposure expected-log allocation; other policies are diagnostics. Bankroll advances once per fully terminal round. Not a profit guarantee.",
+ "note": "Paper ledger for ticket-construction-v3 only. Flat is 50/30/20; MEL-v1 is mandatory-exposure expected-log allocation; other policies are diagnostics. Bankroll advances once per fully terminal round. v2/v3 records are never pooled. Not a profit guarantee.",
  "policy_version": "mel-v1",
  "rounds": [],
- "schema_version": 2,
+ "schema_version": 3,
  "types": {
   "around3": {
    "flat_returned": 0.0,

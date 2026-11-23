@@ -8,9 +8,9 @@ from pipeline import bankroll, preregistration, proposed_tickets, ticket_constru
 
 def test_versions_and_formulas_are_frozen() -> None:
     payload = preregistration.build()
-    assert payload["construction_version"] == ticket_construction.CONSTRUCTION_VERSION == "ticket-construction-v2"
+    assert payload["construction_version"] == ticket_construction.CONSTRUCTION_VERSION_V3 == "ticket-construction-v3"
     assert payload["policy_version"] == bankroll.POLICY_VERSION == "mel-v1"
-    assert payload["proposal_schema_version"] == proposed_tickets.SCHEMA_VERSION
+    assert payload["proposal_schema_version"] == proposed_tickets.SCHEMA_VERSION == 3
     assert payload["activation_date"] == proposed_tickets.PROPOSAL_ACTIVATION_DATE
     assert payload["mel"]["drawdown_scale"] == 0.20
     assert payload["mel"]["base_fraction"] == 0.0025
@@ -18,6 +18,9 @@ def test_versions_and_formulas_are_frozen() -> None:
     assert payload["comparators"]["flat"]["shares"] == [0.5, 0.3, 0.2]
     assert payload["primary_comparison"] == ["flat", "mel"]
     assert "fixed_fractional" in payload["exploratory"]
+    assert payload["evaluation_id"] == "ticket-construction-v3+mel-v1"
+    assert payload["evaluation"]["pooling_rule"] == "v2 and v3 performance records are never pooled"
+    assert payload["ticket_construction"]["preferred_min_individual_odds"] == 1.20
 
 
 def test_protocol_is_preregistered_and_complete() -> None:

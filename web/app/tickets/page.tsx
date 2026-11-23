@@ -69,6 +69,8 @@ function ProposalCard({ ticket, statuses, shared }: { ticket: ProposedTicket; st
       <div className="tabular grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground sm:grid-cols-4">
         <span>Model {pct(ticket.combined_probability)}</span>
         <span>Actual odds {ticket.combined_odds?.toFixed(2)}</span>
+        <span>Model EV {pct(ticket.model_ev ?? null)}</span>
+        <span>{ticket.legs.length} legs</span>
         <span>Flat {ticket.flat_stake.toFixed(0)}u</span>
         <span>MEL-v1 {ticket.mel?.stake?.toFixed(2) ?? '0.00'}u</span>
       </div>
@@ -363,6 +365,11 @@ export default function TicketsPage() {
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Forward proposals — actual frozen prices</h2>
+        <p className="max-w-3xl text-xs text-muted-foreground">
+          Combined probability is the model product under cross-fixture conditional independence. Combined
+          odds are the product of frozen actual prices. High, Around 3.00 and 5–10 combo are statistical
+          constructions, never certainties.
+        </p>
       {proposalsState === 'loading' ? <p className="text-sm text-muted-foreground">Loading automatic proposals…</p> : null}
       {proposalsState === 'error' ? <p className="text-sm text-muted-foreground">Automatic proposals could not be loaded.</p> : null}
       {proposalsState === 'unpriced' ? (

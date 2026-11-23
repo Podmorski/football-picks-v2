@@ -1,8 +1,9 @@
-"""Pre-registration of ticket-construction-v2, MEL-v1 and the forward protocol.
+"""Pre-registration of ticket-construction-v3, MEL-v1 and the forward protocol.
 
 This file is the durable contract. Any parameter change must create a new
 version and a new forward record; existing audits are hypothesis generation,
-not an untouched holdout.
+not an untouched holdout. Construction-v3 + MEL-v1 is a separate forward
+evaluation from the earlier construction-v2 record.
 """
 from __future__ import annotations
 
@@ -29,20 +30,34 @@ BOOTSTRAP_SEED = 20261025
 def build() -> dict:
     return {
         "schema_version": SCHEMA_VERSION,
-        "construction_version": ticket_construction.CONSTRUCTION_VERSION,
+        "construction_version": ticket_construction.CONSTRUCTION_VERSION_V3,
         "policy_version": bankroll.POLICY_VERSION,
         "proposal_schema_version": proposed_tickets.SCHEMA_VERSION,
         "activation_date": proposed_tickets.PROPOSAL_ACTIVATION_DATE,
+        "evaluation_id": proposed_tickets.EVALUATION_ID,
+        "evaluation": {
+            "id": proposed_tickets.EVALUATION_ID,
+            "construction_version": ticket_construction.CONSTRUCTION_VERSION_V3,
+            "policy_version": bankroll.POLICY_VERSION,
+            "start_rule": "first eligible round with a frozen schema-3 proposal; pre-existing schema-1/2 proposals stay frozen and are not pooled",
+            "pooling_rule": "v2 and v3 performance records are never pooled",
+            "unsupported_same_fixture_rule": "flat proposals are retained; new MEL exposure is zero with reason unsupported same-fixture dependence",
+        },
         "ticket_construction": {
             "specs": ticket_construction.SPECS,
             "preferred_min_individual_odds": ticket_construction.PREFERRED_MIN_INDIVIDUAL,
+            "individual_price_tiers": [
+                {"tier": name, "minimum_odds": minimum, "message": message}
+                for name, minimum, message in ticket_construction.PRICE_TIERS
+            ],
             "exact_combination_cap": ticket_construction.EXACT_COMBINATION_CAP,
             "bounded_dp": {"log_odds_bucket": ticket_construction.DP_LOG_BUCKET,
                             "keep_per_state": ticket_construction.DP_KEEP_PER_STATE},
-            "ranking": "combined pc, model_EV, fewer legs, log-distance to target, deterministic identity",
-            "overlap": "soft non-overlap across best2/around3/around5; relaxation is recorded",
+            "ranking": "combined pc, model_EV, fewer legs; Around 3.00 then log-distance to 3.00; deterministic identity",
+            "overlap": "soft no-fixture-reuse, then exact shared legs only, then recorded relaxation; no fixture in all three when avoidable",
             "fallback_labels": ["in preferred band", "outside preferred band",
-                                 "below meaningful payout floor; highest available payout"],
+                                 "below meaningful payout floor; highest available payout",
+                                 "no combined-odds target"],
         },
         "mel": {
             "total_stake_formula": "A = max(0, B - U); m = max(0, 1 - D/0.20); S = A * (0.0025 + 0.0175*m)",

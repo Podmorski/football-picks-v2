@@ -23,9 +23,11 @@ MAX_LEGS = 5
 # Earlier snapshots are explicitly exempt because proposals were not generated then.
 PROPOSAL_ACTIVATION_DATE = "2026-11-24"
 PROPOSAL_ACTIVATION_MARKER = "proposal-readiness-v1"
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
+SUPPORTED_SCHEMA_VERSIONS = (1, 2, 3)
 POLICY_VERSION = bankroll.POLICY_VERSION
-CONSTRUCTION_VERSION = ticket_construction.CONSTRUCTION_VERSION
+CONSTRUCTION_VERSION = ticket_construction.CONSTRUCTION_VERSION_V3
+EVALUATION_ID = "ticket-construction-v3+mel-v1"
 INITIAL_BANKROLL = 1000.0
 PER_TICKET_CAP = 0.01
 ROUND_CAP = 0.02
@@ -34,9 +36,9 @@ DRAWDOWN_STOP = 0.20
 MIN_CI_ROUNDS = 30
 FLAT_STAKES = {"best2": 50.0, "around3": 30.0, "around5": 20.0}
 TARGETS = {
-    "best2": {"label": "2 best games", "target": None, "low": None, "high": None, "min_legs": 2, "max_legs": 2},
-    "around3": {"label": "Around 3.00", "target": 3.0, "low": 2.70, "high": 3.30, "min_legs": 2, "max_legs": 5},
-    "around5": {"label": "Around 5.00", "target": 5.0, "low": 4.50, "high": 5.50, "min_legs": 2, "max_legs": 5},
+    "best2": {"label": "High-probability", "target": None, "low": None, "high": None, "min_legs": 2, "max_legs": 3},
+    "around3": {"label": "Around 3.00", "target": 3.0, "low": 2.70, "high": 3.30, "min_legs": 1, "max_legs": 3},
+    "around5": {"label": "5–10 combo", "target": 7.0, "low": 5.00, "high": 10.00, "min_legs": 3, "max_legs": 5},
 }
 
 
@@ -153,6 +155,8 @@ def replay_adaptive(prices_dir: Path, picks_dir: Path, before_date: str) -> dict
     documents = []
     for path in sorted((prices_dir / "proposals").glob("*.json")):
         document = json.loads(path.read_text(encoding="utf-8"))
+        if document.get("schema_version") != SCHEMA_VERSION:
+            continue
         if document.get("round_date", "") >= before_date:
             continue
         documents.append(document)
@@ -212,9 +216,10 @@ def build_proposals(
     date = document["date"]
     menu = eligible_pool(document, snapshot)
     proposals = []
-    for item in ticket_construction.construct(menu):
+    for item in ticket_construction.construct_v3(menu):
         key = item["type"]
         proposals.append({**item, "flat_stake": FLAT_STAKES[key] if item["status"] == "available" else 0.0})
+    dependence = ticket_construction.unsupported_same_fixture_dependence(proposals)
 
     shifts: dict[tuple[str, str], float] = {}
     if picks_dir is not None:
@@ -223,12 +228,33 @@ def build_proposals(
         shifts = {cohort: bankroll.cohort_shift(dates, rng) for cohort, dates in residuals.items()}
     bankroll.annotate_q(proposals, shifts)
     state = prior_state or (
-        bankroll.policy_state(prices_dir, picks_dir, date) if prices_dir is not None and picks_dir is not None
+        bankroll.policy_state(prices_dir, picks_dir, date, schema_version=SCHEMA_VERSION)
+        if prices_dir is not None and picks_dir is not None
         else _default_state()
     )
 
     outcomes, scenario_meta = bankroll.scenarios(proposals)
-    mel = bankroll.allocate(proposals, state, outcomes)
+    scenario_meta["same_fixture_dependence"] = dependence
+    if dependence:
+        scenario_meta["assumption"] += "; unsupported same-fixture dependence detected; MEL exposure forced to zero"
+        mel = {
+            "available": float(state["available"]), "total_stake": 0.0,
+            "tickets": sum(1 for proposal in proposals if proposal.get("status") == "available"),
+            "mandatory_exposure": False,
+            "negative_ev": all(float(proposal.get("model_ev", 0.0)) <= 0
+                               for proposal in proposals if proposal.get("status") == "available"),
+            "message": "unsupported same-fixture dependence",
+            "stakes": [0.0] * sum(1 for proposal in proposals if proposal.get("status") == "available"),
+            "solver": {"status": "blocked", "message": "unsupported same-fixture dependence"},
+            "stress": {
+                "shift": bankroll.MEL_STRESS_SHIFT,
+                "stakes": [0.0] * sum(1 for proposal in proposals if proposal.get("status") == "available"),
+                "status": "blocked",
+                "note": "MEL exposure is zero because the joint scenario model does not represent same-fixture dependence.",
+            },
+        }
+    else:
+        mel = bankroll.allocate(proposals, state, outcomes)
     available = [proposal for proposal in proposals if proposal.get("status") == "available"]
     fixed_total, fixed_stakes = bankroll.fixed_fractional(state["available"], len(available))
     probability_stakes = bankroll.probability_weighted(proposals, state["mel_total_stake"])
@@ -284,12 +310,16 @@ def build_proposals(
 
     return {
         "schema_version": SCHEMA_VERSION,
+        "construction_version": CONSTRUCTION_VERSION,
+        "evaluation_id": EVALUATION_ID,
         "round_date": date,
         "snapshot_identity": {"round_date": snapshot.get("round_date"), "fetched_at": snapshot.get("fetched_at")},
         "policy": {
             "version": POLICY_VERSION, "construction_version": CONSTRUCTION_VERSION,
             "initial_bankroll": INITIAL_BANKROLL,
             "mel": {
+                "supported": not dependence,
+                "reason": "unsupported same-fixture dependence" if dependence else "",
                 "drawdown_scale": bankroll.MEL_DRAWDOWN_SCALE,
                 "base_fraction": bankroll.MEL_BASE_FRACTION, "slope": bankroll.MEL_SLOPE,
                 "residual_quantile": bankroll.MEL_SHIFT_QUANTILE,
@@ -327,7 +357,7 @@ def _proposal_is_valid(path: Path) -> bool:
         return False
     proposals = payload.get("proposals")
     return (
-        payload.get("schema_version") == SCHEMA_VERSION
+        payload.get("schema_version") in SUPPORTED_SCHEMA_VERSIONS
         and isinstance(proposals, list)
         and len(proposals) == 3
         and {item.get("type") for item in proposals} == set(TARGETS)
@@ -363,7 +393,7 @@ def ensure_proposals(round_date: str, document: dict, snapshot: dict, prices_dir
     path = prices_dir / "proposals" / f"{round_date}.json"
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
-    state = bankroll.policy_state(prices_dir, picks_dir, round_date)
+    state = bankroll.policy_state(prices_dir, picks_dir, round_date, schema_version=SCHEMA_VERSION)
     payload = build_proposals(document, snapshot, state, prices_dir, picks_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=1) + "\n", encoding="utf-8")
@@ -440,8 +470,12 @@ def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
     flat_account = _empty_account(INITIAL_BANKROLL)
     accounts = {key: _empty_account(INITIAL_BANKROLL) for key in POLICY_KEYS}
     counts = Counter()
+    legacy_rounds = 0
     for path in sorted((prices_dir / "proposals").glob("*.json")):
         document = json.loads(path.read_text(encoding="utf-8"))
+        if document.get("schema_version") != SCHEMA_VERSION:
+            legacy_rounds += 1
+            continue
         date = document["round_date"]
         statuses = _status_map(picks_dir, date)
         proposals = document.get("proposals", [])
@@ -516,12 +550,15 @@ def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
     return {
         "schema_version": SCHEMA_VERSION,
         "policy_version": POLICY_VERSION,
+        "construction_version": CONSTRUCTION_VERSION,
+        "evaluation_id": EVALUATION_ID,
         "rounds": rounds,
         "counts": {
             "rounds": len(rounds), "tickets": counts["tickets"],
             "settled": counts["landed"] + counts["lost"] + counts["void"],
             "pending": counts["pending"], "void": counts["void"],
             "unavailable": counts["unavailable"], "unpriced": 0,
+            "legacy_rounds": legacy_rounds,
         },
         "flat": {
             **_ledger(flat_account), "return_ci": ci(flat_account),
@@ -539,7 +576,7 @@ def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
             for key in POLICY_KEYS if key != "mel"
         },
         "types": type_stats,
-        "note": "Paper ledger. Flat is 50/30/20; MEL-v1 is mandatory-exposure expected-log allocation; other policies are diagnostics. Bankroll advances once per fully terminal round. Not a profit guarantee.",
+        "note": "Paper ledger for ticket-construction-v3 only. Flat is 50/30/20; MEL-v1 is mandatory-exposure expected-log allocation; other policies are diagnostics. Bankroll advances once per fully terminal round. v2/v3 records are never pooled. Not a profit guarantee.",
     }
 
 

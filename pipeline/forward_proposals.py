@@ -10,7 +10,7 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from . import bankroll, proposed_tickets, ticket_construction
+from . import bankroll, proposed_tickets
 
 SCHEMA_VERSION = 1
 
@@ -43,11 +43,19 @@ def build(prices_dir: Path | None, picks_dir: Path, web_dir: Path) -> dict:
     missing = proposed_tickets.missing_required_proposals(prices_dir) if prices_dir is not None else []
 
     documents = []
+    legacy_rounds = 0
     if prices_dir is not None:
         for path in sorted((prices_dir / "proposals").glob("*.json")):
             payload = _load(path)
-            if payload.get("proposals"):
-                documents.append(payload)
+            if not payload.get("proposals"):
+                continue
+            if payload.get("schema_version") != proposed_tickets.SCHEMA_VERSION:
+                legacy_rounds += 1
+                continue
+            documents.append(payload)
+    evaluation_start_round = min(
+        (row["round_date"] for row in documents if row.get("round_date")), default=None,
+    )
 
     bands = Counter()
     tickets = available = unavailable = 0
@@ -84,6 +92,8 @@ def build(prices_dir: Path | None, picks_dir: Path, web_dir: Path) -> dict:
         state = "awaiting first eligible published round with fixtures and a usable snapshot"
     elif documents:
         state = "frozen proposals available"
+    elif legacy_rounds:
+        state = "frozen legacy proposals only; ticket-construction-v3 awaits an eligible round"
     else:
         state = "eligible round exists; proposal file not yet frozen"
 
@@ -100,11 +110,14 @@ def build(prices_dir: Path | None, picks_dir: Path, web_dir: Path) -> dict:
         "schema_version": SCHEMA_VERSION,
         "activation_date": proposed_tickets.PROPOSAL_ACTIVATION_DATE,
         "policy_version": bankroll.POLICY_VERSION,
-        "construction_version": ticket_construction.CONSTRUCTION_VERSION,
+        "construction_version": proposed_tickets.CONSTRUCTION_VERSION,
+        "evaluation_id": proposed_tickets.EVALUATION_ID,
         "eligible_round": eligible_round,
+        "evaluation_start_round": evaluation_start_round,
         "state": state,
         "errors": errors,
         "rounds_with_proposals": len(documents),
+        "legacy_rounds": legacy_rounds,
         "counts": {
             "tickets": tickets, "available": available, "unavailable": unavailable,
             "bands": dict(bands), "individual_floor_relaxed": floor_relaxed,
@@ -113,6 +126,14 @@ def build(prices_dir: Path | None, picks_dir: Path, web_dir: Path) -> dict:
             "search_methods": dict(methods),
         },
         "price_coverage": coverage,
+        "evaluation": {
+            "id": proposed_tickets.EVALUATION_ID,
+            "construction_version": proposed_tickets.CONSTRUCTION_VERSION,
+            "policy_version": bankroll.POLICY_VERSION,
+            "start_round": evaluation_start_round,
+            "pooling_rule": "v2 and v3 records are separate forward evaluations and are never pooled",
+            "unsupported_same_fixture_rule": "flat proposals are retained; new MEL exposure is zero with reason unsupported same-fixture dependence",
+        },
         "results": {
             "source": "proposed-tickets-record.json",
             "counts": record.get("counts", {}),

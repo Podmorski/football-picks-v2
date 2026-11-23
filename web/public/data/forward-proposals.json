@@ -1,6 +1,6 @@
 {
  "activation_date": "2026-11-24",
- "construction_version": "ticket-construction-v2",
+ "construction_version": "ticket-construction-v3",
  "counts": {
   "available": 0,
   "bands": {},
@@ -14,17 +14,29 @@
  },
  "eligible_round": null,
  "errors": [],
+ "evaluation": {
+  "construction_version": "ticket-construction-v3",
+  "id": "ticket-construction-v3+mel-v1",
+  "policy_version": "mel-v1",
+  "pooling_rule": "v2 and v3 records are separate forward evaluations and are never pooled",
+  "start_round": null,
+  "unsupported_same_fixture_rule": "flat proposals are retained; new MEL exposure is zero with reason unsupported same-fixture dependence"
+ },
+ "evaluation_id": "ticket-construction-v3+mel-v1",
+ "evaluation_start_round": null,
+ "legacy_rounds": 0,
  "policy_version": "mel-v1",
  "price_coverage": {
-  "fixtures": 121,
-  "priced_fixtures": 121,
-  "priced_markets": 20064,
-  "snapshot_rounds": 2,
-  "started_not_priced": 14,
-  "unmatched_fixtures": 31
+  "fixtures": 0,
+  "priced_fixtures": 0,
+  "priced_markets": 0,
+  "snapshot_rounds": 0,
+  "started_not_priced": 0,
+  "unmatched_fixtures": 0
  },
  "results": {
   "counts": {
+   "legacy_rounds": 0,
    "pending": 0,
    "rounds": 0,
    "settled": 0,

@@ -146,7 +146,7 @@ def test_all_policies_share_tickets_and_round_atomic_settlement(tmp_path: Path) 
         "legs": [leg("C", "M2", 0.5, 2.0)],
     }
     third = {"type": "around5", "status": "unavailable", "flat_stake": 0.0, "policies": {"mel": {"stake": 0.0}}, "legs": []}
-    document = {"round_date": "2026-11-24", "proposals": [first, second, third]}
+    document = {"schema_version": 3, "round_date": "2026-11-24", "proposals": [first, second, third]}
     (prices / "proposals" / "2026-11-24.json").write_text(json.dumps(document), encoding="utf-8")
     (picks / "2026-11-24.json").write_text(json.dumps({
         "date": "2026-11-24",

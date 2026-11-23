@@ -50,3 +50,38 @@ def test_no_snapshot_is_awaiting_first_eligible_round(tmp_path) -> None:
     assert payload["state"] == "awaiting first eligible published round with fixtures and a usable snapshot"
     assert payload["errors"]
     assert payload["counts"]["tickets"] == 0
+    assert payload["construction_version"] == "ticket-construction-v3"
+    assert payload["evaluation_id"] == "ticket-construction-v3+mel-v1"
+
+
+def test_v2_records_are_legacy_and_not_pooled_with_v3(tmp_path) -> None:
+    prices = tmp_path / "prices"; (prices / "rounds").mkdir(parents=True); (prices / "proposals").mkdir()
+    for date in ("2026-11-24",):
+        (prices / "rounds" / f"{date}.json").write_text(json.dumps({
+            "round_date": date, "fixtures": [{"div": "E0"}], "started_not_priced": [],
+        }), encoding="utf-8")
+    (prices / "proposals" / "2026-11-24.json").write_text(json.dumps({
+        "schema_version": 2, "round_date": "2026-11-24",
+        "proposals": [valid_proposal(key) for key in proposed_tickets.TARGETS],
+    }), encoding="utf-8")
+    legacy_only = forward_proposals.build(prices, tmp_path / "picks", tmp_path / "web")
+    assert legacy_only["state"] == "frozen legacy proposals only; ticket-construction-v3 awaits an eligible round"
+    assert legacy_only["rounds_with_proposals"] == 0
+    assert legacy_only["legacy_rounds"] == 1
+    assert legacy_only["evaluation_start_round"] is None
+    assert legacy_only["counts"]["tickets"] == 0
+
+    (prices / "rounds" / "2026-11-25.json").write_text(json.dumps({
+        "round_date": "2026-11-25", "fixtures": [{"div": "E0"}], "started_not_priced": [],
+    }), encoding="utf-8")
+    (prices / "proposals" / "2026-11-25.json").write_text(json.dumps({
+        "schema_version": 3, "round_date": "2026-11-25",
+        "proposals": [valid_proposal(key) for key in proposed_tickets.TARGETS],
+    }), encoding="utf-8")
+    mixed = forward_proposals.build(prices, tmp_path / "picks", tmp_path / "web")
+    assert mixed["state"] == "frozen proposals available"
+    assert mixed["rounds_with_proposals"] == 1
+    assert mixed["legacy_rounds"] == 1
+    assert mixed["evaluation_start_round"] == "2026-11-25"
+    assert mixed["counts"]["tickets"] == 3
+    assert mixed["evaluation"]["pooling_rule"].startswith("v2 and v3")

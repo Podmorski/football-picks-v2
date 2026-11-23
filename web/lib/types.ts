@@ -498,11 +498,17 @@ export type ProposalConstruction = {
   policy: string;
   band: string;
   band_message?: string;
+  band_low?: number | null;
+  band_high?: number | null;
+  floor?: number | null;
   achieved_odds?: number;
+  individual_price_tier?: string;
+  individual_price_min?: number;
   individual_floor_relaxed: boolean;
   individual_floor_message?: string;
   overlap_relaxed: boolean;
   overlap_message?: string;
+  overlap_level?: string;
   method?: string;
   exact?: boolean;
   note?: string;
@@ -574,10 +580,12 @@ export type ProposalLedger = {
 export type ProposalRecordFile = {
   schema_version: number;
   policy_version: string;
+  construction_version?: string;
+  evaluation_id?: string;
   rounds: ProposalRoundRecord[];
   counts: {
     rounds: number; tickets: number; settled: number; pending: number;
-    void: number; unavailable: number; unpriced: number;
+    void: number; unavailable: number; unpriced: number; legacy_rounds?: number;
   };
   flat: ProposalLedger & { return_ci: [number | null, number | null]; ci_rounds: number };
   mel: ProposalLedger & {
@@ -731,10 +739,13 @@ export type ForwardProposalsFile = {
   activation_date: string;
   policy_version: string;
   construction_version: string;
+  evaluation_id?: string;
   eligible_round: string | null;
+  evaluation_start_round?: string | null;
   state: string;
   errors: string[];
   rounds_with_proposals: number;
+  legacy_rounds?: number;
   counts: {
     tickets: number; available: number; unavailable: number;
     bands: Record<string, number>;
