@@ -154,17 +154,13 @@ function RetrospectiveSection({ state, data }: { state: 'loading' | 'ready' | 'e
             </div>
           ))}
           <div className="rounded-xl border p-3 text-sm">
-            <h3 className="font-semibold">Retrospective cumulative — model-fair odds</h3>
-            <p className="text-muted-foreground">Retrospective simulation — generated after the round; not a frozen pre-match recommendation. Model-fair odds — not realised bookmaker returns.</p>
+            <h3 className="font-semibold">Retrospective counts — model-fair odds</h3>
+            <p className="text-muted-foreground">Retrospective simulation — generated after the round; not a frozen pre-match recommendation. Model-fair odds — not realised bookmaker returns. No profit, ROI or bankroll headline is reported for retrospective tickets.</p>
             <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
               <dt>Tickets</dt><dd className="tabular text-right">{data.cumulative.tickets}</dd>
               <dt>Settled</dt><dd className="tabular text-right">{data.cumulative.settled}</dd>
               <dt>Pending</dt><dd className="tabular text-right">{data.cumulative.pending}</dd>
               <dt>Source pending</dt><dd className="tabular text-right">{data.cumulative.source_pending}</dd>
-              <dt>Staked</dt><dd className="tabular text-right">{data.cumulative.staked.toFixed(2)}</dd>
-              <dt>Returned</dt><dd className="tabular text-right">{data.cumulative.returned.toFixed(2)}</dd>
-              <dt>Profit</dt><dd className="tabular text-right">{units(data.cumulative.profit)}</dd>
-              <dt>ROI</dt><dd className="tabular text-right">{rate(data.cumulative.roi)}</dd>
             </dl>
           </div>
         </>

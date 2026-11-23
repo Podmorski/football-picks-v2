@@ -523,6 +523,7 @@ export type PrivateProposalsFile = { rounds: ProposalRound[] };
 
 export type ProposalRoundRecord = {
   round_date: string;
+  terminal: boolean;
   available: number;
   unavailable: number;
   pending: number;
@@ -554,8 +555,8 @@ export type ProposalRecordFile = {
   flat: ProposalLedger & { return_ci: [number | null, number | null]; ci_rounds: number };
   adaptive: ProposalLedger & {
     initial_bankroll: number; bankroll: number; peak: number;
-    current_drawdown: number; maximum_drawdown: number;
-    series: { round_date: string; bankroll: number }[];
+    current_drawdown: number; maximum_drawdown: number; unresolved_exposure: number;
+    series: { round_date: string; bankroll: number; terminal?: boolean; unresolved_exposure?: number }[];
   };
   types: Record<string, Record<string, number>>;
   note: string;
@@ -606,7 +607,6 @@ export type RetrospectiveFile = {
   cumulative: {
     tickets: number; settled: number; landed: number; lost: number; void: number;
     pending: number; unavailable: number; source_pending: number;
-    staked: number; returned: number; profit: number; roi: number | null;
   };
 };
 

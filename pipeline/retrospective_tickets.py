@@ -9,7 +9,7 @@ import argparse
 import json
 from pathlib import Path
 
-from . import ranking
+from . import ranking, settlement
 from .proposed_tickets import FLAT_STAKES, TARGETS, choose_target
 
 DATES = ("2026-11-14", "2026-11-21", "2026-11-22")
@@ -37,7 +37,7 @@ def _status_map(picks_dir: Path, date: str) -> dict[tuple, str]:
 
 
 def _leg_key(leg: dict) -> tuple:
-    return (leg["d"], leg["h"], leg["a"], leg["m"])
+    return settlement.leg_key(leg)
 
 
 def eligible_pool(document: dict) -> list[dict]:
@@ -97,44 +97,32 @@ def _settle(proposal: dict, statuses: dict[tuple, str]) -> None:
     if proposal["status"] != "available":
         proposal["settlement"] = {"status": "unavailable", "return": None, "profit": None, "source_pending": False, "leg_statuses": []}
         return
-    states = [statuses.get(_leg_key(leg), "pending") for leg in proposal["legs"]]
-    stake = float(proposal["flat_stake"])
-    if any(state == "lost" for state in states):
-        settlement = {"status": "lost", "return": 0.0, "profit": -stake, "source_pending": False, "leg_statuses": states}
-    elif not states or any(state not in ("landed", "void") for state in states):
-        settlement = {"status": "pending", "return": None, "profit": None, "source_pending": all(state == "pending" for state in states), "leg_statuses": states}
-    elif all(state == "void" for state in states):
-        settlement = {"status": "void", "return": stake, "profit": 0.0, "source_pending": False, "leg_statuses": states}
-    else:
-        odds = 1.0
-        for leg, state in zip(proposal["legs"], states):
-            if state == "landed":
-                odds *= float(leg["fair"])
-        returned = stake * odds
-        settlement = {"status": "landed", "return": round(returned, 4), "profit": round(returned - stake, 4), "source_pending": False, "leg_statuses": states}
-    proposal["settlement"] = settlement
+    outcome = settlement.ticket_outcome(
+        proposal["legs"], statuses, float(proposal["flat_stake"]), price_key="fair",
+    )
+    proposal["settlement"] = {
+        "status": outcome["status"],
+        "return": None if outcome["return"] is None else round(float(outcome["return"]), 4),
+        "profit": None if outcome["profit"] is None else round(float(outcome["profit"]), 4),
+        "source_pending": outcome["source_pending"],
+        "leg_statuses": outcome["leg_statuses"],
+    }
 
 
 def _cumulative(rounds: list[dict]) -> dict:
+    """Counts only. Retrospective model-fair money never enters a profit headline."""
     counts = {"tickets": 0, "settled": 0, "landed": 0, "lost": 0, "void": 0, "pending": 0, "unavailable": 0, "source_pending": 0}
-    staked = returned = 0.0
     for round_doc in rounds:
         for proposal in round_doc["proposals"]:
             counts["tickets"] += 1
-            settlement = proposal["settlement"]
-            status = settlement["status"]
+            outcome = proposal["settlement"]
+            status = outcome["status"]
             counts[status] = counts.get(status, 0) + 1
-            if settlement["source_pending"]:
+            if outcome["source_pending"]:
                 counts["source_pending"] += 1
             if status in ("landed", "lost", "void"):
                 counts["settled"] += 1
-                staked += float(proposal["flat_stake"])
-                returned += float(settlement["return"] or 0.0)
-    profit = returned - staked
-    return {
-        **counts, "staked": round(staked, 4), "returned": round(returned, 4),
-        "profit": round(profit, 4), "roi": round(profit / staked, 6) if staked else None,
-    }
+    return counts
 
 
 def generate_payload(picks_dir: Path) -> dict:

@@ -435,6 +435,8 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   commits the private store with `if: always()` so a failed pass is still recorded; the deploy hook
   runs only on success.
 
+- Task 21 Phase 1 (23 Nov): shared ticket settlement is `pipeline/settlement.py`. One gross-multiplier rule is used by forward flat, forward adaptive and retrospective model-fair ledgers: any lost leg 0; all void 1; mixed landed/void the product of actual prices for landed legs only; pending no money movement. Forward accounting is round-atomic in `pipeline/proposed_tickets.py` (`aggregate_records`, `replay_adaptive`): bankroll/peak/maximum drawdown advance once after every available ticket in a round is terminal, otherwise the round's whole stake is reserved as unresolved exposure. Ticket order cannot change bankroll, peak or drawdown. Retrospective aggregates now expose counts only; their staked/returned/profit/ROI and any cumulative-profit headline are removed from the JSON, TypeScript types and My tickets. Individual retrospective fair accounting remains only beside the two retrospective disclaimers. Focused Phase-1 tests: 39 passing (`tests/test_settlement_accounting.py`, proposal/retrospective/contract/report tests).
+
 ## Open items
 
 - **Ranked audit complete; realised profitability remains mostly unmeasured**: Task 14's aggregate

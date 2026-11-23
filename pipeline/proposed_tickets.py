@@ -12,7 +12,7 @@ import math
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from . import ranking
+from . import ranking, settlement
 from .model.ranked_backtest import _clustered_mean_ci
 from .model.ranking_backtest import RETURN_BOOTSTRAP_RESAMPLES, RETURN_BOOTSTRAP_SEED
 
@@ -43,7 +43,7 @@ def _pc(row: dict) -> float:
 
 
 def _leg_key(leg: dict) -> tuple:
-    return (leg["d"], leg["h"], leg["a"], leg["m"])
+    return settlement.leg_key(leg)
 
 
 def eligible_pool(document: dict, snapshot: dict) -> list[dict]:
@@ -166,45 +166,28 @@ def _status_map(picks_dir: Path, date: str) -> dict[tuple, str]:
 
 
 def ticket_result(proposal: dict, statuses: dict[tuple, str]) -> dict:
-    states = [statuses.get(_leg_key(leg), "pending") for leg in proposal.get("legs", [])]
     stake = float((proposal.get("adaptive") or {}).get("stake", 0.0))
-    if any(state == "lost" for state in states):
-        return {"status": "lost", "stake": stake, "return": 0.0, "profit": -stake}
-    if not states or any(state not in ("landed", "void") for state in states):
-        return {"status": "pending", "stake": stake, "return": None, "profit": None}
-    if all(state == "void" for state in states):
-        return {"status": "void", "stake": stake, "return": stake, "profit": 0.0}
-    landed_odds = 1.0
-    for leg, state in zip(proposal.get("legs", []), states):
-        if state == "landed":
-            landed_odds *= float(leg["odds"])
-    returned = stake * landed_odds
-    return {"status": "landed", "stake": stake, "return": returned, "profit": returned - stake}
+    outcome = settlement.ticket_outcome(proposal.get("legs", []), statuses, stake)
+    return {key: outcome[key] for key in ("status", "stake", "return", "profit")}
+
+
+def _adaptive_stake(proposal: dict) -> float:
+    return float((proposal.get("adaptive") or {}).get("stake", 0.0))
 
 
 def replay_adaptive(prices_dir: Path, picks_dir: Path, before_date: str) -> dict:
-    bankroll = INITIAL_BANKROLL
-    peak = INITIAL_BANKROLL
-    unresolved = 0.0
+    documents = []
     for path in sorted((prices_dir / "proposals").glob("*.json")):
         document = json.loads(path.read_text(encoding="utf-8"))
         if document.get("round_date", "") >= before_date:
             continue
-        statuses = _status_map(picks_dir, document["round_date"])
-        for proposal in document.get("proposals", []):
-            result = ticket_result(proposal, statuses)
-            stake = float((proposal.get("adaptive") or {}).get("stake", 0.0))
-            if result["status"] == "pending":
-                unresolved += stake
-            elif result["status"] == "landed":
-                bankroll += float(result["profit"] or 0.0)
-            elif result["status"] == "lost":
-                bankroll -= stake
-            peak = max(peak, bankroll)
-    drawdown = (peak - bankroll) / peak if peak > 0 else 0.0
+        documents.append(document)
+    state = settlement.replay_bankroll(
+        documents, lambda date: _status_map(picks_dir, date), _adaptive_stake, INITIAL_BANKROLL,
+    )
     return {
-        "bankroll": round(bankroll, 4), "peak": round(peak, 4), "drawdown": round(drawdown, 4),
-        "unresolved_exposure": round(unresolved, 4), "available": round(max(0.0, bankroll - unresolved), 4),
+        "bankroll": state["bankroll"], "peak": state["peak"], "drawdown": state["drawdown"],
+        "unresolved_exposure": state["unresolved_exposure"], "available": state["available"],
     }
 
 
@@ -344,6 +327,7 @@ def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
     totals = {"flat_staked": 0.0, "flat_returned": 0.0, "adaptive_staked": 0.0, "adaptive_returned": 0.0}
     bankroll = INITIAL_BANKROLL
     peak = INITIAL_BANKROLL
+    unresolved = 0.0
     max_drawdown = 0.0
     series = []
     flat_date_rows = []
@@ -351,64 +335,79 @@ def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
     for path in sorted((prices_dir / "proposals").glob("*.json")):
         document = json.loads(path.read_text(encoding="utf-8"))
         statuses = _status_map(picks_dir, document["round_date"])
-        round_row = {"round_date": document["round_date"], "available": 0, "unavailable": 0, "pending": 0, "void": 0, "settled": 0, "flat_staked": 0.0, "flat_returned": 0.0, "adaptive_staked": 0.0, "adaptive_returned": 0.0}
-        flat_round_staked = flat_round_net = 0.0
-        for proposal in document.get("proposals", []):
+        proposals = document.get("proposals", [])
+        flat = settlement.round_accounting(
+            proposals, statuses, lambda proposal: float(proposal.get("flat_stake", 0.0)),
+        )
+        adaptive = settlement.round_accounting(proposals, statuses, _adaptive_stake)
+        round_row = {
+            "round_date": document["round_date"], "terminal": flat["terminal"],
+            "available": len(flat["outcomes"]), "unavailable": 0, "pending": 0,
+            "void": 0, "settled": 0, "flat_staked": 0.0, "flat_returned": 0.0,
+            "adaptive_staked": 0.0, "adaptive_returned": 0.0,
+        }
+        for proposal in proposals:
             stats = type_stats[proposal["type"]]
             stats["tickets"] += 1
             counts["tickets"] += 1
-            flat_stake = float(proposal.get("flat_stake", 0.0))
-            adaptive_stake = float((proposal.get("adaptive") or {}).get("stake", 0.0))
-            status = "unavailable" if proposal.get("status") != "available" else "pending"
-            flat_return = adaptive_return = None
-            if status != "unavailable":
-                round_row["available"] += 1
-                result = ticket_result(proposal, statuses)
-                status = result["status"]
-                if status == "pending":
-                    round_row["pending"] += 1
-                    stats["pending"] += 1
-                    counts["pending"] += 1
-                else:
-                    round_row["settled"] += 1
-                    stats["settled"] += 1
-                    stats[status] += 1
-                    counts[status] += 1
-                    if status == "void": round_row["void"] += 1
-                    if status == "landed":
-                        flat_return = flat_stake * float(proposal["combined_odds"])
-                        adaptive_return = float(result["return"] or 0.0)
-                    elif status == "lost":
-                        flat_return = 0.0
-                        adaptive_return = 0.0
-                    else:
-                        flat_return = flat_stake
-                        adaptive_return = adaptive_stake
-                    round_row["flat_staked"] += flat_stake
-                    round_row["flat_returned"] += flat_return
-                    stats["flat_staked"] += flat_stake
-                    stats["flat_returned"] += flat_return
-                    round_row["adaptive_staked"] += adaptive_stake
-                    round_row["adaptive_returned"] += adaptive_return
-                    stats["adaptive_staked"] += adaptive_stake
-                    stats["adaptive_returned"] += adaptive_return
-                    flat_round_staked += flat_stake
-                    flat_round_net += flat_return - flat_stake
-                    bankroll += adaptive_return - adaptive_stake
-                    peak = max(peak, bankroll)
-                    max_drawdown = max(max_drawdown, (peak - bankroll) / peak if peak > 0 else 0.0)
-            else:
+            if proposal.get("status") != "available":
                 round_row["unavailable"] += 1
                 stats["unavailable"] = stats.get("unavailable", 0) + 1
                 counts["unavailable"] += 1
-        for key in ("flat_staked", "flat_returned", "adaptive_staked", "adaptive_returned"):
-            totals[key] += round_row[key]
-        if flat_round_staked > 0:
-            flat_date_rows.append([flat_round_staked, flat_round_net])
+        for outcome in flat["outcomes"]:
+            proposal = outcome["proposal"]
+            stats = type_stats[proposal["type"]]
+            status = outcome["status"]
+            if status == "pending":
+                round_row["pending"] += 1
+                stats["pending"] += 1
+                counts["pending"] += 1
+                continue
+            round_row["settled"] += 1
+            stats["settled"] += 1
+            stats[status] += 1
+            counts[status] += 1
+            if status == "void":
+                round_row["void"] += 1
+            if not flat["terminal"]:
+                # Atomic rounds: a terminal ticket in a still-pending round does
+                # not move ledger money until every ticket in the round is terminal.
+                continue
+            gross = float(outcome["gross_multiplier"])
+            flat_return = outcome["stake"] * gross
+            adaptive_stake = _adaptive_stake(proposal)
+            adaptive_return = adaptive_stake * gross
+            round_row["flat_staked"] += outcome["stake"]
+            round_row["flat_returned"] += flat_return
+            stats["flat_staked"] += outcome["stake"]
+            stats["flat_returned"] += flat_return
+            round_row["adaptive_staked"] += adaptive_stake
+            round_row["adaptive_returned"] += adaptive_return
+            stats["adaptive_staked"] += adaptive_stake
+            stats["adaptive_returned"] += adaptive_return
+            totals["flat_staked"] += outcome["stake"]
+            totals["flat_returned"] += flat_return
+            totals["adaptive_staked"] += adaptive_stake
+            totals["adaptive_returned"] += adaptive_return
+
+        if flat["terminal"]:
+            if round_row["flat_staked"] > 0:
+                flat_date_rows.append([
+                    round_row["flat_staked"],
+                    round_row["flat_returned"] - round_row["flat_staked"],
+                ])
+            bankroll += float(adaptive["net"] or 0.0)
+            peak = max(peak, bankroll)
+            max_drawdown = max(max_drawdown, (peak - bankroll) / peak if peak > 0 else 0.0)
+        else:
+            unresolved += float(adaptive["exposure"])
         round_row["flat_net"] = round(round_row["flat_returned"] - round_row["flat_staked"], 4)
         round_row["adaptive_net"] = round(round_row["adaptive_returned"] - round_row["adaptive_staked"], 4)
         rounds.append(round_row)
-        series.append({"round_date": document["round_date"], "bankroll": round(bankroll, 4)})
+        series.append({
+            "round_date": document["round_date"], "bankroll": round(bankroll, 4),
+            "terminal": flat["terminal"], "unresolved_exposure": round(unresolved, 4),
+        })
     current_drawdown = (peak - bankroll) / peak if peak > 0 else 0.0
     flat_ci = [None, None]
     if len(flat_date_rows) >= MIN_CI_ROUNDS:
@@ -433,10 +432,11 @@ def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
         "adaptive": {
             **ledger("adaptive"), "initial_bankroll": INITIAL_BANKROLL, "bankroll": round(bankroll, 4),
             "peak": round(peak, 4), "current_drawdown": round(current_drawdown, 6),
-            "maximum_drawdown": round(max_drawdown, 6), "series": series,
+            "maximum_drawdown": round(max_drawdown, 6),
+            "unresolved_exposure": round(unresolved, 4), "series": series,
         },
         "types": type_stats,
-        "note": "Paper ledger. Flat stakes are fixed allocations; adaptive is quarter-Kelly with caps and drawdown controls. Not a profit guarantee.",
+        "note": "Paper ledger. Flat stakes are fixed allocations; adaptive is quarter-Kelly with caps and drawdown controls. Bankroll advances once per fully terminal round. Not a profit guarantee.",
     }
 
 
