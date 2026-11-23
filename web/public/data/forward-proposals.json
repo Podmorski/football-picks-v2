@@ -27,12 +27,12 @@
  "legacy_rounds": 0,
  "policy_version": "mel-v1",
  "price_coverage": {
-  "fixtures": 0,
-  "priced_fixtures": 0,
-  "priced_markets": 0,
-  "snapshot_rounds": 0,
-  "started_not_priced": 0,
-  "unmatched_fixtures": 0
+  "fixtures": 121,
+  "priced_fixtures": 121,
+  "priced_markets": 20064,
+  "snapshot_rounds": 2,
+  "started_not_priced": 14,
+  "unmatched_fixtures": 31
  },
  "results": {
   "counts": {
