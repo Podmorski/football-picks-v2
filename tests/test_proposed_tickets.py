@@ -1,4 +1,4 @@
-"""Frozen proposals, target selection, paper settlement and bankroll policy."""
+"""Frozen proposals, ticket-construction-v2, paper settlement and policy."""
 from __future__ import annotations
 
 import json
@@ -7,13 +7,13 @@ from pathlib import Path
 import pytest
 
 from pipeline import proposed_tickets as proposals
-
+from pipeline import ticket_construction
 
 DATE = "2026-11-24"
 
 
-def row(market: str, home: str, away: str, pc: float) -> dict:
-    return {"d": "E0", "k": "20:00", "h": home, "a": away, "m": market, "p": pc, "pc": pc}
+def row(market: str, home: str, away: str, pc: float, div: str = "E0") -> dict:
+    return {"d": div, "k": "20:00", "h": home, "a": away, "m": market, "p": pc, "pc": pc}
 
 
 def document(rows: list[dict]) -> dict:
@@ -24,99 +24,149 @@ def snapshot(fixtures: list[dict], fetched_at: str = "2026-11-24T13:00:00+00:00"
     return {"round_date": DATE, "fetched_at": fetched_at, "fixtures": fixtures, "started_not_priced": []}
 
 
-def fixture(home: str, away: str, prices: dict) -> dict:
-    return {"div": "E0", "home": home, "away": away, "kickoff": "20:00", "prices": prices}
+def fixture(home: str, away: str, prices: dict, div: str = "E0") -> dict:
+    return {"div": div, "home": home, "away": away, "kickoff": "20:00", "prices": prices}
 
 
-def test_58_is_inclusive_correct_score_missing_price_and_started_are_excluded() -> None:
+def build(rows: list[dict], fixtures: list[dict]) -> dict:
+    return proposals.build_proposals(document(rows), snapshot(fixtures))
+
+
+def by_type(payload: dict, key: str) -> dict:
+    return next(item for item in payload["proposals"] if item["type"] == key)
+
+
+def test_full_menu_keeps_every_priced_market_and_has_no_58_gate() -> None:
     doc = document([
-        row("BTTS:GG", "A", "B", 0.58),
-        row("CORRECT_SCORE:2:1", "C", "D", 0.99),
-        row("RESULT:1", "E", "F", 0.80),
+        row("BTTS:GG", "A", "B", 0.30), row("RESULT:X", "A", "B", 0.45),
+        row("CORRECT_SCORE:2:1", "C", "D", 0.99), row("BTTS:GG", "E", "F", 0.80),
+        row("RESULT:1", "G", "H", 0.70),
     ])
     snap = snapshot([
-        fixture("A", "B", {"BTTS:GG": 2.0}),
+        fixture("A", "B", {"BTTS:GG": 2.0, "RESULT:X": 3.0}),
         fixture("C", "D", {"CORRECT_SCORE:2:1": 10.0}),
-        fixture("E", "F", {"RESULT:1": 2.0}),
-        fixture("G", "H", {"BTTS:NG": 2.0}),
+        fixture("E", "F", {"BTTS:GG": 2.0}),
+        fixture("G", "H", {}),
     ])
     snap["started_not_priced"] = [{"div": "E0", "home": "E", "away": "F"}]
-    pool = proposals.eligible_pool(doc, snap)
-    assert {(leg["h"], leg["a"], leg["m"], leg["pc"]) for leg in pool} == {("A", "B", "BTTS:GG", 0.58)}
+    menu = proposals.eligible_pool(doc, snap)
+    assert {(leg["h"], leg["m"], leg["pc"]) for leg in menu} == {
+        ("A", "BTTS:GG", 0.30), ("A", "RESULT:X", 0.45),
+    }
 
 
-def test_one_highest_probability_leg_per_match() -> None:
-    doc = document([
-        row("BTTS:GG", "A", "B", 0.61), row("RESULT:1", "A", "B", 0.64),
-        row("BTTS:GG", "C", "D", 0.70),
-    ])
-    snap = snapshot([
-        fixture("A", "B", {"BTTS:GG": 1.8, "RESULT:1": 1.7}),
-        fixture("C", "D", {"BTTS:GG": 1.6}),
-    ])
-    pool = proposals.eligible_pool(doc, snap)
-    assert len(pool) == 2
-    assert pool[0]["h"] == "C" and pool[0]["pc"] == 0.70
-    assert pool[1]["m"] == "RESULT:1"
-
-
-def pool() -> list[dict]:
-    return [
-        {"d": "E0", "h": "A", "a": "B", "k": "20:00", "m": "A", "pc": 0.90, "fair": 1.1111, "odds": 1.80},
-        {"d": "E0", "h": "C", "a": "D", "k": "20:00", "m": "B", "pc": 0.90, "fair": 1.1111, "odds": 1.70},
-        {"d": "E0", "h": "E", "a": "F", "k": "20:00", "m": "C", "pc": 0.80, "fair": 1.25, "odds": 1.50},
-        {"d": "E0", "h": "G", "a": "H", "k": "20:00", "m": "D", "pc": 0.70, "fair": 1.4286, "odds": 2.00},
+def test_banded_best2_uses_actual_prices_and_highest_pc_in_band() -> None:
+    rows = [
+        row("F1A", "A", "B", 0.80), row("F1B", "A", "B", 0.90),
+        row("F2A", "C", "D", 0.75), row("F2B", "C", "D", 0.70),
+        row("F3A", "E", "F", 0.85),
     ]
+    fixtures = [
+        fixture("A", "B", {"F1A": 1.50, "F1B": 1.20}),
+        fixture("C", "D", {"F2A": 1.10, "F2B": 1.30}),
+        fixture("E", "F", {"F3A": 1.60}),
+    ]
+    payload = build(rows, fixtures)
+    best2 = by_type(payload, "best2")
+    assert best2["status"] == "available"
+    assert len(best2["legs"]) == 2
+    assert best2["combined_odds"] == pytest.approx(1.56)
+    assert {leg["m"] for leg in best2["legs"]} == {"F1B", "F2B"}
+    assert best2["construction"]["band"] == "preferred"
+    assert best2["construction"]["band_message"] == "in preferred band"
 
 
-def test_two_best_and_target_band_maximise_probability() -> None:
-    legs = pool()
-    doc = document([{**leg, "p": leg["pc"]} for leg in legs])
-    snap = snapshot([fixture(leg["h"], leg["a"], {leg["m"]: leg["odds"]}) for leg in legs])
-    payload = proposals.build_proposals(doc, snap)
-    assert payload["proposals"][0]["type"] == "best2"
-    assert [leg["h"] for leg in payload["proposals"][0]["legs"]] == ["A", "C"]
-    assert payload["proposals"][0]["combined_odds"] == pytest.approx(3.06)
-    assert payload["proposals"][0]["combined_probability"] == pytest.approx(0.81)
-    around3 = payload["proposals"][1]
-    assert around3["status"] == "available"
-    assert around3["combined_odds"] == pytest.approx(3.06)
-    assert around3["combined_probability"] == pytest.approx(0.81)
-    around5 = payload["proposals"][2]
+def test_short_price_pool_does_not_force_a_1_02_ticket() -> None:
+    rows = [row("M", "A", "B", 0.90), row("M", "C", "D", 0.90)]
+    fixtures = [fixture("A", "B", {"M": 1.10}), fixture("C", "D", {"M": 1.40})]
+    best2 = by_type(build(rows, fixtures), "best2")
+    assert best2["status"] == "available"
+    assert min(leg["odds"] for leg in best2["legs"]) >= 1.10
+
+
+def test_a_single_cheap_fixture_does_not_by_itself_force_relaxation() -> None:
+    rows = [row("M", "A", "B", 0.90), row("M", "C", "D", 0.90)]
+    fixtures = [fixture("A", "B", {"M": 1.02}), fixture("C", "D", {"M": 1.40})]
+    best2 = by_type(build(rows, fixtures), "best2")
+    assert best2["construction"]["individual_floor_relaxed"] is True
+    assert best2["construction"]["individual_floor_message"] == "preferred individual-odds floor relaxed"
+
+
+def test_fallback_ladder_is_explicit_and_deterministic() -> None:
+    rows = [row("M", "A", "B", 0.60), row("M", "C", "D", 0.60), row("M", "E", "F", 0.60)]
+    fixtures = [fixture("A", "B", {"M": 1.20}), fixture("C", "D", {"M": 1.20}), fixture("E", "F", {"M": 1.20})]
+    menu = proposals.eligible_pool(document(rows), snapshot(fixtures))
+    around5 = ticket_construction._build_one(menu, "around5")
     assert around5["status"] == "available"
-    assert 4.50 <= around5["combined_odds"] <= 5.50
-    assert around5["combined_odds"] == pytest.approx(4.59)
-    assert around5["combined_probability"] == pytest.approx(0.648)
+    assert around5["combined_odds"] == pytest.approx(1.728)
+    assert around5["construction"]["band"] == "below_floor"
+    assert around5["construction"]["band_message"] == "below meaningful payout floor; highest available payout"
+    assert around5["construction"]["achieved_odds"] == pytest.approx(1.728)
 
 
-def test_no_band_uses_closest_without_threshold_relaxation_or_filler() -> None:
-    target_pool = [
-        {"d": "E0", "h": "A", "a": "B", "k": "20:00", "m": "A", "pc": 0.70, "fair": 1.4286, "odds": 1.20},
-        {"d": "E0", "h": "C", "a": "D", "k": "20:00", "m": "B", "pc": 0.70, "fair": 1.4286, "odds": 1.25},
-        {"d": "E0", "h": "E", "a": "F", "k": "20:00", "m": "C", "pc": 0.70, "fair": 1.4286, "odds": 1.30},
-    ]
-    legs, reason = proposals.choose_target(target_pool, 3.0, 2.70, 3.30)
-    assert legs and len(legs) <= 3
-    assert "closest actual odds" in reason
-    assert all(leg["pc"] >= 0.58 for leg in legs)
-    _none, unavailable = proposals.choose_target(target_pool[:1], 3.0, 2.70, 3.30)
-    assert _none is None
-    assert unavailable == "fewer than 2 eligible legs"
+def test_outside_band_fallback_minimises_distance_above_the_floor() -> None:
+    rows = [row("M", "A", "B", 0.70), row("M", "C", "D", 0.70)]
+    fixtures = [fixture("A", "B", {"M": 2.20}), fixture("C", "D", {"M": 2.20})]
+    menu = proposals.eligible_pool(document(rows), snapshot(fixtures))
+    around3 = ticket_construction._build_one(menu, "around3")
+    assert around3["combined_odds"] == pytest.approx(4.84)
+    assert around3["construction"]["band"] == "outside"
+    assert around3["construction"]["band_message"] == "outside preferred band"
+
+
+def test_individual_price_relaxation_is_visible_and_not_a_silent_gate() -> None:
+    rows = [row("M", "A", "B", 0.70), row("M", "C", "D", 0.70)]
+    fixtures = [fixture("A", "B", {"M": 1.05}), fixture("C", "D", {"M": 1.05})]
+    best2 = by_type(build(rows, fixtures), "best2")
+    assert best2["status"] == "available"
+    assert best2["combined_odds"] == pytest.approx(1.1025)
+    assert best2["construction"]["individual_floor_relaxed"] is True
+    assert best2["construction"]["individual_floor_message"] == "preferred individual-odds floor relaxed"
+
+
+def test_fewer_than_two_priced_fixtures_is_unavailable_without_filler() -> None:
+    payload = build([row("M", "A", "B", 0.70)], [fixture("A", "B", {"M": 2.0})])
+    for key in ("best2", "around3", "around5"):
+        proposal = by_type(payload, key)
+        assert proposal["status"] == "unavailable"
+        assert proposal["reason"] == "unavailable — fewer than two distinct priced fixtures"
+        assert proposal["legs"] == []
+
+
+def test_tickets_never_reuse_a_fixture_inside_one_ticket() -> None:
+    rows = [row("M1", "A", "B", 0.70), row("M2", "A", "B", 0.60), row("M", "C", "D", 0.70)]
+    fixtures = [fixture("A", "B", {"M1": 1.50, "M2": 1.60}), fixture("C", "D", {"M": 2.0})]
+    payload = build(rows, fixtures)
+    for proposal in payload["proposals"]:
+        if proposal["status"] != "available":
+            continue
+        keys = [(leg["d"], leg["h"], leg["a"]) for leg in proposal["legs"]]
+        assert len(keys) == len(set(keys))
+        assert not any(leg["m"].startswith("CORRECT_SCORE:") for leg in proposal["legs"])
+
+
+def test_overlap_relaxation_is_recorded_when_fixtures_are_scarce() -> None:
+    rows = [row("M", "A", "B", 0.70), row("M", "C", "D", 0.70)]
+    fixtures = [fixture("A", "B", {"M": 1.50}), fixture("C", "D", {"M": 2.00})]
+    payload = build(rows, fixtures)
+    assert by_type(payload, "best2")["construction"]["overlap_relaxed"] is False
+    assert by_type(payload, "around3")["construction"]["overlap_relaxed"] is True
 
 
 def test_frozen_file_is_immutable_after_later_snapshot(tmp_path: Path) -> None:
-    doc = document([{**leg, "p": leg["pc"]} for leg in pool()])
-    first = snapshot([fixture(leg["h"], leg["a"], {leg["m"]: leg["odds"]}) for leg in pool()])
+    rows = [row("M", "A", "B", 0.70), row("M", "C", "D", 0.70)]
+    first = snapshot([fixture("A", "B", {"M": 2.0}), fixture("C", "D", {"M": 2.0})])
     prices = tmp_path / "prices"
     picks = tmp_path / "picks"
     picks.mkdir()
-    created = proposals.ensure_proposals(DATE, doc, first, prices, picks)
+    created = proposals.ensure_proposals(DATE, document(rows), first, prices, picks)
     path = prices / "proposals" / f"{DATE}.json"
     before = path.read_bytes()
-    changed = snapshot([fixture(leg["h"], leg["a"], {leg["m"]: leg["odds"] + 1}) for leg in pool()], "2026-11-24T17:00:00+00:00")
-    again = proposals.ensure_proposals(DATE, doc, changed, prices, picks)
+    changed = snapshot([fixture("A", "B", {"M": 3.0}), fixture("C", "D", {"M": 3.0})], "2026-11-24T17:00:00+00:00")
+    again = proposals.ensure_proposals(DATE, document(rows), changed, prices, picks)
     assert again == created
     assert path.read_bytes() == before
+    assert json.loads(path.read_text(encoding="utf-8"))["proposals"][0]["construction"]["policy"] == "ticket-construction-v2"
 
 
 def test_paper_settlement_semantics() -> None:
@@ -125,8 +175,7 @@ def test_paper_settlement_semantics() -> None:
             {"d": "E0", "h": "A", "a": "B", "m": "A", "odds": 2.0},
             {"d": "E0", "h": "C", "a": "D", "m": "B", "odds": 2.5},
         ],
-        "combined_odds": 5.0,
-        "adaptive": {"stake": 10.0},
+        "combined_odds": 5.0, "adaptive": {"stake": 10.0},
     }
     base = {("E0", "A", "B", "A"): "landed", ("E0", "C", "D", "B"): "landed"}
     assert proposals.ticket_result(proposal, base) == {"status": "landed", "stake": 10.0, "return": 50.0, "profit": 40.0}
@@ -242,7 +291,7 @@ def test_readiness_requires_valid_proposals_only_after_activation(tmp_path: Path
         proposals.validate_required_proposals(prices)
 
     proposal = {
-        "schema_version": 1, "round_date": "2026-11-24",
+        "schema_version": 2, "round_date": "2026-11-24",
         "proposals": [
             {"type": "best2", "status": "unavailable", "reason": "fewer than 2 eligible legs"},
             {"type": "around3", "status": "unavailable", "reason": "fewer than 2 eligible legs"},

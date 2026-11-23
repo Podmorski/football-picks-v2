@@ -435,6 +435,22 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   commits the private store with `if: always()` so a failed pass is still recorded; the deploy hook
   runs only on success.
 
+- Task 21 Phase 2 (23 Nov): automatic construction is `pipeline/ticket_construction.py` under frozen policy
+  `ticket-construction-v2` (proposal schema 2). It uses the full per-fixture production menu with an
+  exact frozen pre-match price and no 58% gate: a candidate needs 0<pc<1, odds>1, no CORRECT_SCORE,
+  unstarted fixture, exact round/division/home/away/market identity. Each ticket uses at most one market
+  per fixture. Specs: 2 best games exactly 2 fixtures, preferred 1.35-1.65, floor 1.20; Around 3.00
+  2-5 fixtures, preferred 2.70-3.30, floor 2.00; Around 5.00 2-5 fixtures, preferred 4.50-5.50, floor
+  3.00. Preferred individual odds 1.10; cheaper legs require the visible "preferred individual-odds
+  floor relaxed" metadata. Ranking is combined pc, model_EV, fewer legs, log-distance to target, then
+  deterministic identity. Visible fallbacks: in preferred band; outside preferred band; below
+  meaningful payout floor (highest available payout). Cross-ticket construction is best2, around3,
+  around5 with soft non-overlap; any relaxation is recorded as "cross-ticket overlap relaxation".
+  Search is exact up to 250,000 estimated combinations, otherwise a deterministic bounded DP
+  (2% log-odds buckets, 3 states per bucket) that records `exact: false` and makes no global
+  optimality claim. `PROPOSAL_ACTIVATION_DATE` remains 2026-11-24; frozen files are never rebuilt.
+  Focused tests: 25 in `tests/test_proposed_tickets.py`; full suite 353 passing.
+
 - Task 21 Phase 1 (23 Nov): shared ticket settlement is `pipeline/settlement.py`. One gross-multiplier rule is used by forward flat, forward adaptive and retrospective model-fair ledgers: any lost leg 0; all void 1; mixed landed/void the product of actual prices for landed legs only; pending no money movement. Forward accounting is round-atomic in `pipeline/proposed_tickets.py` (`aggregate_records`, `replay_adaptive`): bankroll/peak/maximum drawdown advance once after every available ticket in a round is terminal, otherwise the round's whole stake is reserved as unresolved exposure. Ticket order cannot change bankroll, peak or drawdown. Retrospective aggregates now expose counts only; their staked/returned/profit/ROI and any cumulative-profit headline are removed from the JSON, TypeScript types and My tickets. Individual retrospective fair accounting remains only beside the two retrospective disclaimers. Focused Phase-1 tests: 39 passing (`tests/test_settlement_accounting.py`, proposal/retrospective/contract/report tests).
 
 ## Open items

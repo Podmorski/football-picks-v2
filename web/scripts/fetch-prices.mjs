@@ -73,7 +73,7 @@ try {
     proposals
       .filter((round) => {
         const types = new Set((round.proposals ?? []).map((item) => item.type));
-        return round.schema_version === 1 && types.size === 3 && ['best2', 'around3', 'around5'].every((type) => types.has(type));
+        return Number(round.schema_version ?? 0) >= 2 && types.size === 3 && ['best2', 'around3', 'around5'].every((type) => types.has(type));
       })
       .map((round) => round.round_date),
   );

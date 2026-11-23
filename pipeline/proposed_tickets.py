@@ -12,18 +12,18 @@ import math
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from . import ranking, settlement
+from . import ranking, settlement, ticket_construction
 from .model.ranked_backtest import _clustered_mean_ci
 from .model.ranking_backtest import RETURN_BOOTSTRAP_RESAMPLES, RETURN_BOOTSTRAP_SEED
 
-MIN_PC = 0.58
 MAX_LEGS = 5
 # Rounds on/after this date require a frozen proposal file once a usable snapshot exists.
 # Earlier snapshots are explicitly exempt because proposals were not generated then.
 PROPOSAL_ACTIVATION_DATE = "2026-11-24"
 PROPOSAL_ACTIVATION_MARKER = "proposal-readiness-v1"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 POLICY_VERSION = "adaptive-quarter-kelly-v1"
+CONSTRUCTION_VERSION = ticket_construction.CONSTRUCTION_VERSION
 INITIAL_BANKROLL = 1000.0
 PER_TICKET_CAP = 0.01
 ROUND_CAP = 0.02
@@ -47,36 +47,8 @@ def _leg_key(leg: dict) -> tuple:
 
 
 def eligible_pool(document: dict, snapshot: dict) -> list[dict]:
-    """One highest-pc priced, not-started play per match."""
-    by_fixture: dict[tuple, list[dict]] = defaultdict(list)
-    for row in document.get("rows", []):
-        by_fixture[(row["d"], row["h"], row["a"])].append(row)
-    started = {
-        (row.get("div"), row.get("home"), row.get("away"))
-        for row in snapshot.get("started_not_priced", [])
-    }
-    pool = []
-    for fixture in snapshot.get("fixtures", []):
-        key = (fixture.get("div"), fixture.get("home"), fixture.get("away"))
-        if key in started or not fixture.get("prices"):
-            continue
-        best = None
-        for row in by_fixture.get(key, []):
-            if str(row.get("m", "")).startswith("CORRECT_SCORE:") or _pc(row) < MIN_PC:
-                continue
-            odds = fixture["prices"].get(row["m"])
-            if odds is None or float(odds) <= 1.0:
-                continue
-            candidate = {
-                "d": row["d"], "h": row["h"], "a": row["a"], "k": row.get("k"),
-                "m": row["m"], "pc": _pc(row), "fair": 1.0 / max(_pc(row), 1e-4),
-                "odds": float(odds),
-            }
-            if best is None or candidate["pc"] > best["pc"]:
-                best = candidate
-        if best is not None:
-            pool.append(best)
-    return sorted(pool, key=lambda leg: (-leg["pc"], leg["d"], leg["h"], leg["a"]))
+    """Backward-compatible name for the full priced candidate menu."""
+    return ticket_construction.candidate_menu(document, snapshot)
 
 
 def _combined(legs: list[dict], price_key: str = "odds") -> tuple[float, float]:
@@ -223,27 +195,14 @@ def _adaptive_allocations(proposals: list[dict], state: dict) -> None:
 
 
 def build_proposals(document: dict, snapshot: dict, prior_state: dict | None = None) -> dict:
-    pool = eligible_pool(document, snapshot)
+    menu = eligible_pool(document, snapshot)
     proposals = []
-    for key in ("best2", "around3", "around5"):
-        spec = TARGETS[key]
-        if key == "best2":
-            legs = pool[:2] if len(pool) >= 2 else None
-            reason = "" if legs else "fewer than 2 eligible priced legs"
-        else:
-            legs, reason = choose_target(pool, spec["target"], spec["low"], spec["high"], spec["min_legs"], spec["max_legs"])
+    for item in ticket_construction.construct(menu):
+        key = item["type"]
         proposal = {
-            "type": key, "label": spec["label"], "status": "available" if legs else "unavailable",
-            "reason": reason, "flat_stake": FLAT_STAKES[key] if legs else 0.0,
+            **item,
+            "flat_stake": FLAT_STAKES[key] if item["status"] == "available" else 0.0,
         }
-        if legs:
-            probability, odds = _combined(legs)
-            proposal.update({
-                "legs": legs, "combined_probability": round(probability, 8),
-                "combined_odds": round(odds, 6),
-            })
-        else:
-            proposal.update({"legs": [], "combined_probability": None, "combined_odds": None})
         proposals.append(proposal)
     state = prior_state or {
         "bankroll": INITIAL_BANKROLL, "peak": INITIAL_BANKROLL, "drawdown": 0.0,
@@ -255,7 +214,8 @@ def build_proposals(document: dict, snapshot: dict, prior_state: dict | None = N
         "round_date": document["date"],
         "snapshot_identity": {"round_date": snapshot.get("round_date"), "fetched_at": snapshot.get("fetched_at")},
         "policy": {
-            "version": POLICY_VERSION, "initial_bankroll": INITIAL_BANKROLL,
+            "version": POLICY_VERSION, "construction_version": CONSTRUCTION_VERSION,
+            "initial_bankroll": INITIAL_BANKROLL,
             "per_ticket_cap": PER_TICKET_CAP, "round_cap": ROUND_CAP,
             "drawdown_half": DRAWDOWN_HALF, "drawdown_stop": DRAWDOWN_STOP,
             "kelly_fraction": 0.25, "flat_stakes": FLAT_STAKES,
