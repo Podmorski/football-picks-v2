@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-11-23T15:58:04+00:00",
+ "generated_at": "2026-11-23T17:18:27+00:00",
  "rounds": [
   {
    "date": "2026-11-14",
@@ -17,27 +17,27 @@
   {
    "date": "2026-11-21",
    "fixtures": 122,
-   "hits": 0,
+   "hits": 5060,
    "kind": "round",
    "label": "Saturday 21 Nov",
    "leagues": 21,
    "picks": 19076,
    "rows": 19076,
    "settled": false,
-   "settled_count": 0,
+   "settled_count": 18768,
    "weekday": "Saturday"
   },
   {
    "date": "2026-11-22",
    "fixtures": 44,
-   "hits": 927,
+   "hits": 1822,
    "kind": "round",
    "label": "Sunday 22 Nov",
    "leagues": 13,
    "picks": 6810,
    "rows": 6810,
-   "settled": false,
-   "settled_count": 3397,
+   "settled": true,
+   "settled_count": 6810,
    "weekday": "Sunday"
   }
  ]

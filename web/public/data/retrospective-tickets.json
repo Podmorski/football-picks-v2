@@ -1,10 +1,10 @@
 {
  "cumulative": {
-  "landed": 3,
+  "landed": 9,
   "lost": 0,
-  "pending": 6,
-  "settled": 3,
-  "source_pending": 6,
+  "pending": 0,
+  "settled": 9,
+  "source_pending": 0,
   "tickets": 9,
   "unavailable": 0,
   "void": 0
@@ -230,13 +230,13 @@
      "reason": "",
      "settlement": {
       "leg_statuses": [
-       "pending",
-       "pending"
+       "landed",
+       "landed"
       ],
-      "profit": null,
-      "return": null,
-      "source_pending": true,
-      "status": "pending"
+      "profit": 2.067,
+      "return": 52.067,
+      "source_pending": false,
+      "status": "landed"
      },
      "status": "available",
      "type": "best2"
@@ -296,16 +296,16 @@
      "reason": "no combination in the preferred odds band; closest actual odds used",
      "settlement": {
       "leg_statuses": [
-       "pending",
-       "pending",
-       "pending",
-       "pending",
-       "pending"
+       "landed",
+       "landed",
+       "landed",
+       "landed",
+       "landed"
       ],
-      "profit": null,
-      "return": null,
-      "source_pending": true,
-      "status": "pending"
+      "profit": 19.694,
+      "return": 49.694,
+      "source_pending": false,
+      "status": "landed"
      },
      "status": "available",
      "type": "around3"
@@ -365,16 +365,16 @@
      "reason": "no combination in the preferred odds band; closest actual odds used",
      "settlement": {
       "leg_statuses": [
-       "pending",
-       "pending",
-       "pending",
-       "pending",
-       "pending"
+       "landed",
+       "landed",
+       "landed",
+       "landed",
+       "landed"
       ],
-      "profit": null,
-      "return": null,
-      "source_pending": true,
-      "status": "pending"
+      "profit": 13.1294,
+      "return": 33.1294,
+      "source_pending": false,
+      "status": "landed"
      },
      "status": "available",
      "type": "around5"
@@ -414,13 +414,13 @@
      "reason": "",
      "settlement": {
       "leg_statuses": [
-       "pending",
-       "pending"
+       "landed",
+       "landed"
       ],
-      "profit": null,
-      "return": null,
-      "source_pending": true,
-      "status": "pending"
+      "profit": 1.2739,
+      "return": 51.2739,
+      "source_pending": false,
+      "status": "landed"
      },
      "status": "available",
      "type": "best2"
@@ -480,16 +480,16 @@
      "reason": "no combination in the preferred odds band; closest actual odds used",
      "settlement": {
       "leg_statuses": [
-       "pending",
-       "pending",
-       "pending",
-       "pending",
-       "pending"
+       "landed",
+       "landed",
+       "landed",
+       "landed",
+       "landed"
       ],
-      "profit": null,
-      "return": null,
-      "source_pending": true,
-      "status": "pending"
+      "profit": 17.8429,
+      "return": 47.8429,
+      "source_pending": false,
+      "status": "landed"
      },
      "status": "available",
      "type": "around3"
@@ -549,16 +549,16 @@
      "reason": "no combination in the preferred odds band; closest actual odds used",
      "settlement": {
       "leg_statuses": [
-       "pending",
-       "pending",
-       "pending",
-       "pending",
-       "pending"
+       "landed",
+       "landed",
+       "landed",
+       "landed",
+       "landed"
       ],
-      "profit": null,
-      "return": null,
-      "source_pending": true,
-      "status": "pending"
+      "profit": 11.8953,
+      "return": 31.8953,
+      "source_pending": false,
+      "status": "landed"
      },
      "status": "available",
      "type": "around5"

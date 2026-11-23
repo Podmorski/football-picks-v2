@@ -1,11 +1,11 @@
 {
  "cumulative": {
-  "expected": 55.8346,
-  "landed": 53,
-  "lost": 15,
+  "expected": 172.4107,
+  "landed": 171,
+  "lost": 39,
   "passing": 214,
-  "pending": 144,
-  "settled": 68,
+  "pending": 2,
+  "settled": 210,
   "void": 2
  },
  "min_fair": 1.2,
@@ -25,26 +25,26 @@
   },
   {
    "date": "2026-11-21",
-   "expected": 0,
+   "expected": 98.5216,
    "kind": "round",
    "label": "Saturday 21 Nov",
-   "landed": 0,
-   "lost": 0,
+   "landed": 97,
+   "lost": 23,
    "passing": 122,
-   "pending": 122,
-   "settled": 0,
+   "pending": 2,
+   "settled": 120,
    "void": 0
   },
   {
    "date": "2026-11-22",
-   "expected": 18.1262,
+   "expected": 36.1807,
    "kind": "round",
    "label": "Sunday 22 Nov",
-   "landed": 17,
-   "lost": 5,
+   "landed": 38,
+   "lost": 6,
    "passing": 44,
-   "pending": 22,
-   "settled": 22,
+   "pending": 0,
+   "settled": 44,
    "void": 0
   }
  ]

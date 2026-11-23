@@ -1,23 +1,153 @@
 {
- "bands": {},
+ "bands": {
+  "2-3": {
+   "bets": 4,
+   "ci": [
+    -1.0,
+    0.075
+   ],
+   "landed": 1,
+   "needed": 1.6649,
+   "profit": -1.85,
+   "return": -0.4625
+  },
+  "3-6": {
+   "bets": 7,
+   "ci": [
+    -1.0,
+    -1.0
+   ],
+   "landed": 0,
+   "needed": 1.7852,
+   "profit": -7.0,
+   "return": -1.0
+  },
+  "<2": {
+   "bets": 1,
+   "ci": [
+    -1.0,
+    -1.0
+   ],
+   "landed": 0,
+   "needed": 0.5051,
+   "profit": -1.0,
+   "return": -1.0
+  }
+ },
  "bootstrap": {
   "resamples": 2000,
   "seed": 20261025,
   "unit": "round date"
  },
  "cumulative": {
-  "bets": 0,
+  "bets": 12,
   "ci": [
-   null,
-   null
+   -1.0,
+   -0.7312
   ],
-  "landed": 0,
-  "needed": 0,
-  "profit": 0,
-  "return": null
+  "landed": 1,
+  "needed": 3.9552,
+  "profit": -9.85,
+  "return": -0.8208
  },
- "groups": {},
+ "groups": {
+  "BTTS": {
+   "bets": 1,
+   "ci": [
+    -1.0,
+    -1.0
+   ],
+   "landed": 0,
+   "needed": 0.2381,
+   "profit": -1.0,
+   "return": -1.0
+  },
+  "Goals": {
+   "bets": 2,
+   "ci": [
+    -1.0,
+    -1.0
+   ],
+   "landed": 0,
+   "needed": 0.6971,
+   "profit": -2.0,
+   "return": -1.0
+  },
+  "HT/FT": {
+   "bets": 3,
+   "ci": [
+    -1.0,
+    1.15
+   ],
+   "landed": 1,
+   "needed": 1.2803,
+   "profit": -0.85,
+   "return": -0.2833
+  },
+  "Half-time": {
+   "bets": 4,
+   "ci": [
+    -1.0,
+    -1.0
+   ],
+   "landed": 0,
+   "needed": 1.0074,
+   "profit": -4.0,
+   "return": -1.0
+  },
+  "Team goals": {
+   "bets": 2,
+   "ci": [
+    -1.0,
+    -1.0
+   ],
+   "landed": 0,
+   "needed": 0.7323,
+   "profit": -2.0,
+   "return": -1.0
+  }
+ },
  "note": "Settled rounds only. Value = Mozzart >= min play, team records and agreement pass, fair <= 6, one per match by highest edge; flat 1 unit at the Mozzart price.",
- "profit_series": [],
- "rounds": []
+ "profit_series": [
+  {
+   "date": "2026-11-21",
+   "profit": -5.85
+  },
+  {
+   "date": "2026-11-22",
+   "profit": -9.85
+  }
+ ],
+ "rounds": [
+  {
+   "date": "2026-11-21",
+   "label": "Saturday 21 Nov",
+   "summary": {
+    "bets": 8,
+    "ci": [
+     -0.7312,
+     -0.7312
+    ],
+    "landed": 1,
+    "needed": 2.6522,
+    "profit": -5.85,
+    "return": -0.7312
+   }
+  },
+  {
+   "date": "2026-11-22",
+   "label": "Sunday 22 Nov",
+   "summary": {
+    "bets": 4,
+    "ci": [
+     -1.0,
+     -1.0
+    ],
+    "landed": 0,
+    "needed": 1.303,
+    "profit": -4.0,
+    "return": -1.0
+   }
+  }
+ ]
 }

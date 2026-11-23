@@ -1,5 +1,5 @@
 {
- "latest_football_data_result_date": "2026-11-20",
+ "latest_football_data_result_date": "2026-11-22",
  "schema_version": 1,
  "unsettled_rounds": [
   {
@@ -8,79 +8,35 @@
     "ambiguous": 0,
     "attempted": false,
     "reason": "no cached next-day attempt (outside the fallback window or not requested)",
-    "unmatched": 122
+    "unmatched": 2
    },
    "fixtures": 122,
    "kind": "round",
    "label": "Saturday 21 Nov",
    "next_retry": "Tue 10:00 UTC",
-   "pending_fixtures": 122,
+   "pending_fixtures": 2,
    "pending_reasons": {
     "ambiguous_fixtures": 0,
-    "source_pending_fixtures": 122,
+    "source_pending_fixtures": 2,
     "source_pending_sample": [
-     "Accrington v Salford",
-     "Alaves v La Coruna",
-     "Aldershot v Scunthorpe"
+     "Dunfermline v Morton",
+     "Spartans v Dumbarton"
     ],
-    "unmatched_fixtures": 122
+    "unmatched_fixtures": 2
    },
    "rows": {
-    "pending": 21716,
-    "settled": 0,
+    "pending": 356,
+    "settled": 21360,
     "total": 21716
    },
-   "settled_fixtures": 0,
+   "settled_fixtures": 120,
    "sources": {
     "api_football_fixtures": 0,
     "api_football_rows": 0,
-    "football_data_fixtures": 0,
-    "football_data_rows": 0,
-    "unknown_fixtures": 122,
-    "unknown_rows": 21716
-   }
-  },
-  {
-   "date": "2026-11-22",
-   "fallback": {
-    "ambiguous": 0,
-    "attempted": true,
-    "events": 36,
-    "fetched_at": "2026-11-23T15:55:47+00:00",
-    "final_count": 36,
-    "fixtures": 44,
-    "matched": 22,
-    "requests": 1,
-    "unmatched": 22
-   },
-   "fixtures": 44,
-   "kind": "round",
-   "label": "Sunday 22 Nov",
-   "next_retry": "Tue 10:00 UTC",
-   "pending_fixtures": 22,
-   "pending_reasons": {
-    "ambiguous_fixtures": 0,
-    "source_pending_fixtures": 22,
-    "source_pending_sample": [
-     "Ajax v Den Haag",
-     "Anderlecht v Oud-Heverlee Leuven",
-     "Augsburg v Mainz"
-    ],
-    "unmatched_fixtures": 22
-   },
-   "rows": {
-    "pending": 3916,
-    "settled": 3916,
-    "total": 7832
-   },
-   "settled_fixtures": 22,
-   "sources": {
-    "api_football_fixtures": 22,
-    "api_football_rows": 3916,
-    "football_data_fixtures": 0,
-    "football_data_rows": 0,
-    "unknown_fixtures": 22,
-    "unknown_rows": 3916
+    "football_data_fixtures": 120,
+    "football_data_rows": 21360,
+    "unknown_fixtures": 2,
+    "unknown_rows": 356
    }
   }
  ]
