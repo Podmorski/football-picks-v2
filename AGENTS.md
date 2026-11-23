@@ -351,6 +351,30 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   loading/error/unavailable states. Frequencies are labelled historical, not calibrated chances. No
   probability, Ranked/Strict, dropdown, ticket, price, settlement, ranking or filter behaviour changes;
   these statistics do not currently influence rankings.
+- Task 17 (23 Nov): 23 additional score-settleable candidates are defined research-only in
+  `pipeline/model/additional_markets.py`; they are NOT registered in `markets.py`. Nineteen are unique;
+  four requested HT/FT+BTTS candidates (`1-X&gg`, `1-2&gg`, `2-1&gg`, `2-X&gg`) are logically exact
+  duplicates of existing `HTFT:1-X`, `1-2`, `2-1`, `2-X` and are excluded from the augmented registry.
+  The impossible NG counterparts remain absent. Candidate ids use existing groups only: HT/FT or Combos.
+  Catalogue evidence uses the existing read-only v1 Mozzart snapshot dated 24 Sep 2026; no private
+  checkout was available locally and no Mozzart request or budget was used. Snapshot-confirmed are
+  `RESULT_AND_BTTS:1&gg`, `2&gg`, `DC_AND_BTTS:1X&gg`, `X2&gg`, `BTTS_AND_GOALS:GG&3+` and
+  `HTFT_AND_GOALS:X-X&3+`; the other 17 remain unconfirmed or technically blocked. The full
+  walk-forward audit in `pipeline/model/additional_market_backtest.py` uses the same 22 divisions,
+  2019-20..2025-26, round schedule, half-life 365, pre-round goals/empirical fitting and existing
+  target-season picker factors, without refitting or closing odds. It writes aggregate-only
+  `web/public/data/additional_markets_backtest.json` (29,398 bytes): every candidate's selections,
+  dates, landed/raw-pc calibration, median fair odds, fair return and 2000-date bootstrap CI, plus
+  descriptive Ranked-group impact. Full run: 5m43s, 303 MiB peak, 23/23 candidate cohorts. All candidates
+  have 42,904 or 42,939 selections over 891 dates and are not small-sample. Combos selection changes on
+  2,904/42,939 fixtures (6.76%; additional winners `NG&0-2` 2,882, `1X&ng` 20, `X2&ng` 2); HT/FT changes
+  none. Changed selections: current landed .4735 / mean pc .4642; augmented .4793 / .4965. This is
+  descriptive, not an improvement or profit claim. Every candidate's realised historical bookmaker
+  return is not measurable from current data. Positive fair-return tails are multiple comparisons and
+  must not drive activation. Nothing is activated in rounds/UI; production selections, rounds,
+  calibration, prices, workflows and existing backtests are unchanged. Regenerate with
+  `/home/nikola/.venvs/picks-v2/bin/python -m pipeline.model.additional_market_backtest` from the repo
+  root. Activation still requires current-catalogue confirmation and owner review.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`

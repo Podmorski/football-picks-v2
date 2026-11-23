@@ -1,0 +1,961 @@
+{
+ "candidates": [
+  {
+   "activation_blocker": "logically equivalent to HTFT:1-X",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": "HTFT:1-X",
+   "fair_return": 0.2176,
+   "fair_return_ci": [
+    0.1692,
+    0.2695
+   ],
+   "group": "HT/FT",
+   "id": "HTFT_COMBO:1-X&gg",
+   "landed": 2272,
+   "landed_minus_pc": 0.009,
+   "landed_minus_raw_p": 0.009,
+   "landed_pct": 0.053,
+   "mean_pc": 0.0439,
+   "mean_raw_p": 0.0439,
+   "median_fair_odds": 21.791,
+   "round_dates": 891,
+   "selections": 42904,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "logically equivalent to HTFT:1-2",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": "HTFT:1-2",
+   "fair_return": 0.285,
+   "fair_return_ci": [
+    0.1933,
+    0.3765
+   ],
+   "group": "HT/FT",
+   "id": "HTFT_COMBO:1-2&gg",
+   "landed": 978,
+   "landed_minus_pc": 0.0051,
+   "landed_minus_raw_p": 0.0051,
+   "landed_pct": 0.0228,
+   "mean_pc": 0.0177,
+   "mean_raw_p": 0.0177,
+   "median_fair_odds": 57.535,
+   "round_dates": 891,
+   "selections": 42904,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "logically equivalent to HTFT:2-1",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": "HTFT:2-1",
+   "fair_return": 0.2368,
+   "fair_return_ci": [
+    0.1659,
+    0.3126
+   ],
+   "group": "HT/FT",
+   "id": "HTFT_COMBO:2-1&gg",
+   "landed": 1150,
+   "landed_minus_pc": 0.005,
+   "landed_minus_raw_p": 0.005,
+   "landed_pct": 0.0268,
+   "mean_pc": 0.0218,
+   "mean_raw_p": 0.0218,
+   "median_fair_odds": 46.069,
+   "round_dates": 891,
+   "selections": 42904,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "logically equivalent to HTFT:2-X",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": "HTFT:2-X",
+   "fair_return": 0.1962,
+   "fair_return_ci": [
+    0.1501,
+    0.2428
+   ],
+   "group": "HT/FT",
+   "id": "HTFT_COMBO:2-X&gg",
+   "landed": 2231,
+   "landed_minus_pc": 0.0086,
+   "landed_minus_raw_p": 0.0086,
+   "landed_pct": 0.052,
+   "mean_pc": 0.0434,
+   "mean_raw_p": 0.0434,
+   "median_fair_odds": 22.169,
+   "round_dates": 891,
+   "selections": 42904,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0262,
+   "fair_return_ci": [
+    -0.0604,
+    0.0089
+   ],
+   "group": "HT/FT",
+   "id": "HTFT_COMBO:X-X&ng",
+   "landed": 3109,
+   "landed_minus_pc": -0.0014,
+   "landed_minus_raw_p": -0.0014,
+   "landed_pct": 0.0725,
+   "mean_pc": 0.0738,
+   "mean_raw_p": 0.0738,
+   "median_fair_odds": 13.839,
+   "round_dates": 891,
+   "selections": 42904,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": null,
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "confirmed_in_existing_snapshot",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0208,
+   "fair_return_ci": [
+    -0.043,
+    0.0013
+   ],
+   "group": "Combos",
+   "id": "RESULT_AND_BTTS:1&gg",
+   "landed": 8225,
+   "landed_minus_pc": -0.0022,
+   "landed_minus_raw_p": -0.0023,
+   "landed_pct": 0.1916,
+   "mean_pc": 0.1938,
+   "mean_raw_p": 0.1938,
+   "median_fair_odds": 5.302,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0294,
+   "fair_return_ci": [
+    -0.048,
+    -0.01
+   ],
+   "group": "Combos",
+   "id": "RESULT_AND_BTTS:1&ng",
+   "landed": 10194,
+   "landed_minus_pc": -0.0059,
+   "landed_minus_raw_p": -0.0072,
+   "landed_pct": 0.2374,
+   "mean_pc": 0.2433,
+   "mean_raw_p": 0.2446,
+   "median_fair_odds": 4.253,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": 0.1008,
+   "fair_return_ci": [
+    0.0791,
+    0.1233
+   ],
+   "group": "Combos",
+   "id": "RESULT_AND_BTTS:X&gg",
+   "landed": 8065,
+   "landed_minus_pc": 0.0172,
+   "landed_minus_raw_p": 0.0172,
+   "landed_pct": 0.1878,
+   "mean_pc": 0.1707,
+   "mean_raw_p": 0.1707,
+   "median_fair_odds": 5.558,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.027,
+   "fair_return_ci": [
+    -0.0611,
+    0.0081
+   ],
+   "group": "Combos",
+   "id": "RESULT_AND_BTTS:X&ng",
+   "landed": 3109,
+   "landed_minus_pc": -0.0014,
+   "landed_minus_raw_p": -0.0014,
+   "landed_pct": 0.0724,
+   "mean_pc": 0.0738,
+   "mean_raw_p": 0.0738,
+   "median_fair_odds": 13.85,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": null,
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "confirmed_in_existing_snapshot",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0146,
+   "fair_return_ci": [
+    -0.0428,
+    0.0152
+   ],
+   "group": "Combos",
+   "id": "RESULT_AND_BTTS:2&gg",
+   "landed": 6233,
+   "landed_minus_pc": -0.0016,
+   "landed_minus_raw_p": -0.0016,
+   "landed_pct": 0.1452,
+   "mean_pc": 0.1468,
+   "mean_raw_p": 0.1468,
+   "median_fair_odds": 7.239,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.04,
+   "fair_return_ci": [
+    -0.0657,
+    -0.0134
+   ],
+   "group": "Combos",
+   "id": "RESULT_AND_BTTS:2&ng",
+   "landed": 7113,
+   "landed_minus_pc": -0.0043,
+   "landed_minus_raw_p": -0.0047,
+   "landed_pct": 0.1657,
+   "mean_pc": 0.17,
+   "mean_raw_p": 0.1703,
+   "median_fair_odds": 6.209,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": null,
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "confirmed_in_existing_snapshot",
+   "equivalent_existing_id": null,
+   "fair_return": 0.0562,
+   "fair_return_ci": [
+    0.0438,
+    0.0693
+   ],
+   "group": "Combos",
+   "id": "DC_AND_BTTS:1X&gg",
+   "landed": 16290,
+   "landed_minus_pc": 0.021,
+   "landed_minus_raw_p": 0.0149,
+   "landed_pct": 0.3794,
+   "mean_pc": 0.3584,
+   "mean_raw_p": 0.3645,
+   "median_fair_odds": 2.714,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0187,
+   "fair_return_ci": [
+    -0.034,
+    -0.0031
+   ],
+   "group": "Combos",
+   "id": "DC_AND_BTTS:1X&ng",
+   "landed": 13303,
+   "landed_minus_pc": -0.0049,
+   "landed_minus_raw_p": -0.0086,
+   "landed_pct": 0.3098,
+   "mean_pc": 0.3147,
+   "mean_raw_p": 0.3184,
+   "median_fair_odds": 3.156,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0031,
+   "fair_return_ci": [
+    -0.0168,
+    0.0112
+   ],
+   "group": "Combos",
+   "id": "DC_AND_BTTS:12&gg",
+   "landed": 14458,
+   "landed_minus_pc": -0.0009,
+   "landed_minus_raw_p": -0.0039,
+   "landed_pct": 0.3367,
+   "mean_pc": 0.3376,
+   "mean_raw_p": 0.3406,
+   "median_fair_odds": 2.956,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": 0.0023,
+   "fair_return_ci": [
+    -0.0083,
+    0.013
+   ],
+   "group": "Combos",
+   "id": "DC_AND_BTTS:12&ng",
+   "landed": 17307,
+   "landed_minus_pc": 0.0008,
+   "landed_minus_raw_p": -0.0118,
+   "landed_pct": 0.4031,
+   "mean_pc": 0.4023,
+   "mean_raw_p": 0.4149,
+   "median_fair_odds": 2.532,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": null,
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "confirmed_in_existing_snapshot",
+   "equivalent_existing_id": null,
+   "fair_return": 0.0622,
+   "fair_return_ci": [
+    0.0465,
+    0.0777
+   ],
+   "group": "Combos",
+   "id": "DC_AND_BTTS:X2&gg",
+   "landed": 14298,
+   "landed_minus_pc": 0.0187,
+   "landed_minus_raw_p": 0.0155,
+   "landed_pct": 0.333,
+   "mean_pc": 0.3143,
+   "mean_raw_p": 0.3175,
+   "median_fair_odds": 3.101,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0349,
+   "fair_return_ci": [
+    -0.0529,
+    -0.0158
+   ],
+   "group": "Combos",
+   "id": "DC_AND_BTTS:X2&ng",
+   "landed": 10222,
+   "landed_minus_pc": -0.005,
+   "landed_minus_raw_p": -0.0061,
+   "landed_pct": 0.2381,
+   "mean_pc": 0.2431,
+   "mean_raw_p": 0.2441,
+   "median_fair_odds": 4.139,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": 0.0733,
+   "fair_return_ci": [
+    0.0459,
+    0.1009
+   ],
+   "group": "Combos",
+   "id": "BTTS_AND_GOALS:GG&0-2",
+   "landed": 5227,
+   "landed_minus_pc": 0.009,
+   "landed_minus_raw_p": 0.009,
+   "landed_pct": 0.1217,
+   "mean_pc": 0.1128,
+   "mean_raw_p": 0.1128,
+   "median_fair_odds": 8.476,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": null,
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "confirmed_in_existing_snapshot",
+   "equivalent_existing_id": null,
+   "fair_return": 0.0363,
+   "fair_return_ci": [
+    0.0243,
+    0.0493
+   ],
+   "group": "Combos",
+   "id": "BTTS_AND_GOALS:GG&3+",
+   "landed": 17296,
+   "landed_minus_pc": 0.0136,
+   "landed_minus_raw_p": 0.0043,
+   "landed_pct": 0.4028,
+   "mean_pc": 0.3892,
+   "mean_raw_p": 0.3985,
+   "median_fair_odds": 2.583,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0063,
+   "fair_return_ci": [
+    -0.0192,
+    0.0066
+   ],
+   "group": "Combos",
+   "id": "BTTS_AND_GOALS:NG&0-2",
+   "landed": 15975,
+   "landed_minus_pc": -0.0013,
+   "landed_minus_raw_p": -0.0097,
+   "landed_pct": 0.372,
+   "mean_pc": 0.3734,
+   "mean_raw_p": 0.3817,
+   "median_fair_odds": 2.63,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0327,
+   "fair_return_ci": [
+    -0.0611,
+    -0.0051
+   ],
+   "group": "Combos",
+   "id": "BTTS_AND_GOALS:NG&3+",
+   "landed": 4441,
+   "landed_minus_pc": -0.0035,
+   "landed_minus_raw_p": -0.0035,
+   "landed_pct": 0.1034,
+   "mean_pc": 0.1069,
+   "mean_raw_p": 0.107,
+   "median_fair_odds": 11.363,
+   "round_dates": 891,
+   "selections": 42939,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": "catalogue availability not confirmed",
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "insufficient_catalogue_evidence",
+   "equivalent_existing_id": null,
+   "fair_return": -0.0075,
+   "fair_return_ci": [
+    -0.0409,
+    0.0247
+   ],
+   "group": "HT/FT",
+   "id": "HTFT_AND_GOALS:X-X&2+",
+   "landed": 3562,
+   "landed_minus_pc": -0.0003,
+   "landed_minus_raw_p": -0.0003,
+   "landed_pct": 0.083,
+   "mean_pc": 0.0834,
+   "mean_raw_p": 0.0834,
+   "median_fair_odds": 11.321,
+   "round_dates": 891,
+   "selections": 42904,
+   "small_sample": false
+  },
+  {
+   "activation_blocker": null,
+   "actual_bookmaker_return": {
+    "measurement": "realised historical return not measurable from current data",
+    "reason": "No exact pre-match historical bookmaker mapping exists for this combination."
+   },
+   "catalogue_status": "confirmed_in_existing_snapshot",
+   "equivalent_existing_id": null,
+   "fair_return": 0.0018,
+   "fair_return_ci": [
+    -0.0642,
+    0.0689
+   ],
+   "group": "HT/FT",
+   "id": "HTFT_AND_GOALS:X-X&3+",
+   "landed": 938,
+   "landed_minus_pc": -0.0005,
+   "landed_minus_raw_p": -0.0005,
+   "landed_pct": 0.0219,
+   "mean_pc": 0.0224,
+   "mean_raw_p": 0.0224,
+   "median_fair_odds": 44.711,
+   "round_dates": 891,
+   "selections": 42904,
+   "small_sample": false
+  }
+ ],
+ "catalogue": {
+  "candidates": [
+   {
+    "activation_blocker": "logically equivalent to HTFT:1-X",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": "HTFT:1-X",
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "HT/FT",
+    "id": "HTFT_COMBO:1-X&gg"
+   },
+   {
+    "activation_blocker": "logically equivalent to HTFT:1-2",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": "HTFT:1-2",
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "HT/FT",
+    "id": "HTFT_COMBO:1-2&gg"
+   },
+   {
+    "activation_blocker": "logically equivalent to HTFT:2-1",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": "HTFT:2-1",
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "HT/FT",
+    "id": "HTFT_COMBO:2-1&gg"
+   },
+   {
+    "activation_blocker": "logically equivalent to HTFT:2-X",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": "HTFT:2-X",
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "HT/FT",
+    "id": "HTFT_COMBO:2-X&gg"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "HT/FT",
+    "id": "HTFT_COMBO:X-X&ng"
+   },
+   {
+    "activation_blocker": null,
+    "catalogue_status": "confirmed_in_existing_snapshot",
+    "equivalent_existing_id": null,
+    "evidence": {
+     "date": "2026-09-24T21:33:44Z",
+     "file": "soccer_events__20260924T213344Z.json",
+     "location": "/home/nikola/code/Work/Betting/data/mozzart/raw",
+     "provider_market_id": "92:FULL_TIME",
+     "section": "Konačan ishod kombinazzije",
+     "selection": "1 & gg",
+     "source": "read-only v1 Mozzart raw snapshot"
+    },
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "RESULT_AND_BTTS:1&gg"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "RESULT_AND_BTTS:1&ng"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "RESULT_AND_BTTS:X&gg"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "RESULT_AND_BTTS:X&ng"
+   },
+   {
+    "activation_blocker": null,
+    "catalogue_status": "confirmed_in_existing_snapshot",
+    "equivalent_existing_id": null,
+    "evidence": {
+     "date": "2026-09-24T21:33:44Z",
+     "file": "soccer_events__20260924T213344Z.json",
+     "location": "/home/nikola/code/Work/Betting/data/mozzart/raw",
+     "provider_market_id": "92:FULL_TIME",
+     "section": "Konačan ishod kombinazzije",
+     "selection": "2 & gg",
+     "source": "read-only v1 Mozzart raw snapshot"
+    },
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "RESULT_AND_BTTS:2&gg"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "RESULT_AND_BTTS:2&ng"
+   },
+   {
+    "activation_blocker": null,
+    "catalogue_status": "confirmed_in_existing_snapshot",
+    "equivalent_existing_id": null,
+    "evidence": {
+     "date": "2026-09-24T21:33:44Z",
+     "file": "soccer_events__20260924T213344Z.json",
+     "location": "/home/nikola/code/Work/Betting/data/mozzart/raw",
+     "provider_market_id": "94:FULL_TIME",
+     "section": "Dupla šansa kombinazzije",
+     "selection": "1X & gg",
+     "source": "read-only v1 Mozzart raw snapshot"
+    },
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "DC_AND_BTTS:1X&gg"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "DC_AND_BTTS:1X&ng"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "DC_AND_BTTS:12&gg"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "DC_AND_BTTS:12&ng"
+   },
+   {
+    "activation_blocker": null,
+    "catalogue_status": "confirmed_in_existing_snapshot",
+    "equivalent_existing_id": null,
+    "evidence": {
+     "date": "2026-09-24T21:33:44Z",
+     "file": "soccer_events__20260924T213344Z.json",
+     "location": "/home/nikola/code/Work/Betting/data/mozzart/raw",
+     "provider_market_id": "94:FULL_TIME",
+     "section": "Dupla šansa kombinazzije",
+     "selection": "X2 & gg",
+     "source": "read-only v1 Mozzart raw snapshot"
+    },
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "DC_AND_BTTS:X2&gg"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "DC_AND_BTTS:X2&ng"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "BTTS_AND_GOALS:GG&0-2"
+   },
+   {
+    "activation_blocker": null,
+    "catalogue_status": "confirmed_in_existing_snapshot",
+    "equivalent_existing_id": null,
+    "evidence": {
+     "date": "2026-09-24T21:33:44Z",
+     "file": "soccer_events__20260924T213344Z.json",
+     "location": "/home/nikola/code/Work/Betting/data/mozzart/raw",
+     "provider_market_id": "67:FULL_TIME",
+     "section": "Oba tima daju gol",
+     "selection": "GG3+",
+     "source": "read-only v1 Mozzart raw snapshot"
+    },
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "BTTS_AND_GOALS:GG&3+"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "BTTS_AND_GOALS:NG&0-2"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "Combos",
+    "id": "BTTS_AND_GOALS:NG&3+"
+   },
+   {
+    "activation_blocker": "catalogue availability not confirmed",
+    "catalogue_status": "insufficient_catalogue_evidence",
+    "equivalent_existing_id": null,
+    "evidence": null,
+    "exists_in_production": false,
+    "group": "HT/FT",
+    "id": "HTFT_AND_GOALS:X-X&2+"
+   },
+   {
+    "activation_blocker": null,
+    "catalogue_status": "confirmed_in_existing_snapshot",
+    "equivalent_existing_id": null,
+    "evidence": {
+     "date": "2026-09-24T21:33:44Z",
+     "file": "soccer_events__20260924T213344Z.json",
+     "location": "/home/nikola/code/Work/Betting/data/mozzart/raw",
+     "provider_market_id": "96:FULL_TIME",
+     "section": "Poluvreme - Kraj + Golovi",
+     "selection": "X-X&3+",
+     "source": "read-only v1 Mozzart raw snapshot"
+    },
+    "exists_in_production": false,
+    "group": "HT/FT",
+    "id": "HTFT_AND_GOALS:X-X&3+"
+   }
+  ],
+  "current_private_snapshot_checked": false,
+  "current_private_snapshot_note": "No private price-store checkout was available locally; no Mozzart request or budget was used.",
+  "existing_evidence": {
+   "date": "2026-09-24T21:33:44Z",
+   "location": "/home/nikola/code/Work/Betting/data/mozzart/raw",
+   "scope": "historical read-only snapshot; confirms observation, not current availability",
+   "source": "soccer_events__20260924T213344Z.json"
+  }
+ },
+ "group_selection_impact": {
+  "Combos": {
+   "additional_candidate_wins": 2904,
+   "additional_winner_counts": {
+    "BTTS_AND_GOALS:NG&0-2": 2882,
+    "DC_AND_BTTS:1X&ng": 20,
+    "DC_AND_BTTS:X2&ng": 2
+   },
+   "augmented_changed": {
+    "landed": 1392,
+    "landed_pct": 0.4793,
+    "mean_pc": 0.4965,
+    "selections": 2904
+   },
+   "augmented_selections": 42939,
+   "baseline_changed": {
+    "landed": 1375,
+    "landed_pct": 0.4735,
+    "mean_pc": 0.4642,
+    "selections": 2904
+   },
+   "baseline_selections": 42939,
+   "changed": 2904,
+   "changed_share_of_evaluated": 0.0676,
+   "fixtures_evaluated": 42939
+  },
+  "HT/FT": {
+   "additional_candidate_wins": 0,
+   "additional_winner_counts": {},
+   "augmented_changed": {
+    "landed": 0,
+    "landed_pct": null,
+    "mean_pc": null,
+    "selections": 0
+   },
+   "augmented_selections": 42904,
+   "baseline_changed": {
+    "landed": 0,
+    "landed_pct": null,
+    "mean_pc": null,
+    "selections": 0
+   },
+   "baseline_selections": 42904,
+   "changed": 0,
+   "changed_share_of_evaluated": 0.0,
+   "fixtures_evaluated": 42904
+  }
+ },
+ "limitations": [
+  "Fair-odds returns are not realised profitability.",
+  "No candidate has an exact historical bookmaker price mapping.",
+  "Catalogue evidence is from an existing 24 September 2026 snapshot, not a current availability check.",
+  "Four proposed HT/FT+BTTS markets are logically equivalent to existing basic HT/FT markets.",
+  "All candidate returns and group impacts are unadjusted multiple comparisons.",
+  "No candidate is activated or recommended from the largest observed return."
+ ],
+ "methodology": {
+  "actual_odds": "No candidate has an exact historical pre-match bookmaker mapping; no approximate mapping was created.",
+  "bootstrap": {
+   "interval": "95% percentile CI",
+   "resamples": 2000,
+   "seed": 20261025,
+   "unit": "round date"
+  },
+  "candidates_are_not_registered": true,
+  "closing_odds": "Never used.",
+  "correct_score": "Excluded and remains hidden.",
+  "divisions": 22,
+  "group_impact": "Research copy only: unique candidates are added to Combos/HT.FT group Ranked selection; logically equivalent duplicates are excluded. One highest-pc candidate per match remains the rule.",
+  "half_life_days": 365,
+  "interpretation": "Fair return is model-price accounting, not realised profit. All candidates are multiple comparisons; no candidate is selected from the largest observed return. Group impact is descriptive, not causal.",
+  "minimum_training_matches": 200,
+  "research_only": true,
+  "round_weekdays": [
+   "Tuesday",
+   "Saturday",
+   "Sunday"
+  ],
+  "seasons": [
+   "2019-20",
+   "2020-21",
+   "2021-22",
+   "2022-23",
+   "2023-24",
+   "2024-25",
+   "2025-26"
+  ],
+  "single_market_cohort": "Every eligible fixture for each candidate; p raw and pc calibrated by group/band factor; fair = 1/pc.",
+  "small_sample": "Flagged below 200 selections or 30 contributing round dates.",
+  "walk_forward": "Goals and empirical rates use matches strictly before each round; picker factors are existing target-season factors and are not refit."
+ },
+ "schema_version": 1
+}
