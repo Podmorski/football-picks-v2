@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { BestBetsRecordFile, LeagueFile, LeagueIndex, ModelFile, MozzartStatusFile, MozzartVettedRecordFile, RankRow, RecordFile, RoundDocument, RoundIndexRow, TypeBacktestFile, ValueRecordFile } from './types';
+import type { BestBetsRecordFile, DataHealthFile, ForwardProposalsFile, ForwardValidationFile, LeagueFile, LeagueIndex, ModelFile, MozzartStatusFile, MozzartVettedRecordFile, PreregistrationFile, RankRow, RecordFile, RoundDocument, RoundIndexRow, TypeBacktestFile, ValueRecordFile } from './types';
 
 // The pipeline writes here; Next serves the same files statically. Reads happen at build time.
 const DATA_DIR = path.join(process.cwd(), 'public', 'data');
@@ -108,4 +108,24 @@ export function readMozzartStatus(): MozzartStatusFile | null {
 export function readValueRecord(): ValueRecordFile | null {
   const file = path.join(DATA_DIR, 'value-record.json');
   return fs.existsSync(file) ? readJson<ValueRecordFile>('value-record.json') : null;
+}
+
+export function readDataHealth(): DataHealthFile | null {
+  const file = path.join(DATA_DIR, 'data-health.json');
+  return fs.existsSync(file) ? readJson<DataHealthFile>('data-health.json') : null;
+}
+
+export function readForwardProposals(): ForwardProposalsFile | null {
+  const file = path.join(DATA_DIR, 'forward-proposals.json');
+  return fs.existsSync(file) ? readJson<ForwardProposalsFile>('forward-proposals.json') : null;
+}
+
+export function readPreregistration(): PreregistrationFile | null {
+  const file = path.join(DATA_DIR, 'preregistration.json');
+  return fs.existsSync(file) ? readJson<PreregistrationFile>('preregistration.json') : null;
+}
+
+export function readForwardValidation(): ForwardValidationFile | null {
+  const file = path.join(DATA_DIR, 'forward-validation.json');
+  return fs.existsSync(file) ? readJson<ForwardValidationFile>('forward-validation.json') : null;
 }

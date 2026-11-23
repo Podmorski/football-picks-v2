@@ -663,3 +663,111 @@ export type LeagueFile = {
   teams: Record<string, TeamRecord>;
   top10: Record<string, Partial<Record<ScopeKey, Top10Row[]>>>;
 };
+
+export type DataHealthRound = {
+  date: string;
+  label: string;
+  kind: string;
+  fixtures: number;
+  settled_fixtures: number;
+  pending_fixtures: number;
+  rows: { total: number; settled: number; pending: number };
+  sources: {
+    football_data_fixtures: number; api_football_fixtures: number; unknown_fixtures: number;
+    football_data_rows: number; api_football_rows: number; unknown_rows: number;
+  };
+  fallback: {
+    attempted: boolean; fetched_at?: string | null; requests?: number | null;
+    final_count?: number | null; matched?: number; ambiguous?: number; unmatched?: number;
+    reason?: string;
+  };
+  pending_reasons: {
+    source_pending_fixtures: number; ambiguous_fixtures: number; unmatched_fixtures: number;
+    source_pending_sample: string[];
+  };
+  next_retry: string;
+};
+
+export type DataHealthFile = {
+  schema_version: number;
+  latest_football_data_result_date: string | null;
+  unsettled_rounds: DataHealthRound[];
+};
+
+export type ForwardProposalsFile = {
+  schema_version: number;
+  activation_date: string;
+  policy_version: string;
+  construction_version: string;
+  eligible_round: string | null;
+  state: string;
+  errors: string[];
+  rounds_with_proposals: number;
+  counts: {
+    tickets: number; available: number; unavailable: number;
+    bands: Record<string, number>;
+    individual_floor_relaxed: number; overlap_relaxed: number;
+    negative_model_ev: number; negative_model_ev_share: number | null;
+    search_methods: Record<string, number>;
+  };
+  price_coverage: {
+    snapshot_rounds: number; fixtures: number; priced_fixtures: number; priced_markets: number;
+    started_not_priced: number; unmatched_fixtures: number;
+  };
+  results: {
+    source: string;
+    counts: Record<string, number>;
+    flat: Record<string, number | null>;
+    mel: Record<string, number | null>;
+    types: Record<string, Record<string, number>>;
+    note: string;
+    has_settled_data: boolean;
+  };
+};
+
+export type PreregistrationFile = {
+  schema_version: number;
+  construction_version: string;
+  policy_version: string;
+  proposal_schema_version: number;
+  activation_date: string;
+  primary_comparison: string[];
+  exploratory: string[];
+  protocol: Record<string, string | number | boolean | Record<string, string | number>>;
+  research_note: string;
+  version_rule: string;
+  [key: string]: unknown;
+};
+
+export type ForwardValidationSeries = {
+  terminal_rounds: number;
+  staked: number;
+  returned: number;
+  net: number;
+  roi: number | null;
+  bankroll: number;
+  peak: number;
+  maximum_drawdown: number;
+  losing_round_frequency: number | null;
+  unresolved_exposure?: number;
+  round_log_growth: number[];
+  bootstrap: { rounds: number; roi_ci: [number | null, number | null]; log_growth_ci: [number | null, number | null]; max_drawdown_ci?: [number | null, number | null]; unresolved_exposure_ci?: [number | null, number | null]; mean_log_growth: number | null };
+};
+
+export type ForwardValidationFile = {
+  schema_version: number;
+  state: string;
+  counts: { rounds: number; terminal_rounds: number; tickets: number; void: number; pending: number; void_frequency?: number | null; pending_frequency?: number | null };
+  primary: { flat: ForwardValidationSeries; mel: ForwardValidationSeries };
+  exploratory: Record<string, { terminal_rounds: number; roi: number | null; maximum_drawdown: number }>;
+  exposure: { by_type_mel_stake: Record<string, number>; fixtures: number; shared_leg_instances: number; shared_leg_tickets: number };
+  fallbacks: Record<string, number | null>;
+  power: { n_star: number | null; reason?: string; observed_rounds?: number; observed_sd?: number; meaningful_log_growth?: number; alpha_one_sided?: number; power?: number; source?: string };
+  evidence: { n_star: number | null; settled_playable_rounds: number; lower_95_log_growth: number | null; positive: boolean; inconclusive: boolean; rule: string; no_early_efficacy_stopping: boolean };
+  safety: { maximum_drawdown: number; drawdown_review: boolean; identity_failure: boolean; ruin_upper_95: number | null; stop_adaptive: boolean; owner_loss_budget?: number | null };
+  protocol: Record<string, string | number | boolean | Record<string, string | number>>;
+  notes: string[];
+  small_sample?: boolean;
+  multiple_comparisons?: string;
+  bootstrap: { unit: string; resamples: number; seed: number };
+};

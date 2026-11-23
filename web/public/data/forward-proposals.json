@@ -1,0 +1,112 @@
+{
+ "activation_date": "2026-11-24",
+ "construction_version": "ticket-construction-v2",
+ "counts": {
+  "available": 0,
+  "bands": {},
+  "individual_floor_relaxed": 0,
+  "negative_model_ev": 0,
+  "negative_model_ev_share": null,
+  "overlap_relaxed": 0,
+  "search_methods": {},
+  "tickets": 0,
+  "unavailable": 0
+ },
+ "eligible_round": null,
+ "errors": [
+  "private proposal store not available in this build; counters are zero and no actual prices are shown"
+ ],
+ "policy_version": "mel-v1",
+ "price_coverage": {
+  "fixtures": 0,
+  "priced_fixtures": 0,
+  "priced_markets": 0,
+  "snapshot_rounds": 0,
+  "started_not_priced": 0,
+  "unmatched_fixtures": 0
+ },
+ "results": {
+  "counts": {
+   "pending": 0,
+   "rounds": 0,
+   "settled": 0,
+   "tickets": 0,
+   "unavailable": 0,
+   "unpriced": 0,
+   "void": 0
+  },
+  "flat": {
+   "ci_rounds": 0,
+   "net": 0.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "staked": 0.0
+  },
+  "has_settled_data": false,
+  "mel": {
+   "bankroll": 1000.0,
+   "ci_rounds": 0,
+   "current_drawdown": 0.0,
+   "initial_bankroll": 1000.0,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "series": [],
+   "staked": 0.0,
+   "unresolved_exposure": 0.0
+  },
+  "note": "Forward frozen-price paper results. Not an executable-return or profit claim.",
+  "source": "proposed-tickets-record.json",
+  "types": {
+   "around3": {
+    "flat_returned": 0.0,
+    "flat_staked": 0.0,
+    "landed": 0,
+    "lost": 0,
+    "mel_returned": 0.0,
+    "mel_staked": 0.0,
+    "pending": 0,
+    "settled": 0,
+    "tickets": 0,
+    "void": 0
+   },
+   "around5": {
+    "flat_returned": 0.0,
+    "flat_staked": 0.0,
+    "landed": 0,
+    "lost": 0,
+    "mel_returned": 0.0,
+    "mel_staked": 0.0,
+    "pending": 0,
+    "settled": 0,
+    "tickets": 0,
+    "void": 0
+   },
+   "best2": {
+    "flat_returned": 0.0,
+    "flat_staked": 0.0,
+    "landed": 0,
+    "lost": 0,
+    "mel_returned": 0.0,
+    "mel_staked": 0.0,
+    "pending": 0,
+    "settled": 0,
+    "tickets": 0,
+    "void": 0
+   }
+  }
+ },
+ "rounds_with_proposals": 0,
+ "schema_version": 1,
+ "state": "awaiting first eligible published round with fixtures and a usable snapshot"
+}

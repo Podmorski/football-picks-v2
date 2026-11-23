@@ -68,8 +68,27 @@ def test_report_page_has_the_extended_sections() -> None:
     for needle in (
         "Best bets results", "Record at Mozzart prices", "Price status", "Last updated",
         "readBestBetsRecord", "readMozzartVettedRecord", "readMozzartStatus",
+        "Data health", "Forward proposals", "Pre-registration · construction and staking",
+        "Forward validation · actual prices only", "readDataHealth", "readForwardProposals",
+        "readPreregistration", "readForwardValidation",
     ):
-        assert needle in source
+        assert needle in source, needle
+
+
+def test_phase6_public_aggregates_exist_and_carry_no_prices() -> None:
+    for name in ("data-health.json", "forward-proposals.json", "forward-validation.json", "preregistration.json"):
+        text = (ROOT / "web" / "public" / "data" / name).read_text(encoding="utf-8").lower()
+        assert '"odds"' not in text, name
+        assert '"price"' not in text, name
+        assert '"prices"' not in text, name
+    health = json.loads((ROOT / "web" / "public" / "data" / "data-health.json").read_text(encoding="utf-8"))
+    assert health["latest_football_data_result_date"]
+    dates = {row["date"] for row in health["unsettled_rounds"]}
+    assert "2026-11-21" in dates and "2026-11-22" in dates
+    proposals = json.loads((ROOT / "web" / "public" / "data" / "forward-proposals.json").read_text(encoding="utf-8"))
+    assert proposals["activation_date"] == "2026-11-24"
+    validation = json.loads((ROOT / "web" / "public" / "data" / "forward-validation.json").read_text(encoding="utf-8"))
+    assert validation["state"] in ("no settled playable rounds", "accumulating", "positive evidence", "inconclusive")
 
 
 def test_top_nav_has_best_bets_explore_report() -> None:

@@ -513,6 +513,31 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   still returned HTTP 403, so no licensing review is claimed. Focused tests: `tests/test_api_football.py`
   and the revised `tests/test_api_football_probe.py` (18 passing).
 
+- Task 21 Phase 6 (23 Nov): `/report` now starts with four functional sections. **Data health**
+  (`web/public/data/data-health.json`, written by `pipeline/data_health.py` on every `run_model`
+  pass) lists each unsettled indexed round with pending/total fixtures and rows, settled counts by
+  source (football-data / API-Football / unknown), fallback attempt (requests, final fixtures,
+  matched/ambiguous/unmatched), source-pending reasons and the next update.yml retry. **Forward
+  proposals** (`forward-proposals.json`, `pipeline/forward_proposals.py`) shows activation
+  2026-11-24, policy/construction versions, the eligible round or the exact awaiting state, required
+  proposal errors, construction bands, individual-floor/overlap relaxations, negative model-EV share,
+  price-coverage counts and the frozen-price paper ledger note; it contains no actual prices.
+  **Pre-registration** (`preregistration.json`, `pipeline/preregistration.py`) freezes
+  ticket-construction-v2 and MEL-v1 formulas, parameters, scenario assumptions, settlement rules,
+  the flat/MEL primary comparison, exploratory policies, one-sided alpha 0.05, 80% power, +2pp
+  ROI-equivalent alternative (`log(1.02)`), N* rule, 156-round inconclusive rule, no early efficacy
+  stopping, 20% drawdown/identity safety review and the adaptive stop rule; a change requires a new
+  version and forward record. **Forward validation** (`forward-validation.json`,
+  `pipeline/forward_validation.py`) uses actual pre-match prices only, resamples whole round dates
+  with every ticket/leg retained, replays bankroll/unresolved exposure/drawdown, and reports ROI and
+  mean log-growth CIs, max drawdown, losing-round frequency, void/pending frequency, exposure by
+  type/fixture/shared leg, construction fallbacks and negative-model-EV share, N*/evidence and
+  safety. Empty stores report honest unavailable states rather than invented numbers. `update.yml`
+  regenerates the forward files after the private checkout. Public aggregates carry no leg/ticket
+  prices or raw provider responses. Phase-6 tests: `tests/test_data_health.py`,
+  `tests/test_forward_proposals.py`, `tests/test_preregistration.py`,
+  `tests/test_forward_validation.py` and the extended `tests/test_report.py`.
+
 ## Open items
 
 - **Ranked audit complete; realised profitability remains mostly unmeasured**: Task 14's aggregate

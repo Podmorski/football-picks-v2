@@ -1,0 +1,132 @@
+{
+ "activation_date": "2026-11-24",
+ "comparators": {
+  "fixed_fractional": {
+   "fraction_of_available": 0.1
+  },
+  "flat": {
+   "basis": "50/30/20 of the round stake",
+   "shares": [
+    0.5,
+    0.3,
+    0.2
+   ]
+  },
+  "martingale": {
+   "base": 1.0,
+   "cap": 32.0,
+   "uncapped": "reported for diagnosis only"
+  },
+  "minimum_variance": "SLSQP on the joint scenario covariance; duplicate/singular tickets handled under constraints",
+  "no_forced_kelly": {
+   "drawdown_multiplier": true,
+   "fraction": 0.25,
+   "may_return_zero": true,
+   "ticket_cap": 0.01,
+   "total_cap": 0.02
+  },
+  "probability_weighted": "S allocated in proportion to combined ticket probability"
+ },
+ "construction_version": "ticket-construction-v2",
+ "exploratory": [
+  "fixed_fractional",
+  "no_forced_kelly",
+  "probability_weighted",
+  "minimum_variance",
+  "martingale_capped",
+  "martingale_uncapped"
+ ],
+ "mel": {
+  "base_fraction": 0.0025,
+  "constraints": "SLSQP; sum(stakes) = S; 0 <= stake <= S/2 (single ticket: S); positive wealth",
+  "drawdown_scale": 0.2,
+  "minimum_residual_dates": 30,
+  "objective": "maximise sum(scenario probability * log(A + scenario net . stakes))",
+  "q_formula": "q = clamp(pc + cohort_shift, 0.001, 0.999); cohort = market group x 10-point pc band",
+  "residual_fallback": -0.05,
+  "residual_quantile": 0.1,
+  "scenarios": "binary pre-match win/loss over unique legs; cross-fixture conditional independence; exact shared legs reused once; probabilities sum to one",
+  "slope": 0.0175,
+  "stress": "simultaneous q - 0.05 re-solve; descriptive, not a bound",
+  "stress_shift": -0.05,
+  "ticket_net": "odds - 1 on a win, -1 on a loss",
+  "total_stake_formula": "A = max(0, B - U); m = max(0, 1 - D/0.20); S = A * (0.0025 + 0.0175*m)"
+ },
+ "policy_version": "mel-v1",
+ "primary_comparison": [
+  "flat",
+  "mel"
+ ],
+ "proposal_schema_version": 2,
+ "protocol": {
+  "alpha_one_sided": 0.05,
+  "bootstrap": {
+   "resamples": 2000,
+   "seed": 20261025,
+   "unit": "whole round date"
+  },
+  "evidence_rule": "at least N* settled playable rounds and the whole-round bootstrap lower 95% bound on mean log growth above zero",
+  "inconclusive_rule": "report inconclusive after 156 settled playable rounds without the evidence rule",
+  "meaningful_log_growth": 0.01980263,
+  "meaningful_roi_equivalent": 0.02,
+  "n_star_rule": "ceil(((z_0.95 + z_0.80) * sd(round log growth) / log(1.02))**2)",
+  "n_star_unavailable": "report N* unavailable rather than invent a value",
+  "no_early_efficacy_stopping": true,
+  "power": 0.8,
+  "safety_review_drawdown": 0.2,
+  "safety_review_identity_failure": true,
+  "stop_adaptive_rule": "upper 95% estimate of losing 50% within 52 rounds above 5%, or the owner's loss budget is breached"
+ },
+ "research_note": "Existing audits are hypothesis generation, not an untouched holdout. No retrospective fair-odds substitution is used in actual-price results.",
+ "schema_version": 1,
+ "settlement": {
+  "round_atomic": "bankroll, peak and drawdown advance once after every available ticket in a round is terminal",
+  "rules": "any lost leg 0; all legs void 1; mixed landed/void the product of actual prices for landed legs only",
+  "unresolved_exposure": "the whole round stake is reserved until then"
+ },
+ "ticket_construction": {
+  "bounded_dp": {
+   "keep_per_state": 3,
+   "log_odds_bucket": 0.02
+  },
+  "exact_combination_cap": 250000,
+  "fallback_labels": [
+   "in preferred band",
+   "outside preferred band",
+   "below meaningful payout floor; highest available payout"
+  ],
+  "overlap": "soft non-overlap across best2/around3/around5; relaxation is recorded",
+  "preferred_min_individual_odds": 1.1,
+  "ranking": "combined pc, model_EV, fewer legs, log-distance to target, deterministic identity",
+  "specs": {
+   "around3": {
+    "floor": 2.0,
+    "high": 3.3,
+    "label": "Around 3.00",
+    "low": 2.7,
+    "max_legs": 5,
+    "min_legs": 2,
+    "target": 3.0
+   },
+   "around5": {
+    "floor": 3.0,
+    "high": 5.5,
+    "label": "Around 5.00",
+    "low": 4.5,
+    "max_legs": 5,
+    "min_legs": 2,
+    "target": 5.0
+   },
+   "best2": {
+    "floor": 1.2,
+    "high": 1.65,
+    "label": "2 best games",
+    "low": 1.35,
+    "max_legs": 2,
+    "min_legs": 2,
+    "target": 1.5
+   }
+  }
+ },
+ "version_rule": "Any formula, parameter, scenario or stopping-rule change creates a new version and a new forward record."
+}

@@ -1,0 +1,187 @@
+{
+ "bootstrap": {
+  "resamples": 2000,
+  "seed": 20261025,
+  "unit": "whole round date"
+ },
+ "counts": {
+  "pending": 0,
+  "pending_frequency": null,
+  "rounds": 0,
+  "terminal_rounds": 0,
+  "tickets": 0,
+  "void": 0,
+  "void_frequency": null
+ },
+ "evidence": {
+  "inconclusive": false,
+  "lower_95_log_growth": null,
+  "n_star": null,
+  "no_early_efficacy_stopping": true,
+  "positive": false,
+  "rule": "positive growth requires at least N* settled playable rounds and a whole-round-bootstrap lower 95% bound above zero",
+  "settled_playable_rounds": 0
+ },
+ "exploratory": {
+  "fixed_fractional": {
+   "maximum_drawdown": 0.0,
+   "roi": null,
+   "terminal_rounds": 0
+  },
+  "martingale_capped": {
+   "maximum_drawdown": 0.0,
+   "roi": null,
+   "terminal_rounds": 0
+  },
+  "martingale_uncapped": {
+   "maximum_drawdown": 0.0,
+   "roi": null,
+   "terminal_rounds": 0
+  },
+  "minimum_variance": {
+   "maximum_drawdown": 0.0,
+   "roi": null,
+   "terminal_rounds": 0
+  },
+  "no_forced_kelly": {
+   "maximum_drawdown": 0.0,
+   "roi": null,
+   "terminal_rounds": 0
+  },
+  "probability_weighted": {
+   "maximum_drawdown": 0.0,
+   "roi": null,
+   "terminal_rounds": 0
+  }
+ },
+ "exposure": {
+  "by_type_mel_stake": {
+   "around3": 0,
+   "around5": 0,
+   "best2": 0
+  },
+  "fixtures": 0,
+  "shared_leg_instances": 0,
+  "shared_leg_tickets": 0
+ },
+ "fallbacks": {
+  "any_fallback_tickets": 0,
+  "bounded_dp": 0,
+  "fallback_frequency": null,
+  "individual_floor_relaxed": 0,
+  "negative_model_ev": 0,
+  "negative_model_ev_share": null,
+  "outside_preferred_band": 0,
+  "overlap_relaxed": 0
+ },
+ "multiple_comparisons": "exploratory policies and splits are descriptive; do not select the best observed return",
+ "notes": [
+  "Actual pre-match prices only; no retrospective fair-odds substitution.",
+  "Flat and MEL-v1 are the primary pre-registered comparison; other policies are exploratory diagnostics.",
+  "Every policy consumes the same frozen proposals and round-atomic settlement.",
+  "Do not select a policy because it has the best observed test return.",
+  "Small samples and multiple comparisons: treat every exploratory return as descriptive."
+ ],
+ "power": {
+  "n_star": null,
+  "reason": "fewer than two settled playable rounds; N* is not estimated"
+ },
+ "primary": {
+  "flat": {
+   "bankroll": 1000.0,
+   "bootstrap": {
+    "log_growth_ci": [
+     null,
+     null
+    ],
+    "max_drawdown_ci": [
+     null,
+     null
+    ],
+    "mean_log_growth": null,
+    "roi_ci": [
+     null,
+     null
+    ],
+    "rounds": 0,
+    "unresolved_exposure_ci": [
+     null,
+     null
+    ]
+   },
+   "losing_round_frequency": null,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "returned": 0.0,
+   "roi": null,
+   "round_log_growth": [],
+   "staked": 0.0,
+   "terminal_rounds": 0,
+   "unresolved_exposure": 0.0
+  },
+  "mel": {
+   "bankroll": 1000.0,
+   "bootstrap": {
+    "log_growth_ci": [
+     null,
+     null
+    ],
+    "max_drawdown_ci": [
+     null,
+     null
+    ],
+    "mean_log_growth": null,
+    "roi_ci": [
+     null,
+     null
+    ],
+    "rounds": 0,
+    "unresolved_exposure_ci": [
+     null,
+     null
+    ]
+   },
+   "losing_round_frequency": null,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "returned": 0.0,
+   "roi": null,
+   "round_log_growth": [],
+   "staked": 0.0,
+   "terminal_rounds": 0,
+   "unresolved_exposure": 0.0
+  }
+ },
+ "protocol": {
+  "alpha_one_sided": 0.05,
+  "bootstrap": {
+   "resamples": 2000,
+   "seed": 20261025,
+   "unit": "whole round date"
+  },
+  "evidence_rule": "at least N* settled playable rounds and the whole-round bootstrap lower 95% bound on mean log growth above zero",
+  "inconclusive_rule": "report inconclusive after 156 settled playable rounds without the evidence rule",
+  "meaningful_log_growth": 0.01980263,
+  "meaningful_roi_equivalent": 0.02,
+  "n_star_rule": "ceil(((z_0.95 + z_0.80) * sd(round log growth) / log(1.02))**2)",
+  "n_star_unavailable": "report N* unavailable rather than invent a value",
+  "no_early_efficacy_stopping": true,
+  "power": 0.8,
+  "safety_review_drawdown": 0.2,
+  "safety_review_identity_failure": true,
+  "stop_adaptive_rule": "upper 95% estimate of losing 50% within 52 rounds above 5%, or the owner's loss budget is breached"
+ },
+ "safety": {
+  "drawdown_review": false,
+  "identity_failure": false,
+  "maximum_drawdown": 0.0,
+  "owner_loss_budget": null,
+  "ruin_upper_95": null,
+  "stop_adaptive": false
+ },
+ "schema_version": 1,
+ "small_sample": true,
+ "state": "no settled playable rounds"
+}

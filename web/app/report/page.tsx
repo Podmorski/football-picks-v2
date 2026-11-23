@@ -1,11 +1,15 @@
 import {
   readBestBetsRecord,
+  readDataHealth,
+  readForwardProposals,
+  readForwardValidation,
   readMozzartStatus,
   readMozzartVettedRecord,
+  readPreregistration,
   readTypeBacktest,
   readValueRecord,
 } from '@/lib/data';
-import type { BestBetsRound, MozzartStatusFile, ValueSummaryRow } from '@/lib/types';
+import type { BestBetsRound, DataHealthFile, ForwardProposalsFile, ForwardValidationFile, ForwardValidationSeries, MozzartStatusFile, PreregistrationFile, ValueSummaryRow } from '@/lib/types';
 
 function pct(value: number | null): string {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
@@ -133,6 +137,220 @@ function PriceStatus({ status }: { status: MozzartStatusFile }) {
   );
 }
 
+function DataHealthSection({ health }: { health: DataHealthFile | null }) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Data health</h2>
+      <p className="max-w-3xl text-sm text-muted-foreground">
+        Each unsettled indexed round, its pending fixtures, the result source, the cached fallback attempt
+        and the next scheduled retry. Aggregates only.
+      </p>
+      {!health ? (
+        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No data health file yet; the next pipeline run writes it.</p>
+      ) : (
+        <>
+          <p className="text-sm">
+            Latest football-data result date: <span className="font-medium">{health.latest_football_data_result_date ?? 'unknown'}</span>
+          </p>
+          {health.unsettled_rounds.length === 0 ? (
+            <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No unsettled indexed round.</p>
+          ) : (
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                    <th className="px-3 py-2 text-left font-semibold">Round</th>
+                    <th className="px-3 py-2 text-right font-semibold">Fixtures</th>
+                    <th className="px-3 py-2 text-right font-semibold">Pending</th>
+                    <th className="px-3 py-2 text-right font-semibold">Settled by source</th>
+                    <th className="px-3 py-2 text-left font-semibold">Fallback attempt</th>
+                    <th className="px-3 py-2 text-left font-semibold">Pending reasons</th>
+                    <th className="px-3 py-2 text-left font-semibold">Next retry</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {health.unsettled_rounds.map((round) => (
+                    <tr key={round.date} className="border-t align-top">
+                      <td className="px-3 py-1.5">{round.label}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{round.fixtures}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{round.pending_fixtures}</td>
+                      <td className="tabular px-3 py-1.5 text-right text-xs">
+                        football-data {round.sources.football_data_fixtures} · API-Football {round.sources.api_football_fixtures} · unknown {round.sources.unknown_fixtures}
+                      </td>
+                      <td className="px-3 py-1.5 text-xs">
+                        {round.fallback.attempted
+                          ? `${round.fallback.requests ?? 0} req · ${round.fallback.matched ?? 0} matched · ${round.fallback.ambiguous ?? 0} ambiguous · ${round.fallback.unmatched ?? 0} unmatched`
+                          : round.fallback.reason ?? 'not attempted'}
+                      </td>
+                      <td className="px-3 py-1.5 text-xs">
+                        source-pending {round.pending_reasons.source_pending_fixtures} · ambiguous {round.pending_reasons.ambiguous_fixtures} · unmatched {round.pending_reasons.unmatched_fixtures}
+                        {round.pending_reasons.source_pending_sample.length > 0
+                          ? ` (e.g. ${round.pending_reasons.source_pending_sample.join('; ')})`
+                          : ''}
+                      </td>
+                      <td className="px-3 py-1.5 text-xs">{round.next_retry}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+    </section>
+  );
+}
+
+function ForwardProposalsSection({ forward }: { forward: ForwardProposalsFile | null }) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Forward proposals</h2>
+      <p className="max-w-3xl text-sm text-muted-foreground">
+        Frozen automatic tickets are separate from Best bets. Counts are aggregate; actual leg and ticket
+        prices stay in the private store.
+      </p>
+      {!forward ? (
+        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No forward proposal record yet.</p>
+      ) : (
+        <>
+          <p className="text-sm">
+            Activation <span className="font-medium">{forward.activation_date}</span> · policy{' '}
+            <span className="font-medium">{forward.policy_version}</span> · construction{' '}
+            <span className="font-medium">{forward.construction_version}</span> · eligible round{' '}
+            <span className="font-medium">{forward.eligible_round ?? 'none yet'}</span>
+          </p>
+          <p className="text-sm"><span className="font-medium">State:</span> {forward.state}</p>
+          {forward.errors.length > 0 ? (
+            <ul className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
+              {forward.errors.map((error) => <li key={error}>{error}</li>)}
+            </ul>
+          ) : null}
+          <div className="grid gap-2 text-sm sm:grid-cols-2">
+            <p>Tickets: <span className="font-medium">{forward.counts.available} available / {forward.counts.unavailable} unavailable</span></p>
+            <p>Preferred band: <span className="font-medium">{forward.counts.bands.preferred ?? 0}</span> · outside {forward.counts.bands.outside ?? 0} · below floor {forward.counts.bands.below_floor ?? 0}</p>
+            <p>Individual floor relaxed: <span className="font-medium">{forward.counts.individual_floor_relaxed}</span> · overlap relaxed {forward.counts.overlap_relaxed}</p>
+            <p>Negative model EV: <span className="font-medium">{forward.counts.negative_model_ev}</span> ({forward.counts.negative_model_ev_share === null ? '–' : pct(forward.counts.negative_model_ev_share)})</p>
+            <p>Price coverage: <span className="font-medium">{forward.price_coverage.priced_fixtures} / {forward.price_coverage.fixtures}</span> fixtures · {forward.price_coverage.priced_markets} priced markets</p>
+            <p>Started not priced: {forward.price_coverage.started_not_priced} · unmatched fixtures {forward.price_coverage.unmatched_fixtures}</p>
+          </div>
+          <p className="text-sm">
+            Paper results: flat ROI {signed(typeof forward.results.flat.roi === 'number' ? forward.results.flat.roi : null)} · MEL ROI{' '}
+            {signed(typeof forward.results.mel.roi === 'number' ? forward.results.mel.roi : null)} · settled tickets {forward.results.counts.settled ?? 0} · pending {forward.results.counts.pending ?? 0}.
+            {' '}{forward.results.note}
+          </p>
+        </>
+      )}
+    </section>
+  );
+}
+
+function PreregistrationSection({ prereg }: { prereg: PreregistrationFile | null }) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Pre-registration · construction and staking</h2>
+      {!prereg ? (
+        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No pre-registration file yet.</p>
+      ) : (
+        <>
+          <p className="max-w-3xl text-sm text-muted-foreground">
+            {prereg.construction_version} · {prereg.policy_version} · proposal schema {prereg.proposal_schema_version} · activation {prereg.activation_date}.
+            Primary comparison: {prereg.primary_comparison.join(' and ')}. Exploratory: {prereg.exploratory.join(', ')}.
+          </p>
+          <ul className="space-y-1 text-sm">
+            <li>One-sided alpha {String(prereg.protocol.alpha_one_sided)}, power {String(prereg.protocol.power)}, meaningful alternative {pct(Number(prereg.protocol.meaningful_roi_equivalent))} ROI-equivalent.</li>
+            <li>N* rule: {String(prereg.protocol.n_star_rule)}; {String(prereg.protocol.n_star_unavailable)}.</li>
+            <li>Evidence: {String(prereg.protocol.evidence_rule)}. {String(prereg.protocol.inconclusive_rule)}.</li>
+            <li>No early efficacy stopping; safety review at {pct(Number(prereg.protocol.safety_review_drawdown))} realised drawdown or any identity/accounting failure.</li>
+            <li>Stop adaptive staking if {String(prereg.protocol.stop_adaptive_rule)}.</li>
+          </ul>
+          <p className="max-w-3xl text-sm text-muted-foreground">{prereg.research_note}</p>
+          <p className="max-w-3xl text-xs text-muted-foreground">{prereg.version_rule}</p>
+        </>
+      )}
+    </section>
+  );
+}
+
+function validationRow(label: string, series: ForwardValidationSeries) {
+  return (
+    <tr key={label} className="border-t">
+      <td className="px-3 py-1.5 font-medium">{label}</td>
+      <td className="tabular px-3 py-1.5 text-right">{series.terminal_rounds}</td>
+      <td className="tabular px-3 py-1.5 text-right">{signed(series.roi)}</td>
+      <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">{interval(series.bootstrap.roi_ci[0], series.bootstrap.roi_ci[1])}</td>
+      <td className="tabular px-3 py-1.5 text-right">{series.bootstrap.mean_log_growth === null ? '–' : `${(series.bootstrap.mean_log_growth * 100).toFixed(2)}%`}</td>
+      <td className="tabular px-3 py-1.5 text-right text-xs text-muted-foreground">{interval(series.bootstrap.log_growth_ci[0], series.bootstrap.log_growth_ci[1])}</td>
+      <td className="tabular px-3 py-1.5 text-right">{pct(series.maximum_drawdown)}</td>
+      <td className="tabular px-3 py-1.5 text-right">{pct(series.losing_round_frequency)}</td>
+    </tr>
+  );
+}
+
+function ForwardValidationSection({ validation }: { validation: ForwardValidationFile | null }) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Forward validation · actual prices only</h2>
+      <p className="max-w-3xl text-sm text-muted-foreground">
+        Whole round dates are resampled with every ticket and leg retained; bankroll, unresolved exposure and
+        drawdown are replayed through each sequence. No retrospective fair-odds substitution.
+      </p>
+      {!validation ? (
+        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No forward validation file yet.</p>
+      ) : (
+        <>
+          <p className="text-sm"><span className="font-medium">State:</span> {validation.state} · rounds {validation.counts.rounds} · settled playable {validation.counts.terminal_rounds} · void {validation.counts.void} · pending {validation.counts.pending}</p>
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-3 py-2 text-left font-semibold">Policy</th>
+                  <th className="px-3 py-2 text-right font-semibold">Rounds</th>
+                  <th className="px-3 py-2 text-right font-semibold">ROI</th>
+                  <th className="px-3 py-2 text-right font-semibold">95% CI</th>
+                  <th className="px-3 py-2 text-right font-semibold">Mean log growth</th>
+                  <th className="px-3 py-2 text-right font-semibold">95% CI</th>
+                  <th className="px-3 py-2 text-right font-semibold">Max DD</th>
+                  <th className="px-3 py-2 text-right font-semibold">Losing rounds</th>
+                </tr>
+              </thead>
+              <tbody>
+                {validationRow('Flat (primary)', validation.primary.flat)}
+                {validationRow('MEL-v1 (primary)', validation.primary.mel)}
+                {Object.entries(validation.exploratory).map(([key, series]) => (
+                  <tr key={key} className="border-t text-muted-foreground">
+                    <td className="px-3 py-1.5">{key} (exploratory)</td>
+                    <td className="tabular px-3 py-1.5 text-right">{series.terminal_rounds}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{signed(series.roi)}</td>
+                    <td className="tabular px-3 py-1.5 text-right text-xs">–</td>
+                    <td className="tabular px-3 py-1.5 text-right">–</td>
+                    <td className="tabular px-3 py-1.5 text-right text-xs">–</td>
+                    <td className="tabular px-3 py-1.5 text-right">{pct(series.maximum_drawdown)}</td>
+                    <td className="tabular px-3 py-1.5 text-right">–</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="grid gap-1 text-sm sm:grid-cols-2">
+            <p>N*: <span className="font-medium">{validation.power.n_star ?? 'not estimable'}</span>{validation.power.reason ? ` — ${validation.power.reason}` : ''}</p>
+            <p>Settled playable rounds: <span className="font-medium">{validation.evidence.settled_playable_rounds}</span> · positive evidence {validation.evidence.positive ? 'yes' : 'no'} · inconclusive {validation.evidence.inconclusive ? 'yes' : 'no'}</p>
+            <p>Maximum drawdown: <span className="font-medium">{pct(validation.safety.maximum_drawdown)}</span> · review {validation.safety.drawdown_review ? 'required' : 'not triggered'}</p>
+            <p>Void frequency: {pct(validation.counts.void_frequency ?? null)} · pending frequency {pct(validation.counts.pending_frequency ?? null)} · unresolved exposure (MEL) {validation.primary.mel.unresolved_exposure?.toFixed(2) ?? '–'}</p>
+            <p>Ruin upper 95% ({validation.protocol.stop_adaptive_rule ? '52 rounds' : '52 rounds'}): <span className="font-medium">{validation.safety.ruin_upper_95 === null ? 'not estimable' : pct(validation.safety.ruin_upper_95)}</span> · stop adaptive {validation.safety.stop_adaptive ? 'yes' : 'no'}</p>
+            <p>Exposure by type (MEL): {Object.entries(validation.exposure.by_type_mel_stake).map(([key, value]) => `${key} ${value.toFixed(2)}`).join(' · ')}</p>
+            <p>Shared leg instances: {validation.exposure.shared_leg_instances} · tickets {validation.exposure.shared_leg_tickets} · fallbacks outside band {validation.fallbacks.outside_preferred_band ?? 0} · bounded DP {validation.fallbacks.bounded_dp ?? 0} · fallback frequency {validation.fallbacks.fallback_frequency === null || validation.fallbacks.fallback_frequency === undefined ? '–' : pct(validation.fallbacks.fallback_frequency as number)}</p>
+            <p>Negative model EV share: {validation.fallbacks.negative_model_ev_share === null ? '–' : pct(validation.fallbacks.negative_model_ev_share as number)}</p>
+            {validation.small_sample ? <p>Small sample: fewer than 30 settled playable rounds. {validation.multiple_comparisons}</p> : null}
+          </div>
+          <ul className="space-y-1 text-xs text-muted-foreground">
+            {validation.notes.map((note) => <li key={note}>{note}</li>)}
+          </ul>
+        </>
+      )}
+    </section>
+  );
+}
+
 export default function ReportPage() {
   const report = readTypeBacktest();
   const bestBets = readBestBetsRecord();
@@ -140,6 +358,10 @@ export default function ReportPage() {
   const status = readMozzartStatus();
   const updated = utcStamp(new Date().toISOString());
   const valueRecord = readValueRecord();
+  const dataHealth = readDataHealth();
+  const forwardProposals = readForwardProposals();
+  const preregistration = readPreregistration();
+  const forwardValidation = readForwardValidation();
 
   const settled = bestBets?.rounds.filter((round) => round.settled > 0) ?? [];
   const pending = bestBets?.rounds.filter((round) => round.settled === 0 && round.passing > 0) ?? [];
@@ -164,6 +386,11 @@ export default function ReportPage() {
           calibrated with the target season&apos;s picker factors. No threshold is tuned on results.
         </p>
       </header>
+
+      <DataHealthSection health={dataHealth} />
+      <ForwardProposalsSection forward={forwardProposals} />
+      <PreregistrationSection prereg={preregistration} />
+      <ForwardValidationSection validation={forwardValidation} />
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Legacy research · STRICT_checks TYPE_RULE cohort · per group</h2>

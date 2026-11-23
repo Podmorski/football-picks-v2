@@ -13,7 +13,7 @@ from pathlib import Path
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
 from .extras import parse_extra_csv
 from .fixtures import ROUND_WEEKDAYS, Fixture, fixtures_for_date, last_saturday, parse_fixtures, round_dates_for
-from . import alerts, api_football, descriptive, ranking, report
+from . import alerts, api_football, data_health, descriptive, forward_proposals, forward_validation, preregistration, ranking, report
 from .model import backtest, live, ranking_backtest
 from .parse import parse_season_csv
 from .picks import read_results
@@ -354,10 +354,12 @@ def main(argv=None) -> int:
 
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
     divisions_set = {league.code for league in divisions}
-    results = read_results(all_matches)
+    football_data_results = read_results(all_matches)
+    football_keys = set(football_data_results)
     fallback = api_football.cached_fallback(PICKS_DIR, today)
+    results = api_football.merge_results(football_data_results, fallback["results"]) if fallback["results"] else dict(football_data_results)
+    fallback_keys = set(fallback["results"])
     if fallback["results"]:
-        results = api_football.merge_results(results, fallback["results"])
         diagnostics = fallback.get("diagnostics") or {}
         print(
             f"api-football fallback {fallback['date']}: matched {diagnostics.get('matched', 0)}, "
@@ -477,6 +479,15 @@ def main(argv=None) -> int:
         + ", ".join(f"{row['date']} ({row['fixtures']} fixtures)" for row in descriptive_coverage)
     )
     index, best_bets = rebuild_round_reports(PICKS_DIR, WEB_DATA_DIR)
+    data_health.write(
+        PICKS_DIR, WEB_DATA_DIR, today=today,
+        latest_football_data=max((match.date for match in all_matches), default=None).isoformat() if all_matches else None,
+        football_keys=football_keys, fallback_keys=fallback_keys,
+    )
+    preregistration.write(WEB_DATA_DIR)
+    prices_dir = Path("prices-private")
+    forward_proposals.write(prices_dir if prices_dir.exists() else None, PICKS_DIR, WEB_DATA_DIR)
+    forward_validation.write(prices_dir if prices_dir.exists() else Path("nonexistent-prices"), PICKS_DIR, WEB_DATA_DIR)
     write_json(WEB_DATA_DIR / "markets.json", ranking.market_catalogue())
     print(
         f"best bets record: {best_bets['cumulative']['landed']} of "
