@@ -84,7 +84,7 @@ def test_phase6_public_aggregates_exist_and_carry_no_prices() -> None:
     health = json.loads((ROOT / "web" / "public" / "data" / "data-health.json").read_text(encoding="utf-8"))
     assert health["latest_football_data_result_date"]
     dates = {row["date"] for row in health["unsettled_rounds"]}
-    assert "2026-11-21" in dates and "2026-11-22" in dates
+    assert "2026-11-21" in dates
     proposals = json.loads((ROOT / "web" / "public" / "data" / "forward-proposals.json").read_text(encoding="utf-8"))
     assert proposals["activation_date"] == "2026-11-24"
     validation = json.loads((ROOT / "web" / "public" / "data" / "forward-validation.json").read_text(encoding="utf-8"))

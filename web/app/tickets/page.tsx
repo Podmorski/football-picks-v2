@@ -14,7 +14,7 @@ import {
   type SavedTicket,
 } from '@/lib/ticket';
 import { paperSettlement, proposalKey, sharedCounts, type LegStatuses } from '@/lib/proposals';
-import type { PrivateProposalsFile, ProposalRecordFile, ProposedTicket, RetrospectiveFile, RetrospectiveProposal } from '@/lib/types';
+import type { PrivateProposalsFile, ProposalRecordFile, ProposedTicket, PublishedReconstructionFile, ReconstructionProposal } from '@/lib/types';
 
 function pct(value: number | null): string {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
@@ -98,73 +98,113 @@ function ProposalCard({ ticket, statuses, shared }: { ticket: ProposedTicket; st
   );
 }
 
-function RetrospectiveCard({ ticket }: { ticket: RetrospectiveProposal }) {
+function ReconstructionCard({ ticket }: { ticket: ReconstructionProposal }) {
+  const settlement = ticket.settlement;
   if (ticket.status !== 'available') {
     return (
       <li className="rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
         <div className="font-semibold text-foreground">{ticket.label}</div>
-        <p>Unavailable: {ticket.reason || 'no eligible legs'}.</p>
-        <p className="text-xs">Its flat allocation remains unbet.</p>
+        <p>Unavailable: {ticket.reason || 'no eligible published legs'}.</p>
       </li>
     );
   }
-  const settlement = ticket.settlement;
   const source = settlement.source_pending ? ' · SOURCE PENDING' : '';
   return (
     <li className="space-y-2 rounded-xl border p-3 text-sm">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="font-semibold">{ticket.label}</span>
-        <span className={`rounded-full border px-2 py-0.5 text-xs ${statusClass(settlement.status)}`}>{settlement.status}{source}</span>
+        <span className={`rounded-full border px-2 py-0.5 text-xs ${statusClass(settlement.status)}`}>{settlement.status.replaceAll('_', ' ')}{source}</span>
       </div>
       <div className="tabular grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground sm:grid-cols-3">
         <span>Model {pct(ticket.combined_probability)}</span>
-        <span>Fair odds {ticket.combined_fair_odds?.toFixed(2)}</span>
-        <span>Flat {ticket.flat_stake.toFixed(0)}u</span>
+        <span>Model-fair odds {ticket.combined_fair_odds?.toFixed(2)}</span>
+        <span>{ticket.legs.length} legs</span>
       </div>
       <ul className="space-y-1 text-xs">
         {ticket.legs.map((leg, index) => (
           <li key={proposalKey(leg)} className="flex flex-wrap items-baseline justify-between gap-2">
-            <span>{leg.h} v {leg.a} · {leg.m}</span>
-            <span className="tabular text-muted-foreground">{pct(leg.pc)} · fair {leg.fair.toFixed(2)} · {settlement.leg_statuses[index] ?? 'pending'}</span>
+            <span>{leg.h} v {leg.a} · {leg.label}</span>
+            <span className="tabular text-muted-foreground">{pct(leg.pc)} · fair {leg.fair.toFixed(2)} · {settlement.leg_statuses[index] ?? '–'}</span>
           </li>
         ))}
       </ul>
-      {settlement.status !== 'pending' && settlement.status !== 'unavailable' ? (
-        <p className="tabular text-xs">Stake {ticket.flat_stake.toFixed(2)} · return {settlement.return?.toFixed(2)} · profit {units(settlement.profit)}</p>
+      {ticket.construction.band_message ? (
+        <p className="text-xs text-muted-foreground">
+          {ticket.construction.band_message}
+          {ticket.construction.individual_floor_message ? ` · ${ticket.construction.individual_floor_message}` : ''}
+          {ticket.construction.overlap_message ? ` · ${ticket.construction.overlap_message}` : ''}
+        </p>
+      ) : null}
+      {settlement.status === 'not_reconstructed' ? (
+        <p className="text-xs text-muted-foreground">Settlement was not reconstructed for this example round.</p>
       ) : null}
     </li>
   );
 }
 
-function RetrospectiveSection({ state, data }: { state: 'loading' | 'ready' | 'error'; data: RetrospectiveFile | null }) {
+function ReconstructionRoundBlock({ round }: { round: PublishedReconstructionFile['rounds'][number] }) {
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-baseline gap-2">
+        <h3 className="text-base font-semibold">{round.round_date}</h3>
+        <span className="text-xs text-muted-foreground">{round.kind === 'example' ? 'Retrospective example' : 'Published round'}</span>
+      </div>
+      <p className="text-xs text-muted-foreground">{round.disclaimer}</p>
+      {round.example_disclaimer ? <p className="text-xs font-medium">{round.example_disclaimer}</p> : null}
+      <p className="text-xs text-muted-foreground">{round.pricing_note}</p>
+      <p className="text-xs text-muted-foreground">
+        Commit {round.provenance.source_publication_commit} · rule {round.provenance.rule_version} · construction {round.provenance.construction_version} · pricing {round.provenance.pricing_mode} · pool {round.provenance.pool_hash.slice(0, 19)}… · inputs {round.provenance.prediction_input_hash.slice(0, 19)}…
+      </p>
+      <p className="text-xs text-muted-foreground">
+        {round.pre_match_publication ? 'Published before the fixtures.' : 'No pre-match publication.'}
+        {' '}Current prediction fields {round.provenance.current_fields_match ? 'match the publication.' : 'do not all match the publication; the pool is taken from the publication itself.'}
+      </p>
+      <ul className="grid gap-3 lg:grid-cols-3">
+        {round.proposals.map((ticket) => <ReconstructionCard key={ticket.type} ticket={ticket} />)}
+      </ul>
+    </div>
+  );
+}
+
+function ReconstructionSection({ state, data }: { state: 'loading' | 'ready' | 'error'; data: PublishedReconstructionFile | null }) {
+  const published = data?.rounds.filter((round) => round.kind !== 'example') ?? [];
+  const example = data?.rounds.filter((round) => round.kind === 'example') ?? [];
   return (
     <section className="space-y-3 border-t pt-4">
       <div>
-        <h2 className="text-lg font-semibold">Retrospective simulations — model-fair odds</h2>
-        <p className="text-sm text-muted-foreground">Retrospective simulation — generated after the round; not a frozen pre-match recommendation.</p>
-        <p className="text-sm text-muted-foreground">Model-fair odds — not realised bookmaker returns.</p>
+        <h2 className="text-lg font-semibold">Published-pick reconstructions — model-fair odds</h2>
+        <p className="text-sm text-muted-foreground">
+          Pick pools are reproduced from the commit that published them. Tickets are constructed later from those pools with
+          ticket-construction-v2; these were not frozen automatic proposals before kickoff.
+        </p>
+        <p className="text-sm text-muted-foreground">Model-fair odds — 1/pc, not realised bookmaker returns. No profit, ROI or bankroll headline is reported.</p>
       </div>
-      {state === 'loading' ? <p className="text-sm text-muted-foreground">Loading retrospective tickets…</p> : null}
-      {state === 'error' ? <p className="text-sm text-muted-foreground">Retrospective tickets could not be loaded.</p> : null}
+      {state === 'loading' ? <p className="text-sm text-muted-foreground">Loading published-pick reconstructions…</p> : null}
+      {state === 'error' ? <p className="text-sm text-muted-foreground">Published-pick reconstructions could not be loaded.</p> : null}
       {data ? (
         <>
-          {data.rounds.map((round) => (
-            <div key={round.round_date} className="space-y-2">
-              <h3 className="text-base font-semibold">{round.round_date}</h3>
-              <p className="text-xs text-muted-foreground">{round.disclaimer}</p>
-              <p className="text-xs text-muted-foreground">{round.fair_odds_note}</p>
-              <ul className="grid gap-3 lg:grid-cols-3">
-                {round.proposals.map((ticket) => <RetrospectiveCard key={ticket.type} ticket={ticket} />)}
-              </ul>
+          {published.length > 0 ? (
+            <div className="space-y-3">
+              <h3 className="text-base font-semibold">Published rounds — reconstructed later</h3>
+              {published.map((round) => <ReconstructionRoundBlock key={round.round_date} round={round} />)}
             </div>
-          ))}
+          ) : null}
+          {example.length > 0 ? (
+            <div className="space-y-3 border-t pt-3">
+              <h3 className="text-base font-semibold">Retrospective example — no pre-match publication</h3>
+              {example.map((round) => <ReconstructionRoundBlock key={round.round_date} round={round} />)}
+            </div>
+          ) : null}
           <div className="rounded-xl border p-3 text-sm">
-            <h3 className="font-semibold">Retrospective counts — model-fair odds</h3>
-            <p className="text-muted-foreground">Retrospective simulation — generated after the round; not a frozen pre-match recommendation. Model-fair odds — not realised bookmaker returns. No profit, ROI or bankroll headline is reported for retrospective tickets.</p>
-            <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
+            <h3 className="font-semibold">Reconstruction counts — no profit headline</h3>
+            <p className="text-muted-foreground">
+              Model-fair pricing. Not forward proposals and not realised profit. No ROI, cumulative profit or bankroll growth is computed.
+            </p>
+            <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-5">
               <dt>Tickets</dt><dd className="tabular text-right">{data.cumulative.tickets}</dd>
               <dt>Settled</dt><dd className="tabular text-right">{data.cumulative.settled}</dd>
               <dt>Pending</dt><dd className="tabular text-right">{data.cumulative.pending}</dd>
+              <dt>Not reconstructed</dt><dd className="tabular text-right">{data.cumulative.not_reconstructed}</dd>
               <dt>Source pending</dt><dd className="tabular text-right">{data.cumulative.source_pending}</dd>
             </dl>
           </div>
@@ -252,8 +292,8 @@ export default function TicketsPage() {
   const [rounds, setRounds] = useState<PrivateProposalsFile['rounds']>([]);
   const [record, setRecord] = useState<ProposalRecordFile | null>(null);
   const [recordState, setRecordState] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [retrospective, setRetrospective] = useState<RetrospectiveFile | null>(null);
-  const [retrospectiveState, setRetrospectiveState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [reconstructions, setReconstructions] = useState<PublishedReconstructionFile | null>(null);
+  const [reconstructionState, setReconstructionState] = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => { setTickets(loadTickets()); }, []);
 
@@ -274,13 +314,13 @@ export default function TicketsPage() {
       })
       .then((payload) => { if (!cancelled) { setRecord(payload); setRecordState('ready'); } })
       .catch(() => { if (!cancelled) setRecordState('error'); });
-    fetch('/data/retrospective-tickets.json')
+    fetch('/data/published-reconstructions.json')
       .then((response) => {
-        if (!response.ok) throw new Error('retrospective');
-        return response.json() as Promise<RetrospectiveFile>;
+        if (!response.ok) throw new Error('reconstructions');
+        return response.json() as Promise<PublishedReconstructionFile>;
       })
-      .then((payload) => { if (!cancelled) { setRetrospective(payload); setRetrospectiveState('ready'); } })
-      .catch(() => { if (!cancelled) setRetrospectiveState('error'); });
+      .then((payload) => { if (!cancelled) { setReconstructions(payload); setReconstructionState('ready'); } })
+      .catch(() => { if (!cancelled) setReconstructionState('error'); });
     return () => { cancelled = true; };
   }, []);
 
@@ -319,7 +359,7 @@ export default function TicketsPage() {
         </p>
       </header>
 
-      {!forwardAvailable ? <RetrospectiveSection state={retrospectiveState} data={retrospective} /> : null}
+      {!forwardAvailable ? <ReconstructionSection state={reconstructionState} data={reconstructions} /> : null}
 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Forward proposals — actual frozen prices</h2>
@@ -354,7 +394,7 @@ export default function TicketsPage() {
 
       <LedgerSummary record={record} />
 
-      {forwardAvailable ? <RetrospectiveSection state={retrospectiveState} data={retrospective} /> : null}
+      {forwardAvailable ? <ReconstructionSection state={reconstructionState} data={reconstructions} /> : null}
 
       <section className="space-y-3 border-t pt-4">
         <h2 className="text-lg font-semibold">My saved tickets</h2>

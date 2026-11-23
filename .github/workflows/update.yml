@@ -110,8 +110,8 @@ jobs:
           python -m pipeline.forward_proposals --prices-dir prices-private --picks-dir picks --web-dir web/public/data
           python -m pipeline.forward_validation --prices-dir prices-private --picks-dir picks --web-dir web/public/data
 
-      - name: Update retrospective ticket settlements
-        run: python -m pipeline.retrospective_tickets settle --picks-dir picks --output web/public/data/retrospective-tickets.json
+      - name: Update published-pick reconstruction settlements
+        run: python -m pipeline.published_reconstructions settle --picks-dir picks --output web/public/data/published-reconstructions.json
 
       - name: Commit changed data
         id: commit

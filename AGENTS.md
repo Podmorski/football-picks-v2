@@ -538,6 +538,34 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `tests/test_forward_proposals.py`, `tests/test_preregistration.py`,
   `tests/test_forward_validation.py` and the extended `tests/test_report.py`.
 
+- Task 22 (23 Nov): the retrospective-model-fair dataset was replaced by versioned published-pick
+  reconstructions in `pipeline/published_reconstructions.py` and
+  `web/public/data/published-reconstructions.json` (`published-pick-reconstruction-v1`, schema 2).
+  `pipeline/provenance/<date>.json` records the verified first-publication pool and hashes.
+  Provenance: **14 Nov** first published by `5c59bf3` at 2026-11-18T16:26:10+01:00 as an `example`
+  under `picks-build-round-v1`; it has **no pre-match publication** (fixtures were 14 Nov) and is
+  labelled “Retrospective example round; no pre-match publication.” The first example file's 15
+  published picks are the pool (`pool_hash` `54b4146f…`); current rows differ for some mapped picks
+  and the historical `c7` market has no current catalogue equivalent, so current fields are not fully
+  comparable and the pool is taken from the publication itself. **21 Nov** and **22 Nov** were first
+  published by `8650c95` at 2026-11-20T11:12:47+00:00 as real rounds under
+  `dashboard-lean-top15-v1` (Dashboard default: Any bet/any league/Lean/Show all, fair 1.50–4.00,
+  league n ≥ 200, lift ≥ 0.2, one per match, top 15); both precede their fixtures and current
+  prediction fields match the publication apart from st/ht/ft (`pool_hash`
+  `bb9f1362…` and `a2992150…`). All three pools are 15 picks. Tickets are constructed later with
+  ticket-construction-v2 on **model-fair** odds only; no verified usable pre-match actual snapshot
+  was available to the worker for every selected leg, and no fair/actual price is mixed. Reconstructed
+  combined model-fair odds: 14 Nov 2.392952 / 2.552239 / 5.917116; 21 Nov 2.502953 / 3.288525 /
+  5.054197; 22 Nov 2.308612 / 3.124898 / 4.520989. Outcome-mask tests show masked and altered
+  st/ht/ft produce byte-identical legs and construction metadata; only settlement differs, and
+  `pool_menu`/`construct` contain no status read. My tickets separates forward frozen proposals,
+  published-pick reconstructions (21/22 Nov) and the 14 Nov example; reconstructions show counts and
+  status only, with no cumulative profit, ROI or bankroll. `update.yml` runs
+  `pipeline.published_reconstructions settle`, which never regenerates legs. Reconstructions are not
+  used by forward validation, MEL-v1, N*, forward ROI or the pre-registered record. The old
+  `pipeline/retrospective_tickets.py`, its dataset and its tests were removed. Focused tests:
+  `tests/test_published_reconstructions.py` plus updated settlement/contract tests.
+
 ## Open items
 
 - **Ranked audit complete; realised profitability remains mostly unmeasured**: Task 14's aggregate

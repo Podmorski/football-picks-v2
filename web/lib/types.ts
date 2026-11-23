@@ -595,51 +595,83 @@ export type ProposalRecordFile = {
   note: string;
 };
 
-export type RetrospectiveLeg = {
+export type ReconstructionLeg = {
   d: string;
   h: string;
   a: string;
   k: string | null;
   m: string;
+  label: string;
+  group: string;
   pc: number;
   fair: number;
 };
 
-export type RetrospectiveProposal = {
+export type ReconstructionConstruction = {
+  policy: string;
+  algorithm: string;
+  applied_later: boolean;
+  band: string;
+  band_message?: string;
+  achieved_fair_odds?: number;
+  individual_floor_relaxed: boolean;
+  individual_floor_message?: string;
+  overlap_relaxed: boolean;
+  overlap_message?: string;
+  method?: string;
+  exact?: boolean;
+  [key: string]: string | number | boolean | undefined;
+};
+
+export type ReconstructionProposal = {
   type: 'best2' | 'around3' | 'around5';
   label: string;
   status: 'available' | 'unavailable';
   reason: string;
-  flat_stake: number;
-  legs: RetrospectiveLeg[];
+  legs: ReconstructionLeg[];
   combined_probability: number | null;
   combined_fair_odds: number | null;
+  construction: ReconstructionConstruction;
   settlement: {
-    status: 'unavailable' | 'pending' | 'landed' | 'lost' | 'void';
-    return: number | null;
-    profit: number | null;
+    status: 'unavailable' | 'pending' | 'landed' | 'lost' | 'void' | 'not_reconstructed';
     source_pending: boolean;
     leg_statuses: string[];
   };
 };
 
-export type RetrospectiveRound = {
-  round_date: string;
-  disclaimer: string;
-  fair_odds_note: string;
-  proposals: RetrospectiveProposal[];
+export type ReconstructionProvenance = {
+  source_publication_commit: string;
+  publication_time: string;
+  rule_version: string;
+  rule_source: string;
+  prediction_input_hash: string;
+  pool_hash: string;
+  pricing_mode: string;
+  pre_match_publication: boolean;
+  current_fields_match: boolean;
+  construction_version: string;
 };
 
-export type RetrospectiveFile = {
+export type ReconstructionRound = {
+  round_date: string;
+  kind: string;
+  pre_match_publication: boolean;
+  disclaimer: string;
+  example_disclaimer: string;
+  pricing_note: string;
+  pick_pool_count: number;
+  provenance: ReconstructionProvenance;
+  proposals: ReconstructionProposal[];
+};
+
+export type PublishedReconstructionFile = {
   schema_version: number;
   definition_version: string;
-  retrospective: true;
-  disclaimer: string;
-  fair_odds_note: string;
-  rounds: RetrospectiveRound[];
+  pricing_mode: string;
+  rounds: ReconstructionRound[];
   cumulative: {
     tickets: number; settled: number; landed: number; lost: number; void: number;
-    pending: number; unavailable: number; source_pending: number;
+    pending: number; unavailable: number; not_reconstructed: number; source_pending: number;
   };
 };
 

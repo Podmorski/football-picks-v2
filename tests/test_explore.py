@@ -68,8 +68,8 @@ def default_vetted_tally(iso: str) -> tuple[int, int, int]:
 
 
 def test_rounds_tally_matches_the_best_bets_default_rows() -> None:
-    # 21 Nov has no results yet: every row is pending, so no landed/lost tally.
-    assert default_vetted_tally("2026-11-21") == (122, 0, 0)
+    # 21 Nov results have now arrived: 120 of 122 settled, 97 landed.
+    assert default_vetted_tally("2026-11-21") == (122, 120, 97)
     # The 14 Nov example is settled under the same rule: 36 of 46 landed.
     assert default_vetted_tally("2026-11-14") == (48, 46, 36)
 

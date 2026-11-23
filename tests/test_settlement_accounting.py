@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from pipeline import proposed_tickets as proposals
-from pipeline import retrospective_tickets as retrospective
+from pipeline import published_reconstructions as reconstructions
 from pipeline import settlement
 
 
@@ -115,20 +115,19 @@ def test_aggregate_flat_and_adaptive_agree_on_mixed_void(tmp_path: Path) -> None
     assert aggregate["mel"]["net"] == 10.0
 
 
-def test_retrospective_cumulative_has_no_money_or_roi() -> None:
+def test_reconstruction_cumulative_has_no_money_or_roi() -> None:
     rounds = [{
         "proposals": [{
-            "flat_stake": 50.0,
-            "settlement": {"status": "landed", "return": 100.0, "profit": 50.0, "source_pending": False, "leg_statuses": []},
+            "settlement": {"status": "landed", "source_pending": False, "leg_statuses": []},
         }],
     }]
-    cumulative = retrospective._cumulative(rounds)
-    for forbidden in ("staked", "returned", "profit", "roi"):
+    cumulative = reconstructions._cumulative(rounds)
+    for forbidden in ("staked", "returned", "profit", "roi", "bankroll"):
         assert forbidden not in cumulative
     assert cumulative["tickets"] == 1 and cumulative["landed"] == 1
 
 
-def test_committed_retrospective_aggregate_is_counts_only() -> None:
-    payload = json.loads((Path(__file__).resolve().parents[1] / "web" / "public" / "data" / "retrospective-tickets.json").read_text(encoding="utf-8"))
-    for forbidden in ("staked", "returned", "profit", "roi"):
+def test_committed_reconstruction_aggregate_is_counts_only() -> None:
+    payload = json.loads((Path(__file__).resolve().parents[1] / "web" / "public" / "data" / "published-reconstructions.json").read_text(encoding="utf-8"))
+    for forbidden in ("staked", "returned", "profit", "roi", "bankroll"):
         assert forbidden not in payload["cumulative"]

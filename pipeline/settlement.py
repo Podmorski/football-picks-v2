@@ -1,9 +1,8 @@
 """Shared ticket settlement and round-atomic paper accounting.
 
-Every ledger (forward flat, forward adaptive, retrospective model-fair) uses the
-same gross-return rules. Bankroll, peak and drawdown advance once per round,
-after every ticket in that round is terminal, so ticket order cannot change the
-result.
+Every forward paper ledger (flat and adaptive) uses the same gross-return rules.
+Published-pick reconstructions use ``ticket_outcome`` only for status and never
+for a profit headline.
 """
 from __future__ import annotations
 
