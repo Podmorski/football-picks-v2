@@ -52,8 +52,8 @@ def test_a2_band_and_refinement_controls_are_in_every_view() -> None:
 
 def test_a3_dropdowns_are_full_width_on_mobile() -> None:
     source = read("web/components/VettedList.tsx")
-    assert source.count("className=\"w-full rounded-md border") >= 3
-    assert "grid gap-2 sm:grid-cols-3" in source
+    assert source.count("w-full rounded-lg border") >= 3
+    assert "grid gap-3 sm:grid-cols-2 lg:grid-cols-4" in source
 
 
 def test_a4_round_buttons_are_oldest_left_and_report_wording() -> None:

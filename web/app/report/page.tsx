@@ -1,3 +1,4 @@
+import PerformanceChart from '@/components/performance-chart';
 import {
   readBestBetsRecord,
   readDailyBestRecord,
@@ -28,12 +29,21 @@ function units(value: number | null): string {
   return value === null ? '–' : `${value > 0 ? '+' : ''}${value.toFixed(2)}`;
 }
 
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl border border-border border-border bg-muted/25 px-3 py-2">
+      <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
+      <div className="tabular mt-0.5 text-sm font-semibold text-foreground">{value}</div>
+    </div>
+  );
+}
+
 function DailyBestSection({ record }: { record: DailyBestRecordFile | null }) {
   if (!record) {
     return (
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Daily best — forward actual-price record</h2>
-        <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+      <section className="space-y-3 border-t border-border pt-8">
+        <h2 className="text-xl font-semibold tracking-tight">Daily best — forward actual-price record</h2>
+        <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
           No Daily-best forward record is embedded in this build.
         </p>
       </section>
@@ -41,8 +51,8 @@ function DailyBestSection({ record }: { record: DailyBestRecordFile | null }) {
   }
   const cumulative = record.cumulative;
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Daily best — forward actual-price record</h2>
+    <section className="space-y-3 border-t border-border pt-8">
+      <h2 className="text-xl font-semibold tracking-tight">Daily best — forward actual-price record</h2>
       <p className="max-w-3xl text-sm text-muted-foreground">
         The default All-leagues list at actual odds {record.band.low.toFixed(2)}–{record.band.high.toFixed(2)},
         frozen before kickoff and capped at {record.limit} fixtures. One unit per pick. This is a forward
@@ -54,15 +64,35 @@ function DailyBestSection({ record }: { record: DailyBestRecordFile | null }) {
           : 'Daily-best-v1 is not yet operational in the private store.'}
         {' '}Frozen rounds: {record.rounds.length}.
       </p>
+      {record.rounds.length > 0 ? (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+          <Metric label="Selected" value={String(cumulative.selected)} />
+          <Metric label="Landed" value={String(cumulative.landed)} />
+          <Metric label="Lost" value={String(cumulative.lost)} />
+          <Metric label="Net" value={units(cumulative.net)} />
+          <Metric label="ROI" value={signed(cumulative.roi)} />
+          <Metric label="Pending" value={String(cumulative.pending)} />
+        </div>
+      ) : null}
+      {(() => {
+        const series = record.rounds.reduce<{ label: string; value: number }[]>((points, round) => {
+          const previous = points.length > 0 ? points[points.length - 1].value : 0;
+          points.push({ label: round.round_date.slice(5), value: previous + round.net });
+          return points;
+        }, []);
+        return cumulative.settled_rounds > 0 && series.length >= 2 ? (
+          <PerformanceChart points={series} ariaLabel="Daily best cumulative net units by round" valueLabel="Net units" />
+        ) : null;
+      })()}
       {record.rounds.length === 0 ? (
-        <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
           No frozen Daily-best rounds yet. The record starts with the first activated round; pre-activation
           rounds are not backfilled.
         </p>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-xl border">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-2xl border border-border">
+            <table className="w-full min-w-[64rem] text-sm">
               <thead>
                 <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2 text-left font-semibold">Round</th>
@@ -133,7 +163,7 @@ function DailyBestSection({ record }: { record: DailyBestRecordFile | null }) {
               : `Mean actual odds ${cumulative.mean_actual_odds.toFixed(2)} · median ${cumulative.median_actual_odds?.toFixed(2) ?? '–'} · mean model EV ${signed(cumulative.mean_model_ev)}.`}
           </p>
           <div className="grid gap-3 lg:grid-cols-2">
-            <div className="overflow-x-auto rounded-xl border">
+            <div className="overflow-x-auto rounded-2xl border border-border">
               <table className="w-full text-sm">
                 <thead><tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-2 text-left font-semibold">Market group</th><th className="px-3 py-2 text-right font-semibold">Selected</th><th className="px-3 py-2 text-right font-semibold">Landed</th><th className="px-3 py-2 text-right font-semibold">Net</th><th className="px-3 py-2 text-right font-semibold">ROI</th></tr></thead>
                 <tbody>
@@ -149,7 +179,7 @@ function DailyBestSection({ record }: { record: DailyBestRecordFile | null }) {
                 </tbody>
               </table>
             </div>
-            <div className="overflow-x-auto rounded-xl border">
+            <div className="overflow-x-auto rounded-2xl border border-border">
               <table className="w-full text-sm">
                 <thead><tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-2 text-left font-semibold">Band</th><th className="px-3 py-2 text-right font-semibold">Selected</th><th className="px-3 py-2 text-right font-semibold">Landed</th><th className="px-3 py-2 text-right font-semibold">Net</th><th className="px-3 py-2 text-right font-semibold">ROI</th></tr></thead>
                 <tbody>
@@ -200,31 +230,6 @@ function ValueSplitRow({ label, summary }: { label: string; summary: ValueSummar
   );
 }
 
-function ProfitChart({ points }: { points: { date: string; profit: number }[] }) {
-  if (points.length === 0) return null;
-  const values = points.map((point) => point.profit);
-  const min = Math.min(0, ...values);
-  const max = Math.max(0, ...values);
-  const span = max - min || 1;
-  const width = 560;
-  const height = 120;
-  const left = 20;
-  const top = 10;
-  const x = (index: number) => left + (points.length === 1 ? width / 2 : (index / (points.length - 1)) * width);
-  const y = (value: number) => top + height - ((value - min) / span) * height;
-  const path = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${x(index).toFixed(1)} ${y(point.profit).toFixed(1)}`).join(' ');
-  return (
-    <svg viewBox={`0 0 ${left * 2 + width} ${height + top * 2}`} className="h-40 w-full text-foreground" role="img" aria-label="Cumulative profit chart">
-      <line x1={left} y1={y(0)} x2={left + width} y2={y(0)} stroke="currentColor" strokeOpacity="0.2" />
-      <path d={path} fill="none" stroke="currentColor" strokeWidth="2" />
-      {points.map((point, index) => (
-        <circle key={point.date} cx={x(index)} cy={y(point.profit)} r="2.5" fill="currentColor" />
-      ))}
-    </svg>
-  );
-}
-
-
 function utcStamp(value: string | null): string {
   if (!value) return '–';
   const date = new Date(value);
@@ -241,8 +246,8 @@ const MOZZART_SCOPES: [string, string][] = [
 
 function PriceStatus({ status }: { status: MozzartStatusFile }) {
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Price status</h2>
+    <section className="space-y-3 border-t border-border pt-8">
+      <h2 className="text-xl font-semibold tracking-tight">Price status</h2>
       <p className="text-sm text-muted-foreground">Aggregates only: no prices are stored in this repository.</p>
       {status.usage ? (
         <p className="text-sm">
@@ -255,7 +260,7 @@ function PriceStatus({ status }: { status: MozzartStatusFile }) {
           ) : null}
         </p>
       ) : null}
-      <div className="overflow-x-auto rounded-xl border">
+      <div className="overflow-x-auto rounded-2xl border border-border">
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -284,62 +289,74 @@ function PriceStatus({ status }: { status: MozzartStatusFile }) {
 }
 
 function DataHealthSection({ health }: { health: DataHealthFile | null }) {
+  const pendingTotal = health?.unsettled_rounds.reduce((sum, round) => sum + round.pending_fixtures, 0) ?? 0;
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Data health</h2>
+    <section className="space-y-3 border-t border-border pt-8">
+      <h2 className="text-xl font-semibold tracking-tight">Data health</h2>
       <p className="max-w-3xl text-sm text-muted-foreground">
         Each unsettled indexed round, its pending fixtures, the result source, the cached fallback attempt
         and the next scheduled retry. Aggregates only.
       </p>
       {!health ? (
-        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No data health file yet; the next pipeline run writes it.</p>
+        <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-4 text-sm text-muted-foreground">No data health file yet; the next pipeline run writes it.</p>
       ) : (
         <>
-          <p className="text-sm">
-            Latest football-data result date: <span className="font-medium">{health.latest_football_data_result_date ?? 'unknown'}</span>
-          </p>
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full border border-border bg-muted/30 px-3 py-1">
+              Latest football-data result date: <span className="font-medium text-foreground">{health.latest_football_data_result_date ?? 'unknown'}</span>
+            </span>
+            <span className="rounded-full border border-border bg-muted/30 px-3 py-1">
+              {health.unsettled_rounds.length} unsettled round{health.unsettled_rounds.length === 1 ? '' : 's'}
+            </span>
+            <span className="rounded-full border border-border bg-muted/30 px-3 py-1">
+              {pendingTotal} pending fixture{pendingTotal === 1 ? '' : 's'}
+            </span>
+          </div>
           {health.unsettled_rounds.length === 0 ? (
-            <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No unsettled indexed round.</p>
+            <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-4 text-sm text-muted-foreground">No unsettled indexed round.</p>
           ) : (
-            <div className="overflow-x-auto rounded-xl border">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="px-3 py-2 text-left font-semibold">Round</th>
-                    <th className="px-3 py-2 text-right font-semibold">Fixtures</th>
-                    <th className="px-3 py-2 text-right font-semibold">Pending</th>
-                    <th className="px-3 py-2 text-right font-semibold">Settled by source</th>
-                    <th className="px-3 py-2 text-left font-semibold">Fallback attempt</th>
-                    <th className="px-3 py-2 text-left font-semibold">Pending reasons</th>
-                    <th className="px-3 py-2 text-left font-semibold">Next retry</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {health.unsettled_rounds.map((round) => (
-                    <tr key={round.date} className="border-t align-top">
-                      <td className="px-3 py-1.5">{round.label}</td>
-                      <td className="tabular px-3 py-1.5 text-right">{round.fixtures}</td>
-                      <td className="tabular px-3 py-1.5 text-right">{round.pending_fixtures}</td>
-                      <td className="tabular px-3 py-1.5 text-right text-xs">
-                        football-data {round.sources.football_data_fixtures} · API-Football {round.sources.api_football_fixtures} · unknown {round.sources.unknown_fixtures}
-                      </td>
-                      <td className="px-3 py-1.5 text-xs">
-                        {round.fallback.attempted
-                          ? `${round.fallback.requests ?? 0} req · ${round.fallback.matched ?? 0} matched · ${round.fallback.ambiguous ?? 0} ambiguous · ${round.fallback.unmatched ?? 0} unmatched`
-                          : round.fallback.reason ?? 'not attempted'}
-                      </td>
-                      <td className="px-3 py-1.5 text-xs">
-                        source-pending {round.pending_reasons.source_pending_fixtures} · ambiguous {round.pending_reasons.ambiguous_fixtures} · unmatched {round.pending_reasons.unmatched_fixtures}
-                        {round.pending_reasons.source_pending_sample.length > 0
-                          ? ` (e.g. ${round.pending_reasons.source_pending_sample.join('; ')})`
-                          : ''}
-                      </td>
-                      <td className="px-3 py-1.5 text-xs">{round.next_retry}</td>
+            <details className="overflow-hidden rounded-2xl border border-border bg-card">
+              <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground">Round-by-round source detail</summary>
+              <div className="overflow-x-auto border-t border-border">
+                <table className="w-full min-w-[56rem] text-sm">
+                  <thead>
+                    <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                      <th className="px-3 py-2 text-left font-semibold">Round</th>
+                      <th className="px-3 py-2 text-right font-semibold">Fixtures</th>
+                      <th className="px-3 py-2 text-right font-semibold">Pending</th>
+                      <th className="px-3 py-2 text-right font-semibold">Settled by source</th>
+                      <th className="px-3 py-2 text-left font-semibold">Fallback attempt</th>
+                      <th className="px-3 py-2 text-left font-semibold">Pending reasons</th>
+                      <th className="px-3 py-2 text-left font-semibold">Next retry</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {health.unsettled_rounds.map((round) => (
+                      <tr key={round.date} className="border-t border-border align-top">
+                        <td className="px-3 py-1.5">{round.label}</td>
+                        <td className="tabular px-3 py-1.5 text-right">{round.fixtures}</td>
+                        <td className="tabular px-3 py-1.5 text-right">{round.pending_fixtures}</td>
+                        <td className="tabular px-3 py-1.5 text-right text-xs">
+                          football-data {round.sources.football_data_fixtures} · API-Football {round.sources.api_football_fixtures} · unknown {round.sources.unknown_fixtures}
+                        </td>
+                        <td className="px-3 py-1.5 text-xs">
+                          {round.fallback.attempted
+                            ? `${round.fallback.requests ?? 0} req · ${round.fallback.matched ?? 0} matched · ${round.fallback.ambiguous ?? 0} ambiguous · ${round.fallback.unmatched ?? 0} unmatched`
+                            : round.fallback.reason ?? 'not attempted'}
+                        </td>
+                        <td className="px-3 py-1.5 text-xs">
+                          source-pending {round.pending_reasons.source_pending_fixtures} · ambiguous {round.pending_reasons.ambiguous_fixtures} · unmatched {round.pending_reasons.unmatched_fixtures}
+                          {round.pending_reasons.source_pending_sample.length > 0
+                            ? ` (e.g. ${round.pending_reasons.source_pending_sample.join('; ')})`
+                            : ''}
+                        </td>
+                        <td className="px-3 py-1.5 text-xs">{round.next_retry}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
           )}
         </>
       )}
@@ -349,14 +366,14 @@ function DataHealthSection({ health }: { health: DataHealthFile | null }) {
 
 function ForwardProposalsSection({ forward }: { forward: ForwardProposalsFile | null }) {
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Forward proposals</h2>
+    <section className="space-y-3 border-t border-border pt-8">
+      <h2 className="text-xl font-semibold tracking-tight">Forward proposals</h2>
       <p className="max-w-3xl text-sm text-muted-foreground">
         Frozen automatic tickets are separate from Best bets. Counts are aggregate; actual leg and ticket
         prices stay in the private store.
       </p>
       {!forward ? (
-        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No forward proposal record yet.</p>
+        <p className="rounded-2xl border border-dashed border-border px-4 py-4 text-sm text-muted-foreground">No forward proposal record yet.</p>
       ) : (
         <>
           <p className="text-sm">
@@ -367,18 +384,25 @@ function ForwardProposalsSection({ forward }: { forward: ForwardProposalsFile | 
           </p>
           <p className="text-sm"><span className="font-medium">State:</span> {forward.state}</p>
           {forward.errors.length > 0 ? (
-            <ul className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
+            <ul className="rounded-2xl border border-dashed border-border px-4 py-3 text-sm text-muted-foreground">
               {forward.errors.map((error) => <li key={error}>{error}</li>)}
             </ul>
           ) : null}
-          <div className="grid gap-2 text-sm sm:grid-cols-2">
-            <p>Tickets: <span className="font-medium">{forward.counts.available} available / {forward.counts.unavailable} unavailable</span></p>
-            <p>Preferred band: <span className="font-medium">{forward.counts.bands.preferred ?? 0}</span> · outside {forward.counts.bands.outside ?? 0} · below floor {forward.counts.bands.below_floor ?? 0}</p>
-            <p>Individual floor relaxed: <span className="font-medium">{forward.counts.individual_floor_relaxed}</span> · overlap relaxed {forward.counts.overlap_relaxed}</p>
-            <p>Negative model EV: <span className="font-medium">{forward.counts.negative_model_ev}</span> ({forward.counts.negative_model_ev_share === null ? '–' : pct(forward.counts.negative_model_ev_share)})</p>
-            <p>Price coverage: <span className="font-medium">{forward.price_coverage.priced_fixtures} / {forward.price_coverage.fixtures}</span> fixtures · {forward.price_coverage.priced_markets} priced markets</p>
-            <p>Started not priced: {forward.price_coverage.started_not_priced} · unmatched fixtures {forward.price_coverage.unmatched_fixtures}</p>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            <Metric label="Tickets available" value={String(forward.counts.available)} />
+            <Metric label="Tickets unavailable" value={String(forward.counts.unavailable)} />
+            <Metric label="Preferred band" value={String(forward.counts.bands.preferred ?? 0)} />
+            <Metric label="Outside band" value={String(forward.counts.bands.outside ?? 0)} />
+            <Metric label="Below floor" value={String(forward.counts.bands.below_floor ?? 0)} />
+            <Metric label="Individual floor relaxed" value={String(forward.counts.individual_floor_relaxed)} />
+            <Metric label="Overlap relaxed" value={String(forward.counts.overlap_relaxed)} />
+            <Metric label="Negative model EV" value={`${forward.counts.negative_model_ev} (${forward.counts.negative_model_ev_share === null ? '–' : pct(forward.counts.negative_model_ev_share)})`} />
+            <Metric label="Price coverage" value={`${forward.price_coverage.priced_fixtures} / ${forward.price_coverage.fixtures} fixtures`} />
+            <Metric label="Priced markets" value={String(forward.price_coverage.priced_markets)} />
           </div>
+          <p className="text-xs text-muted-foreground">
+            Started not priced: {forward.price_coverage.started_not_priced} · unmatched fixtures {forward.price_coverage.unmatched_fixtures}
+          </p>
           <p className="text-sm">
             Paper results: flat ROI {signed(typeof forward.results.flat.roi === 'number' ? forward.results.flat.roi : null)} · MEL ROI{' '}
             {signed(typeof forward.results.mel.roi === 'number' ? forward.results.mel.roi : null)} · settled tickets {forward.results.counts.settled ?? 0} · pending {forward.results.counts.pending ?? 0}.
@@ -392,26 +416,31 @@ function ForwardProposalsSection({ forward }: { forward: ForwardProposalsFile | 
 
 function PreregistrationSection({ prereg }: { prereg: PreregistrationFile | null }) {
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Pre-registration · construction and staking</h2>
+    <section className="space-y-3 border-t border-border pt-8">
+      <h2 className="text-xl font-semibold tracking-tight">Pre-registration · construction and staking</h2>
       {!prereg ? (
-        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No pre-registration file yet.</p>
+        <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-4 text-sm text-muted-foreground">No pre-registration file yet.</p>
       ) : (
-        <>
-          <p className="max-w-3xl text-sm text-muted-foreground">
-            {prereg.construction_version} · {prereg.policy_version} · proposal schema {prereg.proposal_schema_version} · activation {prereg.activation_date}.
-            Primary comparison: {prereg.primary_comparison.join(' and ')}. Exploratory: {prereg.exploratory.join(', ')}.
-          </p>
-          <ul className="space-y-1 text-sm">
-            <li>One-sided alpha {String(prereg.protocol.alpha_one_sided)}, power {String(prereg.protocol.power)}, meaningful alternative {pct(Number(prereg.protocol.meaningful_roi_equivalent))} ROI-equivalent.</li>
-            <li>N* rule: {String(prereg.protocol.n_star_rule)}; {String(prereg.protocol.n_star_unavailable)}.</li>
-            <li>Evidence: {String(prereg.protocol.evidence_rule)}. {String(prereg.protocol.inconclusive_rule)}.</li>
-            <li>No early efficacy stopping; safety review at {pct(Number(prereg.protocol.safety_review_drawdown))} realised drawdown or any identity/accounting failure.</li>
-            <li>Stop adaptive staking if {String(prereg.protocol.stop_adaptive_rule)}.</li>
-          </ul>
-          <p className="max-w-3xl text-sm text-muted-foreground">{prereg.research_note}</p>
-          <p className="max-w-3xl text-xs text-muted-foreground">{prereg.version_rule}</p>
-        </>
+        <details className="overflow-hidden rounded-2xl border border-border bg-card">
+          <summary className="cursor-pointer px-4 py-3 text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">{prereg.construction_version} · {prereg.policy_version}</span>
+            {' '}· proposal schema {prereg.proposal_schema_version} · activation {prereg.activation_date}
+          </summary>
+          <div className="space-y-3 border-t border-border p-4 text-sm">
+            <p className="max-w-3xl text-muted-foreground">
+              Primary comparison: {prereg.primary_comparison.join(' and ')}. Exploratory: {prereg.exploratory.join(', ')}.
+            </p>
+            <ul className="space-y-1">
+              <li>One-sided alpha {String(prereg.protocol.alpha_one_sided)}, power {String(prereg.protocol.power)}, meaningful alternative {pct(Number(prereg.protocol.meaningful_roi_equivalent))} ROI-equivalent.</li>
+              <li>N* rule: {String(prereg.protocol.n_star_rule)}; {String(prereg.protocol.n_star_unavailable)}.</li>
+              <li>Evidence: {String(prereg.protocol.evidence_rule)}. {String(prereg.protocol.inconclusive_rule)}.</li>
+              <li>No early efficacy stopping; safety review at {pct(Number(prereg.protocol.safety_review_drawdown))} realised drawdown or any identity/accounting failure.</li>
+              <li>Stop adaptive staking if {String(prereg.protocol.stop_adaptive_rule)}.</li>
+            </ul>
+            <p className="max-w-3xl text-muted-foreground">{prereg.research_note}</p>
+            <p className="max-w-3xl text-xs text-muted-foreground">{prereg.version_rule}</p>
+          </div>
+        </details>
       )}
     </section>
   );
@@ -434,19 +463,27 @@ function validationRow(label: string, series: ForwardValidationSeries) {
 
 function ForwardValidationSection({ validation }: { validation: ForwardValidationFile | null }) {
   return (
-    <section className="space-y-3">
-      <h2 className="text-lg font-semibold">Forward validation · actual prices only</h2>
+    <section className="space-y-3 border-t border-border pt-8">
+      <h2 className="text-xl font-semibold tracking-tight">Forward validation · actual prices only</h2>
       <p className="max-w-3xl text-sm text-muted-foreground">
         Whole round dates are resampled with every ticket and leg retained; bankroll, unresolved exposure and
         drawdown are replayed through each sequence. No retrospective fair-odds substitution.
       </p>
       {!validation ? (
-        <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">No forward validation file yet.</p>
+        <p className="rounded-2xl border border-dashed border-border px-4 py-4 text-sm text-muted-foreground">No forward validation file yet.</p>
       ) : (
         <>
           <p className="text-sm"><span className="font-medium">State:</span> {validation.state} · rounds {validation.counts.rounds} · settled playable {validation.counts.terminal_rounds} · void {validation.counts.void} · pending {validation.counts.pending}</p>
-          <div className="overflow-x-auto rounded-xl border">
-            <table className="w-full text-sm">
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+            <Metric label="Rounds" value={String(validation.counts.rounds)} />
+            <Metric label="Settled playable" value={String(validation.counts.terminal_rounds)} />
+            <Metric label="Pending" value={String(validation.counts.pending)} />
+            <Metric label="Void" value={String(validation.counts.void)} />
+            <Metric label="Max drawdown" value={pct(validation.safety.maximum_drawdown)} />
+            <Metric label="N*" value={validation.power.n_star === null || validation.power.n_star === undefined ? 'not estimable' : String(validation.power.n_star)} />
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-border">
+            <table className="w-full min-w-[52rem] text-sm">
               <thead>
                 <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
                   <th className="px-3 py-2 text-left font-semibold">Policy</th>
@@ -515,7 +552,7 @@ export default function ReportPage() {
 
   if (!report) {
     return (
-      <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+      <p className="rounded-2xl border border-dashed border-border px-4 py-8 text-center text-sm text-muted-foreground">
         No report data yet. Regenerate it with the pipeline.
       </p>
     );
@@ -526,7 +563,8 @@ export default function ReportPage() {
   return (
     <div className="space-y-8">
       <header className="space-y-2">
-        <h1 className="text-2xl font-bold tracking-tight">Report</h1>
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Performance &amp; research</p>
+        <h1 className="text-2xl font-semibold tracking-tight">Report</h1>
         <p className="text-xs text-muted-foreground">Last updated: {updated}</p>
         <p className="max-w-3xl text-sm text-muted-foreground">
           Walk-forward over 2019-20..2025-26. Every round uses matches before it only; each row is
@@ -540,14 +578,14 @@ export default function ReportPage() {
       <PreregistrationSection prereg={preregistration} />
       <ForwardValidationSection validation={forwardValidation} />
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Legacy research · STRICT_checks TYPE_RULE cohort · per group</h2>
+      <section className="space-y-3 border-t border-border pt-8">
+        <h2 className="text-xl font-semibold tracking-tight">Legacy research · STRICT_checks TYPE_RULE cohort · per group</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
           Legacy research only. This is not the current Daily-best list. It applies TYPE_RULE before the UI
           minimum-fair filter and returns at fair odds, not realised Mozzart profit. The interval is a 95% CI
           bootstrapped over round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
         </p>
-        <div className="overflow-x-auto rounded-xl border">
+        <div className="overflow-x-auto rounded-2xl border border-border">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -588,8 +626,8 @@ export default function ReportPage() {
         </p>
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Best bets results · legacy 58% cohort · research only</h2>
+      <section className="space-y-3 border-t border-border pt-8">
+        <h2 className="text-xl font-semibold tracking-tight">Best bets results · legacy 58% cohort · research only</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
           Legacy research cohort: calibrated probability ≥{' '}
           {bestBets ? pct(bestBets.min_pc) : '58.0%'}, fair odds ≥ {bestBets?.min_fair?.toFixed(2) ?? '1.20'} (the old Any-bet
@@ -597,18 +635,18 @@ export default function ReportPage() {
           it is kept as a frozen historical cohort. Expected is the sum of shown probabilities over settled rows only,
           where settled means Landed or Lost; Void and Pending are separate buckets.
         </p>
-        <p className="max-w-3xl rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
+        <p className="max-w-3xl rounded-2xl border border-dashed border-border px-4 py-3 text-sm text-muted-foreground">
           The 14 Nov row is a retrospective example generated after the fixture; not forward
           performance. Under the 1.20 minimum-fair default its 48 selections are 36 landed, 10 lost
           and 2 void; none is GOAL_RANGE_FT:1+, and median selected fair odds are approximately 1.218.
           This is not evidence of positive expected value or realised bookmaker profit.
         </p>
         {settled.length === 0 ? (
-          <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+          <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
             No settled rounds yet.{pending.length > 0 ? ` ${pending.map((round) => `${round.label}: ${round.passing}`).join(', ')} passing picks are awaiting results.` : ''}
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-xl border">
+          <div className="overflow-x-auto rounded-2xl border border-border">
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -661,15 +699,15 @@ export default function ReportPage() {
         ) : null}
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Record at Mozzart prices</h2>
+      <section className="space-y-3 border-t border-border pt-8">
+        <h2 className="text-xl font-semibold tracking-tight">Record at Mozzart prices</h2>
         {mozzart && mozzart.cumulative?.all?.n > 0 ? (
           <>
             <p className="text-sm text-muted-foreground">
               Settled rounds only. Return is at the Mozzart price; the 95% interval is bootstrapped over
               round dates. Aggregates only; no prices are stored here.
             </p>
-            <div className="overflow-x-auto rounded-xl border">
+            <div className="overflow-x-auto rounded-2xl border border-border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -699,14 +737,14 @@ export default function ReportPage() {
             </div>
           </>
         ) : (
-          <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+          <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
             No priced record in this build. Mozzart aggregates are embedded only in the priced production build.
           </p>
         )}
       </section>
 
-      <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Value bets at Mozzart prices</h2>
+      <section className="space-y-3 border-t border-border pt-8">
+        <h2 className="text-xl font-semibold tracking-tight">Value bets at Mozzart prices</h2>
         {valueRecord ? (
           <>
             <p className="text-sm text-muted-foreground">
@@ -714,12 +752,12 @@ export default function ReportPage() {
               Settled rounds only; the 95% CI is bootstrapped over round dates (2,000, seed 20261025).
             </p>
             {valueRecord.cumulative.bets === 0 ? (
-              <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+              <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
                 No settled Value bets yet. They appear after the Monday settle.
               </p>
             ) : (
               <>
-                <div className="overflow-x-auto rounded-xl border">
+                <div className="overflow-x-auto rounded-2xl border border-border">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -737,7 +775,7 @@ export default function ReportPage() {
                 </div>
 
                 <h3 className="text-sm font-semibold">Value bets per round</h3>
-                <div className="overflow-x-auto rounded-xl border">
+                <div className="overflow-x-auto rounded-2xl border border-border">
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -761,7 +799,7 @@ export default function ReportPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold">By bet group</h3>
-                    <div className="overflow-x-auto rounded-xl border">
+                    <div className="overflow-x-auto rounded-2xl border border-border">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -783,7 +821,7 @@ export default function ReportPage() {
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold">By odds band</h3>
-                    <div className="overflow-x-auto rounded-xl border">
+                    <div className="overflow-x-auto rounded-2xl border border-border">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
@@ -806,12 +844,16 @@ export default function ReportPage() {
                 </div>
 
                 <h3 className="text-sm font-semibold">Cumulative profit</h3>
-                <ProfitChart points={valueRecord.profit_series} />
+                <PerformanceChart
+                  points={valueRecord.profit_series.map((point) => ({ label: point.date.slice(5), value: point.profit }))}
+                  ariaLabel="Value bets cumulative profit in units by round"
+                  valueLabel="Profit units"
+                />
               </>
             )}
           </>
         ) : (
-          <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+          <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
             Value tracking is generated by the update workflow; it is not in this build.
           </p>
         )}
@@ -820,9 +862,9 @@ export default function ReportPage() {
       {status ? (
         <PriceStatus status={status} />
       ) : (
-        <section className="space-y-3">
-          <h2 className="text-lg font-semibold">Price status</h2>
-          <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+        <section className="space-y-3 border-t border-border pt-8">
+          <h2 className="text-xl font-semibold tracking-tight">Price status</h2>
+          <p className="rounded-2xl border border-dashed border-border px-4 py-6 text-sm text-muted-foreground">
             Price status is embedded only in the priced production build.
           </p>
         </section>

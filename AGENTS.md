@@ -676,6 +676,26 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   that renders nothing with fewer than two real points. No selection, pipeline, price, generated-data
   or workflow file was touched.
 
+- Task 26 checkpoint B (23 Nov): Best bets, Tickets and Report presentation only. The Best-bets
+  filter area is one card with native labelled selects (League, Bet, odds band/refinement) and Reset;
+  round buttons scroll horizontally on mobile. Daily-best cards are a two-column grid on wide screens
+  (one column on mobile) with match/league first, play second, probability, and separated fair/actual
+  odds; group and exact-market views stay stacked cards. Every selection expression, URL parameter,
+  count, loading/error/empty wording, opened-details diagnostic and `MatchStats` embed is unchanged.
+  Tickets keeps proposal order and all v3/allocation/status/record calculations, adds metric cards,
+  and makes long leg lists native `<details>` disclosures; status text always accompanies colour.
+  Report groups Daily best, forward proposals, data health, pre-registration, forward validation and
+  legacy research into separated sections, collapses data health and pre-registration by default
+  with a visible pending/version summary, and uses Recharts only for a real series
+  (`web/components/performance-chart.tsx` renders nothing under two points; the legacy Value
+  `profit_series` chart renders, the Daily-best cumulative chart is gated on at least one settled
+  round and two points). `/` presentation was restyled without changing its selection inputs.
+  `tests/test_task9.py`'s full-width-dropdown class pin was updated to the new control classes; it
+  still asserts full-width mobile controls and a responsive grid. Full validation at this checkpoint:
+  `npx tsc --noEmit` clean, 443 pytest tests passing, `npm run build` green (50 pages). Local
+  screenshots/browser interaction remain unavailable, so the mobile drawer and touch behaviour were
+  verified only from source and build output.
+
 ## Open items
 
 - **Ranked audit complete; realised profitability remains mostly unmeasured**: Task 14's aggregate

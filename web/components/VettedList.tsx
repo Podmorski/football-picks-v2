@@ -75,7 +75,7 @@ function StatusBadge({ status }: { status?: string }) {
   const label = value === 'landed' ? 'Landed' : value === 'lost' ? 'Lost' : value === 'void' ? 'Void' : 'Pending';
   return (
     <Badge variant={STATUS_VARIANT[value]} className="shrink-0">
-      {value === 'landed' ? <Check className="h-3 w-3" /> : value === 'lost' ? <X className="h-3 w-3" /> : <Minus className="h-3 w-3" />}
+      {value === 'landed' ? <Check className="h-3 w-3" aria-hidden /> : value === 'lost' ? <X className="h-3 w-3" aria-hidden /> : <Minus className="h-3 w-3" aria-hidden />}
       {label}
     </Badge>
   );
@@ -494,62 +494,93 @@ export default function VettedList({
   const shortList = !frozenDefault && isAny && daily.rows.length > 0 && daily.rows.length < DAILY_LIMIT;
 
   return (
-    <div className="space-y-4 pb-40">
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="text-lg font-semibold">{activeMeta.label} — best bets</h2>
+    <div className="space-y-5 pb-40">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Round</p>
+          <h2 className="text-xl font-semibold tracking-tight">{activeMeta.label}</h2>
+          <p className="text-sm text-muted-foreground">Best bets</p>
+        </div>
         {activeKind === 'example' ? <Badge variant="secondary">Example</Badge> : null}
       </div>
 
       {roundOptions.length > 1 ? (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="-mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
           {roundOptions.map(([value, label]) => (
-            <button key={value} type="button" onClick={() => setRound(value)} className={cn('rounded-full border px-3 py-1 text-xs font-medium', activeDate === value ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>{label}</button>
+            <button
+              key={value}
+              type="button"
+              onClick={() => setRound(value)}
+              className={cn(
+                'min-h-9 shrink-0 rounded-full border px-3 text-xs font-medium transition-colors',
+                activeDate === value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-card text-muted-foreground hover:text-foreground',
+              )}
+            >
+              {label}
+            </button>
           ))}
         </div>
       ) : null}
 
-      <div className="grid gap-2 sm:grid-cols-3">
-        <select value={league} onChange={(event) => setLeague(event.target.value)} aria-label="League" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
-          <option value="all">All leagues</option>
-          {countries.map(([country, leagues]) => (
-            <optgroup key={country} label={country}>
-              {leagues.map(([code, name]) => {
-                const count = leagueCounts.get(code);
-                const label = !count
-                  ? name
-                  : isAny
-                    ? `${name} (${count.inBand} in band / ${count.total} fixtures)`
-                    : `${name} (${count.total} fixtures)`;
-                return <option key={code} value={code}>{label}</option>;
-              })}
-            </optgroup>
-          ))}
-        </select>
-        <select value={bet} onChange={(event) => setBet(event.target.value)} aria-label="Bet" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
-          <option value="any">Daily best</option>
-          {GROUP_ORDER.map((group) => (
-            <optgroup key={group} label={GROUP_LABEL[group]}>
-              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({countsReady ? (counts.groups.get(group)?.size ?? 0) : '…'} fixtures)</option>
-              {(marketGroups.get(group) ?? []).map((market) => (
-                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({countsReady ? (counts.markets.get(market.id)?.size ?? 0) : '…'} fixtures)</option>
+      <section aria-label="Filters" className="rounded-2xl border border-border bg-card p-3 sm:p-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+            <span>League</span>
+            <select value={league} onChange={(event) => setLeague(event.target.value)} aria-label="League" className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <option value="all">All leagues</option>
+              {countries.map(([country, leagues]) => (
+                <optgroup key={country} label={country}>
+                  {leagues.map(([code, name]) => {
+                    const count = leagueCounts.get(code);
+                    const label = !count
+                      ? name
+                      : isAny
+                        ? `${name} (${count.inBand} in band / ${count.total} fixtures)`
+                        : `${name} (${count.total} fixtures)`;
+                    return <option key={code} value={code}>{label}</option>;
+                  })}
+                </optgroup>
               ))}
-            </optgroup>
-          ))}
-        </select>
-        {isAny ? (
-          <select value={band.token} onChange={(event) => chooseBand(event.target.value)} aria-label="Daily-best actual-odds band" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
-            {BAND_OPTIONS.map((option) => <option key={option.token} value={option.token}>{option.label}</option>)}
-            {!BAND_OPTIONS.some((option) => option.token === band.token) ? <option value={band.token}>{bandLabel}</option> : null}
-          </select>
-        ) : (
-          <select value={refinement} onChange={(event) => setRefineParam(event.target.value)} aria-label="Optional refinement" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
-            {REFINEMENTS.map((option) => <option key={option.token} value={option.token}>{option.label}</option>)}
-          </select>
-        )}
-        <button type="button" onClick={resetAll} className="w-full rounded-md border px-2 py-1.5 text-sm">Reset</button>
-      </div>
+            </select>
+          </label>
+          <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+            <span>Bet</span>
+            <select value={bet} onChange={(event) => setBet(event.target.value)} aria-label="Bet" className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              <option value="any">Daily best</option>
+              {GROUP_ORDER.map((group) => (
+                <optgroup key={group} label={GROUP_LABEL[group]}>
+                  <option value={`group:${group}`}>{GROUP_LABEL[group]} ({countsReady ? (counts.groups.get(group)?.size ?? 0) : '…'} fixtures)</option>
+                  {(marketGroups.get(group) ?? []).map((market) => (
+                    <option key={market.id} value={`market:${market.id}`}>{market.plain} ({countsReady ? (counts.markets.get(market.id)?.size ?? 0) : '…'} fixtures)</option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1 text-xs font-medium text-muted-foreground">
+            <span>{isAny ? 'Odds band' : 'Refinement'}</span>
+            {isAny ? (
+              <select value={band.token} onChange={(event) => chooseBand(event.target.value)} aria-label="Daily-best actual-odds band" className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                {BAND_OPTIONS.map((option) => <option key={option.token} value={option.token}>{option.label}</option>)}
+                {!BAND_OPTIONS.some((option) => option.token === band.token) ? <option value={band.token}>{bandLabel}</option> : null}
+              </select>
+            ) : (
+              <select value={refinement} onChange={(event) => setRefineParam(event.target.value)} aria-label="Optional refinement" className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                {REFINEMENTS.map((option) => <option key={option.token} value={option.token}>{option.label}</option>)}
+              </select>
+            )}
+          </label>
+          <div className="flex items-end">
+            <button type="button" onClick={resetAll} className="min-h-11 w-full rounded-lg border border-border bg-muted/40 px-3 text-sm font-medium text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+              Reset
+            </button>
+          </div>
+        </div>
+      </section>
 
-      <p className="text-xs text-muted-foreground">
+      <p className="max-w-3xl text-xs text-muted-foreground">
         Daily best needs an actual Mozzart price: one pick per fixture, actual odds at least 1.20, preferring the
         selected band. League, market group and exact-market choices leave the curated algorithm and apply no
         probability, vetting or odds gate. Legacy ?min= links map to an actual-odds floor: 1.70 becomes 1.70+,
@@ -557,7 +588,7 @@ export default function VettedList({
       </p>
 
       {!dataReady ? (
-        <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-6 text-sm text-muted-foreground">
           {roundState === 'error'
             ? 'Could not load the round data. Choose another round or try again.'
             : marketsState === 'error'
@@ -619,9 +650,9 @@ export default function VettedList({
               ) : null}
               {league !== 'all' && daily.rows.length > DAILY_LIMIT ? (
                 showAll ? (
-                  <button type="button" onClick={clearShow} className="rounded-md border px-2.5 py-1">Show top {DAILY_LIMIT}</button>
+                  <button type="button" onClick={clearShow} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show top {DAILY_LIMIT}</button>
                 ) : (
-                  <button type="button" onClick={() => setShowParam('all')} className="rounded-md border px-2.5 py-1">Show all eligible games ({daily.rows.length})</button>
+                  <button type="button" onClick={() => setShowParam('all')} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show all eligible games ({daily.rows.length})</button>
                 )
               ) : null}
             </div>
@@ -629,7 +660,7 @@ export default function VettedList({
 
           {isAny && displayed.length === 0 ? (
             <div className="space-y-2">
-              <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+              <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-6 text-sm text-muted-foreground">
                 {frozenDefault
                   ? 'The frozen Daily-best-v1 list is empty for this round; it is not padded.'
                   : dailyEmptyText()}
@@ -646,24 +677,24 @@ export default function VettedList({
           {!isAny && displayed.length === 0 ? (
             <div className="space-y-2">
               {marketUnavailable ? (
-                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-6 text-sm text-muted-foreground">
                   This market is not in the production market data.
                 </p>
               ) : !leagueHasFixtures ? (
-                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-6 text-sm text-muted-foreground">
                   No fixtures for {leagueLabel} in this round.
                 </p>
               ) : marketBase.length === 0 ? (
-                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-6 text-sm text-muted-foreground">
                   No {betLabel} rows in this round&apos;s data. The round file may not carry every market.
                 </p>
               ) : (
-                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-6 text-sm text-muted-foreground">
                   The optional refinement hides all {marketBase.length} rows. Nothing is missing from the market itself.
                 </p>
               )}
               {refinement !== 'all' && marketBase.length > 0 ? (
-                <button type="button" onClick={() => setRefineParam('all')} className="rounded-md border px-2.5 py-1 text-xs">
+                <button type="button" onClick={() => setRefineParam('all')} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">
                   Show all {marketBase.length}
                 </button>
               ) : null}
@@ -673,12 +704,12 @@ export default function VettedList({
           {!isAny && displayed.length > 0 && refined.hidden > 0 ? (
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="text-muted-foreground">The optional refinement hides {refined.hidden} of {marketBase.length} rows.</span>
-              <button type="button" onClick={() => setRefineParam('all')} className="rounded-md border px-2.5 py-1">Show all</button>
+              <button type="button" onClick={() => setRefineParam('all')} className="min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium hover:bg-accent">Show all</button>
             </div>
           ) : null}
 
           {displayed.length > 0 ? (
-            <ul className="space-y-2">
+            <ul className={cn('grid gap-3', isAny && 'lg:grid-cols-2')}>
               {displayed.map((item) => {
                 const { row, price, candidate } = item;
                 const meta = markets[row.m];
@@ -696,29 +727,41 @@ export default function VettedList({
                   : [];
                 const ladderRows = (data?.ladder ?? []).map((id) => (data?.rows ?? []).find((candidateRow) => candidateRow.h === row.h && candidateRow.a === row.a && candidateRow.m === id)).filter(Boolean) as RankRow[];
                 return (
-                  <li key={key} className="rounded-xl border p-3">
-                    <div className="flex flex-wrap items-start justify-between gap-2">
+                  <li key={key} className="flex flex-col rounded-2xl border border-border bg-card p-4">
+                    <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 text-sm">
-                          <span className="text-muted-foreground">{row.k ?? ''}</span>
-                          <span className="font-semibold">{row.h} <span className="text-muted-foreground">v</span> {row.a}</span>
-                          <span className="text-xs text-muted-foreground">{leagueNames[row.d] ?? row.d}</span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                          {row.k ? <span className="tabular">{row.k}</span> : null}
+                          <span>{leagueNames[row.d] ?? row.d}</span>
                         </div>
-                        <div className="mt-1 text-sm">
-                          {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
-                        </div>
+                        <h3 className="mt-1 truncate text-base font-semibold tracking-tight">
+                          {row.h} <span className="font-normal text-muted-foreground">v</span> {row.a}
+                        </h3>
+                        <p className="mt-2 text-sm font-medium text-foreground">{meta?.plain ?? row.m}</p>
+                        <p className="text-xs text-muted-foreground">{meta?.mozzart ?? ''}</p>
                       </div>
-                      <div className="tabular text-right text-sm">
-                        <div className="text-base font-semibold">{pct(candidate.probability)}</div>
-                        <div className="text-xs text-muted-foreground">fair {candidate.fairOdds.toFixed(2)}</div>
+                      <div className="shrink-0 text-right">
+                        <div className="tabular text-2xl font-semibold leading-none">{pct(candidate.probability)}</div>
+                        <div className="mt-1 text-[11px] uppercase tracking-wide text-muted-foreground">model probability</div>
                       </div>
                     </div>
 
-                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                      <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2">
+                        <div className="text-muted-foreground">Fair odds</div>
+                        <div className="tabular text-sm font-medium">{candidate.fairOdds.toFixed(2)}</div>
+                      </div>
+                      <div className="rounded-lg border border-border bg-muted/30 px-2.5 py-2">
+                        <div className="text-muted-foreground">Actual odds</div>
+                        <div className="tabular text-sm font-medium">{item.odds !== null ? item.odds.toFixed(2) : '—'}</div>
+                      </div>
+                    </div>
+
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <StatusBadge status={row.st} />
                       {item.odds !== null ? (
                         <span className="tabular">
-                          Actual {item.odds.toFixed(2)} · break-even {(breakEvenChance(item.odds) * 100).toFixed(1)}% ·
+                          break-even {(breakEvenChance(item.odds) * 100).toFixed(1)}% ·
                           model return {signedPct(expectedReturn(candidate.probability, item.odds) * 100)}
                         </span>
                       ) : (
@@ -727,20 +770,21 @@ export default function VettedList({
                       {row.ht || row.ft ? <span className="tabular">HT {row.ht ?? '–'} · FT {row.ft ?? '–'}</span> : null}
                     </div>
 
-                    <div className="mt-2 flex flex-wrap items-center gap-1">
-                      <button type="button" onClick={() => toggleLeg(row, item.odds, item.pc)} className={cn('ml-auto rounded-md border px-2.5 py-1 text-xs', checked ? 'border-primary bg-primary text-primary-foreground' : '')}>
+                    <div className="mt-auto flex flex-wrap items-center gap-2 pt-3">
+                      <button type="button" onClick={() => toggleLeg(row, item.odds, item.pc)} className={cn('min-h-9 rounded-lg border px-3 text-xs font-medium transition-colors', checked ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card hover:bg-accent')}>
                         {checked ? 'In ticket' : 'Add to ticket'}
                       </button>
-                      <button type="button" onClick={() => setExpanded(open ? null : key)} aria-label="Details">
-                        <ChevronDown className={cn('h-4 w-4 text-muted-foreground transition-transform', open && 'rotate-180')} />
+                      <button type="button" onClick={() => setExpanded(open ? null : key)} aria-label="Details" aria-expanded={open} className="ml-auto inline-flex min-h-9 items-center gap-1 rounded-lg px-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+                        <span className="hidden sm:inline">{open ? 'Hide details' : 'Details'}</span>
+                        <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} aria-hidden />
                       </button>
                     </div>
 
                     {open ? (
-                      <div className="mt-2 space-y-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                      <div className="mt-3 space-y-2 rounded-xl border border-border bg-muted/25 px-3 py-3 text-sm text-muted-foreground">
                         {price ? (
-                          <div className="space-y-0.5">
-                            <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p>
+                          <div className="space-y-1">
+                            <p className="font-medium text-foreground">Mozzart {price.odds.toFixed(2)} <span className="font-normal text-muted-foreground">({utcTime(price.fetchedAt)})</span></p>
                             <p>
                               Model chance {pct(candidate.probability)} · offered odds {price.odds.toFixed(2)} · break-even
                               chance {(breakEvenChance(price.odds) * 100).toFixed(1)}% · model expected return{' '}
@@ -749,17 +793,19 @@ export default function VettedList({
                             <p className="text-xs">Arithmetic at the offered price only; no positive-edge claim.</p>
                           </div>
                         ) : <p>{priceUnavailableText()}</p>}
-                        <p>League usual {pct(row.lr)} (n={row.ln}) · lift {item.lift.toFixed(2)}× usual</p>
-                        <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)}</p>
-                        <p>Model {pct(row.p)} · team empirical {pct(candidate.countsProbability ?? 0)} · agreement difference {pct(Math.abs(row.p - (candidate.countsProbability ?? 0)))}</p>
-                        <p>Fair odds {candidate.fairOdds.toFixed(2)}</p>
+                        <div className="grid gap-1 sm:grid-cols-2">
+                          <p>League usual {pct(row.lr)} (n={row.ln}) · lift {item.lift.toFixed(2)}× usual</p>
+                          <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)}</p>
+                          <p>Model {pct(row.p)} · team empirical {pct(candidate.countsProbability ?? 0)} · agreement difference {pct(Math.abs(row.p - (candidate.countsProbability ?? 0)))}</p>
+                          <p>Fair odds {candidate.fairOdds.toFixed(2)}</p>
+                        </div>
                         {groupKey && matchOptions.length > 0 ? (
-                          <div>
-                            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">All {GROUP_LABEL[groupKey]} options for this match</h4>
+                          <div className="rounded-lg border border-border bg-card/60 p-2.5">
+                            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-foreground">All {GROUP_LABEL[groupKey]} options for this match</h4>
                             <p className="text-xs font-medium text-foreground">
                               Highest model probability: {markets[matchOptions[0].m]?.plain ?? matchOptions[0].m} · {pct(matchOptions[0].pc)}
                             </p>
-                            <ul className="space-y-0.5">
+                            <ul className="mt-1 space-y-0.5">
                               {matchOptions.map((option) => (
                                 <li key={option.m} className={cn('flex justify-between gap-2', option.m === row.m && 'font-medium text-foreground')}>
                                   <span>{markets[option.m]?.plain ?? option.m}</span>
@@ -772,8 +818,8 @@ export default function VettedList({
                             </ul>
                           </div>
                         ) : null}
-                        <div>
-                          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">Goal ladder</h4>
+                        <div className="rounded-lg border border-border bg-card/60 p-2.5">
+                          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-foreground">Goal ladder</h4>
                           <ul className="grid gap-x-4 gap-y-0.5 sm:grid-cols-2">
                             {ladderRows.map((line) => (
                               <li key={line.m} className={cn('flex justify-between gap-2', line.m === row.m && 'font-medium text-foreground')}>
@@ -794,83 +840,79 @@ export default function VettedList({
         </>
       )}
 
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold">Target tickets</h2>
-        <p className="text-sm text-muted-foreground">
-          Built only from the displayed candidates, one leg per match.
-        </p>
+      <section className="space-y-3 border-t border-border pt-4">
+        <div>
+          <h2 className="text-lg font-semibold tracking-tight">Target tickets</h2>
+          <p className="text-sm text-muted-foreground">
+            Built only from the displayed candidates, one leg per match.
+          </p>
+        </div>
         {targetTickets.some((entry) => entry.ticket) ? (
-          <ul className="grid gap-2 sm:grid-cols-3">
+          <ul className="grid gap-3 sm:grid-cols-3">
             {targetTickets.map(({ target, ticket: suggestion }) => (
-              <li key={target} className="rounded-xl border p-3 text-sm">
+              <li key={target} className="flex flex-col rounded-2xl border border-border bg-card p-4 text-sm">
                 {suggestion ? (
                   <>
-                    <div className="flex justify-between"><span className="font-semibold">Target {target.toFixed(2)}</span><span className="tabular">{pct(suggestion.probability)}</span></div>
-                    <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="font-semibold">Target {target.toFixed(2)}</span>
+                      <span className="tabular text-lg font-semibold">{pct(suggestion.probability)}</span>
+                    </div>
+                    <ul className="mt-2 space-y-0.5 text-xs text-muted-foreground">
                       {suggestion.legs.map((leg) => <li key={legKey(leg)} className="truncate">{leg.h} v {leg.a} · {leg.label} · {pct(leg.pc)}</li>)}
                     </ul>
-                    <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}</div>
-                    <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">Add to my ticket</button>
+                    <div className="mt-2 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}</div>
+                    <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-auto min-h-9 rounded-lg border border-border bg-card px-3 text-xs font-medium transition-colors hover:bg-accent">Add to my ticket</button>
                   </>
                 ) : <p className="text-xs text-muted-foreground">No displayed ticket reaches {target.toFixed(2)}.</p>}
               </li>
             ))}
           </ul>
         ) : (
-          <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">
+          <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-4 text-sm text-muted-foreground">
             No target ticket reaches these targets.
           </p>
         )}
       </section>
 
       {ticket.length > 0 ? (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t bg-background/95 backdrop-blur">
-          <div className="mx-auto max-w-5xl px-4 py-2">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 backdrop-blur">
+          <div className="mx-auto max-w-6xl px-4 py-2.5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="text-sm font-medium">My ticket · {ticket.length} legs · {pct(ticketProbability)}</button>
+              <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="min-h-9 text-sm font-medium">My ticket · {ticket.length} legs · <span className="tabular">{pct(ticketProbability)}</span></button>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="rounded-md border px-2.5 py-1 text-xs">{ticketOpen ? 'Hide' : 'View'}</button>
-                <button type="button" onClick={() => setTicket([])} className="rounded-md border px-2.5 py-1 text-xs">Clear</button>
+                <button type="button" onClick={() => setTicketOpen(!ticketOpen)} className="min-h-9 rounded-lg border border-border px-3 text-xs font-medium hover:bg-accent">{ticketOpen ? 'Hide' : 'View'}</button>
+                <button type="button" onClick={() => setTicket([])} className="min-h-9 rounded-lg border border-border px-3 text-xs font-medium hover:bg-accent">Clear</button>
               </div>
             </div>
             {ticketOpen ? (
-              <div className="mt-2 max-h-[60vh] space-y-2 overflow-y-auto">
+              <div className="mt-2 max-h-[60vh] space-y-3 overflow-y-auto">
                 <ul className="space-y-1 text-sm">
                   {ticket.map((leg) => (
                     <li key={legKey(leg)} className="flex items-center justify-between gap-2">
                       <span className="truncate">{leg.h} v {leg.a} · {leg.label} · {pct(leg.pc)} · {leg.fair.toFixed(2)}{leg.odds !== null ? ` · Mozzart ${leg.odds.toFixed(2)}` : ''}</span>
-                      <button type="button" onClick={() => setTicket((current) => current.filter((item) => legKey(item) !== legKey(leg)))} className="text-xs text-muted-foreground">Remove</button>
+                      <button type="button" onClick={() => setTicket((current) => current.filter((item) => legKey(item) !== legKey(leg)))} className="text-xs text-muted-foreground hover:text-foreground">Remove</button>
                     </li>
                   ))}
                 </ul>
                 {correlated ? <p className="text-sm text-muted-foreground">Same-match legs are correlated; combined % is not reliable.</p> : null}
                 <div className="grid gap-2 text-sm sm:grid-cols-4">
-                  <label className="flex flex-col gap-1">Bonus %
-                    <input type="number" value={bonus} onChange={(event) => setBonus(Number(event.target.value) || 0)} className="w-full rounded-md border bg-background px-2 py-1" />
+                  <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">Bonus %
+                    <input type="number" value={bonus} onChange={(event) => setBonus(Number(event.target.value) || 0)} className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground" />
                   </label>
-                  <label className="flex flex-col gap-1">Stake
-                    <input type="number" value={stake} onChange={(event) => setStake(Number(event.target.value) || 0)} className="w-full rounded-md border bg-background px-2 py-1" />
+                  <label className="flex flex-col gap-1 text-xs font-medium text-muted-foreground">Stake
+                    <input type="number" value={stake} onChange={(event) => setStake(Number(event.target.value) || 0)} className="min-h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground" />
                   </label>
-                  <div>Combined %<div className="tabular font-medium">{pct(ticketProbability)}</div></div>
-                  <div>Fair odds<div className="tabular font-medium">{ticketFair.toFixed(2)}</div></div>
-                  <div>Mozzart<div className="tabular font-medium">{ticketMozzart === null ? 'incomplete' : ticketMozzart.toFixed(2)}</div></div>
-                  <div>Payout<div className="tabular font-medium">{ticketPayout === null ? '–' : ticketPayout.toFixed(2)}</div></div>
-                  <button type="button" onClick={saveCurrent} className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground">Save ticket</button>
+                  <div className="text-xs text-muted-foreground">Combined %<div className="tabular text-sm font-medium text-foreground">{pct(ticketProbability)}</div></div>
+                  <div className="text-xs text-muted-foreground">Fair odds<div className="tabular text-sm font-medium text-foreground">{ticketFair.toFixed(2)}</div></div>
+                  <div className="text-xs text-muted-foreground">Mozzart<div className="tabular text-sm font-medium text-foreground">{ticketMozzart === null ? 'incomplete' : ticketMozzart.toFixed(2)}</div></div>
+                  <div className="text-xs text-muted-foreground">Payout<div className="tabular text-sm font-medium text-foreground">{ticketPayout === null ? '–' : ticketPayout.toFixed(2)}</div></div>
+                  <button type="button" onClick={saveCurrent} className="min-h-11 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">Save ticket</button>
                 </div>
               </div>
             ) : null}
           </div>
         </div>
       ) : null}
-
-      <nav className="flex flex-wrap gap-3 border-t pt-3 text-xs text-muted-foreground">
-        <a className="underline underline-offset-2" href="/leagues">Leagues</a>
-        <a className="underline underline-offset-2" href="/record">Record</a>
-        <a className="underline underline-offset-2" href="/report">Report</a>
-        <a className="underline underline-offset-2" href="/rounds">Rounds</a>
-        <a className="underline underline-offset-2" href="/tickets">Tickets</a>
-        <a className="underline underline-offset-2" href="/how-it-works">How it works</a>
-      </nav>
     </div>
   );
 }

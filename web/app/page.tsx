@@ -74,11 +74,12 @@ export default function HomePage() {
   const checkTimes = weekend ? 'Fri 18:00, Fri 21:00, Sat 08:00, Sun 08:00' : 'Tue 14:00, Tue 16:00';
 
   return (
-    <div className="space-y-4">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight">Best bets</h1>
+    <div className="space-y-5">
+      <header className="space-y-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Daily best</p>
+        <h1 className="text-2xl font-semibold tracking-tight">Best bets</h1>
         {updated ? <p className="text-xs text-muted-foreground">Last updated: {updated}</p> : null}
-        <p className="text-sm text-muted-foreground">
+        <p className="max-w-3xl text-sm text-muted-foreground">
           Daily best is the default: up to 12 games with an actual Mozzart price, preferring the 1.70–2.30 band.
           Choosing a league reruns the same ranking and can show every eligible game. Choosing a market group or
           one exact market shows every eligible fixture with no probability, vetting or odds gate. Every play is
@@ -87,7 +88,7 @@ export default function HomePage() {
       </header>
 
       {!nextHasPicks ? (
-        <div className="rounded-xl border border-dashed bg-muted/40 px-4 py-3 text-sm">
+        <div className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-3 text-sm">
           <p className="font-medium">No picks yet for {roundLabel(next)}.</p>
           <p className="text-muted-foreground">
             They appear once football-data.co.uk posts the fixtures (usually Friday afternoon UK for weekend
@@ -105,7 +106,7 @@ export default function HomePage() {
           roundMeta={roundMeta}
         />
       ) : (
-        <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed border-border bg-muted/20 px-4 py-8 text-center text-sm text-muted-foreground">
           No round published yet. Tuesday, Saturday and Sunday rounds appear when the fixtures and
           pre-match odds are available.
         </p>
