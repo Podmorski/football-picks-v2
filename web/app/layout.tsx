@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 
+import SiteFooter from '@/components/SiteFooter';
 import SiteHeader from '@/components/SiteHeader';
 import './globals.css';
 
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
     'Counted football outcomes, calibrated probabilities and one best play per match, from football-data.co.uk results and pre-match odds.',
 };
 
-const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+const THEME_SCRIPT = `(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':true;if(!d)document.documentElement.classList.remove('dark');else document.documentElement.classList.add('dark');}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -19,26 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="flex min-h-screen flex-col">
         <SiteHeader />
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-6">{children}</main>
-        <footer className="border-t bg-muted/40">
-          <div className="mx-auto max-w-5xl space-y-1 px-4 py-6 text-sm text-muted-foreground">
-            <p>
-              Data:{' '}
-              <a
-                className="underline underline-offset-2"
-                href="https://football-data.co.uk/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                football-data.co.uk
-              </a>
-            </p>
-            <p className="text-xs">
-              Derived counts and rates only — no raw match data is republished. Predictions are probabilities, not
-              certainties. 18+ BeGambleAware.org
-            </p>
-          </div>
-        </footer>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:py-8">{children}</main>
+        <SiteFooter />
       </body>
     </html>
   );

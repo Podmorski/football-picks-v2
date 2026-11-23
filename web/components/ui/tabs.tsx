@@ -43,7 +43,10 @@ function TabsList({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       role="tablist"
-      className={cn('inline-flex flex-wrap items-center gap-1 rounded-lg bg-muted p-1', className)}
+      className={cn(
+        'inline-flex min-h-9 items-center gap-1 rounded-lg bg-muted p-1',
+        className,
+      )}
       {...props}
     />
   );
@@ -61,7 +64,8 @@ function TabsTrigger({ value, className, ...props }: TabsTriggerProps) {
       aria-selected={active}
       onClick={() => context.setValue(value)}
       className={cn(
-        'rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+        'min-h-9 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
         active ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
         className,
       )}

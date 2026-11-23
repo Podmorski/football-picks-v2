@@ -2,41 +2,45 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Light palette: restrained slate with a single blue accent. The dark
+   palette is the default surface and lives under `.dark`. */
 :root {
-  --background: oklch(0.995 0 0);
-  --foreground: oklch(0.17 0.01 260);
+  --background: oklch(0.975 0.005 255);
+  --foreground: oklch(0.24 0.02 258);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.17 0.01 260);
-  --muted: oklch(0.968 0.003 260);
-  --muted-foreground: oklch(0.52 0.01 260);
-  --border: oklch(0.918 0.005 260);
-  --primary: oklch(0.52 0.19 258);
+  --card-foreground: oklch(0.24 0.02 258);
+  --muted: oklch(0.952 0.007 255);
+  --muted-foreground: oklch(0.49 0.02 258);
+  --border: oklch(0.895 0.01 258);
+  --input: oklch(0.87 0.012 258);
+  --primary: oklch(0.5 0.17 258);
   --primary-foreground: oklch(0.99 0 0);
-  --accent: oklch(0.955 0.012 258);
-  --accent-foreground: oklch(0.35 0.12 258);
-  --success: oklch(0.62 0.14 155);
-  --warning: oklch(0.72 0.15 75);
-  --destructive: oklch(0.58 0.2 25);
-  --ring: oklch(0.7 0.05 258);
+  --accent: oklch(0.945 0.02 255);
+  --accent-foreground: oklch(0.38 0.13 258);
+  --success: oklch(0.55 0.13 155);
+  --warning: oklch(0.6 0.14 75);
+  --destructive: oklch(0.56 0.2 25);
+  --ring: oklch(0.58 0.1 258);
   --radius: 0.75rem;
 }
 
 .dark {
-  --background: oklch(0.16 0.008 260);
-  --foreground: oklch(0.95 0.003 260);
-  --card: oklch(0.2 0.01 260);
-  --card-foreground: oklch(0.95 0.003 260);
-  --muted: oklch(0.24 0.01 260);
-  --muted-foreground: oklch(0.7 0.012 260);
-  --border: oklch(0.29 0.012 260);
-  --primary: oklch(0.72 0.14 258);
-  --primary-foreground: oklch(0.16 0.01 260);
-  --accent: oklch(0.26 0.03 258);
-  --accent-foreground: oklch(0.86 0.05 258);
-  --success: oklch(0.7 0.14 155);
-  --warning: oklch(0.78 0.14 75);
-  --destructive: oklch(0.66 0.19 25);
-  --ring: oklch(0.45 0.05 258);
+  --background: oklch(0.185 0.014 258);
+  --foreground: oklch(0.965 0.005 255);
+  --card: oklch(0.225 0.016 258);
+  --card-foreground: oklch(0.965 0.005 255);
+  --muted: oklch(0.255 0.016 258);
+  --muted-foreground: oklch(0.745 0.018 255);
+  --border: oklch(0.315 0.018 258);
+  --input: oklch(0.345 0.02 258);
+  --primary: oklch(0.68 0.15 255);
+  --primary-foreground: oklch(0.16 0.012 258);
+  --accent: oklch(0.285 0.04 255);
+  --accent-foreground: oklch(0.88 0.06 255);
+  --success: oklch(0.72 0.14 155);
+  --warning: oklch(0.8 0.14 75);
+  --destructive: oklch(0.68 0.18 25);
+  --ring: oklch(0.62 0.13 255);
 }
 
 @theme inline {
@@ -47,6 +51,7 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
+  --color-input: var(--input);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
   --color-accent: var(--accent);
@@ -69,6 +74,11 @@
 
   html {
     -webkit-text-size-adjust: 100%;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
@@ -80,6 +90,27 @@
 
   a {
     color: inherit;
+  }
+
+  ::selection {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  :where(button, a, select, input, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

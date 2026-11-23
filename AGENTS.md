@@ -658,6 +658,24 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `pipeline/retrospective_tickets.py`, its dataset and its tests were removed. Focused tests:
   `tests/test_published_reconstructions.py` plus updated settlement/contract tests.
 
+- Task 26 (23 Nov): Phase 4 visual-only redesign, checkpoint A. The chart/UI kit is
+  `class-variance-authority` 0.7.1, `@radix-ui/react-dialog` 1.3.1 (mobile navigation drawer) and
+  `recharts` 3.10.1, added with the existing npm lockfile; all three declare React 19 peer support and
+  the npm registry mirror had no 3.11.1 tarball, so 3.10.1 is pinned. Design tokens in
+  `web/app/globals.css` are now slate-first: dark is the default (the theme script only switches to
+  light when localStorage says `light`), one blue primary accent, green only for Landed, red only for
+  Lost, grey for Pending/Void, amber for warnings, blue for selected controls. System font stack only;
+  tabular numerals, 2px keyboard focus rings, 44px mobile targets, reduced-motion support and
+  `color-scheme`. `web/components/ui/button.tsx` and `badge.tsx` use cva with the existing variant
+  keys (including `value` for the Value page); `card.tsx` and `tabs.tsx` are restyled but keep their
+  exports. New `web/components/ui/sheet.tsx` wraps Radix Dialog with a labelled title/description,
+  Escape handling and a focus trap. The shell is `SiteHeader` (product name, primary nav Best bets ·
+  Tickets · Report, theme toggle, mobile drawer) plus `SiteFooter` (data source, 18+ disclaimer and
+  secondary Value/Explore/Rounds/Leagues/Record/How-it-works links). Secondary routes and their
+  behaviour are unchanged. `web/components/performance-chart.tsx` is a client Recharts area chart
+  that renders nothing with fewer than two real points. No selection, pipeline, price, generated-data
+  or workflow file was touched.
+
 ## Open items
 
 - **Ranked audit complete; realised profitability remains mostly unmeasured**: Task 14's aggregate
