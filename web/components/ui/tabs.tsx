@@ -44,7 +44,7 @@ function TabsList({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       role="tablist"
       className={cn(
-        'inline-flex min-h-9 items-center gap-1 rounded-lg bg-muted p-1',
+        'inline-flex min-h-9 flex-wrap items-center gap-1 rounded-lg bg-muted p-1',
         className,
       )}
       {...props}
