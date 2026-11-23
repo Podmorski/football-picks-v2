@@ -13,7 +13,7 @@ from pathlib import Path
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
 from .extras import parse_extra_csv
 from .fixtures import ROUND_WEEKDAYS, Fixture, fixtures_for_date, last_saturday, parse_fixtures, round_dates_for
-from . import alerts, ranking, report
+from . import alerts, descriptive, ranking, report
 from .model import backtest, live, ranking_backtest
 from .parse import parse_season_csv
 from .picks import read_results
@@ -457,6 +457,15 @@ def main(argv=None) -> int:
     if args.no_publish:
         return 0
 
+    descriptive_coverage = descriptive.backfill_rounds(
+        PICKS_DIR,
+        {code: by_division.get(code, []) for code in divisions_set},
+        WEB_DATA_DIR / "descriptive",
+    )
+    print(
+        "descriptive sidecars: "
+        + ", ".join(f"{row['date']} ({row['fixtures']} fixtures)" for row in descriptive_coverage)
+    )
     index, best_bets = rebuild_round_reports(PICKS_DIR, WEB_DATA_DIR)
     write_json(WEB_DATA_DIR / "markets.json", ranking.market_catalogue())
     print(

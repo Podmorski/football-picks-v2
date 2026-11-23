@@ -332,6 +332,25 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   results. Saturday therefore changed 0 landed / 0 lost / 0 void and left all 40,792 main+companion
   rows Pending across 122 fixtures. No timestamp-only data commit was made; Sun 12:00/18:00 remain
   the next trusted retries.
+- Task 16 (22 Nov): opened match details now show descriptive HT/FT history from
+  `pipeline/descriptive.py`, generated as sidecars in `web/public/data/descriptive/YYYY-MM-DD.json`.
+  Cutoff is strict: completed matches before the fixture date only; same-day/later results and missing FT
+  rows never count. Each team gets overall and venue-specific last-6/last-12 windows with actual n
+  (never padded), W/D/L, goals and per-match rates, 3/1/0 points, BTTS and over-2.5 frequencies, FT/HT
+  `1/X/2` frequencies (historical match perspective) and all nine HT/FT frequencies (HT-applicable n).
+  Streaks run from the most recent completed match backwards and are 0 when the latest result does not
+  satisfy: win, unbeaten, winless, losing, drawing, BTTS, no-BTTS, over-2.5, under-2.5, overall and
+  venue-specific. H2H covers prior loaded main-division league meetings: total n and current-home W/D/L,
+  goals, BTTS/over-2.5, plus up to 6 recent dates/scores; reversed home/away meetings use the current
+  home perspective. No H2H and n=0 rates are available-data states (`null`), never zero chances.
+  Sidecar schema is `schema_version: 1`, `definitions_version: descriptive-v1`, with no generated
+  timestamp; identical inputs produce byte-identical JSON. `run_model` backfills every indexed round
+  after settlement and before index/report rebuilding, so published round files and companions are read
+  only and never modified. Coverage: 14 Nov 48 fixtures, 21 Nov 122, 22 Nov 44. `MatchStats.tsx` is the
+  single shared component embedded only inside opened details in Best bets and Explore, with independent
+  loading/error/unavailable states. Frequencies are labelled historical, not calibrated chances. No
+  probability, Ranked/Strict, dropdown, ticket, price, settlement, ranking or filter behaviour changes;
+  these statistics do not currently influence rankings.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`

@@ -9,7 +9,7 @@ from pipeline import picker, ranking, vetting
 from pipeline.markets import MARKET_BY_ID, MARKETS
 
 ROOT = Path(__file__).resolve().parents[1]
-PICKER_HASH = "2b83bb9d179de00e5e6c0e1501528f03b38fad5913a1cce5fc8748fb7d070c17"
+PICKER_HASH = "efcd2e483c765082ba5afc3fb09b89beba31d79bdbfbd63cb2541cedc8bbd7c4"
 EXPLORE_HASH = "52667740f4cb0b427adf47751a8f88fc1571fb7d52aefe28cdc2bdf7939dd487"
 
 

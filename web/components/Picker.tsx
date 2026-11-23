@@ -3,6 +3,7 @@
 import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Check, ChevronDown, Minus, X } from 'lucide-react';
 
+import MatchStats from '@/components/MatchStats';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
@@ -777,6 +778,7 @@ export default function Picker({
                                 </ul>
                               </div>
                             ) : null}
+                            <MatchStats date={activeDate} div={row.d} home={row.h} away={row.a} />
                           </div>
                         </td>
                       </tr>

@@ -396,6 +396,93 @@ export type RankBacktestRow = {
   ci: [number, number];
 };
 
+export type DescriptiveFrequency = { count: number; rate: number | null };
+
+export type DescriptiveResultFrequency = {
+  n: number;
+  '1': number | null;
+  X: number | null;
+  '2': number | null;
+};
+
+export type DescriptiveHTFTFrequency = { n: number } & Record<string, number | null>;
+
+export type DescriptiveWindow = {
+  n: number;
+  w: number;
+  d: number;
+  l: number;
+  gf: number;
+  ga: number;
+  gf_pm: number | null;
+  ga_pm: number | null;
+  points: number;
+  points_pm: number | null;
+  btts: DescriptiveFrequency;
+  over25: DescriptiveFrequency;
+  ft: DescriptiveResultFrequency;
+  ht: DescriptiveResultFrequency;
+  htft: DescriptiveHTFTFrequency;
+};
+
+export type DescriptiveStreaks = Record<
+  'win' | 'unbeaten' | 'winless' | 'losing' | 'drawing' | 'btts' | 'no_btts' | 'over25' | 'under25',
+  number
+>;
+
+export type DescriptiveTeam = {
+  windows: {
+    overall6: DescriptiveWindow;
+    overall12: DescriptiveWindow;
+    venue6: DescriptiveWindow;
+    venue12: DescriptiveWindow;
+  };
+  streaks: { overall: DescriptiveStreaks; venue: DescriptiveStreaks };
+};
+
+export type DescriptiveMeeting = {
+  date: string;
+  home: string;
+  away: string;
+  fthg: number;
+  ftag: number;
+  hthg: number | null;
+  htag: number | null;
+};
+
+export type DescriptiveH2H = {
+  n: number;
+  w: number;
+  d: number;
+  l: number;
+  gf: number;
+  ga: number;
+  btts: DescriptiveFrequency;
+  over25: DescriptiveFrequency;
+  meetings: DescriptiveMeeting[];
+};
+
+export type DescriptiveFixture = {
+  d: string;
+  h: string;
+  a: string;
+  k: string | null;
+  cutoff: string;
+  home: DescriptiveTeam;
+  away: DescriptiveTeam;
+  h2h: DescriptiveH2H;
+};
+
+export type DescriptiveFile = {
+  schema_version: number;
+  definitions_version: string;
+  round_date: string;
+  cutoff_date: string;
+  note: string;
+  definitions: Record<string, unknown>;
+  fixtures: DescriptiveFixture[];
+};
+
 export type LeagueFile = {
   code: string;
   name: string;

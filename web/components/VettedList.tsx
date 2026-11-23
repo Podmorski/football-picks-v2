@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Check, ChevronDown, Minus, X } from 'lucide-react';
 
+import MatchStats from '@/components/MatchStats';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import {
@@ -589,6 +590,7 @@ export default function VettedList({
                             ))}
                           </ul>
                         </div>
+                        <MatchStats date={activeDate} div={row.d} home={row.h} away={row.a} />
                       </div>
                     ) : null}
                   </li>
