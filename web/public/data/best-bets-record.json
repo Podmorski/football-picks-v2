@@ -1,11 +1,11 @@
 {
  "cumulative": {
-  "expected": 37.7084,
-  "landed": 36,
-  "lost": 10,
+  "expected": 55.8346,
+  "landed": 53,
+  "lost": 15,
   "passing": 214,
-  "pending": 166,
-  "settled": 46,
+  "pending": 144,
+  "settled": 68,
   "void": 2
  },
  "min_fair": 1.2,
@@ -37,14 +37,14 @@
   },
   {
    "date": "2026-11-22",
-   "expected": 0,
+   "expected": 18.1262,
    "kind": "round",
    "label": "Sunday 22 Nov",
-   "landed": 0,
-   "lost": 0,
+   "landed": 17,
+   "lost": 5,
    "passing": 44,
-   "pending": 44,
-   "settled": 0,
+   "pending": 22,
+   "settled": 22,
    "void": 0
   }
  ]

@@ -69,6 +69,21 @@ jobs:
       - name: Download results and fixtures
         run: python -m pipeline.run
 
+      - name: Restore API-Football fallback cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/raw/api_football
+            data/raw/api_football_usage.json
+          key: api-football-${{ github.run_id }}
+          restore-keys: |
+            api-football-
+
+      - name: Fetch next-day result fallback
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: python -m pipeline.api_football ensure
+
       - name: Build model and publish rounds
         if: steps.mode.outputs.settle_only != 'true'
         run: python -m pipeline.run_model

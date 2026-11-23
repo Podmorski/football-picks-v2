@@ -1,7 +1,8 @@
 """One-off, hard-capped API-Football results diagnostic.
 
-Never used by production settlement. At most four GET requests total. Raw
-responses are processed in memory only; output is aggregate diagnostics.
+Never used by production settlement. At most five GET requests total, one date
+only. Raw responses are processed in memory only; output is aggregate
+diagnostics. Provider statuses other than 200 are never retried.
 """
 from __future__ import annotations
 
@@ -22,8 +23,8 @@ from .fixtures import parse_fixtures
 from .mozzart.teams import similarity
 
 BASE_URL = "https://v3.football.api-sports.io"
-MAX_REQUESTS = 4
-DATES = ("2026-11-21", "2026-11-22")
+MAX_REQUESTS = 5
+DATES = ("2026-11-22",)
 V1_ENV = Path("/home/nikola/code/Work/Betting/.env")
 
 DIVISION_NAMES = {
@@ -128,10 +129,16 @@ class Probe:
     def fetch_date(self, date: str) -> list[dict]:
         first = self.fetch_page(date, 1)
         events = list(first["events"])
+        if first["status"] != 200 or first["errors"]:
+            return events
         total = int(first["paging"].get("total", 1) or 1)
-        if total > 1 and self.calls < MAX_REQUESTS:
-            second = self.fetch_page(date, 2)
-            events.extend(second["events"])
+        page = 2
+        while page <= total and self.calls < MAX_REQUESTS:
+            next_page = self.fetch_page(date, page)
+            events.extend(next_page["events"])
+            if next_page["status"] != 200 or next_page["errors"]:
+                break
+            page += 1
         return events
 
 
@@ -159,14 +166,14 @@ def _event_row(event: dict) -> dict:
     }
 
 
-def summarise(pages: list[dict], events: list[dict]) -> dict:
+def summarise(pages: list[dict], events: list[dict], dates: tuple[str, ...] = DATES) -> dict:
     rows = [_event_row(event) for event in events]
     final = [row for row in rows if row["status"] in ("FT", "AET", "PEN") and row["ft"]]
     fixtures_path = RAW_DIR / "fixtures.csv"
     v2_all = parse_fixtures(fixtures_path) if fixtures_path.exists() else []
     v2_fixtures = [
         fixture for fixture in v2_all
-        if fixture.date.isoformat() in DATES and fixture.div in DIVISION_NAMES
+        if fixture.date.isoformat() in dates and fixture.div in DIVISION_NAMES
     ]
     by_date_div = {code: 0 for code in DIVISION_NAMES}
     with_ht = 0
@@ -177,29 +184,29 @@ def summarise(pages: list[dict], events: list[dict]) -> dict:
 
     pairs = []
     for fixture in v2_fixtures:
-        for event in rows:
+        for event in final:
             if event["date"] != fixture.date.isoformat():
                 continue
             if event["div"] != fixture.div:
                 continue
+            # Exact normalized equality after the evidenced alias table only;
+            # no fuzzy threshold is used to manufacture coverage.
             home_score = similarity(fixture.home, event["home"])
             away_score = similarity(fixture.away, event["away"])
-            if min(home_score, away_score) >= 0.86:
+            if home_score == 1.0 and away_score == 1.0:
                 exact = _key(fixture.home) == _key(event["home"]) and _key(fixture.away) == _key(event["away"])
-                pairs.append((min(home_score, away_score), exact, id(fixture), id(event), fixture, event))
-    pairs.sort(key=lambda item: item[0], reverse=True)
+                pairs.append((exact, id(fixture), id(event), fixture, event))
+    pairs.sort(key=lambda item: (item[0], item[3].div, item[3].home), reverse=True)
     used_fixtures, used_events = set(), set()
     exact = alias = ambiguous = 0
-    for _score, is_exact, fixture_id, event_id, _fixture, _event in pairs:
-        if fixture_id in used_fixtures:
-            continue
-        if event_id in used_events:
+    for _exact, fixture_id, event_id, _fixture, _event in pairs:
+        if fixture_id in used_fixtures or event_id in used_events:
             ambiguous += 1
             continue
         used_fixtures.add(fixture_id)
         used_events.add(event_id)
-        exact += int(is_exact)
-        alias += int(not is_exact)
+        exact += int(_exact)
+        alias += int(not _exact)
     status_errors = [page["errors"] for page in pages if page["errors"]]
     return {
         "requests": len(pages),
@@ -225,7 +232,7 @@ def run(probe: Probe, dates: tuple[str, ...] = DATES) -> dict:
         if probe.calls >= MAX_REQUESTS:
             break
         events.extend(probe.fetch_date(date))
-    return summarise(probe.pages, events)
+    return summarise(probe.pages, events, dates)
 
 
 def main(argv=None) -> int:

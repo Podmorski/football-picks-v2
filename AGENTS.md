@@ -491,6 +491,28 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   pending. `web/lib/vetted.ts` `roundTally` now uses the same default contract for `/rounds`.
   Dropdown counts derive from the same preferred rows after league, mode and min-odds filters.
 
+- Task 21 Phase 5 (23 Nov): API-Football is now a conservative next-day result fallback,
+  `pipeline/api_football.py`. The 22 Nov diagnostic made 1 request (page 1, no `page` field, HTTP
+  200, quota 100/97 after the later cache fetch, 938 provider events, 918 final with FT, 870 with
+  HT+FT). Conservative exact/verified-alias matching covered 22 of the 44 round fixtures (19 exact,
+  3 alias, 0 ambiguous); 22 stay unmatched because the provider identity is not verified. Two capped
+  requests were made in total in this phase (probe + cache fetch), both for 2026-11-22 only. 21 Nov was
+  not requested because the provider's free-plan gate excludes it. Settlement through
+  `run_model --settle-only` changed only st/ht/ft: main 3,397 changed rows (927 landed, 2,470 lost,
+  0 void), full 3,916 (1,313 landed, 2,603 lost, 0 void), leaving 3,413 main / 3,916 full rows pending
+  across the 22 unmatched fixtures. Best bets on 22 Nov is 44 passing: 17 landed, 5 lost, 22 pending;
+  21 Nov remains entirely SOURCE PENDING (122 fixtures, 40,792 main+companion rows). The adapter
+  caches normalized fixtures only (never raw payloads) under gitignored `data/raw/api_football/`,
+  records usage in `data/raw/api_football_usage.json`, enforces five requests per UTC day including
+  pagination, requires provider-final FT with both HT and FT scores, and uses exact normalized
+  equality after the evidenced alias table (no fuzzy threshold). Football-data always wins in
+  `merge_results`; fallback only fills missing keys and only for the next-day windows
+  Saturday->Sunday, Sunday->Monday, Tuesday->Wednesday. `update.yml` restores the cache with
+  `actions/cache` and runs `python -m pipeline.api_football ensure` before `run_model`; a missing
+  `API_FOOTBALL_KEY` makes zero requests and does not fail CI. API-Football licensing documentation
+  still returned HTTP 403, so no licensing review is claimed. Focused tests: `tests/test_api_football.py`
+  and the revised `tests/test_api_football_probe.py` (18 passing).
+
 ## Open items
 
 - **Ranked audit complete; realised profitability remains mostly unmeasured**: Task 14's aggregate
@@ -500,10 +522,13 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   coverage, and HT/FT actual returns are not measurable from current data. Do not select an optimal
   group/check from observed returns or make causal claims from the different cohorts.
 
-- **Rounds await source results**: the Task-19 fresh check (23 Nov 11:36 UTC) found no 21/22 Nov result
-  rows; latest result was 16 Nov. Saturday has 40,792 main+companion rows Pending across 122 fixtures
-  and Sunday 14,642 across 44. API-Football diagnostic made 2 capped requests but returned no usable
-  coverage and is not activated. Retries of football-data continue; no fallback settlement exists.
+- **Rounds await source results**: 22 Nov is partly settled through the API-Football next-day fallback
+  (22 of 44 fixtures; 17 landed / 5 lost / 22 pending on the 58% Best-bets list). 21 Nov remains fully
+  SOURCE PENDING: it is outside the next-day window and football-data has not advanced beyond 16 Nov;
+  the provider free-plan date gate excludes it, so no request is made. The fallback is active for future
+  Saturday->Sunday, Sunday->Monday and Tuesday->Wednesday rounds. Older out-of-window rounds stay
+  pending until football-data advances. API-Football licensing documentation returned HTTP 403; the
+  licensing review is not claimed complete.
 - **Record at Mozzart prices / Value tracking** fill after the 21/22 Nov settle (Mon 12:00) and the
   prices are frozen; 21 Nov is 93/122 priced, 22 Nov pending. The Value record is rebuilt by the next
   `update.yml` pass. **Stage A/B backtest and C9 are cancelled** — do not reintroduce them; there is

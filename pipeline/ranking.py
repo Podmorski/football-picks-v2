@@ -331,7 +331,8 @@ def round_action(existing: dict | None, fixtures: list) -> str:
     return "publish" if fixtures else "skip"
 
 
-def encode(document: dict) -> dict:
+def encode(document: dict, fields: list[str] | None = None) -> dict:
+    field_list = list(fields or ROW_FIELDS)
     fixtures: list[dict] = []
     index: dict[tuple, int] = {}
     for row in document.get("rows", []):
@@ -341,12 +342,8 @@ def encode(document: dict) -> dict:
             fixtures.append({"d": row["d"], "k": row["k"], "h": row["h"], "a": row["a"]})
 
     rows = [
-        [
-            index[(row["d"], row["k"], row["h"], row["a"])],
-            row["m"], row["p"], row.get("pc", row["p"]), row["pl"], row["pp"], row["lr"], row["ln"],
-            row["hr"], row["hn"], row["ar"], row["an"], row["c"], row["s"],
-            row.get("st"), row.get("ht"), row.get("ft"),
-        ]
+        [index[(row["d"], row["k"], row["h"], row["a"])] if name == "fi" else row.get(name)
+         for name in field_list]
         for row in document.get("rows", [])
     ]
 
@@ -362,7 +359,7 @@ def encode(document: dict) -> dict:
         "levels": document.get("levels", []),
         "ladder": document.get("ladder", []),
         "market_bands": document.get("market_bands", {}),
-        "fields": ROW_FIELDS,
+        "fields": field_list,
         "fixture_list": fixtures,
         "rows": rows,
     }
@@ -385,19 +382,19 @@ def decode(document: dict) -> dict:
     return decoded
 
 
-def publish(document: dict, picks_dir: Path, web_dir: Path) -> None:
+def publish(document: dict, picks_dir: Path, web_dir: Path, fields: list[str] | None = None) -> None:
     picks_dir.mkdir(parents=True, exist_ok=True)
     web_dir.mkdir(parents=True, exist_ok=True)
-    text = json.dumps(encode(document), ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+    text = json.dumps(encode(document, fields), ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     (picks_dir / f"{document['date']}.json").write_text(text, encoding="utf-8")
     (web_dir / f"{document['date']}.json").write_text(text, encoding="utf-8")
 
 
-def publish_full(document: dict, picks_dir: Path, web_dir: Path) -> None:
+def publish_full(document: dict, picks_dir: Path, web_dir: Path, fields: list[str] | None = None) -> None:
     """Write the all-market companion without touching the published main file."""
     picks_dir.mkdir(parents=True, exist_ok=True)
     web_dir.mkdir(parents=True, exist_ok=True)
-    text = json.dumps(encode(document), ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
+    text = json.dumps(encode(document, fields), ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n"
     (picks_dir / f"{document['date']}.full.json").write_text(text, encoding="utf-8")
     (web_dir / f"{document['date']}.full.json").write_text(text, encoding="utf-8")
 

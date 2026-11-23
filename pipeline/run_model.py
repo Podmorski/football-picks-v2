@@ -13,7 +13,7 @@ from pathlib import Path
 from .config import FIRST_SEASON_START, RAW_DIR, WEB_DATA_DIR, load_divisions, load_extras, season_code, season_label
 from .extras import parse_extra_csv
 from .fixtures import ROUND_WEEKDAYS, Fixture, fixtures_for_date, last_saturday, parse_fixtures, round_dates_for
-from . import alerts, descriptive, ranking, report
+from . import alerts, api_football, descriptive, ranking, report
 from .model import backtest, live, ranking_backtest
 from .parse import parse_season_csv
 from .picks import read_results
@@ -222,16 +222,18 @@ def settle_round_files(
     path = picks_dir / f"{round_date.isoformat()}.json"
     if not path.exists():
         return None
+    main_fields = json.loads(path.read_text(encoding="utf-8")).get("fields")
     document = ranking.load(path)
     full_path = picks_dir / f"{round_date.isoformat()}.full.json"
+    full_fields = json.loads(full_path.read_text(encoding="utf-8")).get("fields") if full_path.exists() else None
     full = ranking.load(full_path) if full_path.exists() else None
     outcome = settle_documents(document, full, results, today)
     if not outcome["eligible"]:
         return outcome
     if write and outcome["main_changed"]:
-        ranking.publish(document, picks_dir, web_dir)
+        ranking.publish(document, picks_dir, web_dir, fields=main_fields)
     if write and outcome["full_changed"] and full is not None:
-        ranking.publish_full(full, picks_dir, web_dir)
+        ranking.publish_full(full, picks_dir, web_dir, fields=full_fields)
     return outcome
 
 
@@ -353,6 +355,14 @@ def main(argv=None) -> int:
     fixtures = parse_fixtures(RAW_DIR / "fixtures.csv")
     divisions_set = {league.code for league in divisions}
     results = read_results(all_matches)
+    fallback = api_football.cached_fallback(PICKS_DIR, today)
+    if fallback["results"]:
+        results = api_football.merge_results(results, fallback["results"])
+        diagnostics = fallback.get("diagnostics") or {}
+        print(
+            f"api-football fallback {fallback['date']}: matched {diagnostics.get('matched', 0)}, "
+            f"ambiguous {diagnostics.get('ambiguous', 0)}, unmatched {diagnostics.get('unmatched', 0)}"
+        )
 
     round_dates = round_dates_for(today)
     round_keys = {date.isoformat() for date in round_dates}
