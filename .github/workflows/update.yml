@@ -90,6 +90,9 @@ jobs:
       - name: Settle proposals and rebuild public aggregate
         run: python -m pipeline.proposed_tickets aggregate --prices-dir prices-private --picks-dir picks --web-dir web/public/data
 
+      - name: Update retrospective ticket settlements
+        run: python -m pipeline.retrospective_tickets settle --picks-dir picks --output web/public/data/retrospective-tickets.json
+
       - name: Commit changed data
         id: commit
         run: |

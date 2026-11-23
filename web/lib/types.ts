@@ -141,6 +141,8 @@ export type BestBetsRound = {
   passing: number;
   settled: number;
   landed: number;
+  lost: number;
+  void: number;
   pending: number;
   expected: number;
 };
@@ -557,6 +559,55 @@ export type ProposalRecordFile = {
   };
   types: Record<string, Record<string, number>>;
   note: string;
+};
+
+export type RetrospectiveLeg = {
+  d: string;
+  h: string;
+  a: string;
+  k: string | null;
+  m: string;
+  pc: number;
+  fair: number;
+};
+
+export type RetrospectiveProposal = {
+  type: 'best2' | 'around3' | 'around5';
+  label: string;
+  status: 'available' | 'unavailable';
+  reason: string;
+  flat_stake: number;
+  legs: RetrospectiveLeg[];
+  combined_probability: number | null;
+  combined_fair_odds: number | null;
+  settlement: {
+    status: 'unavailable' | 'pending' | 'landed' | 'lost' | 'void';
+    return: number | null;
+    profit: number | null;
+    source_pending: boolean;
+    leg_statuses: string[];
+  };
+};
+
+export type RetrospectiveRound = {
+  round_date: string;
+  disclaimer: string;
+  fair_odds_note: string;
+  proposals: RetrospectiveProposal[];
+};
+
+export type RetrospectiveFile = {
+  schema_version: number;
+  definition_version: string;
+  retrospective: true;
+  disclaimer: string;
+  fair_odds_note: string;
+  rounds: RetrospectiveRound[];
+  cumulative: {
+    tickets: number; settled: number; landed: number; lost: number; void: number;
+    pending: number; unavailable: number; source_pending: number;
+    staked: number; returned: number; profit: number; roi: number | null;
+  };
 };
 
 export type LeagueFile = {

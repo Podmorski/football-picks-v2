@@ -74,6 +74,39 @@ def test_report_marks_legacy_research_and_current_58_record() -> None:
     assert "Strong" not in normalized
 
 
+def test_three_retrospective_rounds_are_visible_and_separate_from_forward() -> None:
+    page = read("web/app/tickets/page.tsx")
+    for needle in (
+        "Retrospective simulations — model-fair odds",
+        "Forward proposals — actual frozen prices",
+        "Retrospective simulation — generated after the round; not a frozen pre-match recommendation.",
+        "Model-fair odds — not realised bookmaker returns.",
+        "SOURCE PENDING", "combined_fair_odds", "flat_stake",
+        "!forwardAvailable ? <RetrospectiveSection",
+        "forwardAvailable ? <RetrospectiveSection",
+        "Automatic proposal record could not be loaded.",
+    ):
+        assert needle in page, needle
+    workflow = read(".github/workflows/update.yml")
+    assert "pipeline.retrospective_tickets settle" in workflow
+    payload = json.loads((ROOT / "web" / "public" / "data" / "retrospective-tickets.json").read_text(encoding="utf-8"))
+    assert [row["round_date"] for row in payload["rounds"]] == ["2026-11-14", "2026-11-21", "2026-11-22"]
+    text = json.dumps(payload).lower()
+    for forbidden in ('"odds"', '"prices"', '"price"', '"adaptive"', '"snapshot_identity"'):
+        assert forbidden not in text
+
+
+def test_forward_preloader_has_actionable_activation_check() -> None:
+    script = read("web/scripts/fetch-prices.mjs")
+    assert "PROPOSAL_ACTIVATION_DATE = '2026-11-24'" in script
+    assert "required frozen proposal data missing" in script
+    assert "missingProposals" in script
+    proposed = read("pipeline/proposed_tickets.py")
+    assert "PROPOSAL_ACTIVATION_DATE = \"2026-11-24\"" in proposed
+    assert "ProposalReadinessError" in proposed
+    assert "return 2" in proposed
+
+
 def test_no_login_or_task17_activation() -> None:
     tickets = read("web/app/tickets/page.tsx")
     proposals = read("pipeline/proposed_tickets.py")

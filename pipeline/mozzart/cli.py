@@ -169,6 +169,12 @@ def main(argv=None) -> int:
         )
         created = sum(1 for item in proposal.get("proposals", []) if item.get("status") == "available")
         print(f"proposals: {created}/3 available (frozen file)")
+        try:
+            proposed_tickets.validate_required_proposals(prices_dir)
+        except proposed_tickets.ProposalReadinessError as exc:
+            print(f"ERROR: {exc}")
+            finish(False, f"proposal readiness: {exc}")
+            return 3
 
     aggregate = record.aggregate(_all_rounds(), snapshots)
     _write_json(prices_dir / "record.json", aggregate)

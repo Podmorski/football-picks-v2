@@ -37,6 +37,9 @@ def test_summary_counts_pending_and_is_inclusive_at_58() -> None:
     assert stats["settled"] == 2
     assert stats["landed"] == 1
     assert stats["pending"] == 1
+    assert stats["lost"] == 1
+    assert stats["void"] == 0
+    assert stats["passing"] == stats["landed"] + stats["lost"] + stats["void"] + stats["pending"]
     assert stats["expected"] == 1.18
     assert "strong" not in stats and "possible" not in stats
 
@@ -70,4 +73,17 @@ def test_committed_best_bets_record_structure() -> None:
     assert payload["rounds"]
     cumulative = payload["cumulative"]
     assert cumulative["settled"] >= 0
+    assert cumulative["passing"] == cumulative["landed"] + cumulative["lost"] + cumulative["void"] + cumulative["pending"]
     assert "strong" not in cumulative and "possible" not in cumulative
+
+
+def test_14_nov_void_and_example_reporting_are_exact() -> None:
+    payload = json.loads((ROOT / "web" / "public" / "data" / "best-bets-record.json").read_text(encoding="utf-8"))
+    row = next(item for item in payload["rounds"] if item["date"] == "2026-11-14")
+    assert (row["passing"], row["settled"], row["landed"], row["lost"], row["void"], row["pending"]) == (48, 45, 45, 0, 3, 0)
+    source = (ROOT / "web" / "app" / "report" / "page.tsx").read_text(encoding="utf-8")
+    normalized = " ".join(source.split())
+    assert "Retrospective example generated after the fixture; not forward performance" in normalized
+    assert "44 of its 48 selections were GOAL_RANGE_FT:1+" in normalized
+    assert "median selected fair odds were approximately 1.055" in normalized
+    assert "not evidence of positive expected value or realised bookmaker profit" in normalized

@@ -219,7 +219,14 @@ export default function ReportPage() {
         <p className="max-w-3xl text-sm text-muted-foreground">
           Current Best bets record: calibrated probability ≥{' '}
           {bestBets ? pct(bestBets.min_pc) : '58.0%'}, any odds, one pick per match by highest pc.
-          Expected is the sum of the shown probabilities.
+          Expected is the sum of shown probabilities over settled rows only, where settled means
+          Landed or Lost; Void and Pending are separate buckets.
+        </p>
+        <p className="max-w-3xl rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
+          The 14 Nov row is a retrospective example generated after the fixture; not forward
+          performance. 44 of its 48 selections were GOAL_RANGE_FT:1+, and median selected fair odds
+          were approximately 1.055. High landing frequency at these very short prices is not evidence
+          of positive expected value or realised bookmaker profit.
         </p>
         {settled.length === 0 ? (
           <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
@@ -234,7 +241,10 @@ export default function ReportPage() {
                   <th className="px-3 py-2 text-right font-semibold">Passing</th>
                   <th className="px-3 py-2 text-right font-semibold">Settled</th>
                   <th className="px-3 py-2 text-right font-semibold">Landed</th>
-                  <th className="px-3 py-2 text-right font-semibold">Expected</th>
+                  <th className="px-3 py-2 text-right font-semibold">Lost</th>
+                  <th className="px-3 py-2 text-right font-semibold">Void</th>
+                  <th className="px-3 py-2 text-right font-semibold">Pending</th>
+                  <th className="px-3 py-2 text-right font-semibold">Expected (settled)</th>
                 </tr>
               </thead>
               <tbody>
@@ -242,11 +252,14 @@ export default function ReportPage() {
                   <tr key={round.date} className="border-t">
                     <td className="px-3 py-1.5">
                       {round.label}
-                      {round.kind === 'example' ? <span className="ml-1 text-xs text-muted-foreground">example</span> : null}
+                      {round.kind === 'example' ? <span className="ml-1 text-xs text-muted-foreground">Retrospective example generated after the fixture; not forward performance</span> : null}
                     </td>
                     <td className="tabular px-3 py-1.5 text-right">{round.passing}</td>
                     <td className="tabular px-3 py-1.5 text-right">{round.settled}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{round.landed} of {round.settled}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.landed}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.lost}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.void}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.pending}</td>
                     <td className="tabular px-3 py-1.5 text-right">{round.expected.toFixed(1)}</td>
                   </tr>
                 ))}
@@ -255,7 +268,10 @@ export default function ReportPage() {
                     <td className="px-3 py-1.5">Cumulative</td>
                     <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.passing}</td>
                     <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.settled}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.landed} of {bestBets.cumulative.settled}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.landed}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.lost}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.void}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.pending}</td>
                     <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.expected.toFixed(1)}</td>
                   </tr>
                 ) : null}

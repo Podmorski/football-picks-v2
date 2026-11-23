@@ -36,14 +36,21 @@ def passing_picks(rows: list[dict]) -> list[dict]:
 
 def summarise(rows: list[dict]) -> dict:
     picks = passing_picks(rows)
-    settled = [row for row in picks if row.get("st") in ("landed", "lost")]
-    landed = sum(1 for row in settled if row.get("st") == "landed")
+    landed = sum(1 for row in picks if row.get("st") == "landed")
+    lost = sum(1 for row in picks if row.get("st") == "lost")
+    void = sum(1 for row in picks if row.get("st") == "void")
+    pending = len(picks) - landed - lost - void
+    settled = landed + lost
+    assert landed + lost + void + pending == len(picks)
+    expected = round(sum(_probability(row) for row in picks if row.get("st") in ("landed", "lost")), 4)
     return {
         "passing": len(picks),
-        "settled": len(settled),
+        "settled": settled,
         "landed": landed,
-        "pending": len(picks) - len(settled),
-        "expected": round(sum(_probability(row) for row in settled), 4),
+        "lost": lost,
+        "void": void,
+        "pending": pending,
+        "expected": expected,
     }
 
 
@@ -77,9 +84,12 @@ def build(picks_dir: Path, web_dir: Path) -> dict:
         "passing": total("passing"),
         "settled": total("settled"),
         "landed": total("landed"),
+        "lost": total("lost"),
+        "void": total("void"),
         "pending": total("pending"),
         "expected": round(sum(float(row["expected"]) for row in rounds), 4),
     }
+    assert cumulative["landed"] + cumulative["lost"] + cumulative["void"] + cumulative["pending"] == cumulative["passing"]
 
     payload = {"min_pc": MIN_PC, "rounds": rounds, "cumulative": cumulative}
     web_dir.mkdir(parents=True, exist_ok=True)

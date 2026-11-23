@@ -9,6 +9,7 @@ const RECORD_OUT = join(DATA, 'mozzart-record.json');
 const VETTED_OUT = join(DATA, 'mozzart-vetted-record.json');
 const STATUS_OUT = join(DATA, 'mozzart-status.json');
 const PROPOSALS_OUT = join(DATA, 'proposed-tickets-private.json');
+const PROPOSAL_ACTIVATION_DATE = '2026-11-24';
 
 function clean() {
   for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT, STATUS_OUT, PROPOSALS_OUT]) {
@@ -68,6 +69,24 @@ try {
         .sort()
         .map((name) => JSON.parse(readFileSync(join(proposalsDir, name), 'utf8')))
     : [];
+  const validProposalDates = new Set(
+    proposals
+      .filter((round) => {
+        const types = new Set((round.proposals ?? []).map((item) => item.type));
+        return round.schema_version === 1 && types.size === 3 && ['best2', 'around3', 'around5'].every((type) => types.has(type));
+      })
+      .map((round) => round.round_date),
+  );
+  const missingProposals = rounds
+    .filter((snapshot) => String(snapshot.round_date ?? '') >= PROPOSAL_ACTIVATION_DATE && (snapshot.fixtures ?? []).length > 0)
+    .map((snapshot) => snapshot.round_date)
+    .filter((date) => !validProposalDates.has(date));
+  if (missingProposals.length > 0) {
+    throw new Error(
+      'required frozen proposal data missing for snapshot round(s): ' + missingProposals.join(', ') +
+      ' (activation ' + PROPOSAL_ACTIVATION_DATE + ')',
+    );
+  }
   writeFileSync(PROPOSALS_OUT, JSON.stringify({ rounds: proposals }));
   const recordPath = join(cloneDir, 'record.json');
   if (existsSync(recordPath)) writeFileSync(RECORD_OUT, readFileSync(recordPath));

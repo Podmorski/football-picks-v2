@@ -14,7 +14,7 @@ import {
   type SavedTicket,
 } from '@/lib/ticket';
 import { paperSettlement, proposalKey, sharedCounts, type LegStatuses } from '@/lib/proposals';
-import type { PrivateProposalsFile, ProposalRecordFile, ProposedTicket } from '@/lib/types';
+import type { PrivateProposalsFile, ProposalRecordFile, ProposedTicket, RetrospectiveFile, RetrospectiveProposal } from '@/lib/types';
 
 function pct(value: number | null): string {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
@@ -93,6 +93,86 @@ function ProposalCard({ ticket, statuses, shared }: { ticket: ProposedTicket; st
   );
 }
 
+function RetrospectiveCard({ ticket }: { ticket: RetrospectiveProposal }) {
+  if (ticket.status !== 'available') {
+    return (
+      <li className="rounded-xl border border-dashed p-3 text-sm text-muted-foreground">
+        <div className="font-semibold text-foreground">{ticket.label}</div>
+        <p>Unavailable: {ticket.reason || 'no eligible legs'}.</p>
+        <p className="text-xs">Its flat allocation remains unbet.</p>
+      </li>
+    );
+  }
+  const settlement = ticket.settlement;
+  const source = settlement.source_pending ? ' · SOURCE PENDING' : '';
+  return (
+    <li className="space-y-2 rounded-xl border p-3 text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <span className="font-semibold">{ticket.label}</span>
+        <span className={`rounded-full border px-2 py-0.5 text-xs ${statusClass(settlement.status)}`}>{settlement.status}{source}</span>
+      </div>
+      <div className="tabular grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground sm:grid-cols-3">
+        <span>Model {pct(ticket.combined_probability)}</span>
+        <span>Fair odds {ticket.combined_fair_odds?.toFixed(2)}</span>
+        <span>Flat {ticket.flat_stake.toFixed(0)}u</span>
+      </div>
+      <ul className="space-y-1 text-xs">
+        {ticket.legs.map((leg, index) => (
+          <li key={proposalKey(leg)} className="flex flex-wrap items-baseline justify-between gap-2">
+            <span>{leg.h} v {leg.a} · {leg.m}</span>
+            <span className="tabular text-muted-foreground">{pct(leg.pc)} · fair {leg.fair.toFixed(2)} · {settlement.leg_statuses[index] ?? 'pending'}</span>
+          </li>
+        ))}
+      </ul>
+      {settlement.status !== 'pending' && settlement.status !== 'unavailable' ? (
+        <p className="tabular text-xs">Stake {ticket.flat_stake.toFixed(2)} · return {settlement.return?.toFixed(2)} · profit {units(settlement.profit)}</p>
+      ) : null}
+    </li>
+  );
+}
+
+function RetrospectiveSection({ state, data }: { state: 'loading' | 'ready' | 'error'; data: RetrospectiveFile | null }) {
+  return (
+    <section className="space-y-3 border-t pt-4">
+      <div>
+        <h2 className="text-lg font-semibold">Retrospective simulations — model-fair odds</h2>
+        <p className="text-sm text-muted-foreground">Retrospective simulation — generated after the round; not a frozen pre-match recommendation.</p>
+        <p className="text-sm text-muted-foreground">Model-fair odds — not realised bookmaker returns.</p>
+      </div>
+      {state === 'loading' ? <p className="text-sm text-muted-foreground">Loading retrospective tickets…</p> : null}
+      {state === 'error' ? <p className="text-sm text-muted-foreground">Retrospective tickets could not be loaded.</p> : null}
+      {data ? (
+        <>
+          {data.rounds.map((round) => (
+            <div key={round.round_date} className="space-y-2">
+              <h3 className="text-base font-semibold">{round.round_date}</h3>
+              <p className="text-xs text-muted-foreground">{round.disclaimer}</p>
+              <p className="text-xs text-muted-foreground">{round.fair_odds_note}</p>
+              <ul className="grid gap-3 lg:grid-cols-3">
+                {round.proposals.map((ticket) => <RetrospectiveCard key={ticket.type} ticket={ticket} />)}
+              </ul>
+            </div>
+          ))}
+          <div className="rounded-xl border p-3 text-sm">
+            <h3 className="font-semibold">Retrospective cumulative — model-fair odds</h3>
+            <p className="text-muted-foreground">Retrospective simulation — generated after the round; not a frozen pre-match recommendation. Model-fair odds — not realised bookmaker returns.</p>
+            <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs sm:grid-cols-4">
+              <dt>Tickets</dt><dd className="tabular text-right">{data.cumulative.tickets}</dd>
+              <dt>Settled</dt><dd className="tabular text-right">{data.cumulative.settled}</dd>
+              <dt>Pending</dt><dd className="tabular text-right">{data.cumulative.pending}</dd>
+              <dt>Source pending</dt><dd className="tabular text-right">{data.cumulative.source_pending}</dd>
+              <dt>Staked</dt><dd className="tabular text-right">{data.cumulative.staked.toFixed(2)}</dd>
+              <dt>Returned</dt><dd className="tabular text-right">{data.cumulative.returned.toFixed(2)}</dd>
+              <dt>Profit</dt><dd className="tabular text-right">{units(data.cumulative.profit)}</dd>
+              <dt>ROI</dt><dd className="tabular text-right">{rate(data.cumulative.roi)}</dd>
+            </dl>
+          </div>
+        </>
+      ) : null}
+    </section>
+  );
+}
+
 function LedgerSummary({ record }: { record: ProposalRecordFile | null }) {
   if (!record) return null;
   return (
@@ -152,6 +232,9 @@ export default function TicketsPage() {
   const [proposalsState, setProposalsState] = useState<'loading' | 'ready' | 'unpriced' | 'error'>('loading');
   const [rounds, setRounds] = useState<PrivateProposalsFile['rounds']>([]);
   const [record, setRecord] = useState<ProposalRecordFile | null>(null);
+  const [recordState, setRecordState] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [retrospective, setRetrospective] = useState<RetrospectiveFile | null>(null);
+  const [retrospectiveState, setRetrospectiveState] = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => { setTickets(loadTickets()); }, []);
 
@@ -166,9 +249,19 @@ export default function TicketsPage() {
       })
       .catch(() => { if (!cancelled) setProposalsState('error'); });
     fetch('/data/proposed-tickets-record.json')
-      .then((response) => response.ok ? response.json() as Promise<ProposalRecordFile> : null)
-      .then((payload) => { if (!cancelled) setRecord(payload); })
-      .catch(() => undefined);
+      .then((response) => {
+        if (!response.ok) throw new Error('record');
+        return response.json() as Promise<ProposalRecordFile>;
+      })
+      .then((payload) => { if (!cancelled) { setRecord(payload); setRecordState('ready'); } })
+      .catch(() => { if (!cancelled) setRecordState('error'); });
+    fetch('/data/retrospective-tickets.json')
+      .then((response) => {
+        if (!response.ok) throw new Error('retrospective');
+        return response.json() as Promise<RetrospectiveFile>;
+      })
+      .then((payload) => { if (!cancelled) { setRetrospective(payload); setRetrospectiveState('ready'); } })
+      .catch(() => { if (!cancelled) setRetrospectiveState('error'); });
     return () => { cancelled = true; };
   }, []);
 
@@ -194,6 +287,7 @@ export default function TicketsPage() {
   }, [tickets, rounds]);
 
   const automatic = useMemo(() => [...rounds].sort((a, b) => b.round_date.localeCompare(a.round_date)), [rounds]);
+  const forwardAvailable = proposalsState === 'ready' && automatic.length > 0;
 
   function remove(id: string) { setTickets(removeTicket(id)); }
 
@@ -206,6 +300,10 @@ export default function TicketsPage() {
         </p>
       </header>
 
+      {!forwardAvailable ? <RetrospectiveSection state={retrospectiveState} data={retrospective} /> : null}
+
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Forward proposals — actual frozen prices</h2>
       {proposalsState === 'loading' ? <p className="text-sm text-muted-foreground">Loading automatic proposals…</p> : null}
       {proposalsState === 'error' ? <p className="text-sm text-muted-foreground">Automatic proposals could not be loaded.</p> : null}
       {proposalsState === 'unpriced' ? (
@@ -232,8 +330,12 @@ export default function TicketsPage() {
           </section>
         );
       })}
+      {recordState === 'error' ? <p className="text-sm text-muted-foreground">Automatic proposal record could not be loaded.</p> : null}
+      </section>
 
       <LedgerSummary record={record} />
+
+      {forwardAvailable ? <RetrospectiveSection state={retrospectiveState} data={retrospective} /> : null}
 
       <section className="space-y-3 border-t pt-4">
         <h2 className="text-lg font-semibold">My saved tickets</h2>

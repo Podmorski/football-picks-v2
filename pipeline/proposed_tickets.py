@@ -18,6 +18,10 @@ from .model.ranking_backtest import RETURN_BOOTSTRAP_RESAMPLES, RETURN_BOOTSTRAP
 
 MIN_PC = 0.58
 MAX_LEGS = 5
+# Rounds on/after this date require a frozen proposal file once a usable snapshot exists.
+# Earlier snapshots are explicitly exempt because proposals were not generated then.
+PROPOSAL_ACTIVATION_DATE = "2026-11-24"
+PROPOSAL_ACTIVATION_MARKER = "proposal-readiness-v1"
 SCHEMA_VERSION = 1
 POLICY_VERSION = "adaptive-quarter-kelly-v1"
 INITIAL_BANKROLL = 1000.0
@@ -75,21 +79,21 @@ def eligible_pool(document: dict, snapshot: dict) -> list[dict]:
     return sorted(pool, key=lambda leg: (-leg["pc"], leg["d"], leg["h"], leg["a"]))
 
 
-def _combined(legs: list[dict]) -> tuple[float, float]:
+def _combined(legs: list[dict], price_key: str = "odds") -> tuple[float, float]:
     probability = 1.0
     odds = 1.0
     for leg in legs:
         probability *= leg["pc"]
-        odds *= leg["odds"]
+        odds *= leg[price_key]
     return probability, odds
 
 
-def _enumerated_best(pool: list[dict], low: float, high: float, target: float, min_legs: int, max_legs: int) -> tuple[list[dict] | None, str]:
+def _enumerated_best(pool: list[dict], low: float, high: float, target: float, min_legs: int, max_legs: int, price_key: str = "odds") -> tuple[list[dict] | None, str]:
     best_band = None
     best_closest = None
     for size in range(min_legs, min(max_legs, len(pool)) + 1):
         for combo in itertools.combinations(pool, size):
-            probability, odds = _combined(list(combo))
+            probability, odds = _combined(list(combo), price_key)
             candidate = (probability, -abs(odds - target), list(combo), odds)
             if low <= odds <= high and (best_band is None or candidate[:2] > best_band[:2]):
                 best_band = candidate
@@ -102,7 +106,7 @@ def _enumerated_best(pool: list[dict], low: float, high: float, target: float, m
     return chosen[2], reason
 
 
-def _dp_best(pool: list[dict], low: float, high: float, target: float, min_legs: int, max_legs: int) -> tuple[list[dict] | None, str]:
+def _dp_best(pool: list[dict], low: float, high: float, target: float, min_legs: int, max_legs: int, price_key: str = "odds") -> tuple[list[dict] | None, str]:
     """Bounded exact-state DP for larger priced pools; band membership is rechecked."""
     cap = max(high * 2.0, target * 2.0)
     step = 0.001
@@ -112,7 +116,7 @@ def _dp_best(pool: list[dict], low: float, high: float, target: float, min_legs:
         for (size, bucket), (probability, odds, combo) in current:
             if size >= max_legs:
                 continue
-            new_odds = odds * leg["odds"]
+            new_odds = odds * leg[price_key]
             if new_odds > cap:
                 continue
             new_probability = probability * leg["pc"]
@@ -139,12 +143,12 @@ def _dp_best(pool: list[dict], low: float, high: float, target: float, min_legs:
     return chosen[1], "" if best_band else "no combination in the preferred odds band; closest actual odds used"
 
 
-def choose_target(pool: list[dict], target: float, low: float, high: float, min_legs: int = 2, max_legs: int = 5) -> tuple[list[dict] | None, str]:
+def choose_target(pool: list[dict], target: float, low: float, high: float, min_legs: int = 2, max_legs: int = 5, price_key: str = "odds") -> tuple[list[dict] | None, str]:
     if len(pool) < min_legs:
-        return None, f"fewer than {min_legs} eligible priced legs"
+        return None, f"fewer than {min_legs} eligible legs"
     if len(pool) <= 18:
-        return _enumerated_best(pool, low, high, target, min_legs, max_legs)
-    return _dp_best(pool, low, high, target, min_legs, max_legs)
+        return _enumerated_best(pool, low, high, target, min_legs, max_legs, price_key)
+    return _dp_best(pool, low, high, target, min_legs, max_legs, price_key)
 
 
 def _round_document(picks_dir: Path, date: str) -> dict | None:
@@ -278,6 +282,51 @@ def build_proposals(document: dict, snapshot: dict, prior_state: dict | None = N
     }
 
 
+class ProposalReadinessError(RuntimeError):
+    pass
+
+
+def _proposal_is_valid(path: Path) -> bool:
+    if not path.exists():
+        return False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    proposals = payload.get("proposals")
+    return (
+        payload.get("schema_version") == SCHEMA_VERSION
+        and isinstance(proposals, list)
+        and len(proposals) == 3
+        and {item.get("type") for item in proposals} == set(TARGETS)
+    )
+
+
+def missing_required_proposals(prices_dir: Path) -> list[str]:
+    """Snapshot-backed rounds after activation that lack a valid frozen proposal."""
+    missing = []
+    for path in sorted((prices_dir / "rounds").glob("*.json")):
+        try:
+            snapshot = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        round_date = str(snapshot.get("round_date", ""))
+        if round_date < PROPOSAL_ACTIVATION_DATE or not snapshot.get("fixtures"):
+            continue
+        if not _proposal_is_valid(prices_dir / "proposals" / f"{round_date}.json"):
+            missing.append(round_date)
+    return missing
+
+
+def validate_required_proposals(prices_dir: Path) -> None:
+    missing = missing_required_proposals(prices_dir)
+    if missing:
+        raise ProposalReadinessError(
+            f"missing required frozen proposal file for snapshot round(s): {', '.join(missing)} "
+            f"(activation {PROPOSAL_ACTIVATION_DATE}, marker {PROPOSAL_ACTIVATION_MARKER})"
+        )
+
+
 def ensure_proposals(round_date: str, document: dict, snapshot: dict, prices_dir: Path, picks_dir: Path) -> dict:
     path = prices_dir / "proposals" / f"{round_date}.json"
     if path.exists():
@@ -407,6 +456,11 @@ def main(argv=None) -> int:
     parser.add_argument("--picks-dir", type=Path, default=Path("picks"))
     parser.add_argument("--web-dir", type=Path, default=Path("web/public/data"))
     args = parser.parse_args(argv)
+    try:
+        validate_required_proposals(Path(args.prices_dir))
+    except ProposalReadinessError as exc:
+        print(f"ERROR: {exc}")
+        return 2
     payload = write_aggregate(Path(args.prices_dir), args.picks_dir, args.web_dir)
     print(f"proposal ledger: {payload['counts']['rounds']} rounds, {payload['counts']['tickets']} tickets")
     return 0

@@ -101,7 +101,7 @@ def test_no_band_uses_closest_without_threshold_relaxation_or_filler() -> None:
     assert all(leg["pc"] >= 0.58 for leg in legs)
     _none, unavailable = proposals.choose_target(target_pool[:1], 3.0, 2.70, 3.30)
     assert _none is None
-    assert unavailable == "fewer than 2 eligible priced legs"
+    assert unavailable == "fewer than 2 eligible legs"
 
 
 def test_frozen_file_is_immutable_after_later_snapshot(tmp_path: Path) -> None:
@@ -225,6 +225,46 @@ def test_public_aggregate_contains_no_actual_prices(tmp_path: Path) -> None:
     assert "\"prices\"" not in text
     assert "\"combined_odds\"" not in text
     assert "not a profit guarantee" in text
+
+
+def test_readiness_requires_valid_proposals_only_after_activation(tmp_path: Path) -> None:
+    prices = tmp_path / "prices"
+    picks = tmp_path / "picks"
+    (prices / "rounds").mkdir(parents=True)
+    picks.mkdir()
+    pre = {"round_date": "2026-11-22", "fetched_at": "2026-11-22T12:00:00+00:00", "fixtures": [{"div": "E0"}], "started_not_priced": []}
+    active = {"round_date": "2026-11-24", "fetched_at": "2026-11-24T13:00:00+00:00", "fixtures": [{"div": "E0"}], "started_not_priced": []}
+    empty = {"round_date": "2026-11-25", "fetched_at": "2026-11-25T13:00:00+00:00", "fixtures": [], "started_not_priced": []}
+    for snap in (pre, active, empty):
+        (prices / "rounds" / f"{snap['round_date']}.json").write_text(json.dumps(snap), encoding="utf-8")
+    assert proposals.missing_required_proposals(prices) == ["2026-11-24"]
+    with pytest.raises(proposals.ProposalReadinessError, match="2026-11-24"):
+        proposals.validate_required_proposals(prices)
+
+    proposal = {
+        "schema_version": 1, "round_date": "2026-11-24",
+        "proposals": [
+            {"type": "best2", "status": "unavailable", "reason": "fewer than 2 eligible legs"},
+            {"type": "around3", "status": "unavailable", "reason": "fewer than 2 eligible legs"},
+            {"type": "around5", "status": "unavailable", "reason": "fewer than 2 eligible legs"},
+        ],
+    }
+    (prices / "proposals").mkdir()
+    (prices / "proposals" / "2026-11-24.json").write_text(json.dumps(proposal), encoding="utf-8")
+    assert proposals.missing_required_proposals(prices) == []
+    proposals.validate_required_proposals(prices)
+
+
+def test_aggregate_cli_fails_for_required_missing_proposal(tmp_path: Path) -> None:
+    prices = tmp_path / "prices"
+    (prices / "rounds").mkdir(parents=True)
+    snap = {"round_date": "2026-11-24", "fetched_at": "2026-11-24T13:00:00+00:00", "fixtures": [{"div": "E0"}], "started_not_priced": []}
+    (prices / "rounds" / "2026-11-24.json").write_text(json.dumps(snap), encoding="utf-8")
+    code = proposals.main([
+        "aggregate", "--prices-dir", str(prices), "--picks-dir", str(tmp_path / "picks"),
+        "--web-dir", str(tmp_path / "web"),
+    ])
+    assert code == 2
 
 
 def test_no_retrospective_generation_api() -> None:
