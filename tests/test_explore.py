@@ -193,10 +193,12 @@ def test_correct_score_is_hidden_from_the_picker_ui() -> None:
     assert any(market["group"] == "Correct score" for market in markets["markets"])
 
 
-def test_type_rule_is_wired_into_the_dropdowns_and_list() -> None:
+def test_best_bets_uses_the_58_contract_not_type_rule() -> None:
     vetted = (ROOT / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
-    assert "'type'" in vetted
-    assert "selectType" in vetted
-    assert "typeCounts" in vetted
-    assert ".get(group)?.size" in vetted
-    assert ".get(market.id)?.size" in vetted
+    assert "BEST_BETS_MIN_PC = 0.58" in vetted
+    assert "candidate.probability >= BEST_BETS_MIN_PC" in vetted
+    assert "selectType" not in vetted
+    assert "selectPassing" not in vetted
+    assert "typeCounts" not in vetted
+    assert "counts.groups.get(group)?.size" in vetted
+    assert "counts.markets.get(market.id)?.size" in vetted

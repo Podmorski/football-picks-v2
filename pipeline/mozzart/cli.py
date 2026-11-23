@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 from ..config import ROOT_DIR
-from .. import alerts, ranking
+from .. import alerts, proposed_tickets, ranking
 from . import client, record, snapshot, vetted_record
 
 PICKS_DIR = ROOT_DIR / "picks"
@@ -161,6 +161,14 @@ def main(argv=None) -> int:
         _write_json(prices_dir / "usage.json", budget.dump())
         print(f"budget after: {budget.used}/{budget.monthly_cap} requests this month")
         snapshots = _all_snapshots(prices_dir)
+
+    frozen_snapshot = _load_json(snapshot_path, {})
+    if frozen_snapshot:
+        proposal = proposed_tickets.ensure_proposals(
+            round_date.isoformat(), document, frozen_snapshot, prices_dir, PICKS_DIR,
+        )
+        created = sum(1 for item in proposal.get("proposals", []) if item.get("status") == "available")
+        print(f"proposals: {created}/3 available (frozen file)")
 
     aggregate = record.aggregate(_all_rounds(), snapshots)
     _write_json(prices_dir / "record.json", aggregate)

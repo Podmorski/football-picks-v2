@@ -26,7 +26,7 @@ WED = dt.date(2026, 11, 25)
 def row(market: str = "RESULT:1", home: str = "A", away: str = "B") -> dict:
     return {
         "d": "E0", "k": "15:00", "h": home, "a": away, "m": market,
-        "p": 0.55, "pc": 0.55, "pl": 0.55, "pp": 0.55,
+        "p": 0.60, "pc": 0.60, "pl": 0.60, "pp": 0.60,
         "lr": 0.45, "ln": 1000, "hr": 0.55, "hn": 20,
         "ar": 0.55, "an": 20, "c": "Medium", "s": 0.0,
         "st": "pending", "ht": None, "ft": None,

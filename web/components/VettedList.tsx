@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Check, ChevronDown, Minus, X } from 'lucide-react';
 
 import MatchStats from '@/components/MatchStats';
@@ -14,10 +14,9 @@ import {
   utcTime,
   type MozzartPricesFile,
 } from '@/lib/prices';
-import { addTicket, combinedFair, combinedMinPlay, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, ticketVsFair, type TicketLeg } from '@/lib/ticket';
+import { addTicket, combinedFair, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, type TicketLeg } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
-import { evaluateRows, isHiddenMarketId, isValue, pcOf, selectByMatch, selectPassing, selectType, type Evaluated } from '@/lib/vetted';
-import type { VettingCheck } from '@/lib/vetting';
+import { evaluateRows, isHiddenMarketId, pcOf, selectByMatch, type Evaluated } from '@/lib/vetted';
 import { minPlay } from '@/lib/vetting';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
@@ -34,6 +33,7 @@ const LADDER_LABELS: Record<string, string> = {
   'GOAL_RANGE_1H:I1+': '1st half 1+', 'GOAL_RANGE_1H:I2+': '1st half 2+', 'BTTS:GG': 'Both teams score',
 };
 const TARGETS = [3, 5, 10];
+const BEST_BETS_MIN_PC = 0.58;
 
 function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
@@ -96,30 +96,18 @@ export default function VettedList({
   const [pricesState, setPricesState] = useState<'loading' | 'ready' | 'unpriced' | 'error'>('loading');
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
-  const [minOdds, setMinOdds] = useParam('min', '1.70');
-  const [mode, setMode] = useParam('mode', 'ranked');
+  const [minOdds, setMinOdds] = useParam('min', 'any');
   const [roundParam, setRound] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketLeg[]>([]);
   const [bonus, setBonus] = useState(0);
   const [stake, setStake] = useState(10);
   const [ticketOpen, setTicketOpen] = useState(false);
-  const [valueOnly, setValueOnly] = useState(true);
-  const minParamRef = useRef(false);
 
   const activeDate = /^\d{4}-\d{2}-\d{2}$/.test(roundParam) ? roundParam : date;
   const activeMeta = roundMeta[activeDate] ?? { label: activeDate, kind };
   const activeKind = activeMeta.kind;
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('min')) minParamRef.current = true;
-  }, []);
-
-  useEffect(() => {
-    if (minParamRef.current) return;
-    setMinOdds(bet === 'any' ? '1.70' : 'any', false);
-  }, [bet]);
 
   useEffect(() => {
     let cancelled = false;
@@ -207,14 +195,9 @@ export default function VettedList({
   const snapshot = useMemo(() => snapshotFor(prices, activeDate), [prices, activeDate]);
 
   const isAny = bet === 'any';
-  const isStrict = !isAny && mode === 'strict';
-  const evaluatedAny = useMemo<EvaluatedRow[]>(() => {
+  const activeEvaluated = useMemo<EvaluatedRow[]>(() => {
     return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)], 'any');
   }, [data, priceIndex]);
-  const evaluatedType = useMemo<EvaluatedRow[]>(() => {
-    return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)], 'type');
-  }, [data, priceIndex]);
-  const activeEvaluated = isAny ? evaluatedAny : evaluatedType;
 
   const baseFiltered = useMemo(() => {
     return activeEvaluated.filter((item) => {
@@ -225,13 +208,17 @@ export default function VettedList({
       return item.row.m === bet.slice(7);
     });
   }, [activeEvaluated, league, bet, isAny, markets]);
-  const minFair = minOdds === 'any' ? 0 : Number(minOdds) > 0 ? Number(minOdds) : (isAny ? 1.70 : 0);
+  const minFair = minOdds === 'any' ? 0 : Math.max(0, Number(minOdds) || 0);
   const dataReady = roundState === 'ready' && marketsState === 'ready';
   const countsReady = dataReady;
 
   const eligible = useMemo(
     () => baseFiltered.filter((item) => item.candidate.fairOdds >= minFair),
     [baseFiltered, minFair],
+  );
+  const qualified = useMemo(
+    () => eligible.filter((item) => item.candidate.probability >= BEST_BETS_MIN_PC),
+    [eligible],
   );
   const baseCount = useMemo(
     () => bet.startsWith('group:')
@@ -240,32 +227,15 @@ export default function VettedList({
     [baseFiltered, bet],
   );
 
-  const strictPassing = useMemo(() => {
-    if (isAny) return selectPassing(eligible, { minFair, mozzartOnly: false });
-    return selectType(eligible, {
-      perMatch: bet.startsWith('group:'),
-      market: bet.startsWith('group:') ? undefined : bet.slice(7),
-      minFair,
-    });
-  }, [eligible, isAny, bet, minFair]);
+  const displayed = useMemo(() => {
+    if (isAny || bet.startsWith('group:')) return selectByMatch(qualified);
+    return [...qualified].sort((a, b) => b.candidate.probability - a.candidate.probability);
+  }, [qualified, isAny, bet]);
 
-  const rankedDisplayed = useMemo(() => {
-    if (isAny) return [];
-    if (bet.startsWith('group:')) return selectByMatch(eligible);
-    return [...eligible].sort((a, b) => b.candidate.probability - a.candidate.probability);
-  }, [eligible, isAny, bet]);
-
-  const displayed = isAny || isStrict ? strictPassing : rankedDisplayed;
-
-  // TYPE_RULE match counts for the current round + league, per group and market.
-  const typeCounts = useMemo(() => {
+  const counts = useMemo(() => {
     const groupMatches = new Map<string, Set<string>>();
     const marketMatches = new Map<string, Set<string>>();
-    for (const item of evaluatedType) {
-      if (league !== 'all' && item.row.d !== league) continue;
-      if (isHiddenMarketId(item.row.m)) continue;
-      if (mode === 'strict' && !item.passed) continue;
-      if (item.candidate.fairOdds < minFair) continue;
+    for (const item of qualified) {
       const group = markets[item.row.m]?.group;
       if (!group) continue;
       const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
@@ -275,24 +245,7 @@ export default function VettedList({
       marketMatches.get(item.row.m)?.add(key);
     }
     return { groups: groupMatches, markets: marketMatches };
-  }, [evaluatedType, league, markets, minFair, mode]);
-
-  const failedCandidates = useMemo(() => {
-    if (strictPassing.length > 0) return [];
-    const seen = new Set<string>();
-    const rows: { item: EvaluatedRow; failed: VettingCheck[] }[] = [];
-    const ordered = [...eligible].sort((a, b) => b.candidate.probability - a.candidate.probability);
-    for (const item of ordered) {
-      const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
-      if (seen.has(key)) continue;
-      const failed = item.checks.filter((check) => !check.flag && !check.passed);
-      if (failed.length === 0) continue;
-      seen.add(key);
-      rows.push({ item, failed });
-      if (rows.length >= 3) break;
-    }
-    return rows;
-  }, [eligible, strictPassing.length]);
+  }, [qualified, markets]);
 
   const priceNote = pricesState === 'loading'
     ? 'Loading Mozzart prices…'
@@ -335,11 +288,10 @@ export default function VettedList({
   }
 
   const targetTickets = useMemo(() => {
-    const candidates = valueOnly ? strictPassing.filter(isValue) : strictPassing;
-    const legs = candidates.map((item) => toLeg(item.row));
+    const legs = displayed.map((item) => toLeg(item.row));
     if (legs.length === 0) return [];
     return TARGETS.map((target) => ({ target, ticket: optimiseTickets(legs, target, 5, 1, 1.0)[0] ?? null }));
-  }, [strictPassing, markets, priceIndex, snapshot, valueOnly]);
+  }, [displayed, markets, priceIndex, snapshot]);
 
   const betLabel = bet === 'any' ? 'Any bet' : bet.startsWith('group:') ? (GROUP_LABEL[bet.slice(6)] ?? 'group') : (markets[bet.slice(7)]?.plain ?? 'bet');
   const leagueLabel = league === 'all' ? 'any league' : (leagueNames[league] ?? league);
@@ -348,8 +300,6 @@ export default function VettedList({
   const ticketProbability = combinedProbability(ticket);
   const ticketFair = combinedFair(ticket);
   const ticketMozzart = combinedMozzart(ticket);
-  const ticketMinPlay = combinedMinPlay(ticket);
-  const ticketValue = ticketVsFair(ticket, bonus);
   const ticketPayout = payout(stake, ticket, bonus);
   const correlated = sameMatchWarning(ticket);
 
@@ -381,14 +331,14 @@ export default function VettedList({
           <option value="any">Any bet</option>
           {GROUP_ORDER.map((group) => (
             <optgroup key={group} label={GROUP_LABEL[group]}>
-              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({countsReady ? (typeCounts.groups.get(group)?.size ?? 0) : '…'})</option>
+              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({countsReady ? (counts.groups.get(group)?.size ?? 0) : '…'})</option>
               {(marketGroups.get(group) ?? []).map((market) => (
-                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({countsReady ? (typeCounts.markets.get(market.id)?.size ?? 0) : '…'})</option>
+                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({countsReady ? (counts.markets.get(market.id)?.size ?? 0) : '…'})</option>
               ))}
             </optgroup>
           ))}
         </select>
-        <select value={minOdds} onChange={(event) => { minParamRef.current = true; setMinOdds(event.target.value); }} aria-label="Minimum fair odds" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
+        <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="any">Any odds</option>
           <option value="1.40">Min fair odds 1.40</option>
           <option value="1.70">Min fair odds 1.70</option>
@@ -397,20 +347,9 @@ export default function VettedList({
         </select>
       </div>
 
-      <div className="flex flex-wrap items-center gap-1">
-        {!isAny ? (
-          <>
-            <span className="text-xs text-muted-foreground">Mode</span>
-            <button type="button" onClick={() => setMode('ranked')} className={cn('rounded-full border px-2.5 py-1 text-xs', mode !== 'strict' ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>Ranked — all candidates</button>
-            <button type="button" onClick={() => setMode('strict')} className={cn('rounded-full border px-2.5 py-1 text-xs', mode === 'strict' ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>Strict checks only</button>
-          </>
-        ) : null}
-        <span className="ml-auto text-xs text-muted-foreground">Counts follow the current league, mode and minimum odds.</span>
-      </div>
       <p className="text-xs text-muted-foreground">
-        Any bet defaults to minimum fair 1.70. Group and single-market views default to any odds; a
-        numeric minimum still applies when selected. Ranked mode is a probability ranking; strict checks
-        are optional and are not proof of profit.
+        One unified list: calibrated probability ≥ 58%, after the league, market and visible minimum-fair
+        filters. Counts follow exactly the same filters. Lower-probability analysis remains in Explore.
       </p>
 
       {!dataReady ? (
@@ -424,14 +363,8 @@ export default function VettedList({
       ) : (
         <>
           <p className="text-sm text-muted-foreground">
-            {isAny
-              ? `${displayed.length} best ${displayed.length === 1 ? 'bet' : 'bets'} this round · ${betLabel} · ${leagueLabel} · ${minFair === 0 ? 'any odds' : `fair ≥ ${minFair.toFixed(2)}`}`
-              : `${displayed.length} candidates this round · ${betLabel} · ${leagueLabel} · ${isStrict ? 'Strict checks only' : 'Ranked — all candidates'} · ${minFair === 0 ? 'any odds' : `fair ≥ ${minFair.toFixed(2)}`} · sorted by probability`}
+            {displayed.length} {displayed.length === 1 ? 'candidate' : 'candidates'} · {betLabel} · {leagueLabel} · probability ≥ 58% · {minFair === 0 ? 'any odds' : `fair ≥ ${minFair.toFixed(2)}`} · sorted by probability
             {activeKind === 'example' ? ' · Example round' : ''}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Strong = probability ≥ 55%; Possible otherwise. Strong is a probability label, not a value
-            or profit label.
           </p>
           <p className="text-sm">
             {settledPicks.length > 0 ? (
@@ -445,54 +378,22 @@ export default function VettedList({
           {displayed.length === 0 ? (
             <div className="space-y-2">
               <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
-                {baseFiltered.length === 0
-                  ? `No ${betLabel} candidates for ${leagueLabel} in this round.`
-                  : eligible.length === 0
-                    ? minFair === 0
-                      ? `No ${betLabel} candidates for ${leagueLabel} in this round.`
-                      : bet.startsWith('group:')
-                        ? `${baseCount} matches have ${betLabel} candidates, but none reach fair odds ≥ ${minFair.toFixed(2)}.`
-                        : bet.startsWith('market:')
-                          ? `${baseCount} fixtures have ${betLabel}, but none reach fair odds ≥ ${minFair.toFixed(2)}.`
-                          : `${baseCount} candidates do not reach fair odds ≥ ${minFair.toFixed(2)}.`
-                    : isAny
-                      ? `0 of ${eligible.length} candidates passed the Any-bet rule.`
-                      : isStrict
-                        ? `0 of ${eligible.length} candidates passed the strict checks.`
-                        : 'No candidates to display.'}
+                No candidates meet the visible filters and 58% threshold.
+                {minFair > 0 && baseFiltered.length > 0 ? ` ${baseCount} candidates exist before the minimum fair-odds filter.` : ''}
+                {' '}Lower-probability analysis remains available in Explore.
               </p>
               {eligible.length === 0 && baseFiltered.length > 0 && minFair > 0 ? (
-                <button type="button" onClick={() => { minParamRef.current = true; setMinOdds('any'); }} className="rounded-md border px-2.5 py-1 text-xs">Show all odds</button>
-              ) : null}
-              {!isAny && isStrict && eligible.length > 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Ranked has {rankedDisplayed.length} {rankedDisplayed.length === 1 ? 'candidate' : 'candidates'} at these filters.{' '}
-                  <button type="button" onClick={() => setMode('ranked')} className="underline underline-offset-2">Show ranked candidates</button>
-                </p>
-              ) : null}
-              {failedCandidates.length > 0 ? (
-                <div className="space-y-1">
-                  <h3 className="text-sm font-semibold">Highest-probability candidates that failed</h3>
-                  <ul className="space-y-1 text-sm text-muted-foreground">
-                    {failedCandidates.map(({ item, failed }) => (
-                      <li key={`${item.row.d}|${item.row.h}|${item.row.a}|${item.row.m}`} className="rounded-md border px-2 py-1">
-                        <span className="font-medium text-foreground">{item.row.h} v {item.row.a}</span> · {markets[item.row.m]?.plain ?? item.row.m} · {pct(item.candidate.probability)}
-                        {' — '}{failed.map((check) => `${check.label}: ${check.value}`).join('; ')}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                <button type="button" onClick={() => setMinOdds('any')} className="rounded-md border px-2.5 py-1 text-xs">Show all odds</button>
               ) : null}
             </div>
           ) : (
             <ul className="space-y-2">
               {displayed.map((item) => {
-                const { row, price, candidate, checks } = item;
+                const { row, price, candidate } = item;
                 const meta = markets[row.m];
                 const key = `${row.h}|${row.a}|${row.m}`;
                 const open = expanded === key;
                 const checked = ticket.some((leg) => legKey(leg) === key);
-                const strong = candidate.probability >= 0.55;
                 const groupKey = bet.startsWith('group:') ? bet.slice(6) : null;
                 const matchOptions = groupKey
                   ? activeEvaluated
@@ -501,7 +402,7 @@ export default function VettedList({
                         && (markets[option.row.m]?.group ?? '') === groupKey
                         && !isHiddenMarketId(option.row.m)
                         && option.candidate.fairOdds >= minFair
-                        && (!isStrict || option.passed),
+                        && option.candidate.probability >= BEST_BETS_MIN_PC,
                       )
                       .sort((a, b) => b.candidate.probability - a.candidate.probability)
                   : [];
@@ -514,8 +415,6 @@ export default function VettedList({
                           <span className="text-muted-foreground">{row.k ?? ''}</span>
                           <span className="font-semibold">{row.h} <span className="text-muted-foreground">v</span> {row.a}</span>
                           <span className="text-xs text-muted-foreground">{leagueNames[row.d] ?? row.d}</span>
-                          <Badge variant="secondary">{strong ? 'Strong' : 'Possible'}</Badge>
-                          {isValue(item) ? <Badge variant="value">Value</Badge> : null}
                         </div>
                         <div className="mt-1 text-sm">
                           {meta?.plain ?? row.m} <span className="text-xs text-muted-foreground">({meta?.mozzart ?? ''})</span>
@@ -524,8 +423,6 @@ export default function VettedList({
                       <div className="tabular text-right text-sm">
                         <div className="text-base font-semibold">{pct(candidate.probability)}</div>
                         <div className="text-xs text-muted-foreground">fair {candidate.fairOdds.toFixed(2)}</div>
-                        {!isAny ? <div className="text-xs text-muted-foreground">lift {item.lift.toFixed(2)}× usual</div> : null}
-                        <div className="text-xs text-muted-foreground">Play only at odds ≥ {item.minPlay.toFixed(2)}</div>
                       </div>
                     </div>
 
@@ -549,18 +446,10 @@ export default function VettedList({
                         <p>League usual {pct(row.lr)} (n={row.ln}) · lift {item.lift.toFixed(2)}× usual</p>
                         <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)}</p>
                         <p>Model {pct(row.p)} · team empirical {pct(candidate.countsProbability ?? 0)} · agreement difference {pct(Math.abs(row.p - (candidate.countsProbability ?? 0)))}</p>
-                        <p>Fair odds {candidate.fairOdds.toFixed(2)} · play only at odds ≥ {item.minPlay.toFixed(2)} · needs {(10 / item.minPlay).toFixed(1)} in 10 at that price; our chance {pct(candidate.probability)}</p>
-                        <div>
-                          <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">{isAny ? 'Any-bet checks' : 'Strict checks'}</h4>
-                          <ul className="space-y-0.5">
-                            {checks.filter((check) => !check.flag).map((check) => (
-                              <li key={check.id}>{check.label}: {check.passed ? 'Pass' : 'Does not pass'} — {check.value}</li>
-                            ))}
-                          </ul>
-                        </div>
+                        <p>Fair odds {candidate.fairOdds.toFixed(2)}</p>
                         {groupKey && matchOptions.length > 0 ? (
                           <div>
-                            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">{isStrict ? 'Strict-passing' : 'All'} {GROUP_LABEL[groupKey]} options for this match</h4>
+                            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">All qualifying {GROUP_LABEL[groupKey]} options for this match</h4>
                             <p className="text-xs font-medium text-foreground">
                               Highest-probability {groupKey} option for this match: {markets[matchOptions[0].row.m]?.plain ?? matchOptions[0].row.m} · {pct(matchOptions[0].candidate.probability)}
                             </p>
@@ -571,7 +460,7 @@ export default function VettedList({
                                   {matchOptions.slice(1).map((option) => (
                                     <li key={option.row.m} className="flex justify-between gap-2">
                                       <span>{markets[option.row.m]?.plain ?? option.row.m}</span>
-                                      <span className="tabular">{pct(option.candidate.probability)} · fair {option.candidate.fairOdds.toFixed(2)} · {option.candidate.probability >= 0.55 ? 'Strong' : 'Possible'}</span>
+                                      <span className="tabular">{pct(option.candidate.probability)} · fair {option.candidate.fairOdds.toFixed(2)}</span>
                                     </li>
                                   ))}
                                 </ul>
@@ -602,14 +491,9 @@ export default function VettedList({
       )}
 
       <section className="space-y-2">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-semibold">Target tickets</h2>
-          <button type="button" onClick={() => setValueOnly(!valueOnly)} className={cn('rounded-full border px-2.5 py-1 text-xs', valueOnly ? 'border-primary bg-primary text-primary-foreground' : 'text-muted-foreground')}>
-            Value legs only
-          </button>
-        </div>
+        <h2 className="text-lg font-semibold">Target tickets</h2>
         <p className="text-sm text-muted-foreground">
-          Built only from passing picks, one leg per match{valueOnly ? ' that is a Value bet' : ''}.
+          Built only from the displayed 58%+ candidates, one leg per match.
         </p>
         {targetTickets.some((entry) => entry.ticket) ? (
           <ul className="grid gap-2 sm:grid-cols-3">
@@ -621,7 +505,7 @@ export default function VettedList({
                     <ul className="mt-1 space-y-0.5 text-xs text-muted-foreground">
                       {suggestion.legs.map((leg) => <li key={legKey(leg)} className="truncate">{leg.h} v {leg.a} · {leg.label} · {pct(leg.pc)}</li>)}
                     </ul>
-                    <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)} · min play {(combinedMinPlay(suggestion.legs) ?? 0).toFixed(2)}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}</div>
                     <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">Add to my ticket</button>
                   </>
                 ) : <p className="text-xs text-muted-foreground">No passing ticket reaches {target.toFixed(2)}.</p>}
@@ -630,7 +514,7 @@ export default function VettedList({
           </ul>
         ) : (
           <p className="rounded-xl border border-dashed px-4 py-4 text-sm text-muted-foreground">
-            {valueOnly ? 'No target ticket from Value legs this round.' : 'No target ticket reaches these targets.'}
+            No target ticket reaches these targets.
           </p>
         )}
       </section>
@@ -665,9 +549,7 @@ export default function VettedList({
                   </label>
                   <div>Combined %<div className="tabular font-medium">{pct(ticketProbability)}</div></div>
                   <div>Fair odds<div className="tabular font-medium">{ticketFair.toFixed(2)}</div></div>
-                  <div>Min play<div className="tabular font-medium">{ticketMinPlay === null ? '–' : ticketMinPlay.toFixed(2)}</div></div>
                   <div>Mozzart<div className="tabular font-medium">{ticketMozzart === null ? 'incomplete' : ticketMozzart.toFixed(2)}</div></div>
-                  <div>Ticket vs fair<div className="tabular font-medium">{ticketValue === null ? '–' : signedPct(ticketValue * 100)}</div></div>
                   <div>Payout<div className="tabular font-medium">{ticketPayout === null ? '–' : ticketPayout.toFixed(2)}</div></div>
                   <button type="button" onClick={saveCurrent} className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground">Save ticket</button>
                 </div>

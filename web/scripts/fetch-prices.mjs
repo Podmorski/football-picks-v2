@@ -8,9 +8,10 @@ const PRICES_OUT = join(DATA, 'mozzart-prices.json');
 const RECORD_OUT = join(DATA, 'mozzart-record.json');
 const VETTED_OUT = join(DATA, 'mozzart-vetted-record.json');
 const STATUS_OUT = join(DATA, 'mozzart-status.json');
+const PROPOSALS_OUT = join(DATA, 'proposed-tickets-private.json');
 
 function clean() {
-  for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT, STATUS_OUT]) {
+  for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT, STATUS_OUT, PROPOSALS_OUT]) {
     try {
       if (existsSync(path)) rmSync(path);
     } catch {
@@ -60,6 +61,14 @@ try {
     : [];
   mkdirSync(DATA, { recursive: true });
   writeFileSync(PRICES_OUT, JSON.stringify({ rounds }));
+  const proposalsDir = join(cloneDir, 'proposals');
+  const proposals = existsSync(proposalsDir)
+    ? readdirSync(proposalsDir)
+        .filter((name) => name.endsWith('.json'))
+        .sort()
+        .map((name) => JSON.parse(readFileSync(join(proposalsDir, name), 'utf8')))
+    : [];
+  writeFileSync(PROPOSALS_OUT, JSON.stringify({ rounds: proposals }));
   const recordPath = join(cloneDir, 'record.json');
   if (existsSync(recordPath)) writeFileSync(RECORD_OUT, readFileSync(recordPath));
   const vettedPath = join(cloneDir, 'vetted-record.json');
@@ -97,7 +106,7 @@ try {
       last_run: usage?.last_run ?? inferredRun,
     }),
   );
-  console.log('prices: embedded ' + rounds.length + ' round snapshot(s)');
+  console.log('prices: embedded ' + rounds.length + ' round snapshot(s) and ' + proposals.length + ' proposal round(s)');
 } catch (error) {
   clean();
   // A priced build must never fall back to an unpriced one: throw so Vercel

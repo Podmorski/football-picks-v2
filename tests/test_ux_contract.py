@@ -10,7 +10,7 @@ def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
 
-def test_best_bets_distinguishes_loading_failure_and_empty_verdicts() -> None:
+def test_best_bets_distinguishes_loading_failure_and_unified_empty_state() -> None:
     source = read("web/components/VettedList.tsx")
     for needle in (
         "roundState", "marketsState", "pricesState",
@@ -20,44 +20,36 @@ def test_best_bets_distinguishes_loading_failure_and_empty_verdicts() -> None:
         "Mozzart prices could not be loaded.",
         "Mozzart prices are not embedded in this build.",
         "No Mozzart snapshot for this round.",
-        "reach fair odds ≥",
-        "0 of ${eligible.length} candidates passed",
-        "Highest-probability candidates that failed",
-        "Strong = probability ≥ 55%",
+        "BEST_BETS_MIN_PC = 0.58",
+        "candidate.probability >= BEST_BETS_MIN_PC",
+        "No candidates meet the visible filters and 58% threshold.",
         "activeMeta", "activeKind", "roundMeta",
-        "Any odds", "Ranked — all candidates", "Strict checks only",
-        "Show all odds", "Show ranked candidates",
-        "selectByMatch(eligible)",
-        "mode === 'strict' && !item.passed",
-        "Highest-probability {groupKey} option for this match",
+        "Any odds", "Show all odds",
+        "selectByMatch(qualified)",
+        "All qualifying {GROUP_LABEL[groupKey]} options for this match",
         "Lower-probability alternatives",
-        "Does not pass",
     ):
         assert needle in source, needle
-    assert "Closest candidates" not in source
-    assert "top third" not in source
-    assert "strongLimit" not in source
-    assert "kind === 'example'" not in source
+    for removed in ("Ranked — all candidates", "Strict checks only", "Strong = probability", "<Badge variant=\"value\">Value", "Play only at odds"):
+        assert removed not in source, removed
 
 
-def test_ranked_group_and_single_market_selection() -> None:
+def test_best_bets_group_and_single_market_selection() -> None:
     source = read("web/components/VettedList.tsx")
-    assert "const rankedDisplayed = useMemo" in source
-    assert "selectByMatch(eligible)" in source
-    assert "return [...eligible].sort((a, b) => b.candidate.probability - a.candidate.probability);" in source
-    assert "const displayed = isAny || isStrict ? strictPassing : rankedDisplayed;" in source
+    assert "const displayed = useMemo" in source
+    assert "selectByMatch(qualified)" in source
+    assert "return [...qualified].sort((a, b) => b.candidate.probability - a.candidate.probability);" in source
     vetted = read("web/lib/vetted.ts")
     assert "export function selectByMatch" in vetted
     assert "item.candidate.probability > current.candidate.probability" in vetted
 
 
-def test_ranked_includes_failing_htft_while_strict_still_excludes() -> None:
+def test_58_threshold_gates_not_legacy_rules() -> None:
     source = read("web/components/VettedList.tsx")
-    # Ranked group options are not gated by TYPE_RULE; strict options still are.
-    assert "!isStrict || option.passed" in source
-    assert "selectByMatch(eligible)" in source
-    strict = read("web/lib/vetted.ts")
-    assert "if (!item.passed) continue;" in strict
+    assert "qualified" in source and ">= BEST_BETS_MIN_PC" in source
+    assert "!isStrict || option.passed" not in source
+    assert "selectType(" not in source
+    assert "selectPassing(" not in source
 
     from pipeline.vetting import Candidate, type_evaluate
 
@@ -74,34 +66,33 @@ def test_ranked_includes_failing_htft_while_strict_still_excludes() -> None:
     assert by_id["t6"] is False
 
 
-def test_match_details_expose_all_options() -> None:
+def test_match_details_expose_all_qualifying_options() -> None:
     source = read("web/components/VettedList.tsx")
     assert "const matchOptions = groupKey" in source
     assert "option.row.d === row.d && option.row.h === row.h && option.row.a === row.a" in source
     assert "Highest-probability {groupKey} option for this match" in source
     assert "Lower-probability alternatives" in source
-    assert "option.candidate.probability >= 0.55 ? 'Strong' : 'Possible'" in source
+    assert "option.candidate.probability >= BEST_BETS_MIN_PC" in source
 
 
-def test_any_odds_and_counts_follow_mode() -> None:
+def test_any_odds_default_and_counts_follow_58_contract() -> None:
     source = read("web/components/VettedList.tsx")
     assert '<option value="any">Any odds</option>' in source
     assert "minOdds === 'any' ? 0" in source
-    assert "minParamRef" in source
+    assert "useParam('min', 'any')" in source
     assert "Show all odds" in source
-    assert "Counts follow the current league, mode and minimum odds." in source
-    assert "mode === 'strict' && !item.passed" in source
-    assert "Show ranked candidates" in source
+    assert "Counts follow exactly the same filters." in source
+    assert "counts.groups.get(group)?.size" in source
+    assert "counts.markets.get(market.id)?.size" in source
 
 
-def test_strong_is_absolute_in_every_view() -> None:
+def test_no_strong_possible_or_value_strength_labels() -> None:
     source = read("web/components/VettedList.tsx")
-    assert "candidate.probability >= 0.55" in source
-    assert "top third" not in source
-    assert "strongLimit" not in source
+    for removed in ("'Strong' : 'Possible'", "Value legs only", "ticketVsFair", "ticketMinPlay", "Play only at odds"):
+        assert removed not in source, removed
     how = read("web/app/how-it-works/page.tsx")
-    assert "at or above 55% in every Best bets view" in how
-    assert "top third" not in how
+    assert "Strong and Possible" not in how
+    assert "Best bets: one 58% list" in how
 
 
 def test_any_rule_and_correct_score_unchanged() -> None:
@@ -162,16 +153,12 @@ def test_report_research_table_labels() -> None:
     source = read("web/app/report/page.tsx")
     normalized = " ".join(source.split())
     for needle in (
-        "STRICT_checks cohort",
-        "not the default Ranked group/market list",
-        "Ranked mode has no established profitability record",
-        "This is the Any-bet record only",
-        "TYPE_RULE research backtest",
-        "TYPE_RULE before the UI minimum-fair filter",
-        "One pick per match by highest probability",
+        "Legacy research · STRICT_checks TYPE_RULE cohort",
+        "not the current Best bets list",
+        "unified inclusive 58% calibrated-probability list",
+        "Best bets results · unified 58% selection",
+        "calibrated probability ≥",
         "not realised Mozzart profit",
-        "Return (fair)",
-        "Footnote: one pick per match, highest probability",
     ):
         assert " ".join(needle.split()) in normalized, needle
     assert "highest lift" not in source
@@ -190,12 +177,11 @@ def test_user_facing_copy_is_current() -> None:
     for needle in (
         "Twenty-two main divisions",
         "Tuesday, Saturday and Sunday",
-        "Ranked and strict",
-        "Strong and Possible",
-        "minimum playable price",
-        "any odds",
+        "Best bets: one 58% list",
+        "Automatic round proposals",
+        "Any odds",
         "Mozzart snapshots and Value",
-        "Value is unproven",
+        "Value bets remain a separate experimental page",
     ):
         assert needle in how, needle
     for stale in ("twelve", "1.54", "40–65", "High/Low", "Tuesday and Saturday"):

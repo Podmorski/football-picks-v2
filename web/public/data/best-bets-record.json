@@ -1,38 +1,22 @@
 {
  "cumulative": {
-  "expected": 14.2992,
-  "landed": 10,
-  "passing": 115,
-  "pending": 89,
-  "possible": {
-   "landed": 4,
-   "settled": 12
-  },
-  "settled": 26,
-  "strong": {
-   "landed": 6,
-   "settled": 14
-  }
+  "expected": 42.4484,
+  "landed": 45,
+  "passing": 214,
+  "pending": 169,
+  "settled": 45
  },
- "min_fair": 1.7,
+ "min_pc": 0.58,
  "rounds": [
   {
    "date": "2026-11-14",
-   "expected": 14.2992,
+   "expected": 42.4484,
    "kind": "example",
    "label": "Saturday 14 Nov",
-   "landed": 10,
-   "passing": 26,
-   "pending": 0,
-   "possible": {
-    "landed": 4,
-    "settled": 12
-   },
-   "settled": 26,
-   "strong": {
-    "landed": 6,
-    "settled": 14
-   }
+   "landed": 45,
+   "passing": 48,
+   "pending": 3,
+   "settled": 45
   },
   {
    "date": "2026-11-21",
@@ -40,17 +24,9 @@
    "kind": "round",
    "label": "Saturday 21 Nov",
    "landed": 0,
-   "passing": 70,
-   "pending": 70,
-   "possible": {
-    "landed": 0,
-    "settled": 0
-   },
-   "settled": 0,
-   "strong": {
-    "landed": 0,
-    "settled": 0
-   }
+   "passing": 122,
+   "pending": 122,
+   "settled": 0
   },
   {
    "date": "2026-11-22",
@@ -58,18 +34,9 @@
    "kind": "round",
    "label": "Sunday 22 Nov",
    "landed": 0,
-   "passing": 19,
-   "pending": 19,
-   "possible": {
-    "landed": 0,
-    "settled": 0
-   },
-   "settled": 0,
-   "strong": {
-    "landed": 0,
-    "settled": 0
-   }
+   "passing": 44,
+   "pending": 44,
+   "settled": 0
   }
- ],
- "strong_probability": 0.55
+ ]
 }

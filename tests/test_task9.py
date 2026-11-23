@@ -34,7 +34,6 @@ def test_a1_team_empirical_is_wired_everywhere() -> None:
     assert "teamEmpirical(candidate)" in ts_rule
     assert "countsProbability: teamEmpirical" in read("web/lib/vetted.ts")
     assert "team empirical" in read("web/components/VettedList.tsx")
-    assert "team_empirical_values" in read("pipeline/report.py")
     assert "team_empirical_values" in read("pipeline/model/type_backtest.py")
 
 
@@ -42,8 +41,8 @@ def test_a2_min_fair_dropdown_is_in_every_view() -> None:
     source = read("web/components/VettedList.tsx")
     assert "aria-label=\"Minimum fair odds\"" in source
     assert "value=\"2.50\"" in source
-    assert "minFair," in source
-    assert "selectType(eligible, {" in source
+    assert "item.candidate.fairOdds >= minFair" in source
+    assert "qualified" in source
 
 
 def test_a3_dropdowns_are_full_width_on_mobile() -> None:

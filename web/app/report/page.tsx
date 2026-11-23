@@ -5,7 +5,7 @@ import {
   readTypeBacktest,
   readValueRecord,
 } from '@/lib/data';
-import type { BestBetsRound, BestBetsSplit, MozzartStatusFile, ValueSummaryRow } from '@/lib/types';
+import type { BestBetsRound, MozzartStatusFile, ValueSummaryRow } from '@/lib/types';
 
 function pct(value: number | null): string {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
@@ -74,9 +74,6 @@ function ProfitChart({ points }: { points: { date: string; profit: number }[] })
   );
 }
 
-function split(split: BestBetsSplit): string {
-  return `${split.landed} / ${split.settled}`;
-}
 
 function utcStamp(value: string | null): string {
   if (!value) return '–';
@@ -169,13 +166,12 @@ export default function ReportPage() {
       </header>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">STRICT_checks cohort · TYPE_RULE research backtest · per group</h2>
+        <h2 className="text-lg font-semibold">Legacy research · STRICT_checks TYPE_RULE cohort · per group</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          This is the existing TYPE_RULE research cohort, not the default Ranked group/market list. It
-          applies TYPE_RULE before the UI minimum-fair filter. One pick per match by highest probability,
-          sorted by probability; selection is by probability, not lift. Returns are at fair odds, not
-          realised Mozzart profit. Ranked mode has no established profitability record; this table does
-          not measure it. The interval is a 95% CI bootstrapped over round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
+          Legacy research only. This is not the current Best bets list, which is the unified inclusive
+          58% calibrated-probability list. It applies TYPE_RULE before the UI minimum-fair filter and
+          returns at fair odds, not realised Mozzart profit. The interval is a 95% CI bootstrapped over
+          round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -219,12 +215,11 @@ export default function ReportPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Best bets results · Any bet</h2>
+        <h2 className="text-lg font-semibold">Best bets results · unified 58% selection</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          This is the Any-bet record only. It does not measure the Ranked group/market mode. Passing picks
-          under {bestBets ? `fair ≥ ${bestBets.min_fair.toFixed(2)}` : 'the Any-bet rule'}, one per match.
-          Expected is the sum of the shown probabilities. Strong is ≥{' '}
-          {bestBets ? pct(bestBets.strong_probability) : '55.0%'}.
+          Current Best bets record: calibrated probability ≥{' '}
+          {bestBets ? pct(bestBets.min_pc) : '58.0%'}, any odds, one pick per match by highest pc.
+          Expected is the sum of the shown probabilities.
         </p>
         {settled.length === 0 ? (
           <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
@@ -240,8 +235,6 @@ export default function ReportPage() {
                   <th className="px-3 py-2 text-right font-semibold">Settled</th>
                   <th className="px-3 py-2 text-right font-semibold">Landed</th>
                   <th className="px-3 py-2 text-right font-semibold">Expected</th>
-                  <th className="px-3 py-2 text-right font-semibold">Strong</th>
-                  <th className="px-3 py-2 text-right font-semibold">Possible</th>
                 </tr>
               </thead>
               <tbody>
@@ -255,8 +248,6 @@ export default function ReportPage() {
                     <td className="tabular px-3 py-1.5 text-right">{round.settled}</td>
                     <td className="tabular px-3 py-1.5 text-right">{round.landed} of {round.settled}</td>
                     <td className="tabular px-3 py-1.5 text-right">{round.expected.toFixed(1)}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{split(round.strong)}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{split(round.possible)}</td>
                   </tr>
                 ))}
                 {bestBets ? (
@@ -266,8 +257,6 @@ export default function ReportPage() {
                     <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.settled}</td>
                     <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.landed} of {bestBets.cumulative.settled}</td>
                     <td className="tabular px-3 py-1.5 text-right">{bestBets.cumulative.expected.toFixed(1)}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{split(bestBets.cumulative.strong)}</td>
-                    <td className="tabular px-3 py-1.5 text-right">{split(bestBets.cumulative.possible)}</td>
                   </tr>
                 ) : null}
               </tbody>

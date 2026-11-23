@@ -1,0 +1,76 @@
+{
+ "adaptive": {
+  "bankroll": 1000.0,
+  "current_drawdown": 0.0,
+  "initial_bankroll": 1000.0,
+  "maximum_drawdown": 0.0,
+  "net": 0.0,
+  "peak": 1000.0,
+  "returned": 0.0,
+  "roi": null,
+  "series": [],
+  "staked": 0.0
+ },
+ "counts": {
+  "pending": 0,
+  "rounds": 0,
+  "settled": 0,
+  "tickets": 0,
+  "unavailable": 0,
+  "unpriced": 0,
+  "void": 0
+ },
+ "flat": {
+  "ci_rounds": 0,
+  "net": 0.0,
+  "return_ci": [
+   null,
+   null
+  ],
+  "returned": 0.0,
+  "roi": null,
+  "staked": 0.0
+ },
+ "note": "Paper ledger. Flat stakes are fixed allocations; adaptive is quarter-Kelly with caps and drawdown controls. Not a profit guarantee.",
+ "policy_version": "adaptive-quarter-kelly-v1",
+ "rounds": [],
+ "schema_version": 1,
+ "types": {
+  "around3": {
+   "adaptive_returned": 0.0,
+   "adaptive_staked": 0.0,
+   "flat_returned": 0.0,
+   "flat_staked": 0.0,
+   "landed": 0,
+   "lost": 0,
+   "pending": 0,
+   "settled": 0,
+   "tickets": 0,
+   "void": 0
+  },
+  "around5": {
+   "adaptive_returned": 0.0,
+   "adaptive_staked": 0.0,
+   "flat_returned": 0.0,
+   "flat_staked": 0.0,
+   "landed": 0,
+   "lost": 0,
+   "pending": 0,
+   "settled": 0,
+   "tickets": 0,
+   "void": 0
+  },
+  "best2": {
+   "adaptive_returned": 0.0,
+   "adaptive_staked": 0.0,
+   "flat_returned": 0.0,
+   "flat_staked": 0.0,
+   "landed": 0,
+   "lost": 0,
+   "pending": 0,
+   "settled": 0,
+   "tickets": 0,
+   "void": 0
+  }
+ }
+}

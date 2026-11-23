@@ -87,6 +87,9 @@ jobs:
       - name: Build value record
         run: python -m pipeline.mozzart.value_record --prices-dir prices-private --web-dir web/public/data
 
+      - name: Settle proposals and rebuild public aggregate
+        run: python -m pipeline.proposed_tickets aggregate --prices-dir prices-private --picks-dir picks --web-dir web/public/data
+
       - name: Commit changed data
         id: commit
         run: |

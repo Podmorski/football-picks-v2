@@ -134,8 +134,6 @@ export type TypeBacktestFile = {
   note?: string;
 };
 
-export type BestBetsSplit = { settled: number; landed: number };
-
 export type BestBetsRound = {
   date: string;
   label: string;
@@ -145,13 +143,10 @@ export type BestBetsRound = {
   landed: number;
   pending: number;
   expected: number;
-  strong: BestBetsSplit;
-  possible: BestBetsSplit;
 };
 
 export type BestBetsRecordFile = {
-  min_fair: number;
-  strong_probability: number;
+  min_pc: number;
   rounds: BestBetsRound[];
   cumulative: Omit<BestBetsRound, 'date' | 'label' | 'kind'>;
 };
@@ -481,6 +476,87 @@ export type DescriptiveFile = {
   note: string;
   definitions: Record<string, unknown>;
   fixtures: DescriptiveFixture[];
+};
+
+export type ProposedLeg = {
+  d: string;
+  h: string;
+  a: string;
+  k: string | null;
+  m: string;
+  pc: number;
+  fair: number;
+  odds: number;
+};
+
+export type ProposedTicket = {
+  type: 'best2' | 'around3' | 'around5';
+  label: string;
+  status: 'available' | 'unavailable';
+  reason: string;
+  flat_stake: number;
+  legs: ProposedLeg[];
+  combined_probability: number | null;
+  combined_odds: number | null;
+  adaptive: {
+    stake: number;
+    edge: number | null;
+    kelly_full: number | null;
+    kelly_quarter: number | null;
+    cap_applied: boolean;
+    reason: string;
+  };
+};
+
+export type ProposalRound = {
+  schema_version: number;
+  round_date: string;
+  snapshot_identity: { round_date: string | null; fetched_at: string | null };
+  policy: Record<string, unknown>;
+  state_before: Record<string, number>;
+  proposals: ProposedTicket[];
+};
+
+export type PrivateProposalsFile = { rounds: ProposalRound[] };
+
+export type ProposalRoundRecord = {
+  round_date: string;
+  available: number;
+  unavailable: number;
+  pending: number;
+  void: number;
+  settled: number;
+  flat_staked: number;
+  flat_returned: number;
+  flat_net: number;
+  adaptive_staked: number;
+  adaptive_returned: number;
+  adaptive_net: number;
+};
+
+export type ProposalLedger = {
+  staked: number;
+  returned: number;
+  net: number;
+  roi: number | null;
+};
+
+export type ProposalRecordFile = {
+  schema_version: number;
+  policy_version: string;
+  rounds: ProposalRoundRecord[];
+  counts: {
+    rounds: number; tickets: number; settled: number; pending: number;
+    void: number; unavailable: number; unpriced: number;
+  };
+  flat: ProposalLedger & { return_ci: [number | null, number | null]; ci_rounds: number };
+  adaptive: ProposalLedger & {
+    initial_bankroll: number; bankroll: number; peak: number;
+    current_drawdown: number; maximum_drawdown: number;
+    series: { round_date: string; bankroll: number }[];
+  };
+  types: Record<string, Record<string, number>>;
+  note: string;
 };
 
 export type LeagueFile = {

@@ -81,22 +81,17 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
    settled by `run_model.py`; future rounds carry every market. The already-published 21/22 Nov
    rounds are never edited; their all-market companions are `picks/<date>.full.json`, verified on the
    model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
-6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Best bets = the live
-   list: Any bet uses ANY_RULE; a group or single market uses Ranked — all candidates by default, or
-   optional Strict checks only (TYPE_RULE exactly). Round, League, Bet (Any / group / market), minimum
-   fair odds: Any bet defaults to 1.70; group and single-market views default to Any odds when the URL
-   has no explicit min; 1.40/1.70/2.00/2.50 remain available. Ranked group = one candidate per match
-   by highest displayed probability; a single market = every eligible fixture; both sorted by
-   probability. Strict = TYPE_RULE one pick per match. Strong = probability >= 55% in every Best bets
-   view; Possible otherwise. Cards show probability, fair, min play (`ceil_2dp(1.05/p)`),
-   Strong/Possible and a Value badge; the Mozzart price appears only in the opened details. Counts
-   follow the current league, mode and minimum odds; zero states distinguish no candidates, min-odds
-   filtering (with Show all odds) and strict zero (with Show ranked candidates and the
-   highest-probability failed checks). Opened group details list all Ranked (or strict-passing) group
-   options for the match, with neutral diagnostics and Pass / Does not pass. Correct score is hidden.
-   Tickets and Value are unchanged. Top nav is Best bets | Value bets | Explore | Report; Record/Report
-   cover calibration, combos, Mozzart returns and value tracking; Report's TYPE_RULE table is the
-   STRICT_checks cohort, not Ranked.
+6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Best bets is ONE unified
+   list for Any bet, group and single market: league/market filter, visible minimum-fair filter,
+   correct-score exclusion, inclusive `pc = row.pc ?? row.p >= 0.58`, then one highest-pc candidate per
+   match for Any/group or every eligible fixture for one market, sorted by pc. Any odds is the default
+   in every Best-bets view; explicit 1.40/1.70/2.00/2.50 selections survive. ANY_RULE, TYPE_RULE,
+   Ranked/Strict, Strong/Possible, Value badges, minimum-play text and Value-only ticket controls are
+   not Best-bets gates or labels. Dropdown counts use the same 58% contract. Opened details retain
+   neutral diagnostics and `MatchStats`; correct score stays hidden. Explore keeps its older picker,
+   and Value remains a separate experimental page. `/tickets` shows frozen automatic proposals first
+   and browser-saved tickets second. Top nav is Best bets | Value bets | Explore | Report; Report labels
+   TYPE_RULE as legacy research and the current Best-bets record as the 58% cohort.
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -186,7 +181,8 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 - Task 8 (21 Nov): Correct score is hidden from the Best bets and Explore UI (dropdowns, lists,
   match views, tickets) but stays in `markets.py` / `markets.json` and Record history.
   `web/lib/vetted.ts` exposes `isHiddenMarketId` (prefix `CORRECT_SCORE:`) and both pickers filter it.
-- Two rules: `ANY_RULE` (alias of `DEFAULT_RULE`, used when Bet = Any bet) and `TYPE_RULE` (used when
+- Two historical rules remain defined for research/Value/legacy code: `ANY_RULE` (alias of
+  `DEFAULT_RULE`) and `TYPE_RULE` (used when
   a group or one market is chosen). TYPE_RULE has no probability floor and no minimum odds: lift
   `p >= usual x 1.25` and `p >= usual + 3 pts`; home-at-home and away-at-away records each >= usual
   with n >= 8; `|model - empirical| <= max(5 pts, 0.25 x p)` where empirical is the team-based count
@@ -206,9 +202,9 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   `web/public/data/type_backtest.json` (walk-forward goals model and empirical rates before every round,
   calibration from `picker.json` season factors, seasons 2019-20..2025-26, one pick per match per group
   by highest probability, return at fair odds, 95% CI over round dates, 2000 resamples, seed 20261025);
-  (b) Best bets ANY_RULE results per settled round and cumulative from
-  `web/public/data/best-bets-record.json`, rebuilt by `pipeline/report.py` after every `run_model` pass
-  (including the Monday settle): passing, settled, landed, expected and the Strong/Possible split;
+  (b) current Best bets 58% Any-bet results per settled round and cumulative from
+  `web/public/data/best-bets-record.json`, rebuilt by `pipeline/report.py` after every `run_model` pass:
+  passing, settled, landed, pending and expected; legacy TYPE_RULE/ANY_RULE cohorts are research only;
   (c) Record at Mozzart prices (cumulative aggregates from `mozzart-vetted-record.json`) and price
   status (per-round priced/matched/unmatched, monthly requests vs 90, last price run) from
   `mozzart-status.json`, both embedded only in the priced build; (d) a Last updated time; (e) Value
@@ -375,6 +371,31 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   calibration, prices, workflows and existing backtests are unchanged. Regenerate with
   `/home/nikola/.venvs/picks-v2/bin/python -m pipeline.model.additional_market_backtest` from the repo
   root. Activation still requires current-catalogue confirmation and owner review.
+- Task 18 (23 Nov): Phase A fresh trusted download still found no 21/22 Nov results; latest source dates
+  reached 18-20 Nov only. Both rounds remain SOURCE PENDING (40,792 + 14,642 main+companion rows), 0
+  landed/lost/void. Scheduled Sun/Mon settle runs fired and completed settlement, private checkout,
+  Value record, data commit and deploy; the cause is football-data absence, not matching or CI.
+  Best bets now follows the unified inclusive 58% contract above. Report's Best-bets record is rebuilt
+  from the exact 58% Any-bet selection; TYPE_RULE remains legacy research only. Automatic tickets live
+  in the private store at `proposals/YYYY-MM-DD.json`, frozen once from the first usable snapshot
+  identity (`round_date` + `fetched_at`) and never regenerated. They use production markets only,
+  `pc >= 0.58`, one highest-pc priced leg per match, no correct score, and no started fixtures. The three
+  proposals are 2 best games, Around 3.00 (2.70-3.30) and Around 5.00 (4.50-5.50), each 2-5 legs except
+  best-2 exactly two; band failures use closest actual odds without threshold relaxation or filler.
+  Combined probability is the pc product (model estimate); actual odds are the product of frozen prices.
+  Flat allocation is 50/30/20 units; unavailable allocations remain unbet. Adaptive policy v1 is
+  quarter Kelly, 1% ticket cap, 2% round cap, half stakes at >=10% drawdown, zero at >=20% until a new
+  bankroll high, with previous unresolved exposure reserved. Stakes/policy/state are frozen with each
+  proposal. Paper settlement uses round-file leg outcomes: any lost leg loses, pending waits for every
+  terminal leg, void legs are 1.00, all-void returns stake. Public aggregate is
+  `web/public/data/proposed-tickets-record.json` and contains no actual prices; private proposals are
+  preloaded only into priced builds as gitignored `proposed-tickets-private.json`. Public and unpriced
+  builds show an explicit unpriced state. The price CLI calls `ensure_proposals` after an existing/first
+  snapshot with no extra requests; update.yml rebuilds the aggregate. No proposal history is backfilled.
+  No Task-17 candidate is active. Full validation: 325 pytest tests passing; `npm run build` green
+  (50 pages). Live proposal generation was not exercised because no private checkout was locally
+  available; synthetic lifecycle tests cover it. The next loaded future round date was 24 Nov with zero
+  fixtures, so no future proposal round was yet eligible.
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`
@@ -390,10 +411,10 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   coverage, and HT/FT actual returns are not measurable from current data. Do not select an optimal
   group/check from observed returns or make causal claims from the different cohorts.
 
-- **Rounds await source results**: football-data had no 21 Nov results after the Sun 10:00 refresh;
-  all 40,792 Saturday main+companion rows remain Pending across 122 fixtures (0 landed/lost/void).
-  Sunday's round is not eligible until Monday. Sun 12:00/18:00, Mon 06:00/12:00 and later runs retry
-  automatically; `/rounds` and Best bets show "Results pending" until trusted results arrive.
+- **Rounds await source results**: football-data still had no 21 or 22 Nov results after the Mon 23 Nov
+  fresh download and settle pass; latest source dates are 18-20 Nov. Saturday has 40,792 main+companion
+  rows Pending across 122 fixtures and Sunday 14,642 across 44, all 0 landed/lost/void. Retries continue
+  automatically; "Results pending" is factual. No second result source is active.
 - **Record at Mozzart prices / Value tracking** fill after the 21/22 Nov settle (Mon 12:00) and the
   prices are frozen; 21 Nov is 93/122 priced, 22 Nov pending. The Value record is rebuilt by the next
   `update.yml` pass. **Stage A/B backtest and C9 are cancelled** — do not reintroduce them; there is
