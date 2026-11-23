@@ -549,9 +549,12 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 
 - **Rounds await source results**: 22 Nov is partly settled through the API-Football next-day fallback
   (22 of 44 fixtures; 17 landed / 5 lost / 22 pending on the 58% Best-bets list). 21 Nov remains fully
-  SOURCE PENDING: it is outside the next-day window and football-data has not advanced beyond 16 Nov;
+  SOURCE PENDING: it is outside the next-day window and football-data has not advanced beyond 20 Nov;
   the provider free-plan date gate excludes it, so no request is made. The fallback is active for future
-  Saturday->Sunday, Sunday->Monday and Tuesday->Wednesday rounds. Older out-of-window rounds stay
+  Saturday->Sunday, Sunday->Monday and Tuesday->Wednesday rounds. **Blocker:** the GitHub repository
+  secret list contains `PRICES_DEPLOY_KEY`, `PULSESCORE_API_KEY` and `VERCEL_DEPLOY_HOOK`, but not
+  `API_FOOTBALL_KEY`; CI therefore makes zero fallback requests until the owner adds that secret. The
+  local 22 Nov settlement used the v1 `.env` key and never printed it. Older out-of-window rounds stay
   pending until football-data advances. API-Football licensing documentation returned HTTP 403; the
   licensing review is not claimed complete.
 - **Record at Mozzart prices / Value tracking** fill after the 21/22 Nov settle (Mon 12:00) and the
