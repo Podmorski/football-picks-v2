@@ -48,7 +48,7 @@ def test_top_navigation_has_best_bets_and_explore() -> None:
 
 
 def default_vetted_tally(iso: str) -> tuple[int, int, int]:
-    """Mirror the Best bets Any-bet defaults: pc >= 58%, fair >= 1.20, best per match."""
+    """Legacy /rounds tally: pc >= 58%, fair >= 1.20, best per match."""
     full = ROOT / "picks" / f"{iso}.full.json"
     compact = ROOT / "picks" / f"{iso}.json"
     document = ranking.load(full if full.exists() else compact)
@@ -189,12 +189,17 @@ def test_correct_score_is_hidden_from_the_picker_ui() -> None:
     assert any(market["group"] == "Correct score" for market in markets["markets"])
 
 
-def test_best_bets_uses_the_58_contract_not_type_rule() -> None:
+def test_best_bets_uses_the_daily_best_contract_not_legacy_rules() -> None:
     vetted = (ROOT / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
-    assert "BEST_BETS_MIN_PC" in vetted
-    assert "candidate.probability >= BEST_BETS_MIN_PC" in vetted
+    assert "selectDaily" in vetted
+    assert "selectGroupRows" in vetted
+    assert "selectMarketRows" in vetted
+    assert "BEST_BETS_MIN_PC" not in vetted
     assert "selectType" not in vetted
     assert "selectPassing" not in vetted
     assert "typeCounts" not in vetted
     assert "counts.groups.get(group)?.size" in vetted
     assert "counts.markets.get(market.id)?.size" in vetted
+    daily = (ROOT / "web" / "lib" / "dailyBest.ts").read_text(encoding="utf-8")
+    assert "export const DAILY_LIMIT = 12;" in daily
+    assert "export function selectDaily" in daily

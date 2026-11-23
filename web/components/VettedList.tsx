@@ -16,7 +16,22 @@ import {
 } from '@/lib/prices';
 import { addTicket, combinedFair, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, type TicketLeg } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
-import { evaluateRows, ANY_BET_MIN_FAIR, BEST_BETS_MIN_PC, breakEvenChance, expectedReturn, isHiddenMarketId, pcOf, selectByMatch, type Evaluated } from '@/lib/vetted';
+import {
+  BAND_OPTIONS,
+  DAILY_LIMIT,
+  DEFAULT_BAND,
+  REFINEMENTS,
+  applyRefinement,
+  decodeRankRows,
+  legacyMinToBand,
+  parseBand,
+  parseRefinement,
+  selectDaily,
+  selectGroupRows,
+  selectMarketRows,
+  visibleDailyRows,
+} from '@/lib/dailyBest';
+import { breakEvenChance, evaluateRows, expectedReturn, isHiddenMarketId, pcOf, type Evaluated } from '@/lib/vetted';
 import { minPlay } from '@/lib/vetting';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
@@ -33,7 +48,6 @@ const LADDER_LABELS: Record<string, string> = {
   'GOAL_RANGE_1H:I1+': '1st half 1+', 'GOAL_RANGE_1H:I2+': '1st half 2+', 'BTTS:GG': 'Both teams score',
 };
 const TARGETS = [3, 5, 10];
-const MIN_FAIR_OPTIONS = ['1.20', '1.40', '1.70', '2.00', '2.50'];
 
 function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
@@ -54,19 +68,6 @@ function useParam(key: string, initial: string): [string, (next: string, write?:
   }
   return [value, update];
 }
-function decodeRows(payload: Record<string, unknown>): RankRow[] {
-  const raw = (payload.rows ?? []) as unknown[];
-  if (!raw.length || !Array.isArray(raw[0])) return raw as RankRow[];
-  const fixtures = (payload.fixture_list ?? []) as { d: string; k: string | null; h: string; a: string }[];
-  const fields = (payload.fields ?? []) as string[];
-  return (raw as unknown[][]).map((values) => {
-    const fixture = fixtures[values[0] as number];
-    const row: Record<string, unknown> = { d: fixture.d, k: fixture.k, h: fixture.h, a: fixture.a };
-    fields.forEach((name, index) => { if (index < values.length) row[name] = values[index]; });
-    if (row.pc === undefined) row.pc = row.p;
-    return row as unknown as RankRow;
-  });
-}
 
 const STATUS_VARIANT = { landed: 'success', lost: 'destructive', pending: 'secondary', void: 'outline' } as const;
 function StatusBadge({ status }: { status?: string }) {
@@ -80,7 +81,27 @@ function StatusBadge({ status }: { status?: string }) {
   );
 }
 
-type EvaluatedRow = Evaluated;
+// A dashboard row with flattened identity so the pure Daily-best helpers can
+// rank it without knowing about the evaluation wrapper.
+type PickItem = Evaluated & {
+  d: string;
+  h: string;
+  a: string;
+  m: string;
+  pc: number;
+  odds: number | null;
+  st?: string;
+};
+type PricedItem = PickItem & { odds: number };
+
+function bandLabelOf(band: ReturnType<typeof parseBand>): string {
+  if (band.all) return 'All 1.20+';
+  return band.max === null ? `${band.min.toFixed(2)}+` : `${band.min.toFixed(2)}–${band.max.toFixed(2)}`;
+}
+
+function identityOf(item: { d: string; h: string; a: string; m: string }): string {
+  return `${item.d}|${item.h}|${item.a}|${item.m}`;
+}
 
 export default function VettedList({
   date, kind, leagueOptions, roundOptions = [], roundMeta = {},
@@ -96,7 +117,10 @@ export default function VettedList({
   const [pricesState, setPricesState] = useState<'loading' | 'ready' | 'unpriced' | 'error'>('loading');
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
-  const [minOddsParam, setMinOddsParam] = useParam('min', '');
+  const [bandParam, setBandParam] = useParam('band', '');
+  const [minParam, setMinParam] = useParam('min', '');
+  const [refineParam, setRefineParam] = useParam('refine', '');
+  const [showParam, setShowParam] = useParam('show', '');
   const [roundParam, setRound] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketLeg[]>([]);
@@ -108,7 +132,6 @@ export default function VettedList({
   const activeMeta = roundMeta[activeDate] ?? { label: activeDate, kind };
   const activeKind = activeMeta.kind;
 
-
   useEffect(() => {
     let cancelled = false;
     setData(null);
@@ -119,7 +142,7 @@ export default function VettedList({
         if (!response.ok) continue;
         const payload = (await response.json()) as Record<string, unknown>;
         if (!cancelled) {
-          setData({ rows: decodeRows(payload), ladder: (payload.ladder as string[]) ?? [] });
+          setData({ rows: decodeRankRows(payload), ladder: (payload.ladder as string[]) ?? [] });
           setRoundState('ready');
         }
         return;
@@ -173,14 +196,6 @@ export default function VettedList({
     for (const [code, name] of leagueOptions) map[code] = name;
     return map;
   }, [leagueOptions]);
-  const countries = useMemo(() => {
-    const groups = new Map<string, [string, string][]>();
-    for (const [code, name, country] of leagueOptions) {
-      if (!groups.has(country)) groups.set(country, []);
-      groups.get(country)?.push([code, name]);
-    }
-    return [...groups.entries()];
-  }, [leagueOptions]);
   const marketGroups = useMemo(() => {
     const groups = new Map<string, MarketMeta[]>();
     for (const market of Object.values(markets)) {
@@ -195,74 +210,164 @@ export default function VettedList({
   const snapshot = useMemo(() => snapshotFor(prices, activeDate), [prices, activeDate]);
 
   const isAny = bet === 'any';
-  // Any bet defaults to the 1.20 payout floor; group and single-market views
-  // default to any odds. An explicit `?min=` always survives.
-  const defaultMinOdds = isAny ? ANY_BET_MIN_FAIR.toFixed(2) : 'any';
-  const minOdds = minOddsParam === '' ? defaultMinOdds : minOddsParam;
-  function setMinOdds(next: string) { setMinOddsParam(next); }
-  const activeEvaluated = useMemo<EvaluatedRow[]>(() => {
-    return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)], 'any');
+  const groupKey = bet.startsWith('group:') ? bet.slice(6) : null;
+  const marketId = bet.startsWith('market:') ? bet.slice(7) : null;
+
+  // An explicit `?band=` wins. Legacy `?min=` links are read as an actual-odds
+  // floor (`min=1.70` -> `1.70+`, `min=any` -> `all`).
+  const effectiveBandToken = bandParam || legacyMinToBand(minParam) || DEFAULT_BAND;
+  const band = useMemo(() => parseBand(effectiveBandToken), [effectiveBandToken]);
+  const refinement = parseRefinement(refineParam);
+
+  function dropParams(keys: string[]) {
+    const params = new URLSearchParams(window.location.search);
+    for (const key of keys) params.delete(key);
+    const query = params.toString();
+    window.history.replaceState(null, '', `${window.location.pathname}${query ? `?${query}` : ''}`);
+  }
+  function chooseBand(next: string) {
+    setBandParam(next);
+    dropParams(['min']);
+  }
+  function clearShow() {
+    setShowParam('');
+    dropParams(['show']);
+  }
+  function resetAll() {
+    setLeague('all');
+    setBet('any');
+    setBandParam('');
+    setMinParam('');
+    setRefineParam('');
+    setShowParam('');
+    setRound(date);
+    dropParams(['band', 'min', 'refine', 'show']);
+  }
+
+  const activeEvaluated = useMemo<PickItem[]>(() => {
+    const rows = data?.rows ?? [];
+    return evaluateRows(rows, (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)], 'any').map((item) => ({
+      ...item,
+      d: item.row.d,
+      h: item.row.h,
+      a: item.row.a,
+      m: item.row.m,
+      pc: item.candidate.probability,
+      odds: item.price?.odds ?? null,
+      st: item.row.st,
+    }));
   }, [data, priceIndex]);
 
-  const baseFiltered = useMemo(() => {
-    return activeEvaluated.filter((item) => {
-      if (league !== 'all' && item.row.d !== league) return false;
-      if (isHiddenMarketId(item.row.m)) return false;
-      if (isAny) return true;
-      if (bet.startsWith('group:')) return (markets[item.row.m]?.group ?? '') === bet.slice(6);
-      return item.row.m === bet.slice(7);
-    });
-  }, [activeEvaluated, league, bet, isAny, markets]);
-  const minFair = minOdds === 'any' ? 0 : Math.max(0, Number(minOdds) || 0);
+  const roundRows = useMemo(() => activeEvaluated.filter((item) => !isHiddenMarketId(item.m)), [activeEvaluated]);
+  const leagueScoped = useMemo(
+    () => roundRows.filter((item) => league === 'all' || item.d === league),
+    [roundRows, league],
+  );
   const dataReady = roundState === 'ready' && marketsState === 'ready';
   const countsReady = dataReady;
 
-  const eligible = useMemo(
-    () => baseFiltered.filter((item) => item.candidate.fairOdds >= minFair),
-    [baseFiltered, minFair],
-  );
-  const qualified = useMemo(
-    () => eligible.filter((item) => item.candidate.probability >= BEST_BETS_MIN_PC),
-    [eligible],
-  );
-  const pcCandidates = useMemo(
-    () => baseFiltered.filter((item) => item.candidate.probability >= BEST_BETS_MIN_PC),
-    [baseFiltered],
-  );
-  const fallbacks = useMemo(
-    () => baseFiltered
-      .filter((item) => !(item.candidate.probability >= BEST_BETS_MIN_PC && item.candidate.fairOdds >= minFair))
-      .sort((a, b) => b.candidate.probability - a.candidate.probability)
-      .slice(0, 3),
-    [baseFiltered, minFair],
-  );
-  const payoutOnlyFailure = qualified.length === 0 && pcCandidates.length > 0;
-  const baseCount = useMemo(
-    () => bet.startsWith('group:')
-      ? new Set(baseFiltered.map((item) => `${item.row.d}|${item.row.h}|${item.row.a}`)).size
-      : baseFiltered.length,
-    [baseFiltered, bet],
+  // Daily best is one row per fixture: prefer the highest pc inside the actual
+  // odds band, otherwise fill with the nearest band candidate.
+  const daily = useMemo(() => selectDaily(leagueScoped, band), [leagueScoped, band]);
+  const showAll = isAny && league !== 'all' && showParam === 'all';
+  const dailyDisplayed = useMemo<PricedItem[]>(
+    () => visibleDailyRows(daily, showAll),
+    [daily, showAll],
   );
 
-  const displayed = useMemo(() => {
-    if (isAny || bet.startsWith('group:')) return selectByMatch(qualified);
-    return [...qualified].sort((a, b) => b.candidate.probability - a.candidate.probability);
-  }, [qualified, isAny, bet]);
+  // Group and exact-market views leave the curated Daily-best algorithm. They
+  // apply no probability, price or band gate; refinements are opt-in only.
+  const marketBase = useMemo(() => {
+    if (isAny) return [];
+    const scoped = leagueScoped.filter((item) => {
+      if (groupKey) return (markets[item.m]?.group ?? '') === groupKey;
+      if (marketId) return item.m === marketId;
+      return false;
+    });
+    return groupKey ? selectGroupRows(scoped) : selectMarketRows(scoped);
+  }, [isAny, leagueScoped, groupKey, marketId, markets]);
+  const refined = useMemo(() => applyRefinement(marketBase, refinement), [marketBase, refinement]);
+  const displayed = useMemo<PickItem[]>(
+    () => (isAny ? dailyDisplayed : refined.rows),
+    [isAny, dailyDisplayed, refined],
+  );
+
+  // League options: every division with fixtures in the active round stays
+  // selectable even when its preferred-band count is zero.
+  const roundDivisions = useMemo(() => {
+    const present = new Set<string>();
+    for (const item of roundRows) present.add(item.d);
+    return [...present].sort((a, b) => (leagueNames[a] ?? a).localeCompare(leagueNames[b] ?? b));
+  }, [roundRows, leagueNames]);
+  const countries = useMemo(() => {
+    const present = new Set(roundDivisions);
+    if (league !== 'all' && !present.has(league)) present.add(league);
+    const meta = new Map<string, { name: string; country: string }>();
+    for (const [code, name, country] of leagueOptions) meta.set(code, { name, country });
+    const groups = new Map<string, [string, string][]>();
+    for (const code of [...present].sort((a, b) => (meta.get(a)?.name ?? a).localeCompare(meta.get(b)?.name ?? b))) {
+      const entry = meta.get(code);
+      const country = entry?.country ?? 'Other';
+      if (!groups.has(country)) groups.set(country, []);
+      groups.get(country)?.push([code, entry?.name ?? code]);
+    }
+    return [...groups.entries()];
+  }, [leagueOptions, roundDivisions, league]);
+
+  // Daily counts per league: in-band fixtures over all fixtures in that league.
+  // Group and exact-market counts are fixtures with at least one row in the mode.
+  const leagueCounts = useMemo(() => {
+    const map = new Map<string, { inBand: number; total: number }>();
+    if (isAny) {
+      const byDivision = new Map<string, PickItem[]>();
+      for (const item of roundRows) {
+        if (!byDivision.has(item.d)) byDivision.set(item.d, []);
+        byDivision.get(item.d)?.push(item);
+      }
+      for (const [code, list] of byDivision) {
+        map.set(code, {
+          inBand: selectDaily(list, band).inBandFixtures,
+          total: new Set(list.map((item) => `${item.h}|${item.a}`)).size,
+        });
+      }
+    } else {
+      const fixtures = new Map<string, Set<string>>();
+      for (const item of roundRows) {
+        const matches = groupKey
+          ? (markets[item.m]?.group ?? '') === groupKey
+          : marketId !== null && item.m === marketId;
+        if (!matches) continue;
+        if (!fixtures.has(item.d)) fixtures.set(item.d, new Set());
+        fixtures.get(item.d)?.add(`${item.h}|${item.a}`);
+      }
+      for (const [code, set] of fixtures) map.set(code, { inBand: 0, total: set.size });
+    }
+    return map;
+  }, [isAny, roundRows, band, groupKey, marketId, markets]);
 
   const counts = useMemo(() => {
     const groupMatches = new Map<string, Set<string>>();
     const marketMatches = new Map<string, Set<string>>();
-    for (const item of qualified) {
-      const group = markets[item.row.m]?.group;
+    for (const item of leagueScoped) {
+      const group = markets[item.m]?.group;
       if (!group) continue;
-      const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
+      const key = `${item.d}|${item.h}|${item.a}`;
       if (!groupMatches.has(group)) groupMatches.set(group, new Set());
       groupMatches.get(group)?.add(key);
-      if (!marketMatches.has(item.row.m)) marketMatches.set(item.row.m, new Set());
-      marketMatches.get(item.row.m)?.add(key);
+      if (!marketMatches.has(item.m)) marketMatches.set(item.m, new Set());
+      marketMatches.get(item.m)?.add(key);
     }
     return { groups: groupMatches, markets: marketMatches };
-  }, [qualified, markets]);
+  }, [leagueScoped, markets]);
+
+  const leagueLabel = league === 'all' ? 'any league' : (leagueNames[league] ?? league);
+  const betLabel = isAny ? 'Daily best' : groupKey ? (GROUP_LABEL[groupKey] ?? 'group') : (markets[marketId ?? '']?.plain ?? 'market');
+  const bandLabel = bandLabelOf(band);
+  const roundFixtureCount = new Set(roundRows.map((item) => `${item.d}|${item.h}|${item.a}`)).size;
+  const leagueHasFixtures = league === 'all' ? roundFixtureCount > 0 : roundRows.some((item) => item.d === league);
+  const marketUnavailable = marketId !== null && marketsState === 'ready' && !markets[marketId];
+  const pricedInLeague = leagueScoped.filter((item) => item.odds !== null).length;
+  const refinementOnly = !isAny && displayed.length === 0 && marketBase.length > 0 && refinement !== 'all';
 
   const priceNote = pricesState === 'loading'
     ? 'Loading Mozzart prices…'
@@ -280,6 +385,16 @@ export default function VettedList({
     if (pricesState === 'unpriced') return 'Mozzart price unavailable (not embedded in this build).';
     if (!snapshot) return 'No Mozzart snapshot for this round.';
     return 'No Mozzart price for this bet.';
+  }
+
+  function dailyEmptyText(): string {
+    if (!leagueHasFixtures) return `No fixtures for ${leagueLabel} in this round.`;
+    if (pricesState === 'loading') return 'Loading Mozzart prices…';
+    if (pricesState === 'error') return 'Mozzart prices could not be loaded, so Daily best cannot rank games.';
+    if (pricesState === 'unpriced') return 'Daily best needs frozen Mozzart prices. This build is unpriced.';
+    if (!snapshot) return 'No Mozzart snapshot for this round.';
+    if (pricedInLeague === 0) return 'No Mozzart price for this league in this round.';
+    return 'No priced candidate has a model probability strictly between 0% and 100% at odds of 1.20 or more.';
   }
 
   function toLeg(row: RankRow): TicketLeg {
@@ -310,8 +425,6 @@ export default function VettedList({
     return TARGETS.map((target) => ({ target, ticket: optimiseTickets(legs, target, 5, 1, 1.0)[0] ?? null }));
   }, [displayed, markets, priceIndex, snapshot]);
 
-  const betLabel = bet === 'any' ? 'Any bet' : bet.startsWith('group:') ? (GROUP_LABEL[bet.slice(6)] ?? 'group') : (markets[bet.slice(7)]?.plain ?? 'bet');
-  const leagueLabel = league === 'all' ? 'any league' : (leagueNames[league] ?? league);
   const settledPicks = displayed.filter((item) => item.row.st === 'landed' || item.row.st === 'lost');
   const landedPicks = settledPicks.filter((item) => item.row.st === 'landed').length;
   const ticketProbability = combinedProbability(ticket);
@@ -319,6 +432,17 @@ export default function VettedList({
   const ticketMozzart = combinedMozzart(ticket);
   const ticketPayout = payout(stake, ticket, bonus);
   const correlated = sameMatchWarning(ticket);
+
+  function summaryLine(): string {
+    if (isAny) {
+      return `${dailyDisplayed.length} game${dailyDisplayed.length === 1 ? '' : 's'} · Daily best · ${leagueLabel} · actual odds ${bandLabel}`;
+    }
+    const base = `${betLabel} · ${leagueLabel} · sorted by model probability`;
+    if (refined.hidden > 0) return `${displayed.length} of ${marketBase.length} fixtures · ${base} · optional refinement hides ${refined.hidden}`;
+    return `${displayed.length} fixture${displayed.length === 1 ? '' : 's'} · ${base}`;
+  }
+
+  const shortList = isAny && daily.rows.length > 0 && daily.rows.length < DAILY_LIMIT;
 
   return (
     <div className="space-y-4 pb-40">
@@ -340,38 +464,47 @@ export default function VettedList({
           <option value="all">All leagues</option>
           {countries.map(([country, leagues]) => (
             <optgroup key={country} label={country}>
-              {leagues.map(([code, name]) => <option key={code} value={code}>{name}</option>)}
+              {leagues.map(([code, name]) => {
+                const count = leagueCounts.get(code);
+                const label = !count
+                  ? name
+                  : isAny
+                    ? `${name} (${count.inBand} in band / ${count.total} fixtures)`
+                    : `${name} (${count.total} fixtures)`;
+                return <option key={code} value={code}>{label}</option>;
+              })}
             </optgroup>
           ))}
         </select>
         <select value={bet} onChange={(event) => setBet(event.target.value)} aria-label="Bet" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
-          <option value="any">Any bet</option>
+          <option value="any">Daily best</option>
           {GROUP_ORDER.map((group) => (
             <optgroup key={group} label={GROUP_LABEL[group]}>
-              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({countsReady ? (counts.groups.get(group)?.size ?? 0) : '…'})</option>
+              <option value={`group:${group}`}>{GROUP_LABEL[group]} ({countsReady ? (counts.groups.get(group)?.size ?? 0) : '…'} fixtures)</option>
               {(marketGroups.get(group) ?? []).map((market) => (
-                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({countsReady ? (counts.markets.get(market.id)?.size ?? 0) : '…'})</option>
+                <option key={market.id} value={`market:${market.id}`}>{market.plain} ({countsReady ? (counts.markets.get(market.id)?.size ?? 0) : '…'} fixtures)</option>
               ))}
             </optgroup>
           ))}
         </select>
-        <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
-          <option value="any">Any odds</option>
-          <option value="1.20">Min fair odds 1.20</option>
-          <option value="1.40">Min fair odds 1.40</option>
-          <option value="1.70">Min fair odds 1.70</option>
-          <option value="2.00">Min fair odds 2.00</option>
-          <option value="2.50">Min fair odds 2.50</option>
-          {minOdds !== 'any' && !MIN_FAIR_OPTIONS.includes(minOdds) ? (
-            <option value={minOdds}>Min fair odds {Number(minOdds).toFixed(2)}</option>
-          ) : null}
-        </select>
+        {isAny ? (
+          <select value={band.token} onChange={(event) => chooseBand(event.target.value)} aria-label="Daily-best actual-odds band" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
+            {BAND_OPTIONS.map((option) => <option key={option.token} value={option.token}>{option.label}</option>)}
+            {!BAND_OPTIONS.some((option) => option.token === band.token) ? <option value={band.token}>{bandLabel}</option> : null}
+          </select>
+        ) : (
+          <select value={refinement} onChange={(event) => setRefineParam(event.target.value)} aria-label="Optional refinement" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
+            {REFINEMENTS.map((option) => <option key={option.token} value={option.token}>{option.label}</option>)}
+          </select>
+        )}
+        <button type="button" onClick={resetAll} className="w-full rounded-md border px-2 py-1.5 text-sm">Reset</button>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        One unified list: calibrated probability ≥ 58%, after the league, market and visible minimum-fair
-        filters. Any bet defaults to minimum fair 1.20; group and single-market views default to any odds.
-        Counts follow exactly the same filters. Lower-probability analysis remains in Explore.
+        Daily best needs an actual Mozzart price: one pick per fixture, actual odds at least 1.20, preferring the
+        selected band. League, market group and exact-market choices leave the curated algorithm and apply no
+        probability, vetting or odds gate. Legacy ?min= links map to an actual-odds floor: 1.70 becomes 1.70+,
+        any becomes All 1.20+.
       </p>
 
       {!dataReady ? (
@@ -384,10 +517,13 @@ export default function VettedList({
         </p>
       ) : (
         <>
-          <p className="text-sm text-muted-foreground">
-            {displayed.length} {displayed.length === 1 ? 'candidate' : 'candidates'} · {betLabel} · {leagueLabel} · probability ≥ 58% · {minFair === 0 ? 'any odds' : `fair ≥ ${minFair.toFixed(2)}`} · sorted by probability
-            {activeKind === 'example' ? ' · Example round' : ''}
-          </p>
+          <p className="text-sm text-muted-foreground">{summaryLine()}</p>
+          {isAny ? (
+            <p className="text-sm text-muted-foreground">
+              Showing {dailyDisplayed.length} of {daily.eligibleFixtures} eligible fixtures · {daily.inBandFixtures} have a
+              candidate in {bandLabel} · {daily.outside.length} filled from outside the band (nearest first) · one market per fixture
+            </p>
+          ) : null}
           <p className="text-sm">
             {settledPicks.length > 0 ? (
               <>Result: <span className="font-medium">{landedPicks} of {settledPicks.length} landed</span></>
@@ -397,54 +533,86 @@ export default function VettedList({
           </p>
           {priceNote ? <p className="text-xs text-muted-foreground">{priceNote}</p> : null}
 
-          {displayed.length === 0 ? (
-            <div className="space-y-2">
-              <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
-                No candidates meet the preferred settings (calibrated probability ≥ 58%
-                {minFair > 0 ? ` and fair odds ≥ ${minFair.toFixed(2)}` : ''}).
-                {minFair > 0 && baseFiltered.length > 0 ? ` ${baseCount} candidates exist before the minimum fair-odds filter.` : ''}
-              </p>
-              {fallbacks.length > 0 ? (
-                <section className="rounded-xl border border-dashed px-4 py-3">
-                  <h3 className="text-sm font-medium">
-                    {payoutOnlyFailure ? '58%+ candidates below the selected payout floor' : 'Highest-probability candidates below 58%'}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Outside the preferred contract. Shown for context only, not as passing selections.
-                  </p>
-                  <ul className="mt-2 space-y-1 text-sm">
-                    {fallbacks.map((item) => (
-                      <li key={`${item.row.h}|${item.row.a}|${item.row.m}`} className="flex flex-wrap justify-between gap-x-3 gap-y-0.5">
-                        <span className="min-w-0 truncate">{item.row.h} v {item.row.a} · {markets[item.row.m]?.plain ?? item.row.m}</span>
-                        <span className="tabular text-muted-foreground">{pct(item.candidate.probability)} · fair {item.candidate.fairOdds.toFixed(2)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
+          {isAny && daily.rows.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              {shortList ? (
+                <span className="text-muted-foreground">
+                  Only {daily.rows.length} eligible fixture{daily.rows.length === 1 ? '' : 's'} for this round and league;
+                  the list is not padded with sub-1.20 odds or a second market from the same fixture.
+                </span>
               ) : null}
-              {payoutOnlyFailure && minFair > 0 ? (
-                <button type="button" onClick={() => setMinOdds('any')} className="rounded-md border px-2.5 py-1 text-xs">Show all odds</button>
+              {league !== 'all' && daily.rows.length > DAILY_LIMIT ? (
+                showAll ? (
+                  <button type="button" onClick={clearShow} className="rounded-md border px-2.5 py-1">Show top {DAILY_LIMIT}</button>
+                ) : (
+                  <button type="button" onClick={() => setShowParam('all')} className="rounded-md border px-2.5 py-1">Show all eligible games ({daily.rows.length})</button>
+                )
               ) : null}
             </div>
-          ) : (
+          ) : null}
+
+          {isAny && daily.rows.length === 0 ? (
+            <div className="space-y-2">
+              <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">{dailyEmptyText()}</p>
+              {daily.rejected > 0 ? (
+                <p className="text-xs text-muted-foreground">
+                  {daily.rejected} priced candidate{daily.rejected === 1 ? '' : 's'} were below the 1.20 floor or outside
+                  0 &lt; pc &lt; 1 and are not shown.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+
+          {!isAny && displayed.length === 0 ? (
+            <div className="space-y-2">
+              {marketUnavailable ? (
+                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                  This market is not in the production market data.
+                </p>
+              ) : !leagueHasFixtures ? (
+                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                  No fixtures for {leagueLabel} in this round.
+                </p>
+              ) : marketBase.length === 0 ? (
+                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                  No {betLabel} rows in this round&apos;s data. The round file may not carry every market.
+                </p>
+              ) : (
+                <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                  The optional refinement hides all {marketBase.length} rows. Nothing is missing from the market itself.
+                </p>
+              )}
+              {refinement !== 'all' && marketBase.length > 0 ? (
+                <button type="button" onClick={() => setRefineParam('all')} className="rounded-md border px-2.5 py-1 text-xs">
+                  Show all {marketBase.length}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
+          {!isAny && displayed.length > 0 && refined.hidden > 0 ? (
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="text-muted-foreground">The optional refinement hides {refined.hidden} of {marketBase.length} rows.</span>
+              <button type="button" onClick={() => setRefineParam('all')} className="rounded-md border px-2.5 py-1">Show all</button>
+            </div>
+          ) : null}
+
+          {displayed.length > 0 ? (
             <ul className="space-y-2">
               {displayed.map((item) => {
                 const { row, price, candidate } = item;
                 const meta = markets[row.m];
-                const key = `${row.h}|${row.a}|${row.m}`;
+                const key = identityOf(item);
                 const open = expanded === key;
                 const checked = ticket.some((leg) => legKey(leg) === key);
-                const groupKey = bet.startsWith('group:') ? bet.slice(6) : null;
                 const matchOptions = groupKey
                   ? activeEvaluated
                       .filter((option) =>
-                        option.row.d === row.d && option.row.h === row.h && option.row.a === row.a
-                        && (markets[option.row.m]?.group ?? '') === groupKey
-                        && !isHiddenMarketId(option.row.m)
-                        && option.candidate.fairOdds >= minFair
-                        && option.candidate.probability >= BEST_BETS_MIN_PC,
+                        option.d === row.d && option.h === row.h && option.a === row.a
+                        && !isHiddenMarketId(option.m)
+                        && (markets[option.m]?.group ?? '') === groupKey,
                       )
-                      .sort((a, b) => b.candidate.probability - a.candidate.probability)
+                      .sort((a, b) => b.pc - a.pc || identityOf(a).localeCompare(identityOf(b)))
                   : [];
                 const ladderRows = (data?.ladder ?? []).map((id) => (data?.rows ?? []).find((candidateRow) => candidateRow.h === row.h && candidateRow.a === row.a && candidateRow.m === id)).filter(Boolean) as RankRow[];
                 return (
@@ -466,8 +634,16 @@ export default function VettedList({
                       </div>
                     </div>
 
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                    <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <StatusBadge status={row.st} />
+                      {item.odds !== null ? (
+                        <span className="tabular">
+                          Actual {item.odds.toFixed(2)} · break-even {(breakEvenChance(item.odds) * 100).toFixed(1)}% ·
+                          model return {signedPct(expectedReturn(candidate.probability, item.odds) * 100)}
+                        </span>
+                      ) : (
+                        <span>No actual price · no actual-EV claim</span>
+                      )}
                       {row.ht || row.ft ? <span className="tabular">HT {row.ht ?? '–'} · FT {row.ft ?? '–'}</span> : null}
                     </div>
 
@@ -499,23 +675,21 @@ export default function VettedList({
                         <p>Fair odds {candidate.fairOdds.toFixed(2)}</p>
                         {groupKey && matchOptions.length > 0 ? (
                           <div>
-                            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">All qualifying {GROUP_LABEL[groupKey]} options for this match</h4>
+                            <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide">All {GROUP_LABEL[groupKey]} options for this match</h4>
                             <p className="text-xs font-medium text-foreground">
-                              Highest-probability {groupKey} option for this match: {markets[matchOptions[0].row.m]?.plain ?? matchOptions[0].row.m} · {pct(matchOptions[0].candidate.probability)}
+                              Highest model probability: {markets[matchOptions[0].m]?.plain ?? matchOptions[0].m} · {pct(matchOptions[0].pc)}
                             </p>
-                            {matchOptions.length > 1 ? (
-                              <>
-                                <p className="mt-1 text-xs font-medium">Lower-probability alternatives</p>
-                                <ul className="space-y-0.5">
-                                  {matchOptions.slice(1).map((option) => (
-                                    <li key={option.row.m} className="flex justify-between gap-2">
-                                      <span>{markets[option.row.m]?.plain ?? option.row.m}</span>
-                                      <span className="tabular">{pct(option.candidate.probability)} · fair {option.candidate.fairOdds.toFixed(2)}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </>
-                            ) : null}
+                            <ul className="space-y-0.5">
+                              {matchOptions.map((option) => (
+                                <li key={option.m} className={cn('flex justify-between gap-2', option.m === row.m && 'font-medium text-foreground')}>
+                                  <span>{markets[option.m]?.plain ?? option.m}</span>
+                                  <span className="tabular">
+                                    {pct(option.pc)} · fair {option.candidate.fairOdds.toFixed(2)}
+                                    {option.odds !== null ? ` · actual ${option.odds.toFixed(2)}` : ''}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
                           </div>
                         ) : null}
                         <div>
@@ -536,14 +710,14 @@ export default function VettedList({
                 );
               })}
             </ul>
-          )}
+          ) : null}
         </>
       )}
 
       <section className="space-y-2">
         <h2 className="text-lg font-semibold">Target tickets</h2>
         <p className="text-sm text-muted-foreground">
-          Built only from the displayed 58%+ candidates, one leg per match.
+          Built only from the displayed candidates, one leg per match.
         </p>
         {targetTickets.some((entry) => entry.ticket) ? (
           <ul className="grid gap-2 sm:grid-cols-3">
@@ -558,7 +732,7 @@ export default function VettedList({
                     <div className="mt-1 text-xs text-muted-foreground">fair {suggestion.fair.toFixed(2)}</div>
                     <button type="button" onClick={() => setTicket(suggestion.legs)} className="mt-2 rounded-md border px-2.5 py-1 text-xs">Add to my ticket</button>
                   </>
-                ) : <p className="text-xs text-muted-foreground">No passing ticket reaches {target.toFixed(2)}.</p>}
+                ) : <p className="text-xs text-muted-foreground">No displayed ticket reaches {target.toFixed(2)}.</p>}
               </li>
             ))}
           </ul>
@@ -615,6 +789,7 @@ export default function VettedList({
         <a className="underline underline-offset-2" href="/report">Report</a>
         <a className="underline underline-offset-2" href="/rounds">Rounds</a>
         <a className="underline underline-offset-2" href="/tickets">Tickets</a>
+        <a className="underline underline-offset-2" href="/how-it-works">How it works</a>
       </nav>
     </div>
   );

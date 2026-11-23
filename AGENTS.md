@@ -81,18 +81,26 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
    settled by `run_model.py`; future rounds carry every market. The already-published 21/22 Nov
    rounds are never edited; their all-market companions are `picks/<date>.full.json`, verified on the
    model fields (19,076/19,076 and 6,810/6,810 identical, 0 different).
-6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Best bets is ONE unified
-   list for Any bet, group and single market: league/market filter, visible minimum-fair filter,
-   correct-score exclusion, inclusive `pc = row.pc ?? row.p >= 0.58`, then one highest-pc candidate per
-   match for Any/group or every eligible fixture for one market, sorted by pc. Any bet defaults to a
-   visible minimum fair 1.20; group and single-market views default to any odds. Any odds and explicit
-   1.20/1.40/1.70/2.00/2.50 selections survive. ANY_RULE, TYPE_RULE,
-   Ranked/Strict, Strong/Possible, Value badges, minimum-play text and Value-only ticket controls are
-   not Best-bets gates or labels. Dropdown counts use the same 58% contract. Opened details retain
-   neutral diagnostics and `MatchStats`; correct score stays hidden. Explore keeps its older picker,
-   and Value remains a separate experimental page. `/tickets` shows frozen automatic proposals first
-   and browser-saved tickets second. Top nav is Best bets | Value bets | Explore | Report; Report labels
-   TYPE_RULE as legacy research and the current Best-bets record as the 58% cohort.
+6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Best bets has two modes:
+   **Daily best** (bet = Any) is a curated list of up to 12 unique fixtures with an actual frozen Mozzart
+   price, actual odds ≥ 1.20, 0 < `pc` < 1 (from `row.pc ?? row.p`) and no correct score. It prefers the
+   selected actual-odds band (`?band=`; default `1.70-2.30`, also `1.20-1.69`, `2.31-4.00`, `4.01+` and
+   `all` = All 1.20+): per fixture take the highest pc inside the band, else the candidate nearest the
+   band by absolute log-odds distance; rank in-band rows by pc then model EV, then outside rows by
+   distance then pc/EV, identity last. A selected league reruns the same ranking and adds “Show all
+   eligible games” (`?show=all`), which removes the 12 cap; every league with fixtures stays selectable
+   with an “in band / fixtures” count. Legacy `?min=` links map to an actual-odds floor (`min=1.70` →
+   `1.70+`, `min=any`/`1.20` → `all`). **Group or exact market** leaves Daily best: every eligible
+   fixture with no probability, price, band or vetting gate; group shows one row per fixture by highest
+   pc and lists every group option in opened details; an exact market shows every fixture for that
+   market (including unpriced rows, sorted by pc, with fair odds and no actual-EV claim). Optional
+   `?refine=` choices (`pc50`, `pc58`, `fair150`, `fair200`; default all) report the hidden row count and
+   offer Show all. Reset restores All leagues + Daily best + 1.70–2.30 + the default round. Opened
+   details retain neutral diagnostics and `MatchStats`; correct score stays hidden. Explore keeps its
+   older picker, and Value remains a separate experimental page. `/tickets` shows frozen automatic
+   proposals first and browser-saved tickets second. Top nav is Best bets | Value bets | Explore |
+   Report; Report and How-it-works label TYPE_RULE and the old inclusive 58% / fair-1.20 cohort as
+   legacy research that does not measure the Daily-best list.
 7. **Mozzart prices (private)** — `pipeline/mozzart/` fetches one pass per round (Sat 08:00, Tue
    16:00 UTC) into the **private** repo `Podmorski/football-picks-prices` (`rounds/`, `frozen/`,
    `record.json`, `usage.json`). The v2 hard cap is 90 requests/month; it refuses when the provider
@@ -430,6 +438,23 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   no settlement integration exists. API-Football licensing docs still return HTTP 403. Probe summarisation
   does not require a local `fixtures.csv`, so public CI passes without gitignored cache data. Full
   validation: 340 pytest tests passing; `npm run build` green (50 pages).
+- Task 23 (23 Nov): Phase 1 of the daily Best-bets work. `web/lib/dailyBest.ts` is the pure Daily-best
+  contract (Node-type-stripping friendly, type-only imports): `parseBand`, `legacyMinToBand`,
+  `inBand`/`bandDistance`, `dailyPool`, `chooseOnePerFixture`, `selectDaily`, `visibleDailyRows`,
+  `selectGroupRows`, `selectMarketRows`, `applyRefinement`, `decodeRankRows`. `VettedList.tsx` now uses
+  it: default Daily best (≤12 unique priced fixtures, actual odds ≥ 1.20, band 1.70–2.30), league +
+  Show all, group/exact-market unrestricted views, opt-in refinements with hidden counts, Reset, and
+  daily card arithmetic (actual odds, break-even 1/p, model EV p×o−1). No 58%, ANY_RULE, TYPE_RULE,
+  Strength/Value badge or probability/odds gate remains in Best bets. `/rounds` keeps its frozen tally,
+  relabelled legacy research; Report and How-it-works label the 58% cohort as legacy and not the
+  current Daily-best record. `tests/test_daily_best.py` runs the TypeScript module under Node 24 and
+  pins band selection, the 1.20 floor, the 12-unique cap, nearest-band fill, All 1.20+ ordering, exact
+  HTFT:X-1 inclusion (12/12 E3 fixtures on 21 Nov, all pc < 58%, all unpriced locally), group options,
+  refinements, Reset and legacy labels. Explore/Picker, forward proposals, MEL-v1, ticket construction
+  and published-pick reconstructions are untouched. This supersedes the 58% Best-bets defaults in
+  Tasks 18 and 21 Phase 4; their pipeline records stay frozen as legacy research. Phase 2 (forward
+  Daily-best performance record) is not started.
+
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`

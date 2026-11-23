@@ -79,9 +79,10 @@ export default function HomePage() {
         <h1 className="text-2xl font-bold tracking-tight">Best bets</h1>
         {updated ? <p className="text-xs text-muted-foreground">Last updated: {updated}</p> : null}
         <p className="text-sm text-muted-foreground">
-          Every play is a calibrated probability with fair odds shown. Nothing here is a certainty.
-          Group and single-market views rank all candidates; strict checks are optional. Any bet defaults
-          to minimum fair 1.20; group and single-market views default to any odds.
+          Daily best is the default: up to 12 games with an actual Mozzart price, preferring the 1.70–2.30 band.
+          Choosing a league reruns the same ranking and can show every eligible game. Choosing a market group or
+          one exact market shows every eligible fixture with no probability, vetting or odds gate. Every play is
+          a calibrated probability with fair odds shown; nothing here is a certainty.
         </p>
       </header>
 

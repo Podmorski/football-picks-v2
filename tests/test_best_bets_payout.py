@@ -1,4 +1,7 @@
-"""Task 21 Phase 4: Best-bets payout defaults, fallbacks and price arithmetic."""
+"""Daily-best band defaults, legacy URL mapping and price arithmetic (Phase 1).
+
+The old unified 58% cohort is now explicitly a frozen legacy research record.
+"""
 from __future__ import annotations
 
 import json
@@ -15,97 +18,73 @@ def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
 
-def row(home: str, away: str, market: str, pc: float, status: str = "pending", p: float = 0.45) -> dict:
-    return {
-        "d": "E0", "h": home, "a": away, "m": market, "p": p, "pc": pc,
-        "lr": 0.40, "ln": 5000, "hr": 0.50, "hn": 20, "ar": 0.45, "an": 20, "st": status,
-    }
-
-
-def test_any_bet_default_is_fair_120_plus_pc_58() -> None:
+def test_daily_best_is_the_default_with_a_visible_band() -> None:
+    daily = read("web/lib/dailyBest.ts")
+    assert "export const DAILY_LIMIT = 12;" in daily
+    assert "export const DAILY_MIN_ODDS = 1.20;" in daily
+    assert "export const DEFAULT_BAND = '1.70-2.30';" in daily
+    for label in ("1.70–2.30 — default", "1.20–1.69", "2.31–4.00", "4.01+", "All 1.20+"):
+        assert label in daily, label
     source = read("web/components/VettedList.tsx")
-    assert "isAny ? ANY_BET_MIN_FAIR.toFixed(2) : 'any'" in source
-    assert "minOddsParam === '' ? defaultMinOdds : minOddsParam" in source
+    assert "<option value=\"any\">Daily best</option>" in source
+    assert "BAND_OPTIONS.map" in source
+    assert "aria-label=\"Daily-best actual-odds band\"" in source
+
+
+def test_legacy_min_links_map_to_an_actual_odds_floor() -> None:
+    daily = read("web/lib/dailyBest.ts")
+    assert "if (odds <= DAILY_MIN_ODDS) return 'all';" in daily
+    assert "return `${formatNumber(odds)}+`;" in daily
+    source = read("web/components/VettedList.tsx")
+    assert "useParam('band', '')" in source
     assert "useParam('min', '')" in source
-    vetted = read("web/lib/vetted.ts")
-    assert "export const ANY_BET_MIN_FAIR = 1.20;" in vetted
-    assert "export const BEST_BETS_MIN_PC = 0.58;" in vetted
-    assert "item.candidate.fairOdds < ANY_BET_MIN_FAIR" in vetted
-    assert "item.candidate.probability < BEST_BETS_MIN_PC" in vetted
-    assert "export const DEFAULT_MIN_FAIR = 1.70;" in vetted
+    assert "bandParam || legacyMinToBand(minParam) || DEFAULT_BAND" in source
+    assert "dropParams(['min'])" in source
 
 
-def test_group_and_single_market_keep_any_odds_default() -> None:
+def test_no_probability_vetting_or_ev_gate_remains_in_best_bets() -> None:
     source = read("web/components/VettedList.tsx")
-    # The default is conditional on Any bet; group/market deliberately fall back to any odds.
-    assert ": 'any';" in source
-    assert "const minFair = minOdds === 'any' ? 0" in source
-    for option in ('Any odds', 'Min fair odds 1.20', 'Min fair odds 1.40', 'Min fair odds 1.70', 'Min fair odds 2.00', 'Min fair odds 2.50'):
-        assert option in source, option
-
-
-def test_explicit_url_selections_survive() -> None:
-    source = read("web/components/VettedList.tsx")
-    # An explicit `?min=` (numeric or Any odds) is stored in minOddsParam and wins.
-    assert "minOddsParam === '' ? defaultMinOdds : minOddsParam" in source
-    assert "!MIN_FAIR_OPTIONS.includes(minOdds)" in source
-    assert "Min fair odds {Number(minOdds).toFixed(2)}" in source
-
-
-def test_fallbacks_are_outside_preferred_and_labeled() -> None:
-    source = read("web/components/VettedList.tsx")
-    assert ".filter((item) => !(item.candidate.probability >= BEST_BETS_MIN_PC && item.candidate.fairOdds >= minFair))" in source
-    assert ".slice(0, 3)" in source
-    assert "const payoutOnlyFailure = qualified.length === 0 && pcCandidates.length > 0;" in source
-    assert "58%+ candidates below the selected payout floor" in source
-    assert "Highest-probability candidates below 58%" in source
-    assert "Outside the preferred contract. Shown for context only, not as passing selections." in source
+    for forbidden in ("BEST_BETS_MIN_PC", "ANY_RULE", "TYPE_RULE", "selectPassing", "selectType", "minFair", "0.58"):
+        assert forbidden not in source, forbidden
+    assert "No actual price · no actual-EV claim" in source
+    assert "Arithmetic at the offered price only; no positive-edge claim." in source
 
 
 def test_break_even_and_expected_return_arithmetic_and_unpriced_absence() -> None:
-    vetted = read("web/lib/vetted.ts")
-    assert "export function breakEvenChance(odds: number): number" in vetted
-    assert "return odds > 0 ? 1 / odds : 0;" in vetted
-    assert "export function expectedReturn(probability: number, odds: number): number" in vetted
-    assert "return probability * odds - 1;" in vetted
+    daily = read("web/lib/dailyBest.ts")
+    assert "export function expectedReturnOf(probability: number, odds: number): number" in daily
+    assert "return probability * odds - 1;" in daily
     source = read("web/components/VettedList.tsx")
-    assert "breakEvenChance(price.odds)" in source
-    assert "expectedReturn(candidate.probability, price.odds)" in source
-    # The arithmetic lives inside the priced branch; the unpriced branch has no EV claim.
-    priced = source[source.index("{price ? ("):source.index(") : <p>{priceUnavailableText()}</p>}")]
-    assert "Model chance" in priced and "expected return" in priced
-    unpriced = source[source.index(") : <p>{priceUnavailableText()}</p>}"):]
-    assert "break-even" not in unpriced.split("</div>", 1)[0]
-    # Formula sanity: 60% at 2.00 breaks even at 50% and returns +20%.
+    assert "breakEvenChance(item.odds)" in source
+    assert "expectedReturn(candidate.probability, item.odds)" in source
+    priced = source[source.index("{item.odds !== null ? ("):source.index("No actual price · no actual-EV claim")]
+    assert "break-even" in priced and "model return" in priced
+    unpriced = source[source.index("<span>No actual price · no actual-EV claim</span>"):]
+    assert "break-even" not in unpriced.split("</span>", 1)[0]
     assert 1 / 2.0 == pytest.approx(0.5)
     assert 0.60 * 2.0 - 1 == pytest.approx(0.20)
 
 
-def test_no_value_badge_or_positive_ev_gate() -> None:
+def test_refinements_default_to_all_and_expose_hidden_counts() -> None:
+    daily = read("web/lib/dailyBest.ts")
+    assert "{ token: 'all', label: 'No refinement (all)' }" in daily
+    assert "export function applyRefinement" in daily
     source = read("web/components/VettedList.tsx")
-    for forbidden in ('<Badge variant="value">Value', "Value legs only", "only if", "edge >= 0", "positive expected"):
-        assert forbidden not in source, forbidden
-    assert "Arithmetic at the offered price only; no positive-edge claim." in source
+    assert "aria-label=\"Optional refinement\"" in source
+    assert "The optional refinement hides" in source
+    assert "Show all" in source
 
 
-def test_dropdown_counts_follow_displayed_preferred_rows() -> None:
-    source = read("web/components/VettedList.tsx")
-    assert "for (const item of qualified)" in source
-    assert "counts.groups.get(group)?.size" in source
-    assert "counts.markets.get(market.id)?.size" in source
-    assert "Counts follow exactly the same filters." in source
-
-
-def test_report_record_reconciles_under_default_payout_floor() -> None:
+def test_report_labels_the_old_58_cohort_as_legacy() -> None:
     payload = json.loads((ROOT / "web" / "public" / "data" / "best-bets-record.json").read_text(encoding="utf-8"))
     assert payload["min_pc"] == 0.58 and payload["min_fair"] == 1.20
-    assert payload["rounds"]
-    for item in [*payload["rounds"], payload["cumulative"]]:
-        assert item["passing"] == item["landed"] + item["lost"] + item["void"] + item["pending"]
-        assert item["settled"] == item["landed"] + item["lost"]
+    source = " ".join(read("web/app/report/page.tsx").split())
+    assert "Best bets results · legacy 58% cohort" in source
+    assert "not the current Daily-best list" in source
+    assert "unified 58% selection" not in source
 
 
-def test_committed_rounds_reproduce_the_record_selection() -> None:
+def test_committed_rounds_still_reproduce_the_frozen_legacy_record() -> None:
     payload = json.loads((ROOT / "web" / "public" / "data" / "best-bets-record.json").read_text(encoding="utf-8"))
     for item in payload["rounds"]:
         full = ROOT / "picks" / f"{item['date']}.full.json"

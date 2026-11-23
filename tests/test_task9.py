@@ -37,12 +37,17 @@ def test_a1_team_empirical_is_wired_everywhere() -> None:
     assert "team_empirical_values" in read("pipeline/model/type_backtest.py")
 
 
-def test_a2_min_fair_dropdown_is_in_every_view() -> None:
+def test_a2_band_and_refinement_controls_are_in_every_view() -> None:
     source = read("web/components/VettedList.tsx")
-    assert "aria-label=\"Minimum fair odds\"" in source
-    assert "value=\"2.50\"" in source
-    assert "item.candidate.fairOdds >= minFair" in source
-    assert "qualified" in source
+    daily = read("web/lib/dailyBest.ts")
+    assert "aria-label=\"Daily-best actual-odds band\"" in source
+    assert "aria-label=\"Optional refinement\"" in source
+    assert "BAND_OPTIONS.map" in source
+    assert "REFINEMENTS.map" in source
+    assert "selectDaily" in source
+    assert "applyRefinement" in source
+    assert "1.70-2.30" in daily
+    assert "fair150" in daily and "fair200" in daily
 
 
 def test_a3_dropdowns_are_full_width_on_mobile() -> None:

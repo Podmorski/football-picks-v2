@@ -395,10 +395,9 @@ export default function ReportPage() {
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Legacy research · STRICT_checks TYPE_RULE cohort · per group</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Legacy research only. This is not the current Best bets list, which is the unified inclusive
-          58% calibrated-probability list. It applies TYPE_RULE before the UI minimum-fair filter and
-          returns at fair odds, not realised Mozzart profit. The interval is a 95% CI bootstrapped over
-          round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
+          Legacy research only. This is not the current Daily-best list. It applies TYPE_RULE before the UI
+          minimum-fair filter and returns at fair odds, not realised Mozzart profit. The interval is a 95% CI
+          bootstrapped over round dates{bootstrap ? ` (${bootstrap.resamples.toLocaleString('en-GB')} resamples, seed ${bootstrap.seed})` : ''}.
         </p>
         <div className="overflow-x-auto rounded-xl border">
           <table className="w-full text-sm">
@@ -442,13 +441,13 @@ export default function ReportPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold">Best bets results · unified 58% selection</h2>
+        <h2 className="text-lg font-semibold">Best bets results · legacy 58% cohort · research only</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Current Best bets record: calibrated probability ≥{' '}
-          {bestBets ? pct(bestBets.min_pc) : '58.0%'}, fair odds ≥ {bestBets?.min_fair?.toFixed(2) ?? '1.20'} (the Any-bet
-          default), one pick per match by highest pc.
-          Expected is the sum of shown probabilities over settled rows only, where settled means
-          Landed or Lost; Void and Pending are separate buckets.
+          Legacy research cohort: calibrated probability ≥{' '}
+          {bestBets ? pct(bestBets.min_pc) : '58.0%'}, fair odds ≥ {bestBets?.min_fair?.toFixed(2) ?? '1.20'} (the old Any-bet
+          default), one pick per match by highest pc. This is not the current Daily-best list and does not measure it;
+          it is kept as a frozen historical cohort. Expected is the sum of shown probabilities over settled rows only,
+          where settled means Landed or Lost; Void and Pending are separate buckets.
         </p>
         <p className="max-w-3xl rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
           The 14 Nov row is a retrospective example generated after the fixture; not forward

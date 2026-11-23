@@ -9,12 +9,12 @@ export default function HowItWorksPage() {
       body: 'Two engines run in parallel. One counts league and team history with recency weighting and shrinkage. The other builds a half-by-half goal grid from team strength and anchors it on de-margined pre-match odds. A per-group stack then picks the better source on held-out seasons.',
     },
     {
-      title: 'Fair odds',
-      body: 'Fair odds are 1 divided by the calibrated probability. Any bet defaults to minimum fair 1.20; group and single-market views default to any odds; Any odds, 1.40, 1.70, 2.00 and 2.50 remain available as visible filters. There is no hidden odds floor or favourites switch.',
+      title: 'Fair odds and actual odds',
+      body: 'Fair odds are 1 divided by the calibrated probability. Daily best ranks on the actual decimal price from a frozen Mozzart snapshot, in a visible band: 1.70–2.30 by default, with 1.20–1.69, 2.31–4.00, 4.01+ and All 1.20+ selectable. There is no hidden odds floor or favourites switch.',
     },
     {
-      title: 'Best bets: one 58% list',
-      body: 'Best bets uses one unified rule for Any bet, group and single-market views: after the league, market and visible minimum-fair filters, show only calibrated probabilities at or above 58%. Any bet and groups keep one candidate per match by highest probability; a single market shows every eligible fixture. Correct score stays hidden. Lower-probability analysis remains in Explore.',
+      title: 'Best bets: the Daily best list',
+      body: 'The default view is Daily best: up to 12 games with an actual price of at least 1.20, one market per fixture, preferring the selected band. If a fixture has no candidate inside the band, the nearest band candidate fills the slot; the list is never padded with sub-1.20 odds or a second market from the same match. Choosing a league reruns the same ranking and offers Show all eligible games. Choosing a market group or one exact market switches to the unrestricted picker: every eligible fixture, sorted by probability, with no probability or odds gate. Correct score stays hidden.',
     },
     {
       title: 'How to read a card',
@@ -30,7 +30,7 @@ export default function HowItWorksPage() {
     },
     {
       title: 'Mozzart snapshots and Value',
-      body: 'Mozzart prices come from a private snapshot and appear only in details or the priced My tickets build. Value bets remain a separate experimental page: its price signal is unproven and is not part of the Best bets 58% list.',
+      body: 'Mozzart prices come from a private snapshot and drive the Daily best band. They appear in the daily cards and in details; unpriced builds show the probability and fair odds without an actual-EV claim. Value bets remain a separate experimental page: its price signal is unproven and is not part of the Best bets list.',
     },
     {
       title: 'Statistics, not certainty',

@@ -11,12 +11,14 @@ def read(rel: str) -> str:
     return (ROOT / rel).read_text(encoding="utf-8")
 
 
-def test_best_bets_is_one_inclusive_58_list_without_rule_modes_or_badges() -> None:
+def test_best_bets_is_the_daily_best_and_unrestricted_market_picker() -> None:
     source = read("web/components/VettedList.tsx")
-    assert "BEST_BETS_MIN_PC" in source
-    assert "item.candidate.probability >= BEST_BETS_MIN_PC" in source
-    assert "selectByMatch(qualified)" in source
-    assert "No candidates meet the preferred settings" in source
+    assert "selectDaily" in source
+    assert "selectGroupRows" in source
+    assert "selectMarketRows" in source
+    assert "Show all eligible games" in source
+    assert "BEST_BETS_MIN_PC" not in source
+    assert "0.58" not in source
     for removed in (
         "selectPassing", "selectType", "Ranked — all candidates", "Strict checks only",
         "Value legs only", "Play only at odds", "'Strong' : 'Possible'", "<Badge variant=\"value\">Value",
@@ -64,14 +66,15 @@ def test_price_and_update_workflows_freeze_and_settle_proposals_without_extra_re
     assert "pipeline.proposed_tickets" not in prices
 
 
-def test_report_marks_legacy_research_and_current_58_record() -> None:
+def test_report_marks_legacy_research_and_the_old_58_cohort() -> None:
     source = read("web/app/report/page.tsx")
     normalized = " ".join(source.split())
     assert "Legacy research · STRICT_checks TYPE_RULE cohort" in normalized
-    assert "not the current Best bets list" in normalized
-    assert "Best bets results · unified 58% selection" in normalized
+    assert "not the current Daily-best list" in normalized
+    assert "Best bets results · legacy 58% cohort" in normalized
     assert "calibrated probability ≥" in normalized
     assert "Strong" not in normalized
+    assert "unified 58% selection" not in normalized
 
 
 def test_three_reconstruction_rounds_are_visible_and_separate_from_forward() -> None:

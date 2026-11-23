@@ -1,6 +1,6 @@
-// Shared vetted-list selection. The Best bets page and the rounds tally both
-// use this, so a tally always describes the same rows, rule and default
-// filters as the page it links to.
+// Shared vetted-list helpers. The Best bets page now uses `lib/dailyBest.ts`;
+// the selections below are kept for the legacy /rounds tally, the Value page and
+// research tables. They are not the current Daily-best contract.
 
 import type { PricedRow } from './prices';
 import type { RankRow } from './types';
@@ -185,9 +185,10 @@ export type RoundTally = {
   expected: number;
 };
 
-// Tally under the Any-bet default filters: inclusive 58% probability, fair odds
-// at least 1.20, one highest-probability row per match. Only landed/lost rows
-// count as settled; pending and void never land or lose.
+// Legacy research tally for /rounds: inclusive 58% probability, fair odds at
+// least 1.20, one highest-probability row per match. This is NOT the current
+// Daily-best list. Only landed/lost rows count as settled; pending and void
+// never land or lose.
 export function roundTally(rows: RankRow[]): RoundTally {
   const best = new Map<string, Evaluated>();
   for (const item of evaluateRows(rows)) {

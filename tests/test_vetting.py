@@ -197,15 +197,17 @@ def test_mozzart_value_toggle_is_gone_from_best_bets() -> None:
     assert "Only where Mozzart pays at least fair" not in source
 
 
-def test_best_bets_min_fair_odds_control() -> None:
+def test_best_bets_band_and_legacy_min_mapping() -> None:
     from pathlib import Path
 
     root = Path(__file__).resolve().parents[1]
     source = (root / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
-    shared = (root / "web" / "lib" / "vetted.ts").read_text(encoding="utf-8")
+    shared = (root / "web" / "lib" / "dailyBest.ts").read_text(encoding="utf-8")
     assert "useParam('min', '')" in source
-    assert "item.candidate.fairOdds >= minFair" in source
-    assert "export function selectByMatch" in shared
-    assert 'value="1.20"' in source
-    assert 'value="1.40"' in source
-    assert 'value="2.00"' in source
+    assert "useParam('band', '')" in source
+    assert "legacyMinToBand(minParam)" in source
+    assert "export function selectDaily" in shared
+    assert "export function legacyMinToBand" in shared
+    assert "'1.70-2.30'" in shared
+    assert "'4.01+'" in shared
+    assert "'all'" in shared

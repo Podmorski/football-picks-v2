@@ -20,76 +20,67 @@ def test_best_bets_distinguishes_loading_failure_and_unified_empty_state() -> No
         "Mozzart prices could not be loaded.",
         "Mozzart prices are not embedded in this build.",
         "No Mozzart snapshot for this round.",
-        "BEST_BETS_MIN_PC",
-        "candidate.probability >= BEST_BETS_MIN_PC",
-        "No candidates meet the preferred settings",
+        "Daily best needs frozen Mozzart prices. This build is unpriced.",
+        "No Mozzart price for this league in this round.",
+        "selectDaily", "selectGroupRows", "selectMarketRows",
         "activeMeta", "activeKind", "roundMeta",
-        "Any odds", "Show all odds",
-        "selectByMatch(qualified)",
-        "All qualifying {GROUP_LABEL[groupKey]} options for this match",
-        "Lower-probability alternatives",
+        "Show all eligible games", "Show all",
+        "All {GROUP_LABEL[groupKey]} options for this match",
     ):
         assert needle in source, needle
-    for removed in ("Ranked — all candidates", "Strict checks only", "Strong = probability", "<Badge variant=\"value\">Value", "Play only at odds"):
+    for removed in (
+        "Ranked — all candidates", "Strict checks only", "Strong = probability",
+        "<Badge variant=\"value\">Value", "Play only at odds",
+        "BEST_BETS_MIN_PC", "No candidates meet the preferred settings",
+        "Lower-probability alternatives",
+    ):
         assert removed not in source, removed
 
 
 def test_best_bets_group_and_single_market_selection() -> None:
     source = read("web/components/VettedList.tsx")
     assert "const displayed = useMemo" in source
-    assert "selectByMatch(qualified)" in source
-    assert "return [...qualified].sort((a, b) => b.candidate.probability - a.candidate.probability);" in source
-    vetted = read("web/lib/vetted.ts")
-    assert "export function selectByMatch" in vetted
-    assert "item.candidate.probability > current.candidate.probability" in vetted
+    assert "selectGroupRows(scoped)" in source
+    assert "selectMarketRows(scoped)" in source
+    assert "const daily = useMemo(() => selectDaily(leagueScoped, band)" in source
+    vetted = read("web/lib/dailyBest.ts")
+    assert "export function selectGroupRows" in vetted
+    assert "export function selectMarketRows" in vetted
+    assert "export function selectDaily" in vetted
 
 
-def test_58_threshold_gates_not_legacy_rules() -> None:
+def test_daily_best_has_no_58_or_legacy_rule_gate() -> None:
     source = read("web/components/VettedList.tsx")
-    assert "qualified" in source and ">= BEST_BETS_MIN_PC" in source
+    assert "BEST_BETS_MIN_PC" not in source
     assert "!isStrict || option.passed" not in source
     assert "selectType(" not in source
     assert "selectPassing(" not in source
-
-    from pipeline.vetting import Candidate, type_evaluate
-
-    candidate = Candidate(
-        probability=0.10, model_probability=0.90, league_rate=0.40, league_n=5000,
-        home_rate=0.30, home_n=4, away_rate=0.30, away_n=4, fair_odds=10.0,
-    )
-    passed, checks = type_evaluate(candidate)
-    assert passed is False
-    by_id = {check["id"]: check["passed"] for check in checks}
-    assert by_id["t1"] is False
-    assert by_id["t3"] is False
-    assert by_id["t4"] is False
-    assert by_id["t6"] is False
+    daily = read("web/lib/dailyBest.ts")
+    for forbidden in ("ANY_RULE", "TYPE_RULE", "vetting", "BEST_BETS_MIN_PC"):
+        assert forbidden not in daily, forbidden
 
 
-def test_match_details_expose_all_qualifying_options() -> None:
+def test_match_details_expose_all_group_options() -> None:
     source = read("web/components/VettedList.tsx")
     assert "const matchOptions = groupKey" in source
-    assert "option.row.d === row.d && option.row.h === row.h && option.row.a === row.a" in source
-    assert "Highest-probability {groupKey} option for this match" in source
-    assert "Lower-probability alternatives" in source
-    assert "option.candidate.probability >= BEST_BETS_MIN_PC" in source
+    assert "option.d === row.d && option.h === row.h && option.a === row.a" in source
+    assert "Highest model probability:" in source
+    assert "All {GROUP_LABEL[groupKey]} options for this match" in source
+    # Every group option is listed; there is no probability or price gate here.
+    assert "option.candidate.probability >= BEST_BETS_MIN_PC" not in source
 
 
-def test_any_odds_default_and_counts_follow_58_contract() -> None:
+def test_band_refinements_and_counts() -> None:
     source = read("web/components/VettedList.tsx")
-    assert '<option value="any">Any odds</option>' in source
-    assert '<option value="1.20">Min fair odds 1.20</option>' in source
-    assert "minOdds === 'any' ? 0" in source
-    assert "useParam('min', '')" in source
-    assert "isAny ? ANY_BET_MIN_FAIR.toFixed(2) : 'any'" in source
-    assert "fallbacks" in source
-    assert "58%+ candidates below the selected payout floor" in source
-    assert "Highest-probability candidates below 58%" in source
+    assert '<option value="any">Daily best</option>' in source
+    assert 'aria-label="Daily-best actual-odds band"' in source
+    assert 'aria-label="Optional refinement"' in source
+    assert "in band / " in source
+    assert "fixtures)" in source
+    assert "legacyMinToBand" in source
     assert "Model chance" in source
     assert "break-even" in source
-    assert "model expected return" in source
-    assert "Show all odds" in source
-    assert "Counts follow exactly the same filters." in source
+    assert "model return" in source
     assert "counts.groups.get(group)?.size" in source
     assert "counts.markets.get(market.id)?.size" in source
 
@@ -100,7 +91,7 @@ def test_no_strong_possible_or_value_strength_labels() -> None:
         assert removed not in source, removed
     how = read("web/app/how-it-works/page.tsx")
     assert "Strong and Possible" not in how
-    assert "Best bets: one 58% list" in how
+    assert "Best bets: the Daily best list" in how
 
 
 def test_any_rule_and_correct_score_unchanged() -> None:
@@ -162,15 +153,15 @@ def test_report_research_table_labels() -> None:
     normalized = " ".join(source.split())
     for needle in (
         "Legacy research · STRICT_checks TYPE_RULE cohort",
-        "not the current Best bets list",
-        "unified inclusive 58% calibrated-probability list",
-        "Best bets results · unified 58% selection",
+        "not the current Daily-best list",
+        "legacy 58% cohort",
         "calibrated probability ≥",
         "not realised Mozzart profit",
     ):
         assert " ".join(needle.split()) in normalized, needle
     assert "highest lift" not in source
     assert "report.note" not in source
+    assert "unified 58% selection" not in source
 
 
 def test_combo_record_mozzart_footnote_is_conditional() -> None:
@@ -185,9 +176,9 @@ def test_user_facing_copy_is_current() -> None:
     for needle in (
         "Twenty-two main divisions",
         "Tuesday, Saturday and Sunday",
-        "Best bets: one 58% list",
+        "Best bets: the Daily best list",
         "Automatic round proposals",
-        "Any odds",
+        "All 1.20+",
         "Mozzart snapshots and Value",
         "Value bets remain a separate experimental page",
     ):

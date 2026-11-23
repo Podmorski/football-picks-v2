@@ -19,8 +19,9 @@ export default function RoundsPage() {
       <header className="space-y-2">
         <h1 className="text-2xl font-bold tracking-tight">Rounds</h1>
         <p className="max-w-2xl text-sm text-muted-foreground">
-          Every published round, newest first, with the tally for the default filters (Any bet, any league,
-          probability ≥ 58%, minimum fair odds 1.20). Open a round to see the full dashboard for it.
+          Every published round, newest first, with the legacy 58% Any-bet cohort tally (calibrated probability ≥
+          58%, fair odds ≥ 1.20). That cohort is research only and is not the current Daily-best list. Open a round
+          to see the full dashboard for it.
         </p>
       </header>
 
