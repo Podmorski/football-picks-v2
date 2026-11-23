@@ -95,6 +95,7 @@ def test_aggregate_flat_and_adaptive_agree_on_mixed_void(tmp_path: Path) -> None
         "proposals": [{
             "type": "best2", "status": "available", "flat_stake": 50.0,
             "legs": LEGS, "adaptive": {"stake": 10.0},
+            "policies": {"mel": {"stake": 10.0}},
         }],
     }
     (prices / "proposals" / "2026-11-24.json").write_text(json.dumps(document), encoding="utf-8")
@@ -108,10 +109,10 @@ def test_aggregate_flat_and_adaptive_agree_on_mixed_void(tmp_path: Path) -> None
     aggregate = proposals.write_aggregate(prices, picks, tmp_path / "web")
     assert aggregate["flat"]["staked"] == 50.0
     assert aggregate["flat"]["returned"] == 100.0
-    assert aggregate["adaptive"]["staked"] == 10.0
-    assert aggregate["adaptive"]["returned"] == 20.0
+    assert aggregate["mel"]["staked"] == 10.0
+    assert aggregate["mel"]["returned"] == 20.0
     assert aggregate["flat"]["net"] == 50.0
-    assert aggregate["adaptive"]["net"] == 10.0
+    assert aggregate["mel"]["net"] == 10.0
 
 
 def test_retrospective_cumulative_has_no_money_or_roi() -> None:

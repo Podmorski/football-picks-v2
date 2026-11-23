@@ -268,7 +268,8 @@ def test_public_aggregate_contains_no_actual_prices(tmp_path: Path) -> None:
     aggregate = proposals.write_aggregate(prices, picks, web)
     assert aggregate["flat"]["staked"] == 50.0
     assert aggregate["flat"]["returned"] == 200.0
-    assert aggregate["adaptive"]["bankroll"] == 1030.0
+    assert aggregate["mel"]["bankroll"] == 1000.0
+    assert aggregate["policy_version"] == "mel-v1"
     text = (web / "proposed-tickets-record.json").read_text(encoding="utf-8").lower()
     assert "\"odds\"" not in text
     assert "\"prices\"" not in text

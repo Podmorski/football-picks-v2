@@ -70,7 +70,7 @@ function ProposalCard({ ticket, statuses, shared }: { ticket: ProposedTicket; st
         <span>Model {pct(ticket.combined_probability)}</span>
         <span>Actual odds {ticket.combined_odds?.toFixed(2)}</span>
         <span>Flat {ticket.flat_stake.toFixed(0)}u</span>
-        <span>Adaptive {ticket.adaptive.stake.toFixed(2)}u</span>
+        <span>MEL-v1 {ticket.mel?.stake?.toFixed(2) ?? '0.00'}u</span>
       </div>
       <ul className="space-y-1 text-xs">
         {ticket.legs.map((leg) => {
@@ -83,10 +83,15 @@ function ProposalCard({ ticket, statuses, shared }: { ticket: ProposedTicket; st
           );
         })}
       </ul>
-      {ticket.adaptive.reason ? <p className="text-xs text-muted-foreground">Adaptive: {ticket.adaptive.reason}.</p> : null}
+      {ticket.mel?.message ? <p className="text-xs text-muted-foreground">{ticket.mel.message}.</p> : null}
+      {ticket.construction?.band_message ? (
+        <p className="text-xs text-muted-foreground">
+          {ticket.construction.band_message}{ticket.construction.individual_floor_message ? ` · ${ticket.construction.individual_floor_message}` : ''}{ticket.construction.overlap_message ? ` · ${ticket.construction.overlap_message}` : ''}
+        </p>
+      ) : null}
       {adaptive.status !== 'pending' ? (
         <p className="tabular text-xs">
-          Flat stake {flat.stake.toFixed(2)} · return {flat.returned?.toFixed(2)} · profit {units(flat.profit)} · Adaptive return {adaptive.returned?.toFixed(2)} · profit {units(adaptive.profit)}
+          Flat stake {flat.stake.toFixed(2)} · return {flat.returned?.toFixed(2)} · profit {units(flat.profit)} · MEL return {adaptive.returned?.toFixed(2)} · profit {units(adaptive.profit)}
         </p>
       ) : <p className="text-xs text-muted-foreground">Pending until every leg is terminal.</p>}
     </li>
@@ -187,24 +192,42 @@ function LedgerSummary({ record }: { record: ProposalRecordFile | null }) {
           </dl>
         </div>
         <div className="rounded-xl border p-3 text-sm">
-          <h3 className="font-semibold">Adaptive risk-managed simulation</h3>
-          <p className="text-muted-foreground">Quarter Kelly, 1% ticket cap, 2% round cap, drawdown controls.</p>
+          <h3 className="font-semibold">MEL-v1 mandatory-exposure simulation</h3>
+          <p className="text-muted-foreground">2.00% of available at 0% drawdown, 1.125% at 10%, 0.25% at 20%+. Mandatory paper exposure, not a proven optimum.</p>
           <dl className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
-            <dt>Bankroll</dt><dd className="tabular text-right">{record.adaptive.bankroll.toFixed(2)}</dd>
-            <dt>Net</dt><dd className="tabular text-right">{units(record.adaptive.net)}</dd>
-            <dt>ROI</dt><dd className="tabular text-right">{rate(record.adaptive.roi)}</dd>
-            <dt>Current drawdown</dt><dd className="tabular text-right">{rate(record.adaptive.current_drawdown)}</dd>
-            <dt>Maximum drawdown</dt><dd className="tabular text-right">{rate(record.adaptive.maximum_drawdown)}</dd>
+            <dt>Bankroll</dt><dd className="tabular text-right">{record.mel.bankroll.toFixed(2)}</dd>
+            <dt>Net</dt><dd className="tabular text-right">{units(record.mel.net)}</dd>
+            <dt>ROI</dt><dd className="tabular text-right">{rate(record.mel.roi)}</dd>
+            <dt>Current drawdown</dt><dd className="tabular text-right">{rate(record.mel.current_drawdown)}</dd>
+            <dt>Maximum drawdown</dt><dd className="tabular text-right">{rate(record.mel.maximum_drawdown)}</dd>
+            <dt>Unresolved exposure</dt><dd className="tabular text-right">{record.mel.unresolved_exposure.toFixed(2)}</dd>
           </dl>
         </div>
       </div>
       <p className="text-xs text-muted-foreground">
         Rounds {record.counts.rounds} · tickets {record.counts.tickets} · pending {record.counts.pending} · void {record.counts.void} · unavailable {record.counts.unavailable} · unpriced {record.counts.unpriced}.
-        Paper convention: a lost leg loses the stake; void legs settle at 1.00. This is not a profit guarantee.
+        Paper convention: a lost leg loses the stake; void legs settle at 1.00; bankroll advances once per fully terminal round. This is not a profit guarantee.
       </p>
       <div className="overflow-x-auto rounded-xl border">
         <table className="w-full text-sm">
-          <thead><tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-2 text-left">Type</th><th className="px-3 py-2 text-right">Tickets</th><th className="px-3 py-2 text-right">Settled</th><th className="px-3 py-2 text-right">Flat net</th><th className="px-3 py-2 text-right">Adaptive net</th></tr></thead>
+          <thead><tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-2 text-left">Diagnostic policy</th><th className="px-3 py-2 text-right">Staked</th><th className="px-3 py-2 text-right">Net</th><th className="px-3 py-2 text-right">ROI</th><th className="px-3 py-2 text-right">Bankroll</th><th className="px-3 py-2 text-right">Max drawdown</th></tr></thead>
+          <tbody>
+            {Object.entries(record.benchmarks).map(([policy, row]) => (
+              <tr key={policy} className="border-t">
+                <td className="px-3 py-1.5">{policy.replaceAll('_', ' ')}</td>
+                <td className="tabular px-3 py-1.5 text-right">{row.staked.toFixed(2)}</td>
+                <td className="tabular px-3 py-1.5 text-right">{units(row.net)}</td>
+                <td className="tabular px-3 py-1.5 text-right">{rate(row.roi)}</td>
+                <td className="tabular px-3 py-1.5 text-right">{row.bankroll.toFixed(2)}</td>
+                <td className="tabular px-3 py-1.5 text-right">{rate(row.maximum_drawdown)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="overflow-x-auto rounded-xl border">
+        <table className="w-full text-sm">
+          <thead><tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-2 text-left">Type</th><th className="px-3 py-2 text-right">Tickets</th><th className="px-3 py-2 text-right">Settled</th><th className="px-3 py-2 text-right">Flat net</th><th className="px-3 py-2 text-right">MEL net</th></tr></thead>
           <tbody>
             {Object.entries(record.types).map(([type, row]) => (
               <tr key={type} className="border-t">
@@ -212,7 +235,7 @@ function LedgerSummary({ record }: { record: ProposalRecordFile | null }) {
                 <td className="tabular px-3 py-1.5 text-right">{row.tickets ?? 0}</td>
                 <td className="tabular px-3 py-1.5 text-right">{row.settled ?? 0}</td>
                 <td className="tabular px-3 py-1.5 text-right">{units((row.flat_returned ?? 0) - (row.flat_staked ?? 0))}</td>
-                <td className="tabular px-3 py-1.5 text-right">{units((row.adaptive_returned ?? 0) - (row.adaptive_staked ?? 0))}</td>
+                <td className="tabular px-3 py-1.5 text-right">{units((row.mel_returned ?? 0) - (row.mel_staked ?? 0))}</td>
               </tr>
             ))}
           </tbody>

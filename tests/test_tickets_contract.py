@@ -31,7 +31,7 @@ def test_my_tickets_puts_automatic_proposals_first_and_keeps_saved_secondary() -
     assert automatic < saved
     for needle in (
         "Automatic proposals require private Mozzart prices. This build is unpriced; no actual prices are shown.",
-        "Flat benchmark", "Adaptive risk-managed simulation", "Actual odds",
+        "Flat benchmark", "MEL-v1 mandatory-exposure simulation", "Actual odds",
         "shared by ${count} proposals", "Pending until every leg is terminal.",
         "lost", "void", "Paper convention", "not a profit guarantee",
     ):
@@ -50,7 +50,7 @@ def test_private_proposals_are_preloaded_only_for_priced_builds_and_gitignored()
     record = json.loads((ROOT / "web" / "public" / "data" / "proposed-tickets-record.json").read_text(encoding="utf-8"))
     text = json.dumps(record).lower()
     assert '"odds"' not in text and '"price"' not in text and '"prices"' not in text
-    assert record["policy_version"] == "adaptive-quarter-kelly-v1"
+    assert record["policy_version"] == "mel-v1"
 
 
 def test_price_and_update_workflows_freeze_and_settle_proposals_without_extra_requests() -> None:

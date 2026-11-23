@@ -489,6 +489,22 @@ export type ProposedLeg = {
   pc: number;
   fair: number;
   odds: number;
+  q?: number;
+  cohort?: string;
+};
+
+export type ProposalConstruction = {
+  policy: string;
+  band: string;
+  band_message?: string;
+  achieved_odds?: number;
+  individual_floor_relaxed: boolean;
+  individual_floor_message?: string;
+  overlap_relaxed: boolean;
+  overlap_message?: string;
+  method?: string;
+  exact?: boolean;
+  note?: string;
 };
 
 export type ProposedTicket = {
@@ -500,13 +516,23 @@ export type ProposedTicket = {
   legs: ProposedLeg[];
   combined_probability: number | null;
   combined_odds: number | null;
-  adaptive: {
+  model_ev?: number | null;
+  construction?: ProposalConstruction;
+  mel?: {
+    stake: number; total_stake?: number; mandatory_exposure?: boolean;
+    negative_ev?: boolean; message?: string; solver?: Record<string, unknown>;
+    stress?: Record<string, unknown>; reason?: string;
+  };
+  policies?: Record<string, { stake: number }>;
+  benchmarks?: Record<string, { stake: number }>;
+  adaptive?: {
     stake: number;
-    edge: number | null;
-    kelly_full: number | null;
-    kelly_quarter: number | null;
-    cap_applied: boolean;
-    reason: string;
+    edge?: number | null;
+    kelly_full?: number | null;
+    kelly_quarter?: number | null;
+    cap_applied?: boolean;
+    reason?: string;
+    policy?: string;
   };
 };
 
@@ -532,9 +558,9 @@ export type ProposalRoundRecord = {
   flat_staked: number;
   flat_returned: number;
   flat_net: number;
-  adaptive_staked: number;
-  adaptive_returned: number;
-  adaptive_net: number;
+  mel_staked: number;
+  mel_returned: number;
+  mel_net: number;
 };
 
 export type ProposalLedger = {
@@ -553,11 +579,17 @@ export type ProposalRecordFile = {
     void: number; unavailable: number; unpriced: number;
   };
   flat: ProposalLedger & { return_ci: [number | null, number | null]; ci_rounds: number };
-  adaptive: ProposalLedger & {
+  mel: ProposalLedger & {
     initial_bankroll: number; bankroll: number; peak: number;
     current_drawdown: number; maximum_drawdown: number; unresolved_exposure: number;
+    return_ci: [number | null, number | null]; ci_rounds: number;
     series: { round_date: string; bankroll: number; terminal?: boolean; unresolved_exposure?: number }[];
   };
+  benchmarks: Record<string, ProposalLedger & {
+    initial_bankroll: number; bankroll: number; peak: number;
+    current_drawdown: number; maximum_drawdown: number; unresolved_exposure: number;
+    return_ci: [number | null, number | null]; ci_rounds: number;
+  }>;
   types: Record<string, Record<string, number>>;
   note: string;
 };

@@ -435,6 +435,25 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   commits the private store with `if: always()` so a failed pass is still recorded; the deploy hook
   runs only on success.
 
+- Task 21 Phase 3 (23 Nov): MEL-v1 is the frozen paper staking policy in `pipeline/bankroll.py`
+  (`POLICY_VERSION = "mel-v1"`). At round start B is settled bankroll, H peak, D=(H-B)/H,
+  U unresolved prior stakes, A=max(0,B-U), m(D)=max(0,1-D/0.20), S=A*(0.0025+0.0175*m(D));
+  that is 2.00% at 0% drawdown, 1.125% at 10%, 0.25% at 20%+. A=0 is a solvency exception with no
+  new stake. Displayed pc is unchanged. Each leg gets a separate q from its group x pc-band cohort: per-
+  round-date mean residual y-pc, block-bootstrap 10th percentile capped at zero, fallback -0.05 when
+  fewer than 30 prior contributing dates exist. q and cohort are frozen on the leg. Binary pre-match
+  scenarios iterate every unique leg, reuse exact shared legs once, use cross-fixture conditional
+  independence, sum to one, and define ticket net +odds-1 / -1. Allocation maximises the joint expected
+  log objective with SLSQP under sum(s)=S, 0<=s_j<=S/2 and positive-wealth constraints; solver status,
+  scenario assumptions and a simultaneous q-0.05 stress re-solve are stored. Negative robust EV still
+  receives S and displays "mandatory exposure; no positive-edge claim". Comparators are diagnostic only:
+  fixed-fractional 10% of A at 50/30/20, no-forced quarter-Kelly (1% ticket cap, 2% total cap with
+  drawdown multiplier, may return zero), probability-weighted, SLSQP minimum-variance on the joint
+  covariance (duplicate/singular tickets are handled under constraints, never a pseudoinverse), and
+  martingale capped/uncapped reporting. Aggregate keys are `flat`, `mel` and `benchmarks`; every policy
+  consumes the same frozen proposals, including the round-atomic settlement. Focused tests: 10 in
+  `tests/test_bankroll.py`.
+
 - Task 21 Phase 2 (23 Nov): automatic construction is `pipeline/ticket_construction.py` under frozen policy
   `ticket-construction-v2` (proposal schema 2). It uses the full per-fixture production menu with an
   exact frozen pre-match price and no 58% gate: a candidate needs 0<pc<1, odds>1, no CORRECT_SCORE,

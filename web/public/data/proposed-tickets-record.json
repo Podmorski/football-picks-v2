@@ -1,15 +1,113 @@
 {
- "adaptive": {
-  "bankroll": 1000.0,
-  "current_drawdown": 0.0,
-  "initial_bankroll": 1000.0,
-  "maximum_drawdown": 0.0,
-  "net": 0.0,
-  "peak": 1000.0,
-  "returned": 0.0,
-  "roi": null,
-  "series": [],
-  "staked": 0.0
+ "benchmarks": {
+  "fixed_fractional": {
+   "bankroll": 1000.0,
+   "ci_rounds": 0,
+   "current_drawdown": 0.0,
+   "initial_bankroll": 1000.0,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "series": [],
+   "staked": 0.0,
+   "unresolved_exposure": 0.0
+  },
+  "martingale_capped": {
+   "bankroll": 1000.0,
+   "ci_rounds": 0,
+   "current_drawdown": 0.0,
+   "initial_bankroll": 1000.0,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "series": [],
+   "staked": 0.0,
+   "unresolved_exposure": 0.0
+  },
+  "martingale_uncapped": {
+   "bankroll": 1000.0,
+   "ci_rounds": 0,
+   "current_drawdown": 0.0,
+   "initial_bankroll": 1000.0,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "series": [],
+   "staked": 0.0,
+   "unresolved_exposure": 0.0
+  },
+  "minimum_variance": {
+   "bankroll": 1000.0,
+   "ci_rounds": 0,
+   "current_drawdown": 0.0,
+   "initial_bankroll": 1000.0,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "series": [],
+   "staked": 0.0,
+   "unresolved_exposure": 0.0
+  },
+  "no_forced_kelly": {
+   "bankroll": 1000.0,
+   "ci_rounds": 0,
+   "current_drawdown": 0.0,
+   "initial_bankroll": 1000.0,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "series": [],
+   "staked": 0.0,
+   "unresolved_exposure": 0.0
+  },
+  "probability_weighted": {
+   "bankroll": 1000.0,
+   "ci_rounds": 0,
+   "current_drawdown": 0.0,
+   "initial_bankroll": 1000.0,
+   "maximum_drawdown": 0.0,
+   "net": 0.0,
+   "peak": 1000.0,
+   "return_ci": [
+    null,
+    null
+   ],
+   "returned": 0.0,
+   "roi": null,
+   "series": [],
+   "staked": 0.0,
+   "unresolved_exposure": 0.0
+  }
  },
  "counts": {
   "pending": 0,
@@ -31,42 +129,60 @@
   "roi": null,
   "staked": 0.0
  },
- "note": "Paper ledger. Flat stakes are fixed allocations; adaptive is quarter-Kelly with caps and drawdown controls. Not a profit guarantee.",
- "policy_version": "adaptive-quarter-kelly-v1",
+ "mel": {
+  "bankroll": 1000.0,
+  "ci_rounds": 0,
+  "current_drawdown": 0.0,
+  "initial_bankroll": 1000.0,
+  "maximum_drawdown": 0.0,
+  "net": 0.0,
+  "peak": 1000.0,
+  "return_ci": [
+   null,
+   null
+  ],
+  "returned": 0.0,
+  "roi": null,
+  "series": [],
+  "staked": 0.0,
+  "unresolved_exposure": 0.0
+ },
+ "note": "Paper ledger. Flat is 50/30/20; MEL-v1 is mandatory-exposure expected-log allocation; other policies are diagnostics. Bankroll advances once per fully terminal round. Not a profit guarantee.",
+ "policy_version": "mel-v1",
  "rounds": [],
- "schema_version": 1,
+ "schema_version": 2,
  "types": {
   "around3": {
-   "adaptive_returned": 0.0,
-   "adaptive_staked": 0.0,
    "flat_returned": 0.0,
    "flat_staked": 0.0,
    "landed": 0,
    "lost": 0,
+   "mel_returned": 0.0,
+   "mel_staked": 0.0,
    "pending": 0,
    "settled": 0,
    "tickets": 0,
    "void": 0
   },
   "around5": {
-   "adaptive_returned": 0.0,
-   "adaptive_staked": 0.0,
    "flat_returned": 0.0,
    "flat_staked": 0.0,
    "landed": 0,
    "lost": 0,
+   "mel_returned": 0.0,
+   "mel_staked": 0.0,
    "pending": 0,
    "settled": 0,
    "tickets": 0,
    "void": 0
   },
   "best2": {
-   "adaptive_returned": 0.0,
-   "adaptive_staked": 0.0,
    "flat_returned": 0.0,
    "flat_staked": 0.0,
    "landed": 0,
    "lost": 0,
+   "mel_returned": 0.0,
+   "mel_staked": 0.0,
    "pending": 0,
    "settled": 0,
    "tickets": 0,

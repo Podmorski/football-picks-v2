@@ -14,7 +14,7 @@ export function proposalKey(leg: Pick<ProposedLeg, 'd' | 'h' | 'a' | 'm'>): stri
 }
 
 export function paperSettlement(ticket: ProposedTicket, statuses: LegStatuses, stakeOverride?: number): PaperResult {
-  const stake = stakeOverride ?? ticket.adaptive.stake;
+  const stake = stakeOverride ?? ticket.mel?.stake ?? ticket.adaptive?.stake ?? 0;
   const states = ticket.legs.map((leg) => statuses[proposalKey(leg)] ?? 'pending');
   if (states.some((state) => state === 'lost')) return { status: 'lost', stake, returned: 0, profit: -stake };
   if (states.length === 0 || states.some((state) => state !== 'landed' && state !== 'void')) {

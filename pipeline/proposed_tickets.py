@@ -12,7 +12,9 @@ import math
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from . import ranking, settlement, ticket_construction
+import random
+
+from . import bankroll, ranking, settlement, ticket_construction
 from .model.ranked_backtest import _clustered_mean_ci
 from .model.ranking_backtest import RETURN_BOOTSTRAP_RESAMPLES, RETURN_BOOTSTRAP_SEED
 
@@ -22,7 +24,7 @@ MAX_LEGS = 5
 PROPOSAL_ACTIVATION_DATE = "2026-11-24"
 PROPOSAL_ACTIVATION_MARKER = "proposal-readiness-v1"
 SCHEMA_VERSION = 2
-POLICY_VERSION = "adaptive-quarter-kelly-v1"
+POLICY_VERSION = bankroll.POLICY_VERSION
 CONSTRUCTION_VERSION = ticket_construction.CONSTRUCTION_VERSION
 INITIAL_BANKROLL = 1000.0
 PER_TICKET_CAP = 0.01
@@ -194,31 +196,118 @@ def _adaptive_allocations(proposals: list[dict], state: dict) -> None:
         proposal["adaptive"]["cap_applied"] = scale < 1.0 or stake >= PER_TICKET_CAP * available - 1e-9
 
 
-def build_proposals(document: dict, snapshot: dict, prior_state: dict | None = None) -> dict:
+def _default_state() -> dict:
+    return {
+        "bankroll": INITIAL_BANKROLL, "peak": INITIAL_BANKROLL, "drawdown": 0.0,
+        "unresolved_exposure": 0.0, "available": INITIAL_BANKROLL,
+        "mel_total_stake": round(bankroll.mel_total_stake(INITIAL_BANKROLL, 0.0), 4),
+        "martingale": {"rounds": 0, "multiplier": 1.0}, "initial_bankroll": INITIAL_BANKROLL,
+    }
+
+
+def build_proposals(
+    document: dict, snapshot: dict, prior_state: dict | None = None,
+    prices_dir: Path | None = None, picks_dir: Path | None = None,
+) -> dict:
+    date = document["date"]
     menu = eligible_pool(document, snapshot)
     proposals = []
     for item in ticket_construction.construct(menu):
         key = item["type"]
-        proposal = {
-            **item,
-            "flat_stake": FLAT_STAKES[key] if item["status"] == "available" else 0.0,
+        proposals.append({**item, "flat_stake": FLAT_STAKES[key] if item["status"] == "available" else 0.0})
+
+    shifts: dict[tuple[str, str], float] = {}
+    if picks_dir is not None:
+        residuals = bankroll.residual_dates(picks_dir, date)
+        rng = random.Random(bankroll.MEL_BOOTSTRAP_SEED)
+        shifts = {cohort: bankroll.cohort_shift(dates, rng) for cohort, dates in residuals.items()}
+    bankroll.annotate_q(proposals, shifts)
+    state = prior_state or (
+        bankroll.policy_state(prices_dir, picks_dir, date) if prices_dir is not None and picks_dir is not None
+        else _default_state()
+    )
+
+    outcomes, scenario_meta = bankroll.scenarios(proposals)
+    mel = bankroll.allocate(proposals, state, outcomes)
+    available = [proposal for proposal in proposals if proposal.get("status") == "available"]
+    fixed_total, fixed_stakes = bankroll.fixed_fractional(state["available"], len(available))
+    probability_stakes = bankroll.probability_weighted(proposals, state["mel_total_stake"])
+    variance_stakes, _variance_meta = bankroll.minimum_variance(proposals, state, outcomes)
+    kelly_total, kelly_stakes, _kelly_meta = bankroll.no_forced_kelly(proposals, state, outcomes)
+    martingale_multiplier = float((state.get("martingale") or {}).get("multiplier", 1.0))
+    shares = bankroll._shares(len(available))
+
+    index = 0
+    for proposal in proposals:
+        if proposal.get("status") != "available":
+            proposal["policies"] = {
+                "flat": {"stake": 0.0}, "mel": {"stake": 0.0},
+                "fixed_fractional": {"stake": 0.0}, "no_forced_kelly": {"stake": 0.0},
+                "probability_weighted": {"stake": 0.0}, "minimum_variance": {"stake": 0.0},
+                "martingale_capped": {"stake": 0.0}, "martingale_uncapped": {"stake": 0.0},
+            }
+            proposal["mel"] = {"stake": 0.0, "reason": "ticket unavailable"}
+            proposal["adaptive"] = {"stake": 0.0, "edge": None, "kelly_full": None,
+                                    "kelly_quarter": None, "cap_applied": False,
+                                    "reason": "ticket unavailable", "policy": POLICY_VERSION}
+            proposal["benchmarks"] = {}
+            continue
+        mel_stake = float(mel["stakes"][index])
+        martingale_uncapped = bankroll.MARTINGALE_BASE * martingale_multiplier * shares[index]
+        martingale_capped = min(martingale_uncapped, bankroll.MARTINGALE_CAP)
+        proposal["policies"] = {
+            "flat": {"stake": proposal["flat_stake"]},
+            "mel": {"stake": round(mel_stake, 6)},
+            "fixed_fractional": {"stake": round(fixed_stakes[index], 6)},
+            "no_forced_kelly": {"stake": round(kelly_stakes[index], 6)},
+            "probability_weighted": {"stake": round(probability_stakes[index], 6)},
+            "minimum_variance": {"stake": round(variance_stakes[index], 6)},
+            "martingale_capped": {"stake": round(martingale_capped, 6)},
+            "martingale_uncapped": {"stake": round(martingale_uncapped, 6)},
         }
-        proposals.append(proposal)
-    state = prior_state or {
-        "bankroll": INITIAL_BANKROLL, "peak": INITIAL_BANKROLL, "drawdown": 0.0,
-        "unresolved_exposure": 0.0, "available": INITIAL_BANKROLL,
-    }
-    _adaptive_allocations(proposals, state)
+        proposal["mel"] = {
+            "stake": round(mel_stake, 6), "total_stake": mel["total_stake"],
+            "mandatory_exposure": mel["mandatory_exposure"], "negative_ev": mel["negative_ev"],
+            "message": mel["message"], "solver": mel["solver"], "stress": mel["stress"],
+        }
+        proposal["adaptive"] = {
+            "stake": round(mel_stake, 6), "edge": proposal.get("model_ev"),
+            "kelly_full": None, "kelly_quarter": None, "cap_applied": False,
+            "reason": mel["message"], "policy": POLICY_VERSION,
+        }
+        proposal["benchmarks"] = {
+            name: {"stake": proposal["policies"][name]["stake"]}
+            for name in ("fixed_fractional", "no_forced_kelly", "probability_weighted",
+                         "minimum_variance", "martingale_capped", "martingale_uncapped")
+        }
+        index += 1
+
     return {
         "schema_version": SCHEMA_VERSION,
-        "round_date": document["date"],
+        "round_date": date,
         "snapshot_identity": {"round_date": snapshot.get("round_date"), "fetched_at": snapshot.get("fetched_at")},
         "policy": {
             "version": POLICY_VERSION, "construction_version": CONSTRUCTION_VERSION,
             "initial_bankroll": INITIAL_BANKROLL,
-            "per_ticket_cap": PER_TICKET_CAP, "round_cap": ROUND_CAP,
-            "drawdown_half": DRAWDOWN_HALF, "drawdown_stop": DRAWDOWN_STOP,
-            "kelly_fraction": 0.25, "flat_stakes": FLAT_STAKES,
+            "mel": {
+                "drawdown_scale": bankroll.MEL_DRAWDOWN_SCALE,
+                "base_fraction": bankroll.MEL_BASE_FRACTION, "slope": bankroll.MEL_SLOPE,
+                "residual_quantile": bankroll.MEL_SHIFT_QUANTILE,
+                "residual_fallback": bankroll.MEL_FALLBACK_SHIFT,
+                "minimum_residual_dates": bankroll.MEL_MIN_RESIDUAL_DATES,
+                "stress_shift": bankroll.MEL_STRESS_SHIFT,
+            },
+            "comparators": {
+                "fixed_fractional": bankroll.FIXED_FRACTIONAL_FRACTION,
+                "no_forced_total_cap": bankroll.NO_FORCED_TOTAL_CAP,
+                "no_forced_ticket_cap": bankroll.NO_FORCED_TICKET_CAP,
+                "no_forced_kelly_fraction": bankroll.NO_FORCED_KELLY_FRACTION,
+                "martingale_base": bankroll.MARTINGALE_BASE,
+                "martingale_cap": bankroll.MARTINGALE_CAP,
+                "flat_shares": list(bankroll.FLAT_SHARES),
+            },
+            "flat_stakes": FLAT_STAKES,
+            "scenarios": scenario_meta,
         },
         "state_before": state,
         "proposals": proposals,
@@ -274,37 +363,100 @@ def ensure_proposals(round_date: str, document: dict, snapshot: dict, prices_dir
     path = prices_dir / "proposals" / f"{round_date}.json"
     if path.exists():
         return json.loads(path.read_text(encoding="utf-8"))
-    state = replay_adaptive(prices_dir, picks_dir, round_date)
-    payload = build_proposals(document, snapshot, state)
+    state = bankroll.policy_state(prices_dir, picks_dir, round_date)
+    payload = build_proposals(document, snapshot, state, prices_dir, picks_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=1) + "\n", encoding="utf-8")
     return payload
 
 
+POLICY_KEYS = ("mel", "fixed_fractional", "no_forced_kelly", "probability_weighted", "minimum_variance", "martingale_capped", "martingale_uncapped")
+
+
+def _policy_stake(policy: str):
+    def getter(proposal: dict) -> float:
+        return float(((proposal.get("policies") or {}).get(policy) or {}).get("stake", 0.0))
+    return getter
+
+
+def _empty_account(initial: float) -> dict:
+    return {
+        "staked": 0.0, "returned": 0.0, "bankroll": initial, "peak": initial,
+        "unresolved": 0.0, "max_drawdown": 0.0, "series": [], "date_rows": [],
+    }
+
+
+def _ledger(account: dict) -> dict:
+    net = account["returned"] - account["staked"]
+    return {
+        "staked": round(account["staked"], 4), "returned": round(account["returned"], 4),
+        "net": round(net, 4), "roi": round(net / account["staked"], 6) if account["staked"] else None,
+    }
+
+
+def _bankroll_block(account: dict) -> dict:
+    drawdown = (account["peak"] - account["bankroll"]) / account["peak"] if account["peak"] > 0 else 0.0
+    return {
+        **_ledger(account), "initial_bankroll": INITIAL_BANKROLL,
+        "bankroll": round(account["bankroll"], 4), "peak": round(account["peak"], 4),
+        "current_drawdown": round(drawdown, 6),
+        "maximum_drawdown": round(account["max_drawdown"], 6),
+        "unresolved_exposure": round(account["unresolved"], 4),
+        "series": account["series"],
+    }
+
+
+def _advance(account: dict, accounting: dict, date: str) -> None:
+    if accounting["terminal"]:
+        account["staked"] += accounting["staked"]
+        account["returned"] += float(accounting["returned"] or 0.0)
+        if accounting["staked"] > 0:
+            account["date_rows"].append([accounting["staked"], float(accounting["net"] or 0.0)])
+        account["bankroll"] += float(accounting["net"] or 0.0)
+        account["peak"] = max(account["peak"], account["bankroll"])
+        account["max_drawdown"] = max(
+            account["max_drawdown"],
+            (account["peak"] - account["bankroll"]) / account["peak"] if account["peak"] > 0 else 0.0,
+        )
+        unresolved = account["unresolved"]
+    else:
+        account["unresolved"] += accounting["exposure"]
+        unresolved = account["unresolved"]
+    account["series"].append({
+        "round_date": date, "bankroll": round(account["bankroll"], 4),
+        "terminal": accounting["terminal"], "unresolved_exposure": round(unresolved, 4),
+    })
+
+
 def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
     rounds = []
-    type_stats = {key: {"tickets": 0, "settled": 0, "landed": 0, "lost": 0, "void": 0, "pending": 0, "flat_staked": 0.0, "flat_returned": 0.0, "adaptive_staked": 0.0, "adaptive_returned": 0.0} for key in TARGETS}
-    totals = {"flat_staked": 0.0, "flat_returned": 0.0, "adaptive_staked": 0.0, "adaptive_returned": 0.0}
-    bankroll = INITIAL_BANKROLL
-    peak = INITIAL_BANKROLL
-    unresolved = 0.0
-    max_drawdown = 0.0
-    series = []
-    flat_date_rows = []
+    type_stats = {
+        key: {
+            "tickets": 0, "settled": 0, "landed": 0, "lost": 0, "void": 0, "pending": 0,
+            "flat_staked": 0.0, "flat_returned": 0.0, "mel_staked": 0.0, "mel_returned": 0.0,
+        }
+        for key in TARGETS
+    }
+    flat_account = _empty_account(INITIAL_BANKROLL)
+    accounts = {key: _empty_account(INITIAL_BANKROLL) for key in POLICY_KEYS}
     counts = Counter()
     for path in sorted((prices_dir / "proposals").glob("*.json")):
         document = json.loads(path.read_text(encoding="utf-8"))
-        statuses = _status_map(picks_dir, document["round_date"])
+        date = document["round_date"]
+        statuses = _status_map(picks_dir, date)
         proposals = document.get("proposals", [])
         flat = settlement.round_accounting(
             proposals, statuses, lambda proposal: float(proposal.get("flat_stake", 0.0)),
         )
-        adaptive = settlement.round_accounting(proposals, statuses, _adaptive_stake)
+        policy_accounting = {
+            key: settlement.round_accounting(proposals, statuses, _policy_stake(key))
+            for key in POLICY_KEYS
+        }
         round_row = {
-            "round_date": document["round_date"], "terminal": flat["terminal"],
+            "round_date": date, "terminal": flat["terminal"],
             "available": len(flat["outcomes"]), "unavailable": 0, "pending": 0,
             "void": 0, "settled": 0, "flat_staked": 0.0, "flat_returned": 0.0,
-            "adaptive_staked": 0.0, "adaptive_returned": 0.0,
+            "mel_staked": 0.0, "mel_returned": 0.0,
         }
         for proposal in proposals:
             stats = type_stats[proposal["type"]]
@@ -335,68 +487,59 @@ def aggregate_records(prices_dir: Path, picks_dir: Path) -> dict:
                 continue
             gross = float(outcome["gross_multiplier"])
             flat_return = outcome["stake"] * gross
-            adaptive_stake = _adaptive_stake(proposal)
-            adaptive_return = adaptive_stake * gross
+            mel_stake = _policy_stake("mel")(proposal)
+            mel_return = mel_stake * gross
             round_row["flat_staked"] += outcome["stake"]
             round_row["flat_returned"] += flat_return
+            round_row["mel_staked"] += mel_stake
+            round_row["mel_returned"] += mel_return
             stats["flat_staked"] += outcome["stake"]
             stats["flat_returned"] += flat_return
-            round_row["adaptive_staked"] += adaptive_stake
-            round_row["adaptive_returned"] += adaptive_return
-            stats["adaptive_staked"] += adaptive_stake
-            stats["adaptive_returned"] += adaptive_return
-            totals["flat_staked"] += outcome["stake"]
-            totals["flat_returned"] += flat_return
-            totals["adaptive_staked"] += adaptive_stake
-            totals["adaptive_returned"] += adaptive_return
+            stats["mel_staked"] += mel_stake
+            stats["mel_returned"] += mel_return
 
-        if flat["terminal"]:
-            if round_row["flat_staked"] > 0:
-                flat_date_rows.append([
-                    round_row["flat_staked"],
-                    round_row["flat_returned"] - round_row["flat_staked"],
-                ])
-            bankroll += float(adaptive["net"] or 0.0)
-            peak = max(peak, bankroll)
-            max_drawdown = max(max_drawdown, (peak - bankroll) / peak if peak > 0 else 0.0)
-        else:
-            unresolved += float(adaptive["exposure"])
+        _advance(flat_account, {**flat, "unresolved": 0.0}, date)
+        for key in POLICY_KEYS:
+            _advance(accounts[key], policy_accounting[key], date)
         round_row["flat_net"] = round(round_row["flat_returned"] - round_row["flat_staked"], 4)
-        round_row["adaptive_net"] = round(round_row["adaptive_returned"] - round_row["adaptive_staked"], 4)
+        round_row["mel_net"] = round(round_row["mel_returned"] - round_row["mel_staked"], 4)
         rounds.append(round_row)
-        series.append({
-            "round_date": document["round_date"], "bankroll": round(bankroll, 4),
-            "terminal": flat["terminal"], "unresolved_exposure": round(unresolved, 4),
-        })
-    current_drawdown = (peak - bankroll) / peak if peak > 0 else 0.0
-    flat_ci = [None, None]
-    if len(flat_date_rows) >= MIN_CI_ROUNDS:
-        _mean, flat_ci = _clustered_mean_ci(flat_date_rows, 0, 1, resamples=RETURN_BOOTSTRAP_RESAMPLES, seed=RETURN_BOOTSTRAP_SEED)
-    def ledger(prefix: str) -> dict:
-        staked = totals[f"{prefix}_staked"]
-        returned = totals[f"{prefix}_returned"]
-        net = returned - staked
-        return {
-            "staked": round(staked, 4), "returned": round(returned, 4), "net": round(net, 4),
-            "roi": round(net / staked, 6) if staked else None,
-        }
+
+    def ci(account: dict) -> list:
+        if len(account["date_rows"]) < MIN_CI_ROUNDS:
+            return [None, None]
+        _mean, bounds = _clustered_mean_ci(
+            account["date_rows"], 0, 1, resamples=RETURN_BOOTSTRAP_RESAMPLES, seed=RETURN_BOOTSTRAP_SEED,
+        )
+        return [None if value is None else round(value, 6) for value in bounds]
+
     return {
         "schema_version": SCHEMA_VERSION,
         "policy_version": POLICY_VERSION,
         "rounds": rounds,
         "counts": {
-            "rounds": len(rounds), "tickets": counts["tickets"], "settled": counts["landed"] + counts["lost"] + counts["void"],
-            "pending": counts["pending"], "void": counts["void"], "unavailable": counts["unavailable"], "unpriced": 0,
+            "rounds": len(rounds), "tickets": counts["tickets"],
+            "settled": counts["landed"] + counts["lost"] + counts["void"],
+            "pending": counts["pending"], "void": counts["void"],
+            "unavailable": counts["unavailable"], "unpriced": 0,
         },
-        "flat": {**ledger("flat"), "return_ci": [None if value is None else round(value, 6) for value in flat_ci], "ci_rounds": len(flat_date_rows)},
-        "adaptive": {
-            **ledger("adaptive"), "initial_bankroll": INITIAL_BANKROLL, "bankroll": round(bankroll, 4),
-            "peak": round(peak, 4), "current_drawdown": round(current_drawdown, 6),
-            "maximum_drawdown": round(max_drawdown, 6),
-            "unresolved_exposure": round(unresolved, 4), "series": series,
+        "flat": {
+            **_ledger(flat_account), "return_ci": ci(flat_account),
+            "ci_rounds": len(flat_account["date_rows"]),
+        },
+        "mel": {
+            **_bankroll_block(accounts["mel"]), "return_ci": ci(accounts["mel"]),
+            "ci_rounds": len(accounts["mel"]["date_rows"]),
+        },
+        "benchmarks": {
+            key: {
+                **_bankroll_block(accounts[key]), "return_ci": ci(accounts[key]),
+                "ci_rounds": len(accounts[key]["date_rows"]),
+            }
+            for key in POLICY_KEYS if key != "mel"
         },
         "types": type_stats,
-        "note": "Paper ledger. Flat stakes are fixed allocations; adaptive is quarter-Kelly with caps and drawdown controls. Bankroll advances once per fully terminal round. Not a profit guarantee.",
+        "note": "Paper ledger. Flat is 50/30/20; MEL-v1 is mandatory-exposure expected-log allocation; other policies are diagnostics. Bankroll advances once per fully terminal round. Not a profit guarantee.",
     }
 
 
