@@ -20,10 +20,22 @@ def test_correct_score_and_probability_below_58_are_excluded() -> None:
     rows = [
         row("A", "B", "BTTS:GG", 0.50),
         row("A", "B", "CORRECT_SCORE:1:0", 0.90),
-        row("C", "D", "BTTS:GG", 0.90),
+        row("C", "D", "BTTS:GG", 0.80),
     ]
     picks = report.passing_picks(rows)
     assert [(item["h"], item["a"], item["m"]) for item in picks] == [("C", "D", "BTTS:GG")]
+
+
+def test_any_bet_default_excludes_fair_odds_below_120() -> None:
+    rows = [
+        row("A", "B", "GOAL_RANGE_FT:1+", 0.95),
+        row("C", "D", "GOAL_RANGE_FT:1+", 0.84),
+        row("E", "F", "GOAL_RANGE_FT:1+", 0.80),
+        row("G", "H", "GOAL_RANGE_FT:1+", 0.58),
+    ]
+    picks = report.passing_picks(rows)
+    assert [(item["h"], item["a"]) for item in picks] == [("E", "F"), ("G", "H")]
+    assert report.MIN_FAIR == 1.20
 
 
 def test_summary_counts_pending_and_is_inclusive_at_58() -> None:
@@ -70,6 +82,7 @@ def test_top_nav_has_best_bets_explore_report() -> None:
 def test_committed_best_bets_record_structure() -> None:
     payload = json.loads((ROOT / "web" / "public" / "data" / "best-bets-record.json").read_text(encoding="utf-8"))
     assert payload["min_pc"] == 0.58
+    assert payload["min_fair"] == 1.20
     assert payload["rounds"]
     cumulative = payload["cumulative"]
     assert cumulative["settled"] >= 0
@@ -80,10 +93,11 @@ def test_committed_best_bets_record_structure() -> None:
 def test_14_nov_void_and_example_reporting_are_exact() -> None:
     payload = json.loads((ROOT / "web" / "public" / "data" / "best-bets-record.json").read_text(encoding="utf-8"))
     row = next(item for item in payload["rounds"] if item["date"] == "2026-11-14")
-    assert (row["passing"], row["settled"], row["landed"], row["lost"], row["void"], row["pending"]) == (48, 45, 45, 0, 3, 0)
+    assert (row["passing"], row["settled"], row["landed"], row["lost"], row["void"], row["pending"]) == (48, 46, 36, 10, 2, 0)
     source = (ROOT / "web" / "app" / "report" / "page.tsx").read_text(encoding="utf-8")
     normalized = " ".join(source.split())
     assert "Retrospective example generated after the fixture; not forward performance" in normalized
-    assert "44 of its 48 selections were GOAL_RANGE_FT:1+" in normalized
-    assert "median selected fair odds were approximately 1.055" in normalized
+    assert "36 landed, 10 lost and 2 void" in normalized
+    assert "none is GOAL_RANGE_FT:1+" in normalized
+    assert "median selected fair odds are approximately 1.218" in normalized
     assert "not evidence of positive expected value or realised bookmaker profit" in normalized

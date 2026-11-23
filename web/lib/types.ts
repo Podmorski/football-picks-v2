@@ -149,6 +149,7 @@ export type BestBetsRound = {
 
 export type BestBetsRecordFile = {
   min_pc: number;
+  min_fair?: number;
   rounds: BestBetsRound[];
   cumulative: Omit<BestBetsRound, 'date' | 'label' | 'kind'>;
 };

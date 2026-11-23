@@ -10,7 +10,7 @@ export default function HowItWorksPage() {
     },
     {
       title: 'Fair odds',
-      body: 'Fair odds are 1 divided by the calibrated probability. Best bets defaults to Any odds in every view; 1.40, 1.70, 2.00 and 2.50 remain available as visible filters. There is no hidden odds floor or favourites switch.',
+      body: 'Fair odds are 1 divided by the calibrated probability. Any bet defaults to minimum fair 1.20; group and single-market views default to any odds; Any odds, 1.40, 1.70, 2.00 and 2.50 remain available as visible filters. There is no hidden odds floor or favourites switch.',
     },
     {
       title: 'Best bets: one 58% list',

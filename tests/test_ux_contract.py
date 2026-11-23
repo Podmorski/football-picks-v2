@@ -20,9 +20,9 @@ def test_best_bets_distinguishes_loading_failure_and_unified_empty_state() -> No
         "Mozzart prices could not be loaded.",
         "Mozzart prices are not embedded in this build.",
         "No Mozzart snapshot for this round.",
-        "BEST_BETS_MIN_PC = 0.58",
+        "BEST_BETS_MIN_PC",
         "candidate.probability >= BEST_BETS_MIN_PC",
-        "No candidates meet the visible filters and 58% threshold.",
+        "No candidates meet the preferred settings",
         "activeMeta", "activeKind", "roundMeta",
         "Any odds", "Show all odds",
         "selectByMatch(qualified)",
@@ -78,8 +78,16 @@ def test_match_details_expose_all_qualifying_options() -> None:
 def test_any_odds_default_and_counts_follow_58_contract() -> None:
     source = read("web/components/VettedList.tsx")
     assert '<option value="any">Any odds</option>' in source
+    assert '<option value="1.20">Min fair odds 1.20</option>' in source
     assert "minOdds === 'any' ? 0" in source
-    assert "useParam('min', 'any')" in source
+    assert "useParam('min', '')" in source
+    assert "isAny ? ANY_BET_MIN_FAIR.toFixed(2) : 'any'" in source
+    assert "fallbacks" in source
+    assert "58%+ candidates below the selected payout floor" in source
+    assert "Highest-probability candidates below 58%" in source
+    assert "Model chance" in source
+    assert "break-even" in source
+    assert "model expected return" in source
     assert "Show all odds" in source
     assert "Counts follow exactly the same filters." in source
     assert "counts.groups.get(group)?.size" in source

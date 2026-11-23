@@ -13,10 +13,10 @@ def read(rel: str) -> str:
 
 def test_best_bets_is_one_inclusive_58_list_without_rule_modes_or_badges() -> None:
     source = read("web/components/VettedList.tsx")
-    assert "const BEST_BETS_MIN_PC = 0.58" in source
+    assert "BEST_BETS_MIN_PC" in source
     assert "item.candidate.probability >= BEST_BETS_MIN_PC" in source
     assert "selectByMatch(qualified)" in source
-    assert "No candidates meet the visible filters and 58% threshold." in source
+    assert "No candidates meet the preferred settings" in source
     for removed in (
         "selectPassing", "selectType", "Ranked — all candidates", "Strict checks only",
         "Value legs only", "Play only at odds", "'Strong' : 'Possible'", "<Badge variant=\"value\">Value",

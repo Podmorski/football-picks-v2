@@ -84,8 +84,9 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
 6. **Site** — `web/` (Next.js static export) reads `web/public/data/*.json`. Best bets is ONE unified
    list for Any bet, group and single market: league/market filter, visible minimum-fair filter,
    correct-score exclusion, inclusive `pc = row.pc ?? row.p >= 0.58`, then one highest-pc candidate per
-   match for Any/group or every eligible fixture for one market, sorted by pc. Any odds is the default
-   in every Best-bets view; explicit 1.40/1.70/2.00/2.50 selections survive. ANY_RULE, TYPE_RULE,
+   match for Any/group or every eligible fixture for one market, sorted by pc. Any bet defaults to a
+   visible minimum fair 1.20; group and single-market views default to any odds. Any odds and explicit
+   1.20/1.40/1.70/2.00/2.50 selections survive. ANY_RULE, TYPE_RULE,
    Ranked/Strict, Strong/Possible, Value badges, minimum-play text and Value-only ticket controls are
    not Best-bets gates or labels. Dropdown counts use the same 58% contract. Opened details retain
    neutral diagnostics and `MatchStats`; correct score stays hidden. Explore keeps its older picker,
@@ -471,6 +472,24 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   Focused tests: 25 in `tests/test_proposed_tickets.py`; full suite 353 passing.
 
 - Task 21 Phase 1 (23 Nov): shared ticket settlement is `pipeline/settlement.py`. One gross-multiplier rule is used by forward flat, forward adaptive and retrospective model-fair ledgers: any lost leg 0; all void 1; mixed landed/void the product of actual prices for landed legs only; pending no money movement. Forward accounting is round-atomic in `pipeline/proposed_tickets.py` (`aggregate_records`, `replay_adaptive`): bankroll/peak/maximum drawdown advance once after every available ticket in a round is terminal, otherwise the round's whole stake is reserved as unresolved exposure. Ticket order cannot change bankroll, peak or drawdown. Retrospective aggregates now expose counts only; their staked/returned/profit/ROI and any cumulative-profit headline are removed from the JSON, TypeScript types and My tickets. Individual retrospective fair accounting remains only beside the two retrospective disclaimers. Focused Phase-1 tests: 39 passing (`tests/test_settlement_accounting.py`, proposal/retrospective/contract/report tests).
+
+- Task 21 Phase 4 (23 Nov): the Best-bets dashboard keeps the unified inclusive 58% contract but Any
+  bet now defaults to minimum fair 1.20 (fair odds = 1/pc, so the preferred band is 58.0%-83.3%);
+  group and single-market views keep the Any-odds default, and any odds remain selectable. An
+  explicit `?min=` (numeric or `any`) is preserved; `?min=` absent uses the per-view default. The
+  dropdown lists Any odds and 1.20/1.40/1.70/2.00/2.50 (plus an explicit non-standard numeric value).
+  When no candidate meets the preferred settings, up to three highest-pc candidates outside them are
+  shown in a separate factual section labelled either "58%+ candidates below the selected payout
+  floor" (58% candidates exist but fail only the floor) or "Highest-probability candidates below
+  58%"; they are never presented as passing. Opened details with an actual price show model chance
+  pc, offered odds, break-even chance 1/o and model expected return pc x o - 1 as neutral arithmetic;
+  no Value badge, Strength label or positive-EV gate exists and unpriced builds show no EV claim.
+  `pipeline/report.py` applies the same 0.58 pc and 1.20 fair selection; the regenerated
+  `best-bets-record.json` carries `min_fair: 1.20` and reconciles: 14 Nov retrospective example
+  48 passing / 46 settled / 36 landed / 10 lost / 2 void / 0 pending (median selected fair 1.218,
+  none GOAL_RANGE_FT:1+), 21 Nov 122 pending, 22 Nov 44 pending, cumulative 214 passing / 166
+  pending. `web/lib/vetted.ts` `roundTally` now uses the same default contract for `/rounds`.
+  Dropdown counts derive from the same preferred rows after league, mode and min-odds filters.
 
 ## Open items
 

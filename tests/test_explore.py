@@ -48,23 +48,19 @@ def test_top_navigation_has_best_bets_and_explore() -> None:
 
 
 def default_vetted_tally(iso: str) -> tuple[int, int, int]:
-    """Mirror the Best bets default filters (DEFAULT_RULE, fair >= 1.70, best per match)."""
+    """Mirror the Best bets Any-bet defaults: pc >= 58%, fair >= 1.20, best per match."""
     full = ROOT / "picks" / f"{iso}.full.json"
     compact = ROOT / "picks" / f"{iso}.json"
     document = ranking.load(full if full.exists() else compact)
-    best: dict[tuple[str, str], tuple[float, str]] = {}
+    best: dict[tuple[str, str, str], tuple[float, str]] = {}
     for row in document["rows"]:
-        pc = row.get("pc", row["p"])
-        fair = 1 / max(pc, 1e-4)
-        candidate = vetting.Candidate(
-            probability=pc, model_probability=row["p"], league_rate=row["lr"], league_n=row["ln"],
-            home_rate=row["hr"], home_n=row["hn"], away_rate=row["ar"], away_n=row["an"],
-            fair_odds=fair, counts_probability=row["lr"],
-        )
-        passed, _ = vetting.evaluate(candidate, vetting.DEFAULT_RULE)
-        if not passed or fair < 1.70:
+        if row["m"].startswith("CORRECT_SCORE:"):
             continue
-        key = (row["h"], row["a"])
+        pc = float(row.get("pc", row["p"]))
+        fair = 1 / max(pc, 1e-4)
+        if pc < 0.58 or fair < 1.20:
+            continue
+        key = (row["d"], row["h"], row["a"])
         if key not in best or pc > best[key][0]:
             best[key] = (pc, row["st"])
     settled = [status for _, status in best.values() if status in ("landed", "lost")]
@@ -73,9 +69,9 @@ def default_vetted_tally(iso: str) -> tuple[int, int, int]:
 
 def test_rounds_tally_matches_the_best_bets_default_rows() -> None:
     # 21 Nov has no results yet: every row is pending, so no landed/lost tally.
-    assert default_vetted_tally("2026-11-21") == (70, 0, 0)
-    # The 14 Nov example is settled under the same rule: 10 of 26 landed.
-    assert default_vetted_tally("2026-11-14") == (26, 26, 10)
+    assert default_vetted_tally("2026-11-21") == (122, 0, 0)
+    # The 14 Nov example is settled under the same rule: 36 of 46 landed.
+    assert default_vetted_tally("2026-11-14") == (48, 46, 36)
 
 
 def test_rounds_index_has_one_entry_per_date() -> None:
@@ -195,7 +191,7 @@ def test_correct_score_is_hidden_from_the_picker_ui() -> None:
 
 def test_best_bets_uses_the_58_contract_not_type_rule() -> None:
     vetted = (ROOT / "web" / "components" / "VettedList.tsx").read_text(encoding="utf-8")
-    assert "BEST_BETS_MIN_PC = 0.58" in vetted
+    assert "BEST_BETS_MIN_PC" in vetted
     assert "candidate.probability >= BEST_BETS_MIN_PC" in vetted
     assert "selectType" not in vetted
     assert "selectPassing" not in vetted

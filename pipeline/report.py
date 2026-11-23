@@ -1,6 +1,7 @@
 """Best bets record for /report: the unified 58%+ picker per settled round.
 
-Rebuilt after every run_model pass so the report is automatic. Aggregates only;
+Rebuilt after every run_model pass so the report is automatic. The Any-bet
+record uses the dashboard's default minimum fair odds (1.20). Aggregates only;
 no Mozzart prices are involved.
 """
 from __future__ import annotations
@@ -11,6 +12,7 @@ from pathlib import Path
 from . import ranking
 
 MIN_PC = 0.58
+MIN_FAIR = 1.20
 HIDDEN_PREFIX = "CORRECT_SCORE:"
 
 
@@ -19,13 +21,15 @@ def _probability(row: dict) -> float:
 
 
 def passing_picks(rows: list[dict]) -> list[dict]:
-    """Inclusive 58% calibrated probability, one pick per match, highest pc."""
+    """Inclusive 58% calibrated probability, fair odds >= 1.20, one pick per match, highest pc."""
     best: dict[tuple, dict] = {}
     for row in rows:
         if str(row.get("m", "")).startswith(HIDDEN_PREFIX):
             continue
         probability = _probability(row)
         if probability < MIN_PC:
+            continue
+        if 1.0 / max(probability, 0.0001) < MIN_FAIR:
             continue
         key = (row.get("d"), row.get("h"), row.get("a"))
         current = best.get(key)
@@ -91,7 +95,7 @@ def build(picks_dir: Path, web_dir: Path) -> dict:
     }
     assert cumulative["landed"] + cumulative["lost"] + cumulative["void"] + cumulative["pending"] == cumulative["passing"]
 
-    payload = {"min_pc": MIN_PC, "rounds": rounds, "cumulative": cumulative}
+    payload = {"min_pc": MIN_PC, "min_fair": MIN_FAIR, "rounds": rounds, "cumulative": cumulative}
     web_dir.mkdir(parents=True, exist_ok=True)
     (web_dir / "best-bets-record.json").write_text(
         json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=1) + "\n", encoding="utf-8"

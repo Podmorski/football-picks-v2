@@ -16,7 +16,13 @@ import {
 } from './vetting';
 
 // Default minimum fair odds on Best bets (`?min=`).
+// Any bet defaults to the 1.20 payout floor; group and single-market views
+// default to any odds so a chosen market is never suppressed.
+export const ANY_BET_MIN_FAIR = 1.20;
 export const DEFAULT_MIN_FAIR = 1.70;
+
+// Preferred calibrated probability for the unified Best bets list.
+export const BEST_BETS_MIN_PC = 0.58;
 
 // Groups kept in the data files but no longer shown in the picker UI.
 export const HIDDEN_GROUP = 'Correct score';
@@ -44,6 +50,16 @@ export function pcOf(row: RankRow): number {
 
 export function fairOf(row: RankRow): number {
   return 1 / Math.max(pcOf(row), 0.0001);
+}
+
+// Offered-price arithmetic shown in opened details. These are descriptive
+// values, never a Value badge or a positive-EV gate.
+export function breakEvenChance(odds: number): number {
+  return odds > 0 ? 1 / odds : 0;
+}
+
+export function expectedReturn(probability: number, odds: number): number {
+  return probability * odds - 1;
 }
 
 export function evaluateRows(
@@ -169,10 +185,20 @@ export type RoundTally = {
   expected: number;
 };
 
-// Tally under the default filters. Only landed/lost rows count as settled;
-// pending and void never land or lose.
+// Tally under the Any-bet default filters: inclusive 58% probability, fair odds
+// at least 1.20, one highest-probability row per match. Only landed/lost rows
+// count as settled; pending and void never land or lose.
 export function roundTally(rows: RankRow[]): RoundTally {
-  const picks = selectPassing(evaluateRows(rows), { minFair: DEFAULT_MIN_FAIR });
+  const best = new Map<string, Evaluated>();
+  for (const item of evaluateRows(rows)) {
+    if (isHiddenMarketId(item.row.m)) continue;
+    if (item.candidate.probability < BEST_BETS_MIN_PC) continue;
+    if (item.candidate.fairOdds < ANY_BET_MIN_FAIR) continue;
+    const key = `${item.row.d}|${item.row.h}|${item.row.a}`;
+    const current = best.get(key);
+    if (!current || item.candidate.probability > current.candidate.probability) best.set(key, item);
+  }
+  const picks = [...best.values()].sort((a, b) => b.candidate.probability - a.candidate.probability);
   const settled = picks.filter((item) => item.row.st === 'landed' || item.row.st === 'lost');
   const landed = settled.filter((item) => item.row.st === 'landed').length;
   const expected = settled.reduce((total, item) => total + item.candidate.probability, 0);

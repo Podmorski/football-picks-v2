@@ -16,7 +16,7 @@ import {
 } from '@/lib/prices';
 import { addTicket, combinedFair, combinedMozzart, combinedProbability, legKey, payout, sameMatchWarning, type TicketLeg } from '@/lib/ticket';
 import { optimiseTickets } from '@/lib/ticketOpt';
-import { evaluateRows, isHiddenMarketId, pcOf, selectByMatch, type Evaluated } from '@/lib/vetted';
+import { evaluateRows, ANY_BET_MIN_FAIR, BEST_BETS_MIN_PC, breakEvenChance, expectedReturn, isHiddenMarketId, pcOf, selectByMatch, type Evaluated } from '@/lib/vetted';
 import { minPlay } from '@/lib/vetting';
 import type { MarketMeta, RankRow } from '@/lib/types';
 
@@ -33,7 +33,7 @@ const LADDER_LABELS: Record<string, string> = {
   'GOAL_RANGE_1H:I1+': '1st half 1+', 'GOAL_RANGE_1H:I2+': '1st half 2+', 'BTTS:GG': 'Both teams score',
 };
 const TARGETS = [3, 5, 10];
-const BEST_BETS_MIN_PC = 0.58;
+const MIN_FAIR_OPTIONS = ['1.20', '1.40', '1.70', '2.00', '2.50'];
 
 function pct(value: number): string {
   return `${(value * 100).toFixed(1)}%`;
@@ -96,7 +96,7 @@ export default function VettedList({
   const [pricesState, setPricesState] = useState<'loading' | 'ready' | 'unpriced' | 'error'>('loading');
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
-  const [minOdds, setMinOdds] = useParam('min', 'any');
+  const [minOddsParam, setMinOddsParam] = useParam('min', '');
   const [roundParam, setRound] = useParam('round', date);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [ticket, setTicket] = useState<TicketLeg[]>([]);
@@ -195,6 +195,11 @@ export default function VettedList({
   const snapshot = useMemo(() => snapshotFor(prices, activeDate), [prices, activeDate]);
 
   const isAny = bet === 'any';
+  // Any bet defaults to the 1.20 payout floor; group and single-market views
+  // default to any odds. An explicit `?min=` always survives.
+  const defaultMinOdds = isAny ? ANY_BET_MIN_FAIR.toFixed(2) : 'any';
+  const minOdds = minOddsParam === '' ? defaultMinOdds : minOddsParam;
+  function setMinOdds(next: string) { setMinOddsParam(next); }
   const activeEvaluated = useMemo<EvaluatedRow[]>(() => {
     return evaluateRows(data?.rows ?? [], (row) => priceIndex[priceKey(row.d, row.h, row.a, row.m)], 'any');
   }, [data, priceIndex]);
@@ -220,6 +225,18 @@ export default function VettedList({
     () => eligible.filter((item) => item.candidate.probability >= BEST_BETS_MIN_PC),
     [eligible],
   );
+  const pcCandidates = useMemo(
+    () => baseFiltered.filter((item) => item.candidate.probability >= BEST_BETS_MIN_PC),
+    [baseFiltered],
+  );
+  const fallbacks = useMemo(
+    () => baseFiltered
+      .filter((item) => !(item.candidate.probability >= BEST_BETS_MIN_PC && item.candidate.fairOdds >= minFair))
+      .sort((a, b) => b.candidate.probability - a.candidate.probability)
+      .slice(0, 3),
+    [baseFiltered, minFair],
+  );
+  const payoutOnlyFailure = qualified.length === 0 && pcCandidates.length > 0;
   const baseCount = useMemo(
     () => bet.startsWith('group:')
       ? new Set(baseFiltered.map((item) => `${item.row.d}|${item.row.h}|${item.row.a}`)).size
@@ -340,16 +357,21 @@ export default function VettedList({
         </select>
         <select value={minOdds} onChange={(event) => setMinOdds(event.target.value)} aria-label="Minimum fair odds" className="w-full rounded-md border bg-background px-2 py-1.5 text-sm">
           <option value="any">Any odds</option>
+          <option value="1.20">Min fair odds 1.20</option>
           <option value="1.40">Min fair odds 1.40</option>
           <option value="1.70">Min fair odds 1.70</option>
           <option value="2.00">Min fair odds 2.00</option>
           <option value="2.50">Min fair odds 2.50</option>
+          {minOdds !== 'any' && !MIN_FAIR_OPTIONS.includes(minOdds) ? (
+            <option value={minOdds}>Min fair odds {Number(minOdds).toFixed(2)}</option>
+          ) : null}
         </select>
       </div>
 
       <p className="text-xs text-muted-foreground">
         One unified list: calibrated probability ≥ 58%, after the league, market and visible minimum-fair
-        filters. Counts follow exactly the same filters. Lower-probability analysis remains in Explore.
+        filters. Any bet defaults to minimum fair 1.20; group and single-market views default to any odds.
+        Counts follow exactly the same filters. Lower-probability analysis remains in Explore.
       </p>
 
       {!dataReady ? (
@@ -378,11 +400,29 @@ export default function VettedList({
           {displayed.length === 0 ? (
             <div className="space-y-2">
               <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
-                No candidates meet the visible filters and 58% threshold.
+                No candidates meet the preferred settings (calibrated probability ≥ 58%
+                {minFair > 0 ? ` and fair odds ≥ ${minFair.toFixed(2)}` : ''}).
                 {minFair > 0 && baseFiltered.length > 0 ? ` ${baseCount} candidates exist before the minimum fair-odds filter.` : ''}
-                {' '}Lower-probability analysis remains available in Explore.
               </p>
-              {eligible.length === 0 && baseFiltered.length > 0 && minFair > 0 ? (
+              {fallbacks.length > 0 ? (
+                <section className="rounded-xl border border-dashed px-4 py-3">
+                  <h3 className="text-sm font-medium">
+                    {payoutOnlyFailure ? '58%+ candidates below the selected payout floor' : 'Highest-probability candidates below 58%'}
+                  </h3>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Outside the preferred contract. Shown for context only, not as passing selections.
+                  </p>
+                  <ul className="mt-2 space-y-1 text-sm">
+                    {fallbacks.map((item) => (
+                      <li key={`${item.row.h}|${item.row.a}|${item.row.m}`} className="flex flex-wrap justify-between gap-x-3 gap-y-0.5">
+                        <span className="min-w-0 truncate">{item.row.h} v {item.row.a} · {markets[item.row.m]?.plain ?? item.row.m}</span>
+                        <span className="tabular text-muted-foreground">{pct(item.candidate.probability)} · fair {item.candidate.fairOdds.toFixed(2)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+              {payoutOnlyFailure && minFair > 0 ? (
                 <button type="button" onClick={() => setMinOdds('any')} className="rounded-md border px-2.5 py-1 text-xs">Show all odds</button>
               ) : null}
             </div>
@@ -442,7 +482,17 @@ export default function VettedList({
 
                     {open ? (
                       <div className="mt-2 space-y-2 rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                        {price ? <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p> : <p>{priceUnavailableText()}</p>}
+                        {price ? (
+                          <div className="space-y-0.5">
+                            <p>Mozzart {price.odds.toFixed(2)} ({utcTime(price.fetchedAt)})</p>
+                            <p>
+                              Model chance {pct(candidate.probability)} · offered odds {price.odds.toFixed(2)} · break-even
+                              chance {(breakEvenChance(price.odds) * 100).toFixed(1)}% · model expected return{' '}
+                              {signedPct(expectedReturn(candidate.probability, price.odds) * 100)}
+                            </p>
+                            <p className="text-xs">Arithmetic at the offered price only; no positive-edge claim.</p>
+                          </div>
+                        ) : <p>{priceUnavailableText()}</p>}
                         <p>League usual {pct(row.lr)} (n={row.ln}) · lift {item.lift.toFixed(2)}× usual</p>
                         <p>Home at home {pct(row.hr)} (n={row.hn}) · away away {pct(row.ar)} (n={row.an}) · league usual {pct(row.lr)}</p>
                         <p>Model {pct(row.p)} · team empirical {pct(candidate.countsProbability ?? 0)} · agreement difference {pct(Math.abs(row.p - (candidate.countsProbability ?? 0)))}</p>

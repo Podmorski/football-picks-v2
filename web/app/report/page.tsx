@@ -218,15 +218,16 @@ export default function ReportPage() {
         <h2 className="text-lg font-semibold">Best bets results · unified 58% selection</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">
           Current Best bets record: calibrated probability ≥{' '}
-          {bestBets ? pct(bestBets.min_pc) : '58.0%'}, any odds, one pick per match by highest pc.
+          {bestBets ? pct(bestBets.min_pc) : '58.0%'}, fair odds ≥ {bestBets?.min_fair?.toFixed(2) ?? '1.20'} (the Any-bet
+          default), one pick per match by highest pc.
           Expected is the sum of shown probabilities over settled rows only, where settled means
           Landed or Lost; Void and Pending are separate buckets.
         </p>
         <p className="max-w-3xl rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
           The 14 Nov row is a retrospective example generated after the fixture; not forward
-          performance. 44 of its 48 selections were GOAL_RANGE_FT:1+, and median selected fair odds
-          were approximately 1.055. High landing frequency at these very short prices is not evidence
-          of positive expected value or realised bookmaker profit.
+          performance. Under the 1.20 minimum-fair default its 48 selections are 36 landed, 10 lost
+          and 2 void; none is GOAL_RANGE_FT:1+, and median selected fair odds are approximately 1.218.
+          This is not evidence of positive expected value or realised bookmaker profit.
         </p>
         {settled.length === 0 ? (
           <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
