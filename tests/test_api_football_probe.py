@@ -36,6 +36,17 @@ def test_no_retry_on_provider_error_and_no_second_page() -> None:
     assert result["pages"][0]["quota"]["x-ratelimit-requests-remaining"] == "0"
 
 
+def test_summary_does_not_require_a_local_fixtures_cache(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(probe, "RAW_DIR", tmp_path)
+
+    def transport(url, params, headers):
+        return 200, {}, {"paging": {}, "response": [], "errors": []}
+
+    result = probe.run(probe.Probe(key="not-printed", transport=transport), ("2026-11-21",))
+    assert result["v2_fixtures"] == 0
+    assert result["requests"] == 1
+
+
 def test_missing_key_makes_zero_requests(monkeypatch, capsys) -> None:
     monkeypatch.setattr(probe, "load_api_key", lambda: None)
     assert probe.main([]) == 2

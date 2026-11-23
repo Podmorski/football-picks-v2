@@ -162,8 +162,10 @@ def _event_row(event: dict) -> dict:
 def summarise(pages: list[dict], events: list[dict]) -> dict:
     rows = [_event_row(event) for event in events]
     final = [row for row in rows if row["status"] in ("FT", "AET", "PEN") and row["ft"]]
+    fixtures_path = RAW_DIR / "fixtures.csv"
+    v2_all = parse_fixtures(fixtures_path) if fixtures_path.exists() else []
     v2_fixtures = [
-        fixture for fixture in parse_fixtures(RAW_DIR / "fixtures.csv")
+        fixture for fixture in v2_all
         if fixture.date.isoformat() in DATES and fixture.div in DIVISION_NAMES
     ]
     by_date_div = {code: 0 for code in DIVISION_NAMES}

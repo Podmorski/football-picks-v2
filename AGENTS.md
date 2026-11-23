@@ -426,8 +426,9 @@ from half-time and full-time scores. Next goal: show Mozzart's actual price next
   rejected by the free-plan date gate; 22 Nov returned “Page field do not exist” because the probe sent
   page=1 on its first request. No retry was made; quota headers were limit 100 / remaining 99. The probe
   first-page request is fixed for any future owner-approved run, but no HT/FT coverage was obtained and
-  no settlement integration exists. API-Football licensing docs still return HTTP 403. Full validation:
-  339 pytest tests passing; `npm run build` green (50 pages).
+  no settlement integration exists. API-Football licensing docs still return HTTP 403. Probe summarisation
+  does not require a local `fixtures.csv`, so public CI passes without gitignored cache data. Full
+  validation: 340 pytest tests passing; `npm run build` green (50 pages).
 - Failure alerts: `pipeline/alerts.py` makes `update.yml` fail when a round has fixtures but nothing was
   published or settling found results but changed nothing (return 3 from `run_model`), and makes
   `prices.yml` fail when a price fetch priced < 50% of fixtures (return 5 from the CLI). `prices.yml`
