@@ -10,6 +10,7 @@ web/public/data/mozzart-record.json
 web/public/data/mozzart-vetted-record.json
 web/public/data/mozzart-status.json
 web/public/data/proposed-tickets-private.json
+web/public/data/daily-best-private.json
 web/screens/
 prices/
 prices-private/

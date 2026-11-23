@@ -17,7 +17,7 @@ import sys
 from pathlib import Path
 
 from ..config import ROOT_DIR
-from .. import alerts, proposed_tickets, ranking
+from .. import alerts, daily_best, proposed_tickets, ranking
 from . import client, record, snapshot, vetted_record
 
 PICKS_DIR = ROOT_DIR / "picks"
@@ -175,6 +175,17 @@ def main(argv=None) -> int:
             print(f"ERROR: {exc}")
             finish(False, f"proposal readiness: {exc}")
             return 3
+        frozen_daily = daily_best.ensure_daily_best(
+            round_date.isoformat(), document, frozen_snapshot, prices_dir,
+        )
+        if frozen_daily is not None:
+            print(f"daily best: {frozen_daily.get('selected', 0)} frozen pick(s)")
+        try:
+            daily_best.validate_daily_best(prices_dir)
+        except daily_best.DailyBestReadinessError as exc:
+            print(f"ERROR: {exc}")
+            finish(False, f"daily-best readiness: {exc}")
+            return 4
 
     aggregate = record.aggregate(_all_rounds(), snapshots)
     _write_json(prices_dir / "record.json", aggregate)

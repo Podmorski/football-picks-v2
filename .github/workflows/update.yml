@@ -105,6 +105,9 @@ jobs:
       - name: Settle proposals and rebuild public aggregate
         run: python -m pipeline.proposed_tickets aggregate --prices-dir prices-private --picks-dir picks --web-dir web/public/data
 
+      - name: Rebuild Daily-best forward record
+        run: python -m pipeline.daily_best aggregate --prices-dir prices-private --picks-dir picks --web-dir web/public/data
+
       - name: Forward proposal readiness and validation
         run: |
           python -m pipeline.forward_proposals --prices-dir prices-private --picks-dir picks --web-dir web/public/data

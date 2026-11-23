@@ -1,0 +1,71 @@
+{
+ "activation": null,
+ "activation_marker": "daily-best-v1",
+ "band": {
+  "high": 2.3,
+  "low": 1.7
+ },
+ "cumulative": {
+  "band_split": {
+   "fallback": {
+    "landed": 0,
+    "lost": 0,
+    "net": 0.0,
+    "pending": 0,
+    "returned": 0.0,
+    "roi": null,
+    "selected": 0,
+    "settled": 0,
+    "staked": 0.0,
+    "void": 0
+   },
+   "in_band": {
+    "landed": 0,
+    "lost": 0,
+    "net": 0.0,
+    "pending": 0,
+    "returned": 0.0,
+    "roi": null,
+    "selected": 0,
+    "settled": 0,
+    "staked": 0.0,
+    "void": 0
+   }
+  },
+  "by_group": {},
+  "expected_landed": 0.0,
+  "expected_landed_settled": 0.0,
+  "fallback_selected": 0,
+  "in_band_selected": 0,
+  "interval_state": "insufficient forward rounds for an interval",
+  "landed": 0,
+  "lost": 0,
+  "mean_actual_odds": null,
+  "mean_model_ev": null,
+  "median_actual_odds": null,
+  "net": 0.0,
+  "odds_aggregate_state": "insufficient settled picks for odds aggregates",
+  "pending": 0,
+  "pending_exposure": 0.0,
+  "return_ci": [
+   null,
+   null
+  ],
+  "returned": 0.0,
+  "roi": null,
+  "selected": 0,
+  "settled": 0,
+  "settled_forward_rows": 0,
+  "settled_rounds": 0,
+  "staked": 0.0,
+  "terminal_rounds": 0,
+  "void": 0
+ },
+ "limit": 12,
+ "min_odds": 1.2,
+ "note": "Forward frozen-price paper return. One unit per frozen pick; landed returns the frozen actual price, lost 0, void 1, pending is excluded from settled staked/returned/net and shown as pending exposure. Not an executable bookmaker return and not guaranteed profit.",
+ "prices_published": false,
+ "rounds": [],
+ "rule_version": "daily-best-v1",
+ "schema_version": 1
+}

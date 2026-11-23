@@ -1,5 +1,6 @@
 import {
   readBestBetsRecord,
+  readDailyBestRecord,
   readDataHealth,
   readForwardProposals,
   readForwardValidation,
@@ -9,7 +10,7 @@ import {
   readTypeBacktest,
   readValueRecord,
 } from '@/lib/data';
-import type { BestBetsRound, DataHealthFile, ForwardProposalsFile, ForwardValidationFile, ForwardValidationSeries, MozzartStatusFile, PreregistrationFile, ValueSummaryRow } from '@/lib/types';
+import type { BestBetsRound, DailyBestRecordFile, DataHealthFile, ForwardProposalsFile, ForwardValidationFile, ForwardValidationSeries, MozzartStatusFile, PreregistrationFile, ValueSummaryRow } from '@/lib/types';
 
 function pct(value: number | null): string {
   return value === null ? '–' : `${(value * 100).toFixed(1)}%`;
@@ -25,6 +26,151 @@ function interval(low: number | null, high: number | null): string {
 
 function units(value: number | null): string {
   return value === null ? '–' : `${value > 0 ? '+' : ''}${value.toFixed(2)}`;
+}
+
+function DailyBestSection({ record }: { record: DailyBestRecordFile | null }) {
+  if (!record) {
+    return (
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold">Daily best — forward actual-price record</h2>
+        <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+          No Daily-best forward record is embedded in this build.
+        </p>
+      </section>
+    );
+  }
+  const cumulative = record.cumulative;
+  return (
+    <section className="space-y-3">
+      <h2 className="text-lg font-semibold">Daily best — forward actual-price record</h2>
+      <p className="max-w-3xl text-sm text-muted-foreground">
+        The default All-leagues list at actual odds {record.band.low.toFixed(2)}–{record.band.high.toFixed(2)},
+        frozen before kickoff and capped at {record.limit} fixtures. One unit per pick. This is a forward
+        frozen-price paper return, not an executable bookmaker return or guaranteed profit.
+      </p>
+      <p className="text-xs text-muted-foreground">
+        {record.activation
+          ? `Activated ${record.activation.activated_round} (marker ${record.activation.marker}).`
+          : 'Daily-best-v1 is not yet operational in the private store.'}
+        {' '}Frozen rounds: {record.rounds.length}.
+      </p>
+      {record.rounds.length === 0 ? (
+        <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+          No frozen Daily-best rounds yet. The record starts with the first activated round; pre-activation
+          rounds are not backfilled.
+        </p>
+      ) : (
+        <>
+          <div className="overflow-x-auto rounded-xl border">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground">
+                  <th className="px-3 py-2 text-left font-semibold">Round</th>
+                  <th className="px-3 py-2 text-right font-semibold">Selected</th>
+                  <th className="px-3 py-2 text-right font-semibold">Settled</th>
+                  <th className="px-3 py-2 text-right font-semibold">Landed</th>
+                  <th className="px-3 py-2 text-right font-semibold">Lost</th>
+                  <th className="px-3 py-2 text-right font-semibold">Void</th>
+                  <th className="px-3 py-2 text-right font-semibold">Pending</th>
+                  <th className="px-3 py-2 text-right font-semibold">Expected</th>
+                  <th className="px-3 py-2 text-right font-semibold">Staked</th>
+                  <th className="px-3 py-2 text-right font-semibold">Returned</th>
+                  <th className="px-3 py-2 text-right font-semibold">Net</th>
+                  <th className="px-3 py-2 text-right font-semibold">ROI</th>
+                </tr>
+              </thead>
+              <tbody>
+                {record.rounds.map((round) => (
+                  <tr key={round.round_date} className="border-t">
+                    <td className="px-3 py-1.5">
+                      {round.round_date}
+                      <span className="ml-2 text-xs text-muted-foreground">{round.state}</span>
+                    </td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.selected}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.settled}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.landed}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.lost}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.void}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.pending}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.expected_landed.toFixed(1)}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.staked.toFixed(0)}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{round.returned.toFixed(2)}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{units(round.net)}</td>
+                    <td className="tabular px-3 py-1.5 text-right">{signed(round.roi)}</td>
+                  </tr>
+                ))}
+                <tr className="border-t bg-muted/40 font-medium">
+                  <td className="px-3 py-1.5">Cumulative</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.selected}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.settled}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.landed}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.lost}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.void}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.pending}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.expected_landed.toFixed(1)}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.staked.toFixed(0)}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{cumulative.returned.toFixed(2)}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{units(cumulative.net)}</td>
+                  <td className="tabular px-3 py-1.5 text-right">{signed(cumulative.roi)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Pending exposure {cumulative.pending_exposure.toFixed(0)} unit(s), excluded from settled staked,
+            returned and net. Pending is not a loss; it remains open until the round file is terminal.
+            {' '}In-band picks {cumulative.in_band_selected}; fallback picks {cumulative.fallback_selected}.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {cumulative.settled_rounds >= 30
+              ? `95% whole-round bootstrap return interval: ${interval(cumulative.return_ci[0], cumulative.return_ci[1])}.`
+              : 'Insufficient forward rounds for an interval.'}
+            {' '}Settled rounds {cumulative.settled_rounds}.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            {cumulative.mean_actual_odds === null
+              ? 'Actual-odds and model-EV aggregates are withheld until 10 settled picks.'
+              : `Mean actual odds ${cumulative.mean_actual_odds.toFixed(2)} · median ${cumulative.median_actual_odds?.toFixed(2) ?? '–'} · mean model EV ${signed(cumulative.mean_model_ev)}.`}
+          </p>
+          <div className="grid gap-3 lg:grid-cols-2">
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="w-full text-sm">
+                <thead><tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-2 text-left font-semibold">Market group</th><th className="px-3 py-2 text-right font-semibold">Selected</th><th className="px-3 py-2 text-right font-semibold">Landed</th><th className="px-3 py-2 text-right font-semibold">Net</th><th className="px-3 py-2 text-right font-semibold">ROI</th></tr></thead>
+                <tbody>
+                  {Object.entries(cumulative.by_group).map(([group, row]) => (
+                    <tr key={group} className="border-t">
+                      <td className="px-3 py-1.5">{group}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{row.selected}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{row.landed}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{units(row.net)}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{signed(row.roi)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="overflow-x-auto rounded-xl border">
+              <table className="w-full text-sm">
+                <thead><tr className="bg-muted/60 text-xs uppercase tracking-wide text-muted-foreground"><th className="px-3 py-2 text-left font-semibold">Band</th><th className="px-3 py-2 text-right font-semibold">Selected</th><th className="px-3 py-2 text-right font-semibold">Landed</th><th className="px-3 py-2 text-right font-semibold">Net</th><th className="px-3 py-2 text-right font-semibold">ROI</th></tr></thead>
+                <tbody>
+                  {Object.entries(cumulative.band_split).map(([band, row]) => (
+                    <tr key={band} className="border-t">
+                      <td className="px-3 py-1.5">{band === 'in_band' ? 'In preferred band' : 'Fallback (nearest band)'}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{row.selected}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{row.landed}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{units(row.net)}</td>
+                      <td className="tabular px-3 py-1.5 text-right">{signed(row.roi)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">{record.note}</p>
+        </>
+      )}
+    </section>
+  );
 }
 
 function ValueTable({ label, summary }: { label: string; summary: ValueSummaryRow }) {
@@ -354,6 +500,7 @@ function ForwardValidationSection({ validation }: { validation: ForwardValidatio
 export default function ReportPage() {
   const report = readTypeBacktest();
   const bestBets = readBestBetsRecord();
+  const dailyBest = readDailyBestRecord();
   const mozzart = readMozzartVettedRecord();
   const status = readMozzartStatus();
   const updated = utcStamp(new Date().toISOString());
@@ -387,6 +534,7 @@ export default function ReportPage() {
         </p>
       </header>
 
+      <DailyBestSection record={dailyBest} />
       <DataHealthSection health={dataHealth} />
       <ForwardProposalsSection forward={forwardProposals} />
       <PreregistrationSection prereg={preregistration} />

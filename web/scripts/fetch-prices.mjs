@@ -9,10 +9,11 @@ const RECORD_OUT = join(DATA, 'mozzart-record.json');
 const VETTED_OUT = join(DATA, 'mozzart-vetted-record.json');
 const STATUS_OUT = join(DATA, 'mozzart-status.json');
 const PROPOSALS_OUT = join(DATA, 'proposed-tickets-private.json');
+const DAILY_BEST_OUT = join(DATA, 'daily-best-private.json');
 const PROPOSAL_ACTIVATION_DATE = '2026-11-24';
 
 function clean() {
-  for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT, STATUS_OUT, PROPOSALS_OUT]) {
+  for (const path of [PRICES_OUT, RECORD_OUT, VETTED_OUT, STATUS_OUT, PROPOSALS_OUT, DAILY_BEST_OUT]) {
     try {
       if (existsSync(path)) rmSync(path);
     } catch {
@@ -88,6 +89,37 @@ try {
     );
   }
   writeFileSync(PROPOSALS_OUT, JSON.stringify({ rounds: proposals }));
+  const dailyBestDir = join(cloneDir, 'daily-best');
+  const dailyBest = existsSync(dailyBestDir)
+    ? readdirSync(dailyBestDir)
+        .filter((name) => name.endsWith('.json') && name !== 'activation.json')
+        .sort()
+        .map((name) => JSON.parse(readFileSync(join(dailyBestDir, name), 'utf8')))
+    : [];
+  const activationPath = join(dailyBestDir, 'activation.json');
+  const rawActivation = existsSync(activationPath)
+    ? JSON.parse(readFileSync(activationPath, 'utf8'))
+    : null;
+  const dailyBestActivation = rawActivation && rawActivation.marker === 'daily-best-v1' ? rawActivation : null;
+  const validDailyBest = new Set(
+    dailyBest
+      .filter((round) => round.rule_version === 'daily-best-v1' && round.round_date && Array.isArray(round.rows))
+      .map((round) => round.round_date),
+  );
+  const activatedRound = dailyBestActivation?.activated_round ? String(dailyBestActivation.activated_round) : null;
+  const missingDailyBest = activatedRound
+    ? rounds
+        .filter((snapshot) => String(snapshot.round_date ?? '') >= activatedRound && (snapshot.fixtures ?? []).length > 0)
+        .map((snapshot) => snapshot.round_date)
+        .filter((date) => !validDailyBest.has(date))
+    : [];
+  if (missingDailyBest.length > 0) {
+    throw new Error(
+      'required frozen Daily best data missing for snapshot round(s): ' + missingDailyBest.join(', ') +
+      ' (marker daily-best-v1, activated ' + activatedRound + ')',
+    );
+  }
+  writeFileSync(DAILY_BEST_OUT, JSON.stringify({ activation: dailyBestActivation, rounds: dailyBest }));
   const recordPath = join(cloneDir, 'record.json');
   if (existsSync(recordPath)) writeFileSync(RECORD_OUT, readFileSync(recordPath));
   const vettedPath = join(cloneDir, 'vetted-record.json');
@@ -125,7 +157,10 @@ try {
       last_run: usage?.last_run ?? inferredRun,
     }),
   );
-  console.log('prices: embedded ' + rounds.length + ' round snapshot(s) and ' + proposals.length + ' proposal round(s)');
+  console.log(
+    'prices: embedded ' + rounds.length + ' round snapshot(s), ' + proposals.length +
+    ' proposal round(s) and ' + dailyBest.length + ' frozen Daily best round(s)',
+  );
 } catch (error) {
   clean();
   // A priced build must never fall back to an unpriced one: throw so Vercel

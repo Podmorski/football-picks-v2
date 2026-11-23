@@ -814,3 +814,98 @@ export type ForwardValidationFile = {
   multiple_comparisons?: string;
   bootstrap: { unit: string; resamples: number; seed: number };
 };
+
+export type DailyBestBand = { low: number; high: number };
+
+export type DailyBestFrozenRow = {
+  d: string; h: string; a: string; m: string; k?: string | null;
+  pc: number; fair: number; odds: number; group: string;
+};
+
+export type DailyBestFrozenRound = {
+  schema_version: number;
+  rule_version: string;
+  activation_marker: string;
+  round_date: string;
+  snapshot_identity: { round_date: string | null; fetched_at: string | null };
+  band: DailyBestBand;
+  min_odds: number;
+  limit: number;
+  eligible_counts: { fixtures: number; in_band: number; outside: number; rejected: number };
+  selected: number;
+  in_band_selected: number;
+  fallback_selected: number;
+  rows: DailyBestFrozenRow[];
+};
+
+export type DailyBestActivation = {
+  schema_version: number;
+  marker: string;
+  rule_version: string;
+  activation_date: string;
+  activated_round: string;
+  snapshot_identity?: { round_date: string | null; fetched_at: string | null };
+};
+
+export type DailyBestPrivateFile = {
+  activation: DailyBestActivation | null;
+  rounds: DailyBestFrozenRound[];
+};
+
+export type DailyBestStats = {
+  selected: number; settled: number; landed: number; lost: number; void: number; pending: number;
+  staked: number; returned: number; net: number; roi: number | null;
+};
+
+export type DailyBestRecordRow = {
+  d: string; h: string; a: string; m: string; pc: number; group: string; in_band: boolean; st: string;
+};
+
+export type DailyBestRoundRecord = {
+  round_date: string;
+  snapshot_identity?: { round_date: string | null; fetched_at: string | null };
+  selected: number; settled: number; landed: number; lost: number; void: number; pending: number;
+  expected_landed: number; expected_landed_settled: number;
+  staked: number; returned: number; net: number; roi: number | null;
+  pending_exposure: number;
+  state: 'unavailable' | 'pending' | 'partial' | 'settled';
+  terminal: boolean;
+  round_data_available: boolean;
+  source_pending: boolean;
+  in_band_selected: number; fallback_selected: number;
+  eligible_counts: { fixtures: number; in_band: number; outside: number; rejected: number };
+  by_group: Record<string, DailyBestStats>;
+  band_split: Record<'in_band' | 'fallback', DailyBestStats>;
+  rows: DailyBestRecordRow[];
+};
+
+export type DailyBestCumulative = {
+  selected: number; settled: number; landed: number; lost: number; void: number; pending: number;
+  expected_landed: number; expected_landed_settled: number;
+  staked: number; returned: number; net: number; roi: number | null;
+  pending_exposure: number;
+  settled_rounds: number; terminal_rounds: number;
+  settled_forward_rows: number;
+  return_ci: [number | null, number | null];
+  interval_state: string;
+  in_band_selected: number; fallback_selected: number;
+  by_group: Record<string, DailyBestStats>;
+  band_split: Record<'in_band' | 'fallback', DailyBestStats>;
+  mean_actual_odds: number | null; median_actual_odds: number | null; mean_model_ev: number | null;
+  odds_aggregate_state: string;
+};
+
+export type DailyBestRecordFile = {
+  schema_version: number;
+  rule_version: string;
+  activation_marker: string;
+  band: DailyBestBand;
+  min_odds: number;
+  limit: number;
+  activation: DailyBestActivation | null;
+  rounds: DailyBestRoundRecord[];
+  cumulative: DailyBestCumulative;
+  note: string;
+  prices_published: boolean;
+};
+

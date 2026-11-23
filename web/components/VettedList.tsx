@@ -33,7 +33,7 @@ import {
 } from '@/lib/dailyBest';
 import { breakEvenChance, evaluateRows, expectedReturn, isHiddenMarketId, pcOf, type Evaluated } from '@/lib/vetted';
 import { minPlay } from '@/lib/vetting';
-import type { MarketMeta, RankRow } from '@/lib/types';
+import type { DailyBestPrivateFile, MarketMeta, RankRow } from '@/lib/types';
 
 const GROUP_ORDER = ['Combos', 'HT/FT', 'Goals', 'BTTS', 'Half-time', 'Team goals', 'Result & double chance'];
 const GROUP_LABEL: Record<string, string> = {
@@ -115,6 +115,8 @@ export default function VettedList({
   const [roundState, setRoundState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [marketsState, setMarketsState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [pricesState, setPricesState] = useState<'loading' | 'ready' | 'unpriced' | 'error'>('loading');
+  const [dailyBest, setDailyBest] = useState<DailyBestPrivateFile | null>(null);
+  const [dailyBestState, setDailyBestState] = useState<'loading' | 'ready' | 'unpriced' | 'error'>('loading');
   const [league, setLeague] = useParam('league', 'all');
   const [bet, setBet] = useParam('bet', 'any');
   const [bandParam, setBandParam] = useParam('band', '');
@@ -188,6 +190,23 @@ export default function VettedList({
         if (!cancelled) { setPrices(payload); setPricesState('ready'); }
       })
       .catch(() => { if (!cancelled) setPricesState('error'); });
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setDailyBestState('loading');
+    fetch('/data/daily-best-private.json')
+      .then(async (response) => {
+        if (response.status === 404) {
+          if (!cancelled) { setDailyBest(null); setDailyBestState('unpriced'); }
+          return;
+        }
+        if (!response.ok) throw new Error('daily-best');
+        const payload = (await response.json()) as DailyBestPrivateFile;
+        if (!cancelled) { setDailyBest(payload); setDailyBestState('ready'); }
+      })
+      .catch(() => { if (!cancelled) setDailyBestState('error'); });
     return () => { cancelled = true; };
   }, []);
 
@@ -270,10 +289,37 @@ export default function VettedList({
   // odds band, otherwise fill with the nearest band candidate.
   const daily = useMemo(() => selectDaily(leagueScoped, band), [leagueScoped, band]);
   const showAll = isAny && league !== 'all' && showParam === 'all';
-  const dailyDisplayed = useMemo<PricedItem[]>(
+  const interactiveDaily = useMemo<PricedItem[]>(
     () => visibleDailyRows(daily, showAll),
     [daily, showAll],
   );
+
+  // The forward record covers exactly All leagues + the default 1.70-2.30 band.
+  // When the private frozen file exists, this exact ordered list is displayed.
+  const isDefaultView = isAny && league === 'all' && band.token === DEFAULT_BAND;
+  const frozenRound = useMemo(
+    () => dailyBest?.rounds.find((round) => round.round_date === activeDate) ?? null,
+    [dailyBest, activeDate],
+  );
+  const frozenDefault = isDefaultView && frozenRound !== null;
+  const frozenItems = useMemo<PricedItem[]>(() => {
+    if (!frozenRound) return [];
+    const byKey = new Map(activeEvaluated.map((item) => [identityOf(item), item]));
+    const fetchedAt = frozenRound.snapshot_identity?.fetched_at ?? snapshot?.fetched_at ?? '';
+    const items: PricedItem[] = [];
+    for (const frozen of frozenRound.rows) {
+      const base = byKey.get(identityOf(frozen));
+      if (!base) continue;
+      items.push({
+        ...base,
+        pc: frozen.pc,
+        candidate: { ...base.candidate, probability: frozen.pc, fairOdds: 1 / Math.max(frozen.pc, 0.0001) },
+        odds: frozen.odds,
+        price: { odds: frozen.odds, fetchedAt },
+      });
+    }
+    return items;
+  }, [frozenRound, activeEvaluated, snapshot]);
 
   // Group and exact-market views leave the curated Daily-best algorithm. They
   // apply no probability, price or band gate; refinements are opt-in only.
@@ -288,8 +334,8 @@ export default function VettedList({
   }, [isAny, leagueScoped, groupKey, marketId, markets]);
   const refined = useMemo(() => applyRefinement(marketBase, refinement), [marketBase, refinement]);
   const displayed = useMemo<PickItem[]>(
-    () => (isAny ? dailyDisplayed : refined.rows),
-    [isAny, dailyDisplayed, refined],
+    () => (frozenDefault ? frozenItems : isAny ? interactiveDaily : refined.rows),
+    [frozenDefault, frozenItems, isAny, interactiveDaily, refined],
   );
 
   // League options: every division with fixtures in the active round stays
@@ -397,20 +443,22 @@ export default function VettedList({
     return 'No priced candidate has a model probability strictly between 0% and 100% at odds of 1.20 or more.';
   }
 
-  function toLeg(row: RankRow): TicketLeg {
+  function toLeg(row: RankRow, oddsOverride?: number | null, pcOverride?: number): TicketLeg {
     const meta = markets[row.m];
     const price = priceIndex[priceKey(row.d, row.h, row.a, row.m)];
     const fixture = snapshot?.fixtures.find((item) => item.div === row.d && item.home === row.h && item.away === row.a);
-    const probability = pcOf(row);
+    const probability = pcOverride ?? pcOf(row);
+    const odds = oddsOverride === undefined ? price?.odds ?? null : oddsOverride;
+    const fetchedAt = oddsOverride === undefined ? price?.fetchedAt : snapshot?.fetched_at;
     return {
       d: row.d, h: row.h, a: row.a, m: row.m, label: meta?.plain ?? row.m, mozzart: meta?.mozzart ?? '',
-      pc: probability, fair: 1 / Math.max(probability, 0.0001), minPlay: minPlay(probability), odds: price?.odds ?? null,
-      fetchedAt: price?.fetchedAt, kickoff: fixture?.kickoff ?? null, st: row.st, ht: row.ht, ft: row.ft,
+      pc: probability, fair: 1 / Math.max(probability, 0.0001), minPlay: minPlay(probability), odds,
+      fetchedAt, kickoff: fixture?.kickoff ?? null, st: row.st, ht: row.ht, ft: row.ft,
     };
   }
-  function toggleLeg(row: RankRow) {
+  function toggleLeg(row: RankRow, oddsOverride?: number | null, pcOverride?: number) {
     const key = legKey(row);
-    setTicket((current) => current.some((leg) => legKey(leg) === key) ? current.filter((leg) => legKey(leg) !== key) : [...current, toLeg(row)]);
+    setTicket((current) => current.some((leg) => legKey(leg) === key) ? current.filter((leg) => legKey(leg) !== key) : [...current, toLeg(row, oddsOverride, pcOverride)]);
   }
   function saveCurrent() {
     if (ticket.length === 0) return;
@@ -420,7 +468,7 @@ export default function VettedList({
   }
 
   const targetTickets = useMemo(() => {
-    const legs = displayed.map((item) => toLeg(item.row));
+    const legs = displayed.map((item) => toLeg(item.row, item.odds, item.pc));
     if (legs.length === 0) return [];
     return TARGETS.map((target) => ({ target, ticket: optimiseTickets(legs, target, 5, 1, 1.0)[0] ?? null }));
   }, [displayed, markets, priceIndex, snapshot]);
@@ -435,14 +483,15 @@ export default function VettedList({
 
   function summaryLine(): string {
     if (isAny) {
-      return `${dailyDisplayed.length} game${dailyDisplayed.length === 1 ? '' : 's'} · Daily best · ${leagueLabel} · actual odds ${bandLabel}`;
+      const mode = frozenDefault ? 'Frozen Daily-best-v1' : isDefaultView ? 'Daily best preview' : 'Daily best exploration';
+      return `${displayed.length} game${displayed.length === 1 ? '' : 's'} · ${mode} · ${leagueLabel} · actual odds ${bandLabel}`;
     }
-    const base = `${betLabel} · ${leagueLabel} · sorted by model probability`;
+    const base = `${betLabel} · ${leagueLabel} · exploration · sorted by model probability`;
     if (refined.hidden > 0) return `${displayed.length} of ${marketBase.length} fixtures · ${base} · optional refinement hides ${refined.hidden}`;
     return `${displayed.length} fixture${displayed.length === 1 ? '' : 's'} · ${base}`;
   }
 
-  const shortList = isAny && daily.rows.length > 0 && daily.rows.length < DAILY_LIMIT;
+  const shortList = !frozenDefault && isAny && daily.rows.length > 0 && daily.rows.length < DAILY_LIMIT;
 
   return (
     <div className="space-y-4 pb-40">
@@ -518,10 +567,37 @@ export default function VettedList({
       ) : (
         <>
           <p className="text-sm text-muted-foreground">{summaryLine()}</p>
+          {frozenDefault ? (
+            <p className="text-xs text-muted-foreground">Frozen Daily-best-v1 list — this exact ordered list is measured by the forward record.</p>
+          ) : isDefaultView ? (
+            <p className="text-xs text-muted-foreground">
+              {dailyBestState === 'loading'
+                ? 'Loading frozen Daily-best data…'
+                : dailyBestState === 'error'
+                  ? 'Frozen Daily-best data could not be loaded.'
+                  : dailyBestState === 'unpriced'
+                    ? 'Frozen Daily-best data is not embedded in this build.'
+                    : dailyBest?.activation && activeDate >= dailyBest.activation.activated_round
+                      ? 'Frozen Daily-best-v1 data is unavailable for this round.'
+                      : 'Pre-activation preview; not part of the forward record.'}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">Exploration view — not part of the frozen Daily-best record.</p>
+          )}
           {isAny ? (
             <p className="text-sm text-muted-foreground">
-              Showing {dailyDisplayed.length} of {daily.eligibleFixtures} eligible fixtures · {daily.inBandFixtures} have a
-              candidate in {bandLabel} · {daily.outside.length} filled from outside the band (nearest first) · one market per fixture
+              {frozenDefault && frozenRound ? (
+                <>
+                  Showing {displayed.length} of {frozenRound.eligible_counts.fixtures} eligible fixtures ·{' '}
+                  {frozenRound.eligible_counts.in_band} in band · {frozenRound.fallback_selected} filled from outside the band
+                  (nearest first) · frozen order
+                </>
+              ) : (
+                <>
+                  Showing {interactiveDaily.length} of {daily.eligibleFixtures} eligible fixtures · {daily.inBandFixtures} have a
+                  candidate in {bandLabel} · {daily.outside.length} filled from outside the band (nearest first) · one market per fixture
+                </>
+              )}
             </p>
           ) : null}
           <p className="text-sm">
@@ -533,7 +609,7 @@ export default function VettedList({
           </p>
           {priceNote ? <p className="text-xs text-muted-foreground">{priceNote}</p> : null}
 
-          {isAny && daily.rows.length > 0 ? (
+          {!frozenDefault && isAny && daily.rows.length > 0 ? (
             <div className="flex flex-wrap items-center gap-2 text-xs">
               {shortList ? (
                 <span className="text-muted-foreground">
@@ -551,10 +627,14 @@ export default function VettedList({
             </div>
           ) : null}
 
-          {isAny && daily.rows.length === 0 ? (
+          {isAny && displayed.length === 0 ? (
             <div className="space-y-2">
-              <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">{dailyEmptyText()}</p>
-              {daily.rejected > 0 ? (
+              <p className="rounded-xl border border-dashed px-4 py-6 text-sm text-muted-foreground">
+                {frozenDefault
+                  ? 'The frozen Daily-best-v1 list is empty for this round; it is not padded.'
+                  : dailyEmptyText()}
+              </p>
+              {!frozenDefault && daily.rejected > 0 ? (
                 <p className="text-xs text-muted-foreground">
                   {daily.rejected} priced candidate{daily.rejected === 1 ? '' : 's'} were below the 1.20 floor or outside
                   0 &lt; pc &lt; 1 and are not shown.
@@ -648,7 +728,7 @@ export default function VettedList({
                     </div>
 
                     <div className="mt-2 flex flex-wrap items-center gap-1">
-                      <button type="button" onClick={() => toggleLeg(row)} className={cn('ml-auto rounded-md border px-2.5 py-1 text-xs', checked ? 'border-primary bg-primary text-primary-foreground' : '')}>
+                      <button type="button" onClick={() => toggleLeg(row, item.odds, item.pc)} className={cn('ml-auto rounded-md border px-2.5 py-1 text-xs', checked ? 'border-primary bg-primary text-primary-foreground' : '')}>
                         {checked ? 'In ticket' : 'Add to ticket'}
                       </button>
                       <button type="button" onClick={() => setExpanded(open ? null : key)} aria-label="Details">

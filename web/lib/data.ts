@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { BestBetsRecordFile, DataHealthFile, ForwardProposalsFile, ForwardValidationFile, LeagueFile, LeagueIndex, ModelFile, MozzartStatusFile, MozzartVettedRecordFile, PreregistrationFile, RankRow, RecordFile, RoundDocument, RoundIndexRow, TypeBacktestFile, ValueRecordFile } from './types';
+import type { BestBetsRecordFile, DailyBestPrivateFile, DailyBestRecordFile, DataHealthFile, ForwardProposalsFile, ForwardValidationFile, LeagueFile, LeagueIndex, ModelFile, MozzartStatusFile, MozzartVettedRecordFile, PreregistrationFile, RankRow, RecordFile, RoundDocument, RoundIndexRow, TypeBacktestFile, ValueRecordFile } from './types';
 
 // The pipeline writes here; Next serves the same files statically. Reads happen at build time.
 const DATA_DIR = path.join(process.cwd(), 'public', 'data');
@@ -93,6 +93,17 @@ export function readTypeBacktest(): TypeBacktestFile | null {
 export function readBestBetsRecord(): BestBetsRecordFile | null {
   const file = path.join(DATA_DIR, 'best-bets-record.json');
   return fs.existsSync(file) ? readJson<BestBetsRecordFile>('best-bets-record.json') : null;
+}
+
+export function readDailyBestRecord(): DailyBestRecordFile | null {
+  const file = path.join(DATA_DIR, 'daily-best-record.json');
+  return fs.existsSync(file) ? readJson<DailyBestRecordFile>('daily-best-record.json') : null;
+}
+
+// Build-time only. Present only in priced builds; gitignored and never public.
+export function readDailyBestPrivate(): DailyBestPrivateFile | null {
+  const file = path.join(DATA_DIR, 'daily-best-private.json');
+  return fs.existsSync(file) ? readJson<DailyBestPrivateFile>('daily-best-private.json') : null;
 }
 
 export function readMozzartVettedRecord(): MozzartVettedRecordFile | null {
