@@ -1,5 +1,5 @@
 {
- "latest_football_data_result_date": "2026-11-22",
+ "latest_football_data_result_date": "2026-11-24",
  "schema_version": 1,
  "unsettled_rounds": [
   {
@@ -13,7 +13,7 @@
    "fixtures": 122,
    "kind": "round",
    "label": "Saturday 21 Nov",
-   "next_retry": "Tue 10:00 UTC",
+   "next_retry": "Wed 06:00 UTC",
    "pending_fixtures": 2,
    "pending_reasons": {
     "ambiguous_fixtures": 0,
@@ -37,6 +37,44 @@
     "football_data_rows": 21360,
     "unknown_fixtures": 2,
     "unknown_rows": 356
+   }
+  },
+  {
+   "date": "2026-11-24",
+   "fallback": {
+    "ambiguous": 0,
+    "attempted": false,
+    "reason": "no cached next-day attempt (outside the fallback window or not requested)",
+    "unmatched": 31
+   },
+   "fixtures": 31,
+   "kind": "round",
+   "label": "Tuesday 24 Nov",
+   "next_retry": "Wed 06:00 UTC",
+   "pending_fixtures": 31,
+   "pending_reasons": {
+    "ambiguous_fixtures": 0,
+    "source_pending_fixtures": 31,
+    "source_pending_sample": [
+     "Altrincham v Wealdstone",
+     "Benevento v Empoli",
+     "Blackpool v Leicester"
+    ],
+    "unmatched_fixtures": 31
+   },
+   "rows": {
+    "pending": 5518,
+    "settled": 0,
+    "total": 5518
+   },
+   "settled_fixtures": 0,
+   "sources": {
+    "api_football_fixtures": 0,
+    "api_football_rows": 0,
+    "football_data_fixtures": 0,
+    "football_data_rows": 0,
+    "unknown_fixtures": 31,
+    "unknown_rows": 5518
    }
   }
  ]

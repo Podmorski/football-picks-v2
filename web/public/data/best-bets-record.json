@@ -3,8 +3,8 @@
   "expected": 172.4107,
   "landed": 171,
   "lost": 39,
-  "passing": 214,
-  "pending": 2,
+  "passing": 245,
+  "pending": 33,
   "settled": 210,
   "void": 2
  },
@@ -45,6 +45,18 @@
    "passing": 44,
    "pending": 0,
    "settled": 44,
+   "void": 0
+  },
+  {
+   "date": "2026-11-24",
+   "expected": 0,
+   "kind": "round",
+   "label": "Tuesday 24 Nov",
+   "landed": 0,
+   "lost": 0,
+   "passing": 31,
+   "pending": 31,
+   "settled": 0,
    "void": 0
   }
  ]
