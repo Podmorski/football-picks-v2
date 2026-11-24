@@ -3,14 +3,16 @@
  "construction_version": "ticket-construction-v3",
  "counts": {
   "available": 0,
-  "bands": {},
+  "bands": {
+   "unavailable": 3
+  },
   "individual_floor_relaxed": 0,
   "negative_model_ev": 0,
   "negative_model_ev_share": null,
   "overlap_relaxed": 0,
   "search_methods": {},
-  "tickets": 0,
-  "unavailable": 0
+  "tickets": 3,
+  "unavailable": 3
  },
  "eligible_round": null,
  "errors": [],
@@ -19,29 +21,29 @@
   "id": "ticket-construction-v3+mel-v1",
   "policy_version": "mel-v1",
   "pooling_rule": "v2 and v3 records are separate forward evaluations and are never pooled",
-  "start_round": null,
+  "start_round": "2026-11-24",
   "unsupported_same_fixture_rule": "flat proposals are retained; new MEL exposure is zero with reason unsupported same-fixture dependence"
  },
  "evaluation_id": "ticket-construction-v3+mel-v1",
- "evaluation_start_round": null,
+ "evaluation_start_round": "2026-11-24",
  "legacy_rounds": 0,
  "policy_version": "mel-v1",
  "price_coverage": {
   "fixtures": 121,
   "priced_fixtures": 121,
   "priced_markets": 20064,
-  "snapshot_rounds": 2,
-  "started_not_priced": 14,
+  "snapshot_rounds": 3,
+  "started_not_priced": 45,
   "unmatched_fixtures": 31
  },
  "results": {
   "counts": {
    "legacy_rounds": 0,
    "pending": 0,
-   "rounds": 0,
+   "rounds": 1,
    "settled": 0,
-   "tickets": 0,
-   "unavailable": 0,
+   "tickets": 3,
+   "unavailable": 3,
    "unpriced": 0,
    "void": 0
   },
@@ -71,7 +73,14 @@
    ],
    "returned": 0.0,
    "roi": null,
-   "series": [],
+   "series": [
+    {
+     "bankroll": 1000.0,
+     "round_date": "2026-11-24",
+     "terminal": true,
+     "unresolved_exposure": 0.0
+    }
+   ],
    "staked": 0.0,
    "unresolved_exposure": 0.0
   },
@@ -87,7 +96,8 @@
     "mel_staked": 0.0,
     "pending": 0,
     "settled": 0,
-    "tickets": 0,
+    "tickets": 1,
+    "unavailable": 1,
     "void": 0
    },
    "around5": {
@@ -99,7 +109,8 @@
     "mel_staked": 0.0,
     "pending": 0,
     "settled": 0,
-    "tickets": 0,
+    "tickets": 1,
+    "unavailable": 1,
     "void": 0
    },
    "best2": {
@@ -111,12 +122,13 @@
     "mel_staked": 0.0,
     "pending": 0,
     "settled": 0,
-    "tickets": 0,
+    "tickets": 1,
+    "unavailable": 1,
     "void": 0
    }
   }
  },
- "rounds_with_proposals": 0,
+ "rounds_with_proposals": 1,
  "schema_version": 1,
  "state": "awaiting first eligible published round with fixtures and a usable snapshot"
 }

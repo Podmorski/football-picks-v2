@@ -14,7 +14,14 @@
    ],
    "returned": 0.0,
    "roi": null,
-   "series": [],
+   "series": [
+    {
+     "bankroll": 1000.0,
+     "round_date": "2026-11-24",
+     "terminal": true,
+     "unresolved_exposure": 0.0
+    }
+   ],
    "staked": 0.0,
    "unresolved_exposure": 0.0
   },
@@ -32,7 +39,14 @@
    ],
    "returned": 0.0,
    "roi": null,
-   "series": [],
+   "series": [
+    {
+     "bankroll": 1000.0,
+     "round_date": "2026-11-24",
+     "terminal": true,
+     "unresolved_exposure": 0.0
+    }
+   ],
    "staked": 0.0,
    "unresolved_exposure": 0.0
   },
@@ -50,7 +64,14 @@
    ],
    "returned": 0.0,
    "roi": null,
-   "series": [],
+   "series": [
+    {
+     "bankroll": 1000.0,
+     "round_date": "2026-11-24",
+     "terminal": true,
+     "unresolved_exposure": 0.0
+    }
+   ],
    "staked": 0.0,
    "unresolved_exposure": 0.0
   },
@@ -68,7 +89,14 @@
    ],
    "returned": 0.0,
    "roi": null,
-   "series": [],
+   "series": [
+    {
+     "bankroll": 1000.0,
+     "round_date": "2026-11-24",
+     "terminal": true,
+     "unresolved_exposure": 0.0
+    }
+   ],
    "staked": 0.0,
    "unresolved_exposure": 0.0
   },
@@ -86,7 +114,14 @@
    ],
    "returned": 0.0,
    "roi": null,
-   "series": [],
+   "series": [
+    {
+     "bankroll": 1000.0,
+     "round_date": "2026-11-24",
+     "terminal": true,
+     "unresolved_exposure": 0.0
+    }
+   ],
    "staked": 0.0,
    "unresolved_exposure": 0.0
   },
@@ -104,7 +139,14 @@
    ],
    "returned": 0.0,
    "roi": null,
-   "series": [],
+   "series": [
+    {
+     "bankroll": 1000.0,
+     "round_date": "2026-11-24",
+     "terminal": true,
+     "unresolved_exposure": 0.0
+    }
+   ],
    "staked": 0.0,
    "unresolved_exposure": 0.0
   }
@@ -113,10 +155,10 @@
  "counts": {
   "legacy_rounds": 0,
   "pending": 0,
-  "rounds": 0,
+  "rounds": 1,
   "settled": 0,
-  "tickets": 0,
-  "unavailable": 0,
+  "tickets": 3,
+  "unavailable": 3,
   "unpriced": 0,
   "void": 0
  },
@@ -146,13 +188,36 @@
   ],
   "returned": 0.0,
   "roi": null,
-  "series": [],
+  "series": [
+   {
+    "bankroll": 1000.0,
+    "round_date": "2026-11-24",
+    "terminal": true,
+    "unresolved_exposure": 0.0
+   }
+  ],
   "staked": 0.0,
   "unresolved_exposure": 0.0
  },
  "note": "Paper ledger for ticket-construction-v3 only. Flat is 50/30/20; MEL-v1 is mandatory-exposure expected-log allocation; other policies are diagnostics. Bankroll advances once per fully terminal round. v2/v3 records are never pooled. Not a profit guarantee.",
  "policy_version": "mel-v1",
- "rounds": [],
+ "rounds": [
+  {
+   "available": 0,
+   "flat_net": 0.0,
+   "flat_returned": 0.0,
+   "flat_staked": 0.0,
+   "mel_net": 0.0,
+   "mel_returned": 0.0,
+   "mel_staked": 0.0,
+   "pending": 0,
+   "round_date": "2026-11-24",
+   "settled": 0,
+   "terminal": true,
+   "unavailable": 3,
+   "void": 0
+  }
+ ],
  "schema_version": 3,
  "types": {
   "around3": {
@@ -164,7 +229,8 @@
    "mel_staked": 0.0,
    "pending": 0,
    "settled": 0,
-   "tickets": 0,
+   "tickets": 1,
+   "unavailable": 1,
    "void": 0
   },
   "around5": {
@@ -176,7 +242,8 @@
    "mel_staked": 0.0,
    "pending": 0,
    "settled": 0,
-   "tickets": 0,
+   "tickets": 1,
+   "unavailable": 1,
    "void": 0
   },
   "best2": {
@@ -188,7 +255,8 @@
    "mel_staked": 0.0,
    "pending": 0,
    "settled": 0,
-   "tickets": 0,
+   "tickets": 1,
+   "unavailable": 1,
    "void": 0
   }
  }

@@ -9,8 +9,8 @@
   "legacy_rounds": 0,
   "pending": 0,
   "pending_frequency": null,
-  "rounds": 0,
-  "terminal_rounds": 0,
+  "rounds": 1,
+  "terminal_rounds": 1,
   "tickets": 0,
   "void": 0,
   "void_frequency": null
@@ -23,45 +23,45 @@
   "no_early_efficacy_stopping": true,
   "positive": false,
   "rule": "positive growth requires at least N* settled playable rounds and a whole-round-bootstrap lower 95% bound above zero",
-  "settled_playable_rounds": 0
+  "settled_playable_rounds": 1
  },
  "exploratory": {
   "fixed_fractional": {
    "maximum_drawdown": 0.0,
    "roi": null,
-   "terminal_rounds": 0
+   "terminal_rounds": 1
   },
   "martingale_capped": {
    "maximum_drawdown": 0.0,
    "roi": null,
-   "terminal_rounds": 0
+   "terminal_rounds": 1
   },
   "martingale_uncapped": {
    "maximum_drawdown": 0.0,
    "roi": null,
-   "terminal_rounds": 0
+   "terminal_rounds": 1
   },
   "minimum_variance": {
    "maximum_drawdown": 0.0,
    "roi": null,
-   "terminal_rounds": 0
+   "terminal_rounds": 1
   },
   "no_forced_kelly": {
    "maximum_drawdown": 0.0,
    "roi": null,
-   "terminal_rounds": 0
+   "terminal_rounds": 1
   },
   "probability_weighted": {
    "maximum_drawdown": 0.0,
    "roi": null,
-   "terminal_rounds": 0
+   "terminal_rounds": 1
   }
  },
  "exposure": {
   "by_type_mel_stake": {
-   "around3": 0,
-   "around5": 0,
-   "best2": 0
+   "around3": 0.0,
+   "around5": 0.0,
+   "best2": 0.0
   },
   "fixtures": 0,
   "shared_leg_instances": 0,
@@ -109,21 +109,23 @@
      null,
      null
     ],
-    "rounds": 0,
+    "rounds": 1,
     "unresolved_exposure_ci": [
      null,
      null
     ]
    },
-   "losing_round_frequency": null,
+   "losing_round_frequency": 0.0,
    "maximum_drawdown": 0.0,
    "net": 0.0,
    "peak": 1000.0,
    "returned": 0.0,
    "roi": null,
-   "round_log_growth": [],
+   "round_log_growth": [
+    0.0
+   ],
    "staked": 0.0,
-   "terminal_rounds": 0,
+   "terminal_rounds": 1,
    "unresolved_exposure": 0.0
   },
   "mel": {
@@ -142,21 +144,23 @@
      null,
      null
     ],
-    "rounds": 0,
+    "rounds": 1,
     "unresolved_exposure_ci": [
      null,
      null
     ]
    },
-   "losing_round_frequency": null,
+   "losing_round_frequency": 0.0,
    "maximum_drawdown": 0.0,
    "net": 0.0,
    "peak": 1000.0,
    "returned": 0.0,
    "roi": null,
-   "round_log_growth": [],
+   "round_log_growth": [
+    0.0
+   ],
    "staked": 0.0,
-   "terminal_rounds": 0,
+   "terminal_rounds": 1,
    "unresolved_exposure": 0.0
   }
  },
@@ -189,5 +193,5 @@
  },
  "schema_version": 1,
  "small_sample": true,
- "state": "no settled playable rounds"
+ "state": "accumulating"
 }
