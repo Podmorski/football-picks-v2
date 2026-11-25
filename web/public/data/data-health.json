@@ -13,7 +13,7 @@
    "fixtures": 122,
    "kind": "round",
    "label": "Saturday 21 Nov",
-   "next_retry": "Wed 06:00 UTC",
+   "next_retry": "Fri 15:00 UTC",
    "pending_fixtures": 2,
    "pending_reasons": {
     "ambiguous_fixtures": 0,
@@ -55,7 +55,7 @@
    "fixtures": 31,
    "kind": "round",
    "label": "Tuesday 24 Nov",
-   "next_retry": "Wed 06:00 UTC",
+   "next_retry": "Fri 15:00 UTC",
    "pending_fixtures": 6,
    "pending_reasons": {
     "ambiguous_fixtures": 0,
