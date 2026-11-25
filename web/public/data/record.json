@@ -3171,22 +3171,22 @@
   {
    "date": "2026-11-24",
    "fixtures": 31,
-   "hits": 0,
+   "hits": 1497,
    "kind": "round",
    "label": "Tuesday 24 Nov",
    "leagues": 6,
    "picks": 5518,
    "rows": 5518,
    "settled": false,
-   "settled_count": 0,
+   "settled_count": 4450,
    "weekday": "Tuesday"
   }
  ],
  "totals": {
-  "hit_rate": 0.2859,
-  "hits": 9675,
+  "hit_rate": 0.2918,
+  "hits": 11172,
   "picks": 39948,
   "rounds": 4,
-  "settled": 33840
+  "settled": 38290
  }
 }

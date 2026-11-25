@@ -43,38 +43,43 @@
    "date": "2026-11-24",
    "fallback": {
     "ambiguous": 0,
-    "attempted": false,
-    "reason": "no cached next-day attempt (outside the fallback window or not requested)",
-    "unmatched": 31
+    "attempted": true,
+    "events": 31,
+    "fetched_at": "2026-11-25T00:32:41+00:00",
+    "final_count": 31,
+    "fixtures": 31,
+    "matched": 25,
+    "requests": 1,
+    "unmatched": 6
    },
    "fixtures": 31,
    "kind": "round",
    "label": "Tuesday 24 Nov",
    "next_retry": "Wed 06:00 UTC",
-   "pending_fixtures": 31,
+   "pending_fixtures": 6,
    "pending_reasons": {
     "ambiguous_fixtures": 0,
-    "source_pending_fixtures": 31,
+    "source_pending_fixtures": 6,
     "source_pending_sample": [
-     "Altrincham v Wealdstone",
-     "Benevento v Empoli",
-     "Blackpool v Leicester"
+     "Eastleigh v Yeovil",
+     "Fylde v Halifax",
+     "Hornchurch v Sutton"
     ],
-    "unmatched_fixtures": 31
+    "unmatched_fixtures": 6
    },
    "rows": {
-    "pending": 5518,
-    "settled": 0,
+    "pending": 1068,
+    "settled": 4450,
     "total": 5518
    },
-   "settled_fixtures": 0,
+   "settled_fixtures": 25,
    "sources": {
-    "api_football_fixtures": 0,
-    "api_football_rows": 0,
+    "api_football_fixtures": 25,
+    "api_football_rows": 4450,
     "football_data_fixtures": 0,
     "football_data_rows": 0,
-    "unknown_fixtures": 31,
-    "unknown_rows": 5518
+    "unknown_fixtures": 6,
+    "unknown_rows": 1068
    }
   }
  ]
