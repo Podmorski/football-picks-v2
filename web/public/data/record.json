@@ -3171,22 +3171,48 @@
   {
    "date": "2026-11-24",
    "fixtures": 31,
-   "hits": 1497,
+   "hits": 1830,
    "kind": "round",
    "label": "Tuesday 24 Nov",
    "leagues": 6,
    "picks": 5518,
    "rows": 5518,
-   "settled": false,
-   "settled_count": 4450,
+   "settled": true,
+   "settled_count": 5518,
    "weekday": "Tuesday"
+  },
+  {
+   "date": "2026-11-28",
+   "fixtures": 99,
+   "hits": 0,
+   "kind": "round",
+   "label": "Saturday 28 Nov",
+   "leagues": 18,
+   "picks": 17622,
+   "rows": 17622,
+   "settled": false,
+   "settled_count": 0,
+   "weekday": "Saturday"
+  },
+  {
+   "date": "2026-11-29",
+   "fixtures": 51,
+   "hits": 0,
+   "kind": "round",
+   "label": "Sunday 29 Nov",
+   "leagues": 15,
+   "picks": 9078,
+   "rows": 9078,
+   "settled": false,
+   "settled_count": 0,
+   "weekday": "Sunday"
   }
  ],
  "totals": {
-  "hit_rate": 0.2918,
-  "hits": 11172,
-  "picks": 39948,
-  "rounds": 4,
-  "settled": 38290
+  "hit_rate": 0.2923,
+  "hits": 11505,
+  "picks": 66648,
+  "rounds": 6,
+  "settled": 39358
  }
 }

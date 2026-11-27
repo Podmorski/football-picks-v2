@@ -1,5 +1,5 @@
 {
- "latest_football_data_result_date": "2026-11-24",
+ "latest_football_data_result_date": "2026-11-27",
  "schema_version": 1,
  "unsettled_rounds": [
   {
@@ -13,7 +13,7 @@
    "fixtures": 122,
    "kind": "round",
    "label": "Saturday 21 Nov",
-   "next_retry": "Fri 15:00 UTC",
+   "next_retry": "Sat 05:00 UTC",
    "pending_fixtures": 2,
    "pending_reasons": {
     "ambiguous_fixtures": 0,
@@ -40,46 +40,79 @@
    }
   },
   {
-   "date": "2026-11-24",
+   "date": "2026-11-28",
    "fallback": {
     "ambiguous": 0,
-    "attempted": true,
-    "events": 31,
-    "fetched_at": "2026-11-25T00:32:41+00:00",
-    "final_count": 31,
-    "fixtures": 31,
-    "matched": 25,
-    "requests": 1,
-    "unmatched": 6
+    "attempted": false,
+    "reason": "no cached next-day attempt (outside the fallback window or not requested)",
+    "unmatched": 99
    },
-   "fixtures": 31,
+   "fixtures": 99,
    "kind": "round",
-   "label": "Tuesday 24 Nov",
-   "next_retry": "Fri 15:00 UTC",
-   "pending_fixtures": 6,
+   "label": "Saturday 28 Nov",
+   "next_retry": "Sat 05:00 UTC",
+   "pending_fixtures": 99,
    "pending_reasons": {
     "ambiguous_fixtures": 0,
-    "source_pending_fixtures": 6,
+    "source_pending_fixtures": 99,
     "source_pending_sample": [
-     "Eastleigh v Yeovil",
-     "Fylde v Halifax",
-     "Hornchurch v Sutton"
+     "AFC Wimbledon v Barnsley",
+     "Aberdeen v Dundee",
+     "Academico Viseu v Alverca"
     ],
-    "unmatched_fixtures": 6
+    "unmatched_fixtures": 99
    },
    "rows": {
-    "pending": 1068,
-    "settled": 4450,
-    "total": 5518
+    "pending": 17622,
+    "settled": 0,
+    "total": 17622
    },
-   "settled_fixtures": 25,
+   "settled_fixtures": 0,
    "sources": {
-    "api_football_fixtures": 25,
-    "api_football_rows": 4450,
+    "api_football_fixtures": 0,
+    "api_football_rows": 0,
     "football_data_fixtures": 0,
     "football_data_rows": 0,
-    "unknown_fixtures": 6,
-    "unknown_rows": 1068
+    "unknown_fixtures": 99,
+    "unknown_rows": 17622
+   }
+  },
+  {
+   "date": "2026-11-29",
+   "fallback": {
+    "ambiguous": 0,
+    "attempted": false,
+    "reason": "no cached next-day attempt (outside the fallback window or not requested)",
+    "unmatched": 51
+   },
+   "fixtures": 51,
+   "kind": "round",
+   "label": "Sunday 29 Nov",
+   "next_retry": "Sat 05:00 UTC",
+   "pending_fixtures": 51,
+   "pending_reasons": {
+    "ambiguous_fixtures": 0,
+    "source_pending_fixtures": 51,
+    "source_pending_sample": [
+     "AEK v PAOK",
+     "Almeria v Sp Gijon",
+     "Antwerp v Anderlecht"
+    ],
+    "unmatched_fixtures": 51
+   },
+   "rows": {
+    "pending": 9078,
+    "settled": 0,
+    "total": 9078
+   },
+   "settled_fixtures": 0,
+   "sources": {
+    "api_football_fixtures": 0,
+    "api_football_rows": 0,
+    "football_data_fixtures": 0,
+    "football_data_rows": 0,
+    "unknown_fixtures": 51,
+    "unknown_rows": 9078
    }
   }
  ]
