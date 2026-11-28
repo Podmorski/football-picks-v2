@@ -92808,34 +92808,6 @@
  },
  "upcoming": [
   {
-   "away": "Middlesbrough",
-   "best": {
-    "a": "Middlesbrough",
-    "an": 238,
-    "ar": 0.2215,
-    "c": "Medium",
-    "d": "E1",
-    "ft": null,
-    "h": "Southampton",
-    "hn": 54,
-    "hr": 0.0156,
-    "ht": null,
-    "k": "20:00",
-    "ln": 6276,
-    "lr": 0.1088,
-    "m": "TEAM_GOALS:I2 3+",
-    "p": 0.2517,
-    "pc": 0.2517,
-    "pl": 0.2517,
-    "pp": 0.2517,
-    "s": 1.0133,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Southampton",
-   "time": "20:00"
-  },
-  {
    "away": "Bolton",
    "best": {
     "a": "Bolton",

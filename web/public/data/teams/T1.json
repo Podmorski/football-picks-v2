@@ -76948,62 +76948,6 @@
  },
  "upcoming": [
   {
-   "away": "Konyaspor",
-   "best": {
-    "a": "Konyaspor",
-    "an": 201,
-    "ar": 0.2518,
-    "c": "Medium",
-    "d": "T1",
-    "ft": null,
-    "h": "Alanyaspor",
-    "hn": 184,
-    "hr": 0.3446,
-    "ht": null,
-    "k": "17:00",
-    "ln": 3808,
-    "lr": 0.2833,
-    "m": "DC_AND_GOALS:X2&0-2",
-    "p": 0.4064,
-    "pc": 0.4064,
-    "pl": 0.4064,
-    "pp": 0.4064,
-    "s": 0.5485,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Alanyaspor",
-   "time": "17:00"
-  },
-  {
-   "away": "Kasimpasa",
-   "best": {
-    "a": "Kasimpasa",
-    "an": 202,
-    "ar": 0.5468,
-    "c": "Medium",
-    "d": "T1",
-    "ft": null,
-    "h": "Rizespor",
-    "hn": 166,
-    "hr": 0.4597,
-    "ht": null,
-    "k": "17:00",
-    "ln": 3808,
-    "lr": 0.5323,
-    "m": "DC_AND_GOALS:1X&2+",
-    "p": 0.5957,
-    "pc": 0.5957,
-    "pl": 0.5957,
-    "pp": 0.5957,
-    "s": 0.2581,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Rizespor",
-   "time": "17:00"
-  },
-  {
    "away": "Amedspor",
    "best": {
     "a": "Amedspor",

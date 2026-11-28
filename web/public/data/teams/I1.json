@@ -73177,34 +73177,6 @@
  },
  "upcoming": [
   {
-   "away": "Bologna",
-   "best": {
-    "a": "Bologna",
-    "an": 215,
-    "ar": 0.6269,
-    "c": "Medium",
-    "d": "I1",
-    "ft": null,
-    "h": "Venezia",
-    "hn": 44,
-    "hr": 0.6501,
-    "ht": null,
-    "k": "19:45",
-    "ln": 4299,
-    "lr": 0.5139,
-    "m": "HTFT_DC:X2-X2",
-    "p": 0.6157,
-    "pc": 0.6157,
-    "pl": 0.6157,
-    "pp": 0.6157,
-    "s": 0.4164,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Venezia",
-   "time": "19:45"
-  },
-  {
    "away": "Parma",
    "best": {
     "a": "Parma",

@@ -75984,62 +75984,6 @@
  },
  "upcoming": [
   {
-   "away": "Darmstadt",
-   "best": {
-    "a": "Darmstadt",
-    "an": 141,
-    "ar": 0.2782,
-    "c": "Medium",
-    "d": "D2",
-    "ft": null,
-    "h": "Bochum",
-    "hn": 125,
-    "hr": 0.1525,
-    "ht": null,
-    "k": "17:30",
-    "ln": 3474,
-    "lr": 0.2387,
-    "m": "MARGIN:HP 1",
-    "p": 0.3382,
-    "pc": 0.3382,
-    "pl": 0.3382,
-    "pp": 0.3382,
-    "s": 0.4892,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Bochum",
-   "time": "17:30"
-  },
-  {
-   "away": "Nurnberg",
-   "best": {
-    "a": "Nurnberg",
-    "an": 175,
-    "ar": 0.2203,
-    "c": "Medium",
-    "d": "D2",
-    "ft": null,
-    "h": "Heidenheim",
-    "hn": 142,
-    "hr": 0.2731,
-    "ht": null,
-    "k": "17:30",
-    "ln": 3474,
-    "lr": 0.1658,
-    "m": "GOAL_RANGE_FT:5+",
-    "p": 0.2843,
-    "pc": 0.2843,
-    "pl": 0.2843,
-    "pp": 0.2843,
-    "s": 0.6931,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Heidenheim",
-   "time": "17:30"
-  },
-  {
    "away": "St Pauli",
    "best": {
     "a": "St Pauli",

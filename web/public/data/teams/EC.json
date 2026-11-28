@@ -101857,34 +101857,6 @@
  },
  "upcoming": [
   {
-   "away": "Wealdstone",
-   "best": {
-    "a": "Wealdstone",
-    "an": 145,
-    "ar": 0.129,
-    "c": "Medium",
-    "d": "EC",
-    "ft": null,
-    "h": "Scunthorpe",
-    "hn": 54,
-    "hr": 0.1884,
-    "ht": null,
-    "k": "19:45",
-    "ln": 6074,
-    "lr": 0.1722,
-    "m": "GOAL_RANGE_FT:5+",
-    "p": 0.254,
-    "pc": 0.254,
-    "pl": 0.254,
-    "pp": 0.254,
-    "s": 0.4928,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Scunthorpe",
-   "time": "19:45"
-  },
-  {
    "away": "Worthing",
    "best": {
     "a": "Worthing",

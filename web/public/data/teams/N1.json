@@ -64371,34 +64371,6 @@
  },
  "upcoming": [
   {
-   "away": "Willem II",
-   "best": {
-    "a": "Willem II",
-    "an": 139,
-    "ar": 0.448,
-    "c": "Medium",
-    "d": "N1",
-    "ft": null,
-    "h": "Groningen",
-    "hn": 173,
-    "hr": 0.2184,
-    "ht": null,
-    "k": "19:00",
-    "ln": 3409,
-    "lr": 0.2506,
-    "m": "MARGIN:HP 1",
-    "p": 0.5529,
-    "pc": 0.5529,
-    "pl": 0.5529,
-    "pp": 0.5529,
-    "s": 1.3085,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Groningen",
-   "time": "19:00"
-  },
-  {
    "away": "Sparta Rotterdam",
    "best": {
     "a": "Sparta Rotterdam",

@@ -69622,34 +69622,6 @@
  },
  "upcoming": [
   {
-   "away": "Paris FC",
-   "best": {
-    "a": "Paris FC",
-    "an": 22,
-    "ar": 0.61,
-    "c": "Medium",
-    "d": "F1",
-    "ft": null,
-    "h": "Brest",
-    "hn": 127,
-    "hr": 0.4743,
-    "ht": null,
-    "k": "19:45",
-    "ln": 3955,
-    "lr": 0.4915,
-    "m": "HTFT_DC:X2-X2",
-    "p": 0.6439,
-    "pc": 0.6439,
-    "pl": 0.6439,
-    "pp": 0.6439,
-    "s": 0.6264,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Brest",
-   "time": "19:45"
-  },
-  {
    "away": "Lens",
    "best": {
     "a": "Lens",

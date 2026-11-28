@@ -67777,34 +67777,6 @@
  },
  "upcoming": [
   {
-   "away": "Nacional",
-   "best": {
-    "a": "Nacional",
-    "an": 107,
-    "ar": 0.5508,
-    "c": "Medium",
-    "d": "P1",
-    "ft": null,
-    "h": "Maritimo",
-    "hn": 141,
-    "hr": 0.244,
-    "ht": null,
-    "k": "20:15",
-    "ln": 3464,
-    "lr": 0.3357,
-    "m": "DC_AND_GOALS:1X&0-2",
-    "p": 0.456,
-    "pc": 0.456,
-    "pl": 0.456,
-    "pp": 0.456,
-    "s": 0.5057,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Maritimo",
-   "time": "20:15"
-  },
-  {
    "away": "Alverca",
    "best": {
     "a": "Alverca",

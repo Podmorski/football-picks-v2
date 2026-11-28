@@ -96446,34 +96446,6 @@
  },
  "upcoming": [
   {
-   "away": "Sabadell",
-   "best": {
-    "a": "Sabadell",
-    "an": 29,
-    "ar": 0.7282,
-    "c": "Medium",
-    "d": "SP2",
-    "ft": null,
-    "h": "Leganes",
-    "hn": 133,
-    "hr": 0.5988,
-    "ht": null,
-    "k": "19:30",
-    "ln": 5244,
-    "lr": 0.5231,
-    "m": "GOAL_RANGE_FT:0-2",
-    "p": 0.6048,
-    "pc": 0.6048,
-    "pl": 0.6048,
-    "pp": 0.6048,
-    "s": 0.3338,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Leganes",
-   "time": "19:30"
-  },
-  {
    "away": "Tenerife",
    "best": null,
    "date": "2026-11-28",

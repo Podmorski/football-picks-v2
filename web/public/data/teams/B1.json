@@ -64214,34 +64214,6 @@
  },
  "upcoming": [
   {
-   "away": "Kortrijk",
-   "best": {
-    "a": "Kortrijk",
-    "an": 167,
-    "ar": 0.5241,
-    "c": "Medium",
-    "d": "B1",
-    "ft": null,
-    "h": "Oud-Heverlee Leuven",
-    "hn": 132,
-    "hr": 0.3399,
-    "ht": null,
-    "k": "19:45",
-    "ln": 3153,
-    "lr": 0.4532,
-    "m": "TEAM_GOALS:I1 2+",
-    "p": 0.5243,
-    "pc": 0.5243,
-    "pl": 0.5243,
-    "pp": 0.5243,
-    "s": 0.2852,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Oud-Heverlee Leuven",
-   "time": "19:45"
-  },
-  {
    "away": "Mechelen",
    "best": {
     "a": "Mechelen",

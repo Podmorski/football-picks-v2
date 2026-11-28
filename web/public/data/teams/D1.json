@@ -66897,34 +66897,6 @@
  },
  "upcoming": [
   {
-   "away": "M'gladbach",
-   "best": {
-    "a": "M'gladbach",
-    "an": 192,
-    "ar": 0.5113,
-    "c": "Medium",
-    "d": "D1",
-    "ft": null,
-    "h": "Werder Bremen",
-    "hn": 175,
-    "hr": 0.3315,
-    "ht": null,
-    "k": "19:30",
-    "ln": 3456,
-    "lr": 0.3726,
-    "m": "RESULT_AND_GOALS:1&2+",
-    "p": 0.5074,
-    "pc": 0.5074,
-    "pl": 0.5074,
-    "pp": 0.5074,
-    "s": 0.5511,
-    "st": "pending"
-   },
-   "date": "2026-11-27",
-   "home": "Werder Bremen",
-   "time": "19:30"
-  },
-  {
    "away": "Elversberg",
    "best": {
     "a": "Elversberg",
